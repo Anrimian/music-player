@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.utils.Permissions;
 //if workaround with bind service will work - clear code later
 //what can be also tried:
 //-move media button receiver to external receiver
+//stop service from here too
 public class SystemServiceControllerImpl implements SystemServiceController {
 
     private final Context context;
@@ -31,7 +32,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 //        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
         intent.putExtra(MusicService.REQUEST_CODE, Constants.Actions.PLAY);
         intent.putExtra(MusicService.PLAY_DELAY_MILLIS, playDelay);
-        checkPermissionsAndStartServiceExp(context, intent);
+        checkPermissionsAndStartServiceFromBg(context, intent);
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //            context.startForegroundService(intent);
 //        } else {
@@ -65,16 +66,30 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         startServiceExp(context, intent);
     }
 
+    private static void checkPermissionsAndStartServiceFromBg(Context context, Intent intent) {
+        if (!Permissions.hasFilePermission(context)) {
+            Components.getAppComponent()
+                    .notificationDisplayer()
+                    .showErrorNotification(R.string.no_file_permission);
+            return;
+        }
+        startServiceFromBg(context, intent);
+    }
+
     private static void startServiceExp(Context context, Intent intent) {
         try {
             ServiceConnection connection = new ForegroundServiceStarterConnection(context, intent);
             context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
         } catch (RuntimeException ignored) {
             // Workaround for background calls
-            Intent bgIntent = new Intent(intent);
-            intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
-            ContextCompat.startForegroundService(context, bgIntent);
+            startServiceFromBg(context, intent);
         }
+    }
+
+    private static void startServiceFromBg(Context context, Intent intent) {
+        Intent bgIntent = new Intent(intent);
+        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
+        ContextCompat.startForegroundService(context, bgIntent);
     }
 
     private static class ForegroundServiceStarterConnection implements ServiceConnection {
