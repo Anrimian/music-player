@@ -132,7 +132,7 @@ public class MusicService extends Service {
 //            updateMediaSessionAlbumArt();
 //        }
 
-        subscribeOnServiceState();
+//        subscribeOnServiceState();
     }
 
     @Override
@@ -194,20 +194,22 @@ public class MusicService extends Service {
                 repeatMode,
                 notificationSetting,
                 reloadCover);
+
+        subscribeOnServiceState();
     }
 
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
         /* player interactor not null check because case:
-        * 1) start-stop play
-        * 2) enable bluetooth connection receiver
-        * 3) hide activity
-        * 4) revoke permission
-        * 5) connect bluetooth device
-        * 6) use play button from device
-        * 7) resume activity from task manager
-        *
-        * not actual, but leave, it's interesting memory
-        */
+         * 1) start-stop play
+         * 2) enable bluetooth connection receiver
+         * 3) hide activity
+         * 4) revoke permission
+         * 5) connect bluetooth device
+         * 6) use play button from device
+         * 7) resume activity from task manager
+         *
+         * not actual, but leave, it's interesting memory
+         */
         if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
             playerInteractor().play();
         }
@@ -240,6 +242,9 @@ public class MusicService extends Service {
     }
 
     private void subscribeOnServiceState() {
+        if (serviceDisposable.size() != 0) {
+            return;
+        }
         serviceDisposable.add(Observable.combineLatest(playerInteractor().getPlayerStateObservable(),
                 playerInteractor().getCurrentSourceObservable(),
                 playerInteractor().getTrackPositionObservable(),
@@ -251,6 +256,7 @@ public class MusicService extends Service {
                 serviceState::set)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onServiceStateReceived));
+
     }
 
     private void onServiceStateReceived(ServiceState serviceState) {
@@ -463,15 +469,15 @@ public class MusicService extends Service {
     private PlayerInteractor playerInteractor() {
         return Components.getAppComponent().playerInteractor();
     }
-    
+
     private MusicServiceInteractor musicServiceInteractor() {
         return Components.getAppComponent().musicServiceInteractor();
     }
-    
+
     private NotificationsDisplayer notificationsDisplayer() {
         return Components.getAppComponent().notificationDisplayer();
     }
-    
+
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
 
         @Override

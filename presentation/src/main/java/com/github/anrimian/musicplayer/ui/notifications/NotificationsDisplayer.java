@@ -62,6 +62,7 @@ public class NotificationsDisplayer {
     private final AppNotificationBuilder notificationBuilder;
     private final CoverImageLoader coverImageLoader;
 
+    private NotificationFetchImageData notificationFetchImageData;
     private Bitmap currentNotificationBitmap;
     private Runnable cancellationRunnable;
 
@@ -165,6 +166,14 @@ public class NotificationsDisplayer {
                                                 MediaSessionCompat mediaSession,
                                                 int repeatMode,
                                                 MusicNotificationSetting notificationSetting) {
+        notificationFetchImageData = new NotificationFetchImageData(
+                play,
+                source,
+                mediaSession,
+                repeatMode,
+                notificationSetting
+        );
+
         cancelCoverLoadingForForegroundNotification();
 
         if (source == null) {
@@ -179,14 +188,21 @@ public class NotificationsDisplayer {
             return;
         }
 
+        //we cancel and get short update with old data
         cancellationRunnable = CompositionSourceModelHelper.getCompositionSourceCover(
                 source,
                 bitmap -> {
-                    NotificationCompat.Builder builder = getDefaultMusicNotification(play,
-                            source,
-                            mediaSession,
-                            repeatMode,
-                            notificationSetting);
+                    if (notificationFetchImageData == null) {
+                        return;
+                    }
+
+                    NotificationCompat.Builder builder = getDefaultMusicNotification(
+                            notificationFetchImageData.play,
+                            notificationFetchImageData.source,
+                            notificationFetchImageData.mediaSession,
+                            notificationFetchImageData.repeatMode,
+                            notificationFetchImageData.notificationSetting
+                    );
 
                     builder.setLargeIcon(bitmap);
                     currentNotificationBitmap = bitmap;
@@ -352,5 +368,25 @@ public class NotificationsDisplayer {
 
     private String getString(@StringRes int resId) {
         return context.getString(resId);
+    }
+
+    private static class NotificationFetchImageData {
+        final boolean play;
+        final @Nullable CompositionSource source;
+        final MediaSessionCompat mediaSession;
+        final int repeatMode;
+        final MusicNotificationSetting notificationSetting;
+
+        public NotificationFetchImageData(boolean play,
+                                          @Nullable CompositionSource source,
+                                          MediaSessionCompat mediaSession,
+                                          int repeatMode,
+                                          MusicNotificationSetting notificationSetting) {
+            this.play = play;
+            this.source = source;
+            this.mediaSession = mediaSession;
+            this.repeatMode = repeatMode;
+            this.notificationSetting = notificationSetting;
+        }
     }
 }
