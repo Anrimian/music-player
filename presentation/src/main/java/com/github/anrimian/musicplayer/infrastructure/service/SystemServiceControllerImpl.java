@@ -4,7 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 
 import androidx.core.content.ContextCompat;
 
@@ -22,6 +24,8 @@ import com.github.anrimian.musicplayer.utils.Permissions;
 public class SystemServiceControllerImpl implements SystemServiceController {
 
     private final Context context;
+
+    private static final Handler handler = new Handler(Looper.getMainLooper());
 
     public static void startPlayForegroundService(Context context) {
         startPlayForegroundService(context, 0);
@@ -77,13 +81,15 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     }
 
     private static void startServiceExp(Context context, Intent intent) {
-        try {
-            ServiceConnection connection = new ForegroundServiceStarterConnection(context, intent);
-            context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        } catch (RuntimeException ignored) {
-            // Workaround for background calls
-            startServiceFromBg(context, intent);
-        }
+        handler.post(() -> {
+            try {
+                ServiceConnection connection = new ForegroundServiceStarterConnection(context, intent);
+                context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+            } catch (RuntimeException ignored) {
+                // Workaround for background calls
+                startServiceFromBg(context, intent);
+            }
+        });
     }
 
     private static void startServiceFromBg(Context context, Intent intent) {
