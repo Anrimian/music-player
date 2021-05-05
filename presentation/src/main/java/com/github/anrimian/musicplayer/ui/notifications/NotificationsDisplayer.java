@@ -82,6 +82,26 @@ public class NotificationsDisplayer {
         notificationManager.notify(ERROR_NOTIFICATION_ID, getErrorNotification(errorMessageId));
     }
 
+    public void startStubForegroundNotification(Service service) {
+        service.startForeground(FOREGROUND_NOTIFICATION_ID, getStubNotification());
+    }
+
+    public void removeStubForegroundNotification() {
+        notificationManager.cancel(FOREGROUND_NOTIFICATION_ID);
+    }
+
+    public Notification getStubNotification() {
+        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
+                .setContentTitle("")
+                .setContentText("")
+                .setSmallIcon(R.drawable.ic_music_box)
+                .setShowWhen(false)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build();
+    }
+
     public void startForegroundErrorNotification(Service service,
                                                  @StringRes int errorMessageId) {
         Notification notification = getErrorNotification(errorMessageId);
@@ -233,7 +253,8 @@ public class NotificationsDisplayer {
                 .setContentIntent(pIntent)
                 .setShowWhen(false)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setCategory(Notification.CATEGORY_SERVICE);
 
         if (source != null) {
             formatCompositionSource(source, builder);

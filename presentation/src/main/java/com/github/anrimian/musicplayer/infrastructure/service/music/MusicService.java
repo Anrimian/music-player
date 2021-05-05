@@ -4,9 +4,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.ResultReceiver;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -17,6 +19,7 @@ import android.view.KeyEvent;
 import androidx.annotation.Nullable;
 import androidx.media.session.MediaButtonReceiver;
 
+import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
@@ -28,6 +31,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
+import com.github.anrimian.musicplayer.utils.Permissions;
 
 import javax.annotation.Nonnull;
 
@@ -91,6 +95,8 @@ public class MusicService extends Service {
     private final MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private final CompositeDisposable serviceDisposable = new CompositeDisposable();
 
+    private final Handler cancelStubHandler = new Handler(Looper.getMainLooper());
+
     private MediaSessionCompat mediaSession;
 
     private PlayerState playerState = PlayerState.PLAY;
@@ -106,12 +112,21 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        /*if (!Permissions.hasFilePermission(this)) {
+        if (!Permissions.hasFilePermission(this)) {
             notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
             stopForeground(true);
             stopSelf();
             return;
-        }*/
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //also we can try to move it into onStartCommand
+            notificationsDisplayer().startStubForegroundNotification(this);
+            cancelStubHandler.postDelayed(
+                    notificationsDisplayer()::removeStubForegroundNotification,
+                    5000
+            );
+        }
 
         //reduce chance to show first notification without info
 //        currentSource = playerInteractor().getCurrentSource();
@@ -138,12 +153,14 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
+            cancelStubHandler.removeCallbacksAndMessages(null);
             stopForeground(true);
             stopSelf();
             return START_NOT_STICKY;
         }
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
+            cancelStubHandler.removeCallbacksAndMessages(null);
             startForeground();
         }
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
@@ -161,7 +178,8 @@ public class MusicService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return new LocalBinder();
+        return null;
+//        return new LocalBinder();
     }
 
     @Override
@@ -645,11 +663,11 @@ public class MusicService extends Service {
         }
     }
 
-    public class LocalBinder extends Binder {
-
-        public MusicService getService() {
-            return MusicService.this;
-        }
-    }
+//    public class LocalBinder extends Binder {
+//
+//        public MusicService getService() {
+//            return MusicService.this;
+//        }
+//    }
 
 }
