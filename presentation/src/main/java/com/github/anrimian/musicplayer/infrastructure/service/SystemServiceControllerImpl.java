@@ -27,7 +27,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     public static void startPlayForegroundService(Context context, int playDelay) {
         Intent intent = new Intent(context, MusicService.class);
-//        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
+        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
         intent.putExtra(MusicService.REQUEST_CODE, Constants.Actions.PLAY);
         intent.putExtra(MusicService.PLAY_DELAY_MILLIS, playDelay);
 //        checkPermissionsAndStartServiceFromBg(context, intent);
