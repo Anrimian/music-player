@@ -62,7 +62,7 @@ public class NotificationsDisplayer {
     private final AppNotificationBuilder notificationBuilder;
     private final CoverImageLoader coverImageLoader;
 
-    private NotificationFetchImageData notificationFetchImageData;
+    private NotificationInfoState notificationInfoState;
     private Bitmap currentNotificationBitmap;
     private Runnable cancellationRunnable;
 
@@ -82,15 +82,13 @@ public class NotificationsDisplayer {
         notificationManager.notify(ERROR_NOTIFICATION_ID, getErrorNotification(errorMessageId));
     }
 
-    public void startStubForegroundNotification(Service service) {
-        service.startForeground(FOREGROUND_NOTIFICATION_ID, getStubNotification());
+    public void startStubForegroundNotification(Service service, MediaSessionCompat mediaSession) {
+        service.startForeground(FOREGROUND_NOTIFICATION_ID, getStubNotification(mediaSession));
     }
 
-    public void removeStubForegroundNotification() {
-        notificationManager.cancel(FOREGROUND_NOTIFICATION_ID);
-    }
-
-    public Notification getStubNotification() {
+    public Notification getStubNotification(MediaSessionCompat mediaSession) {
+        androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle();
+        style.setMediaSession(mediaSession.getSessionToken());
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
                 .setContentTitle("")
                 .setContentText("")
@@ -99,6 +97,7 @@ public class NotificationsDisplayer {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setCategory(Notification.CATEGORY_SERVICE)
+                .setStyle(style)
                 .build();
     }
 
@@ -139,6 +138,14 @@ public class NotificationsDisplayer {
                                             int repeatMode,
                                             @Nullable MusicNotificationSetting notificationSetting,
                                             boolean reloadCover) {
+        notificationInfoState = new NotificationInfoState(
+                play,
+                source,
+                mediaSession,
+                repeatMode,
+                notificationSetting
+        );
+
         Notification notification = getDefaultMusicNotification(play,
                 source,
                 mediaSession,
@@ -148,7 +155,7 @@ public class NotificationsDisplayer {
         service.startForeground(FOREGROUND_NOTIFICATION_ID, notification);
 
         if (reloadCover) {
-            showMusicNotificationWithCover(play, source, mediaSession, repeatMode, notificationSetting);
+            showMusicNotificationWithCover(source, notificationSetting);
         }
     }
 
@@ -162,6 +169,14 @@ public class NotificationsDisplayer {
             return;
         }
 
+        notificationInfoState = new NotificationInfoState(
+                play,
+                source,
+                mediaSession,
+                repeatMode,
+                notificationSetting
+        );
+
         Notification notification = getDefaultMusicNotification(play,
                 source,
                 mediaSession,
@@ -171,7 +186,7 @@ public class NotificationsDisplayer {
         notificationManager.notify(FOREGROUND_NOTIFICATION_ID, notification);
 
         if (reloadCover) {
-            showMusicNotificationWithCover(play, source, mediaSession, repeatMode, notificationSetting);
+            showMusicNotificationWithCover(source, notificationSetting);
         }
     }
 
@@ -181,19 +196,8 @@ public class NotificationsDisplayer {
         }
     }
 
-    private void showMusicNotificationWithCover(boolean play,
-                                                @Nullable CompositionSource source,
-                                                MediaSessionCompat mediaSession,
-                                                int repeatMode,
+    private void showMusicNotificationWithCover(@Nullable CompositionSource source,
                                                 MusicNotificationSetting notificationSetting) {
-        notificationFetchImageData = new NotificationFetchImageData(
-                play,
-                source,
-                mediaSession,
-                repeatMode,
-                notificationSetting
-        );
-
         cancelCoverLoadingForForegroundNotification();
 
         if (source == null) {
@@ -212,16 +216,16 @@ public class NotificationsDisplayer {
         cancellationRunnable = CompositionSourceModelHelper.getCompositionSourceCover(
                 source,
                 bitmap -> {
-                    if (notificationFetchImageData == null) {
+                    if (notificationInfoState == null) {
                         return;
                     }
 
                     NotificationCompat.Builder builder = getDefaultMusicNotification(
-                            notificationFetchImageData.play,
-                            notificationFetchImageData.source,
-                            notificationFetchImageData.mediaSession,
-                            notificationFetchImageData.repeatMode,
-                            notificationFetchImageData.notificationSetting
+                            notificationInfoState.play,
+                            notificationInfoState.source,
+                            notificationInfoState.mediaSession,
+                            notificationInfoState.repeatMode,
+                            notificationInfoState.notificationSetting
                     );
 
                     builder.setLargeIcon(bitmap);
@@ -391,18 +395,18 @@ public class NotificationsDisplayer {
         return context.getString(resId);
     }
 
-    private static class NotificationFetchImageData {
+    private static class NotificationInfoState {
         final boolean play;
         final @Nullable CompositionSource source;
         final MediaSessionCompat mediaSession;
         final int repeatMode;
         final MusicNotificationSetting notificationSetting;
 
-        public NotificationFetchImageData(boolean play,
-                                          @Nullable CompositionSource source,
-                                          MediaSessionCompat mediaSession,
-                                          int repeatMode,
-                                          MusicNotificationSetting notificationSetting) {
+        public NotificationInfoState(boolean play,
+                                     @Nullable CompositionSource source,
+                                     MediaSessionCompat mediaSession,
+                                     int repeatMode,
+                                     MusicNotificationSetting notificationSetting) {
             this.play = play;
             this.source = source;
             this.mediaSession = mediaSession;

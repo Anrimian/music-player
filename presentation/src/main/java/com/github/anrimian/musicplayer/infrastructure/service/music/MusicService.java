@@ -6,14 +6,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.ResultReceiver;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 
 import androidx.annotation.Nullable;
@@ -63,7 +62,6 @@ import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
-import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 
 /**
  * Created on 03.11.2017.
@@ -95,11 +93,9 @@ public class MusicService extends Service {
     private final MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private final CompositeDisposable serviceDisposable = new CompositeDisposable();
 
-    private final Handler cancelStubHandler = new Handler(Looper.getMainLooper());
-
     private MediaSessionCompat mediaSession;
 
-    private PlayerState playerState = PlayerState.PLAY;
+    private PlayerState playerState = PlayerState.IDLE;
     @Nullable
     private CompositionSource currentSource;
     private long trackPosition;
@@ -116,16 +112,8 @@ public class MusicService extends Service {
             notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
             stopForeground(true);
             stopSelf();
+            //noinspection UnnecessaryReturnStatement
             return;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //also we can try to move it into onStartCommand
-            notificationsDisplayer().startStubForegroundNotification(this);
-            cancelStubHandler.postDelayed(
-                    notificationsDisplayer()::removeStubForegroundNotification,
-                    5000
-            );
         }
 
         //reduce chance to show first notification without info
@@ -150,17 +138,23 @@ public class MusicService extends Service {
 //        subscribeOnServiceState();
     }
 
+    //app stopped
+    //add widget
+    //start play from widget
+    //wrong notification state(stopped)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
-            cancelStubHandler.removeCallbacksAndMessages(null);
             stopForeground(true);
             stopSelf();
             return START_NOT_STICKY;
         }
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
-            cancelStubHandler.removeCallbacksAndMessages(null);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerState == PlayerState.IDLE) {
+                //should reduce chance of RemoteServiceException
+                notificationsDisplayer().startStubForegroundNotification(this, mediaSession());
+            }
             startForeground();
         }
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
@@ -438,6 +432,45 @@ public class MusicService extends Service {
                 reloadCover);
     }
 
+    private MediaSessionCompat mediaSession() {
+        if (mediaSession == null) {
+            mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
+            mediaSession.setCallback(mediaSessionCallback);
+
+            Intent activityIntent = new Intent(this, MainActivity.class);
+            PendingIntent pActivityIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
+            mediaSession.setSessionActivity(pActivityIntent);
+
+            Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
+            PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
+            mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
+        }
+        return mediaSession;
+    }
+
+    private PlayerInteractor playerInteractor() {
+        return Components.getAppComponent().playerInteractor();
+    }
+
+    private MusicServiceInteractor musicServiceInteractor() {
+        return Components.getAppComponent().musicServiceInteractor();
+    }
+
+    private NotificationsDisplayer notificationsDisplayer() {
+        return Components.getAppComponent().notificationDisplayer();
+    }
+
+    private static int toMediaState(PlayerState playerState) {
+        switch (playerState) {
+            case IDLE: return PlaybackStateCompat.STATE_NONE;
+            case LOADING: return PlaybackStateCompat.STATE_CONNECTING;
+            case PAUSE: return PlaybackStateCompat.STATE_PAUSED;
+            case PLAY: return PlaybackStateCompat.STATE_PLAYING;
+            case STOP: return PlaybackStateCompat.STATE_STOPPED;
+            default: throw new IllegalStateException("unexpected player state: " + playerState);
+        }
+    }
+
     private static class ServiceState {
         PlayerState playerState;
         Optional<CompositionSource> compositionSource;
@@ -466,34 +499,6 @@ public class MusicService extends Service {
             this.appTheme = appTheme;
             return this;
         }
-    }
-
-    private MediaSessionCompat mediaSession() {
-        if (mediaSession == null) {
-            mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
-            mediaSession.setCallback(mediaSessionCallback);
-
-            Intent activityIntent = new Intent(this, MainActivity.class);
-            PendingIntent pActivityIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
-            mediaSession.setSessionActivity(pActivityIntent);
-
-            Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
-            PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
-            mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
-        }
-        return mediaSession;
-    }
-
-    private PlayerInteractor playerInteractor() {
-        return Components.getAppComponent().playerInteractor();
-    }
-
-    private MusicServiceInteractor musicServiceInteractor() {
-        return Components.getAppComponent().musicServiceInteractor();
-    }
-
-    private NotificationsDisplayer notificationsDisplayer() {
-        return Components.getAppComponent().notificationDisplayer();
     }
 
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
