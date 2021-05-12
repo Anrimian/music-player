@@ -36,7 +36,7 @@ public class WidgetActionsReceiver extends BroadcastReceiver {
             return;
         }
 
-        LibraryPlayerInteractor interactor = appComponent.musicPlayerInteractor();
+        LibraryPlayerInteractor interactor = appComponent.libraryPlayerInteractor();
         switch (action) {
             case SKIP_TO_PREVIOUS: {
                 interactor.skipToPrevious();
