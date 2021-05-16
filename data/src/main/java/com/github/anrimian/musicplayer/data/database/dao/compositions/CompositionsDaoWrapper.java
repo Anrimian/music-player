@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
@@ -264,6 +265,15 @@ public class CompositionsDaoWrapper {
 
     public void setCorruptionType(CorruptionType corruptionType, long id) {
         compositionsDao.setCorruptionType(corruptionType, id);
+    }
+
+    public Maybe<FullComposition> selectNextCompositionToScan() {
+        //select composition where last scan time is less than modify time order by modify time(latest - first)
+        return Maybe.empty();
+    }
+
+    public void setCompositionLastFileScanTime(long id, Date time) {
+
     }
 
     private String getOrderQuery(Order order) {
