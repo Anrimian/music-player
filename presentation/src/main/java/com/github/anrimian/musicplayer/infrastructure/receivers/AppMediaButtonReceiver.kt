@@ -27,6 +27,7 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
     }
 
     //we can move all external broadcast events to single method
+    //we can only handle KEYCODE_MEDIA_PLAY, other dispatch to media session?
     private fun handleExternalAction(context: Context, keyEvent: KeyEvent) {
         val appComponent = Components.getAppComponent()
         if (!Permissions.hasFilePermission(context)) {
@@ -54,6 +55,7 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
             KeyEvent.KEYCODE_MEDIA_STOP -> {
                 playerInteractor.pause()
             }
+            KeyEvent.KEYCODE_HEADSETHOOK,//double click handling?, see default processing
             KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
                 playerInteractor.playOrPause()
             }
