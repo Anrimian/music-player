@@ -13,10 +13,8 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.view.KeyEvent;
 
 import androidx.annotation.Nullable;
-import androidx.media.session.MediaButtonReceiver;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
@@ -27,12 +25,11 @@ import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
+import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.utils.Permissions;
-
-import javax.annotation.Nonnull;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -160,12 +157,12 @@ public class MusicService extends Service {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         if (requestCode != -1) {
             handleNotificationAction(requestCode, intent);
-        } else {
+        } /*else {
             KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession(), intent);
             if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
                 handleMediaButtonAction(keyEvent);
             }
-        }
+        }*/
         return START_NOT_STICKY;
     }
 
@@ -210,22 +207,24 @@ public class MusicService extends Service {
         subscribeOnServiceState();
     }
 
-    private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
-        /* player interactor not null check because case:
-         * 1) start-stop play
-         * 2) enable bluetooth connection receiver
-         * 3) hide activity
-         * 4) revoke permission
-         * 5) connect bluetooth device
-         * 6) use play button from device
-         * 7) resume activity from task manager
-         *
-         * not actual, but leave, it's interesting memory
-         */
-        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
-            playerInteractor().play();
-        }
-    }
+//    private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
+//        /* player interactor not null check because case:
+//         * 1) start-stop play
+//         * 2) enable bluetooth connection receiver
+//         * 3) hide activity
+//         * 4) revoke permission
+//         * 5) connect bluetooth device
+//         * 6) use play button from device
+//         * 7) resume activity from task manager
+//         *
+//         * not actual, but leave, it's interesting memory
+//         */
+//        Log.d("KEK", "handleMediaButtonAction");
+//        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
+//            Log.d("KEK", "play from media button");
+//            playerInteractor().play();
+//        }
+//    }
 
     private void handleNotificationAction(int requestCode, Intent intent) {
         switch (requestCode) {
@@ -432,6 +431,8 @@ public class MusicService extends Service {
                 reloadCover);
     }
 
+    //how media session callback is called by system?
+    //can we move media button action into external broadcast receiver?
     private MediaSessionCompat mediaSession() {
         if (mediaSession == null) {
             mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
@@ -441,7 +442,7 @@ public class MusicService extends Service {
             PendingIntent pActivityIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
             mediaSession.setSessionActivity(pActivityIntent);
 
-            Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, MediaButtonReceiver.class);
+            Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, AppMediaButtonReceiver.class);
             PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
             mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
         }
@@ -588,11 +589,6 @@ public class MusicService extends Service {
         }
 
         @Override
-        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-            return super.onMediaButtonEvent(mediaButtonEvent);
-        }
-
-        @Override
         public void onPrepare() {
             super.onPrepare();
         }
@@ -665,6 +661,11 @@ public class MusicService extends Service {
         @Override
         public void onRemoveQueueItem(MediaDescriptionCompat description) {
             super.onRemoveQueueItem(description);
+        }
+
+        @Override
+        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            return super.onMediaButtonEvent(mediaButtonEvent);
         }
     }
 

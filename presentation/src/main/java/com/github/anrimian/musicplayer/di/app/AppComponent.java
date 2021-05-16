@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
@@ -65,7 +66,7 @@ public interface AppComponent {
     AlbumEditorComponent albumEditorComponent(AlbumEditorModule module);
     ExternalPlayerComponent externalPlayerComponent(ExternalPlayerModule module);
 
-    LibraryPlayerInteractor musicPlayerInteractor();
+    LibraryPlayerInteractor libraryPlayerInteractor();
     DisplaySettingsInteractor displaySettingsInteractor();
     PlayerInteractor playerInteractor();
     MusicServiceInteractor musicServiceInteractor();
@@ -87,6 +88,7 @@ public interface AppComponent {
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();
     ErrorParser errorParser();
+    Analytics analytics();
     FileLog fileLog();
     AppLogger appLogger();
     StorageFilesDataSource storageFilesDataSource();
