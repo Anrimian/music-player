@@ -14,6 +14,8 @@ import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.model.Item
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilter
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -29,6 +31,8 @@ class PlayListPresenter(private val playListId: Long,
 
     private val presenterBatterySafeDisposable = CompositeDisposable()
 
+    private val listDragFilter = ListDragFilter()
+
     private var currentItemDisposable: Disposable? = null
     private var items: List<PlayListItem> = ArrayList()
     private var playList: PlayList? = null
@@ -40,7 +44,7 @@ class PlayListPresenter(private val playListId: Long,
     private var currentItem: PlayQueueItem? = null
     private var deletedItem: Item<PlayListItem>? = null
 
-    private var numberOfUpdatesToIgnore: Short = 0
+    private var lastDeleteAction: Completable? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -146,9 +150,10 @@ class PlayListPresenter(private val playListId: Long,
         if (!ListUtils.isIndexInRange(items, startDragPosition) || !ListUtils.isIndexInRange(items, position)) {
             return
         }
-        numberOfUpdatesToIgnore++
+        listDragFilter.increaseEventsToSkip()
         playListsInteractor.moveItemInPlayList(playList, startDragPosition, position)
-                .subscribe()    }
+                .subscribe()
+    }
 
     fun onPlayActionSelected(position: Int) {
         playerInteractor.startPlaying(items.map(PlayListItem::getComposition), position)
@@ -165,6 +170,14 @@ class PlayListPresenter(private val playListId: Long,
     fun onChangePlayListNameButtonClicked() {
         if (playList != null) {
             viewState.showEditPlayListNameDialog(playList)
+        }
+    }
+
+    fun onRetryFailedDeleteActionClicked() {
+        if (lastDeleteAction != null) {
+            lastDeleteAction!!
+                    .doFinally { lastDeleteAction = null }
+                    .justSubscribe(this::onDeleteCompositionsError)
         }
     }
 
@@ -232,8 +245,11 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun deletePreparedCompositions() {
-        playerInteractor.deleteCompositions(compositionsToDelete)
-                .subscribeOnUi(this::onDeleteCompositionsSuccess, this::onDeleteCompositionsError)
+        lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
+                .observeOn(uiScheduler)
+                .doOnComplete(this::onDeleteCompositionsSuccess)
+
+        lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
     }
 
     private fun onDeleteCompositionsSuccess() {
@@ -249,20 +265,12 @@ class PlayListPresenter(private val playListId: Long,
         viewState.showLoading()
         playListsInteractor.getCompositionsObservable(playListId)
                 .observeOn(uiScheduler)
-                .filter { isPlaylistEmitAllowed() }
+                .filter(listDragFilter::filterListEmitting)
                 .subscribeOnUi(
                         this::onPlayListsReceived,
                         { viewState.closeScreen() },
                         viewState::closeScreen
                 )
-    }
-
-    private fun isPlaylistEmitAllowed(): Boolean {
-        val isAllowed = numberOfUpdatesToIgnore <= 0
-        if (numberOfUpdatesToIgnore > 0) {
-            numberOfUpdatesToIgnore--
-        }
-        return isAllowed
     }
 
     private fun subscribePlayList() {

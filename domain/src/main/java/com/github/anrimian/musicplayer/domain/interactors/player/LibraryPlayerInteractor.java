@@ -89,7 +89,7 @@ public class LibraryPlayerInteractor {
 
     public void startPlaying(List<Composition> compositions, int firstPosition) {
         playQueueRepository.setPlayQueue(compositions, firstPosition)
-                .doOnComplete(() -> playerCoordinatorInteractor.play(LIBRARY))
+                .doOnComplete(this::play)
                 //fixes music gap and state blinking(prepare new queue from stop state)
                 .doOnSubscribe(o -> playerCoordinatorInteractor.setInLoadingState(LIBRARY))
                 .doOnError(analytics::processNonFatalError)
@@ -98,7 +98,11 @@ public class LibraryPlayerInteractor {
     }
 
     public void play() {
-        playerCoordinatorInteractor.play(LIBRARY);
+        play(0);
+    }
+
+    public void play(int delay) {
+        playerCoordinatorInteractor.play(LIBRARY, delay);
     }
 
     public void playOrPause() {
@@ -122,11 +126,14 @@ public class LibraryPlayerInteractor {
     }
 
     public void skipToPrevious() {
-        if (getActualTrackPosition() > settingsRepository.getSkipConstraintMillis()) {
-            onSeekFinished(0);
-            return;
-        }
-        playQueueRepository.skipToPrevious();
+        //noinspection ResultOfMethodCallIgnored
+        getActualTrackPosition().subscribe(position -> {
+            if (position > settingsRepository.getSkipConstraintMillis()) {
+                onSeekFinished(0);
+                return;
+            }
+            playQueueRepository.skipToPrevious();
+        });
     }
 
     public void skipToNext() {
@@ -258,6 +265,27 @@ public class LibraryPlayerInteractor {
         playQueueRepository.clearPlayQueue();
     }
 
+    public Observable<Integer> getPlayQueueSizeObservable() {
+        return playQueueRepository.getPlayQueueSizeObservable();
+    }
+
+    public void setPlaybackSpeed(float speed) {
+        playerCoordinatorInteractor.setPlaybackSpeed(speed, LIBRARY);
+        uiStateRepository.setCurrentPlaybackSpeed(speed);
+    }
+
+    public float getPlaybackSpeed() {
+        return uiStateRepository.getCurrentPlaybackSpeed();
+    }
+
+    public Observable<Float> getPlaybackSpeedObservable() {
+        return uiStateRepository.getPlaybackSpeedObservable();
+    }
+
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return playerCoordinatorInteractor.getSpeedChangeAvailableObservable();
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
@@ -265,38 +293,46 @@ public class LibraryPlayerInteractor {
             if (previousItem != null) {
                 stop();
             }
-        } else {
-            long trackPosition = compositionEvent.getTrackPosition();
-
-            //if items are equal and content changed -> restart play
-            if (previousItem != null && previousItem.equals(currentItem)) {
-                trackPosition = getActualTrackPosition();
-
-                if (!hasSourceChanges(previousItem, currentItem)) {
-
-                    //if other fields was changed - update source
-                    if (!areSourcesTheSame(previousItem, currentItem)) {
-                        playerCoordinatorInteractor.updateSource(
-                                new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
-                                LIBRARY);
-                    }
-                    return;
-                }
-            }
-
-            playerCoordinatorInteractor.prepareToPlay(
-                    new LibraryCompositionSource(currentItem.getComposition(), trackPosition),
-                    LIBRARY
-            );
+            return;
         }
+
+        Composition currentComposition = currentItem.getComposition();
+
+        if (previousItem != null && previousItem.equals(currentItem)) {
+            //if file changed - re prepare with actual position
+            //if not - check if changes exists - if true - update source with actual position
+            boolean isFileChanged = hasSourceChanges(previousItem, currentItem);
+            boolean isModelChanged = areSourcesTheSame(previousItem, currentItem);
+            if (isFileChanged || isModelChanged) {
+                //noinspection ResultOfMethodCallIgnored
+                getActualTrackPosition().subscribe(actualTrackPosition -> {
+                    LibraryCompositionSource source = new LibraryCompositionSource(currentComposition, actualTrackPosition);
+                    if (isFileChanged) {
+                        playerCoordinatorInteractor.prepareToPlay(source, LIBRARY);
+                        return;
+                    }
+                    if (isModelChanged) {
+                        playerCoordinatorInteractor.updateSource(source, LIBRARY);
+                    }
+                });
+            }
+            return;
+        }
+
+        playerCoordinatorInteractor.prepareToPlay(
+                new LibraryCompositionSource(currentComposition, compositionEvent.getTrackPosition()),
+                LIBRARY
+        );
     }
 
-    private long getActualTrackPosition() {
-        long position = playerCoordinatorInteractor.getActualTrackPosition(LIBRARY);
-        if (position == -1) {
-            return uiStateRepository.getTrackPosition();
-        }
-        return position;
+    private Single<Long> getActualTrackPosition() {
+        return playerCoordinatorInteractor.getActualTrackPosition(LIBRARY)
+                .map(position -> {
+                    if (position == -1) {
+                        return uiStateRepository.getTrackPosition();
+                    }
+                    return position;
+                });
     }
 
     private void onMusicPlayerEventReceived(PlayerEvent playerEvent) {
@@ -353,7 +389,6 @@ public class LibraryPlayerInteractor {
         if (settingsRepository.getRepeatMode() == RepeatMode.REPEAT_COMPOSITION) {
             return;
         }
-        //skipped twice from end of queue
         playQueueRepository.skipToNext()
                 .doOnSuccess(this::onAutoSkipNextFinished)
                 .subscribe();

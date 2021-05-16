@@ -250,11 +250,13 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                             boolean isCurrentlyActive) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             View itemView = viewHolder.itemView;
+            float contentHeight = iconSize + textStaticLayout.getHeight();
+            float contentMarginTop = (itemView.getHeight() - contentHeight) / 2f;
             float top = itemView.getTop();
             float bottom = itemView.getBottom();
             float left = dX > 0? itemView.getLeft() : itemView.getRight() + dX;
             float right = dX > 0? dX : itemView.getRight();
-            float centerY = top + (itemView.getHeight()/2f);
+            float contentCenterY = top + contentMarginTop + contentHeight/2;
             float centerX = panelWidth >> 1;
 
             boolean draggedFromSwipeEdge = Math.abs(dX) > itemView.getWidth() * getSwipeThreshold(viewHolder);
@@ -302,17 +304,17 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
             c.drawRect(left, top, right, bottom, bgPaint);
 
             if (swipeEffectAnimator != null && swipeEffectAnimator.isRunning()) {
-                c.drawCircle(itemView.getRight() - ((centerX + panelEndPadding)), centerY, (float) swipeEffectAnimator.getAnimatedValue(), bgAnimationPaint);
+                c.drawCircle(itemView.getRight() - ((centerX + panelEndPadding)), contentCenterY, (float) swipeEffectAnimator.getAnimatedValue(), bgAnimationPaint);
             }
 
             //draw icon
             c.save();
-            c.translate(itemView.getRight() - ((centerX + panelEndPadding) + (iconSize >> 1)), centerY - iconSize);
+            c.translate(itemView.getRight() - ((centerX + panelEndPadding) + (iconSize >> 1)), contentCenterY - iconSize);
             icon.draw(c);
             c.restore();
 
             //draw text
-            c.translate(itemView.getRight() - (panelWidth + panelEndPadding), centerY + textTopPadding);
+            c.translate(itemView.getRight() - (panelWidth + panelEndPadding), contentCenterY + textTopPadding);
             textStaticLayout.draw(c);
             c.restore();
         }

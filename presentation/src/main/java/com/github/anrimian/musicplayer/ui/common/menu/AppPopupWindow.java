@@ -9,16 +9,28 @@ import android.widget.PopupWindow;
 
 import com.github.anrimian.musicplayer.R;
 
+import javax.annotation.Nullable;
+
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 @SuppressWarnings("WeakerAccess")
 public class AppPopupWindow {
 
+    private static final long POPUP_OPEN_WINDOW_MILLIS = 200L;
+    private static long lastOpenTime;
+
+    @Nullable
     public static PopupWindow showPopupWindow(View anchorView,
                                               View popupView,
                                               int gravity,
                                               int screenMargin) {
+        long currentTime = System.currentTimeMillis();
+        if (lastOpenTime + POPUP_OPEN_WINDOW_MILLIS > currentTime) {
+            return null;
+        }
+        lastOpenTime = currentTime;
+
         Context context = anchorView.getContext();
 
         //margins
@@ -66,6 +78,10 @@ public class AppPopupWindow {
             case Gravity.BOTTOM: {
                 showX += viewWidth;
                 showY += anchorHeight;
+                break;
+            }
+            case Gravity.END: {
+                showX += anchorWidth + viewWidth + screenMargin;
                 break;
             }
         }

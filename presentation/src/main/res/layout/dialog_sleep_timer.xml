@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.github.anrimian.musicplayer.ui.sleep_timer.view.BlockedSelectionEditText
+        style="@style/TimeEditText"
+        android:id="@+id/etHours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dialog_content_margin_start"
+        android:imeOptions="actionNext"
+        android:nextFocusForward="@id/etMinutes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/etMinutes"/>
+
+    <TextView
+        style="@style/TextStyle"
+        android:id="@+id/tvHoursDivider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=":"
+        android:padding="4dp"
+        app:layout_constraintTop_toTopOf="@id/etHours"
+        app:layout_constraintBottom_toBottomOf="@id/etHours"
+        app:layout_constraintStart_toEndOf="@id/etHours"
+        tools:ignore="HardcodedText"/>
+
+    <com.github.anrimian.musicplayer.ui.sleep_timer.view.BlockedSelectionEditText
+        style="@style/TimeEditText"
+        android:id="@+id/etMinutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialog_margin_content_vertical"
+        android:imeOptions="actionNext"
+        android:nextFocusForward="@id/etSeconds"
+        app:layout_constraintStart_toEndOf="@id/tvHoursDivider"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        style="@style/TextStyle"
+        android:id="@+id/tvMinutesDivider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=":"
+        android:padding="4dp"
+        app:layout_constraintTop_toTopOf="@id/etMinutes"
+        app:layout_constraintBottom_toBottomOf="@id/etMinutes"
+        app:layout_constraintStart_toEndOf="@id/etMinutes"
+        tools:ignore="HardcodedText" />
+
+    <com.github.anrimian.musicplayer.ui.sleep_timer.view.BlockedSelectionEditText
+        style="@style/TimeEditText"
+        android:id="@+id/etSeconds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionDone"
+        app:layout_constraintStart_toEndOf="@id/tvMinutesDivider"
+        app:layout_constraintTop_toTopOf="@id/etMinutes"/>
+
+    <TextView
+        style="@style/TextStyle.Medium"
+        android:id="@+id/tvRemainingTimeMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dialog_content_margin_start"
+        android:layout_marginEnd="@dimen/dialog_content_margin_start"
+        android:layout_marginTop="@dimen/content_vertical_margin"
+        android:text="@string/sleep_timer_message"
+        app:layout_constraintTop_toBottomOf="@id/etMinutes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintHorizontal_bias="0"/>
+
+    <TextView
+        style="@style/TextStyle.BigTimer"
+        android:id="@+id/tvRemainingTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/tvRemainingTimeMessage"
+        app:layout_constraintTop_toBottomOf="@id/tvRemainingTimeMessage"/>
+
+    <Button
+        android:id="@+id/btnAction"
+        style="@style/ButtonBorderlessStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start"
+        android:layout_marginEnd="@dimen/dialog_button_margin_horizontal"
+        android:layout_marginBottom="@dimen/dialog_button_margin_vertical"
+        android:layout_marginTop="@dimen/content_vertical_margin"
+        app:layout_constraintTop_toBottomOf="@id/tvRemainingTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <Button
+        android:id="@+id/btnClose"
+        style="@style/ButtonBorderlessStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/close"
+        app:layout_constraintTop_toTopOf="@id/btnAction"
+        app:layout_constraintEnd_toStartOf="@id/btnAction"
+        app:layout_constraintBottom_toBottomOf="@id/btnAction"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

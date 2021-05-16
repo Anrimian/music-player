@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class PublicRecyclerViewHelper extends RecyclerViewHelper {
     public PublicRecyclerViewHelper(@NonNull RecyclerView view) {
-        super(view);
+        super(view, null);
     }
 
     @Override

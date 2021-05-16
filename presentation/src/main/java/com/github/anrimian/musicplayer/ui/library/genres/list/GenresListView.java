@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.genres.list;
 
-import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
@@ -9,8 +9,8 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import java.util.List;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.OneExecution;
 
 public interface GenresListView extends MvpView {
 
@@ -41,9 +41,9 @@ public interface GenresListView extends MvpView {
     @StateStrategyType(ListStateStrategy.class)
     void submitList(List<Genre> genres);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showSelectOrderScreen(Order order);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 }

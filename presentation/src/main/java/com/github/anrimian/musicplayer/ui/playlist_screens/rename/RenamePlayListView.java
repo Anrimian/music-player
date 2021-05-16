@@ -4,8 +4,8 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.OneExecution;
 
 public interface RenamePlayListView extends MvpView {
 
@@ -20,9 +20,9 @@ public interface RenamePlayListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_STATE)
     void showError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void closeScreen();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showPlayListName(String initialName);
 }

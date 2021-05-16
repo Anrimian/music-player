@@ -7,25 +7,25 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
 
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
-import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.viewstate.strategy.alias.OneExecution;
+import moxy.viewstate.strategy.alias.Skip;
 
 public interface ArtistItemsView extends BaseLibraryCompositionsView {
 
     String RENAME_STATE = "rename_state";
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showArtistInfo(Artist artist);
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showArtistAlbums(List<Album> albums);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void closeScreen();
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showRenameArtistDialog(Artist artist);
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)

@@ -24,7 +24,7 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 public class FolderModule {
 
     @Nullable
-    private Long folderId;
+    private final Long folderId;
 
     public FolderModule(@Nullable Long folderId) {
         this.folderId = folderId;

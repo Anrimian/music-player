@@ -21,6 +21,7 @@
         <item name="secondaryButtonColor">@color/secondary_button_color</item>
         <item name="brightButtonColor">@color/colorAccent</item>
         <item name="buttonColorInverse">@color/icon_color</item>
+        <item name="dialogColorControlHighlight">@color/color_control_highlight</item>
         <item name="colorControlHighlightInverse">@color/color_control_highlight_dark</item>
         <item name="colorControlThird">@color/color_control_third</item>
 
@@ -77,6 +78,7 @@
     <style name="SlidrActivityTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
     </style>
 
     <style name="DialogActivityTheme">

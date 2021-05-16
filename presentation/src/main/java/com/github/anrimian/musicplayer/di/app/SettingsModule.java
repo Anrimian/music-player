@@ -2,15 +2,20 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsPresenter;
+import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsPresenter;
 
 import javax.annotation.Nonnull;
@@ -58,8 +63,10 @@ public class SettingsModule {
 
     @Provides
     @Nonnull
-    DisplaySettingsPresenter displaySettingsPresenter(DisplaySettingsInteractor displaySettingsInteractor) {
-        return new DisplaySettingsPresenter(displaySettingsInteractor);
+    DisplaySettingsPresenter displaySettingsPresenter(DisplaySettingsInteractor displaySettingsInteractor,
+                                                      @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                                      ErrorParser errorParser) {
+        return new DisplaySettingsPresenter(displaySettingsInteractor, uiScheduler, errorParser);
     }
 
     @Provides
@@ -71,7 +78,22 @@ public class SettingsModule {
     @Provides
     @Nonnull
     PlayerSettingsPresenter playerSettingsPresenter(PlayerSettingsInteractor playerSettingsInteractor,
-                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler) {
-        return new PlayerSettingsPresenter(playerSettingsInteractor, uiScheduler);
+                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                                    ErrorParser errorParser) {
+        return new PlayerSettingsPresenter(playerSettingsInteractor, uiScheduler, errorParser);
+    }
+
+    @Provides
+    @NonNull
+    LibrarySettingsPresenter librarySettingsPresenter(LibrarySettingsInteractor librarySettingsInteractor,
+                                                      @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                                      ErrorParser errorParser) {
+        return new LibrarySettingsPresenter(librarySettingsInteractor, uiScheduler, errorParser);
+    }
+
+    @Provides
+    @NonNull
+    LibrarySettingsInteractor librarySettingsInteractor(SettingsRepository settingsRepository) {
+        return new LibrarySettingsInteractor(settingsRepository);
     }
 }

@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -37,6 +38,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     private val presenterBatterySafeDisposable = CompositeDisposable()
 
     private var currentCompositionDisposable: Disposable? = null
+    private var fileActionDisposable: Disposable? = null
 
     private var sourceList: List<FileSource> = ArrayList()
     private val filesForPlayList: MutableList<FileSource> = LinkedList()
@@ -46,6 +48,9 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     private var searchText: String? = null
     private var currentComposition: Composition? = null
     private var recentlyAddedIgnoredFolder: IgnoredFolder? = null
+
+    private var lastEditAction: Completable? = null
+    private var lastDeleteAction: Completable? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -89,7 +94,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
     }
 
-    fun onCompositionMenuClick(position: Int, musicFileSource: CompositionFileSource) {
+    fun onCompositionMenuClick(musicFileSource: CompositionFileSource) {
         viewState.showCompositionActionDialog(musicFileSource.composition)
     }
 
@@ -104,6 +109,14 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     fun onPlayActionSelected(composition: Composition?) {
         interactor.play(folderId, composition)
+    }
+
+    fun onPlayNextSourceClicked(position: Int) {
+        val source = sourceList.elementAtOrNull(position) ?: return
+        when(source) {
+            is CompositionFileSource -> onPlayNextCompositionClicked(source.composition)
+            is FolderFileSource -> onPlayNextFolderClicked(source)
+        }
     }
 
     fun onPlayNextCompositionClicked(composition: Composition) {
@@ -127,7 +140,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     fun onAddToQueueFolderClicked(folder: FolderFileSource) {
         interactor.getAllCompositionsInFolder(folder.id)
                 .flatMap(playerInteractor::addCompositionsToEnd)
-                .subscribeOnUi(viewState:: onCompositionsAddedToQueue, this::onDefaultError)
+                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
     }
 
     fun onPlayAllButtonClicked() {
@@ -159,11 +172,14 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     fun onDeleteFolderDialogConfirmed(folder: FolderFileSource?) {
-        interactor.deleteFolder(folder)
+        lastDeleteAction = interactor.deleteFolder(folder)
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showDeleteProgress() }
+                .doOnSuccess(this::onDeleteFolderSuccess)
                 .doFinally { viewState.hideProgressDialog() }
-                .subscribeOnUi(this::onDeleteFolderSuccess, this::onDeleteCompositionsError)
+                .ignoreElement()
+
+        lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
     }
 
     fun onOrderMenuItemClicked() {
@@ -232,11 +248,16 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     fun onNewFolderNameEntered(folderId: Long, name: String?) {
-        interactor.renameFolder(folderId, name)
+        if (RxUtils.isActive(fileActionDisposable)) {
+            return
+        }
+
+        RxUtils.dispose(fileActionDisposable)
+        lastEditAction = interactor.renameFolder(folderId, name)
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showRenameProgress() }
                 .doFinally { viewState.hideProgressDialog() }
-                .justSubscribe(this::onDefaultError)
+        fileActionDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
     }
 
     fun onSelectionModeBackPressed() {
@@ -308,11 +329,16 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     fun onPasteButtonClicked() {
-        interactor.moveFilesTo(folderId)
+        if (RxUtils.isActive(fileActionDisposable)) {
+            return
+        }
+        RxUtils.dispose(fileActionDisposable)
+        lastEditAction = interactor.moveFilesTo(folderId)
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showMoveProgress() }
+                .doOnComplete { viewState.updateMoveFilesList() }
                 .doFinally { viewState.hideProgressDialog() }
-                .subscribeOnUi(viewState::updateMoveFilesList, this::onDefaultError)
+        fileActionDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
     }
 
     fun onPasteInNewFolderButtonClicked() {
@@ -320,11 +346,16 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     fun onNewFileNameForPasteEntered(name: String?) {
-        interactor.moveFilesToNewFolder(folderId, name)
+        if (RxUtils.isActive(fileActionDisposable)) {
+            return
+        }
+        RxUtils.dispose(fileActionDisposable)
+        lastEditAction = interactor.moveFilesToNewFolder(folderId, name)
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showMoveProgress() }
+                .doOnComplete { viewState.updateMoveFilesList() }
                 .doFinally { viewState.hideProgressDialog() }
-                .subscribeOnUi(viewState::updateMoveFilesList, this::onDefaultError)
+        fileActionDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
     }
 
     fun onExcludeFolderClicked(folder: FolderFileSource?) {
@@ -335,6 +366,24 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     fun onRemoveIgnoredFolderClicked() {
         interactor.deleteIgnoredFolder(recentlyAddedIgnoredFolder)
                 .justSubscribe(this::onDefaultError)
+    }
+
+    fun onRetryFailedEditActionClicked() {
+        if (lastEditAction != null) {
+            RxUtils.dispose(fileActionDisposable, presenterDisposable)
+            fileActionDisposable = lastEditAction!!
+                    .doFinally { lastEditAction = null }
+                    .subscribe(viewState::updateMoveFilesList, this::onDefaultError)
+            presenterDisposable.add(fileActionDisposable)
+        }
+    }
+
+    fun onRetryFailedDeleteActionClicked() {
+        if (lastDeleteAction != null) {
+             lastDeleteAction!!
+                    .doFinally { lastDeleteAction = null }
+                    .justSubscribe(this::onDeleteCompositionsError)
+        }
     }
 
     fun getSelectedMoveFiles(): LinkedHashSet<FileSource> = interactor.filesToMove
@@ -394,8 +443,11 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     private fun deletePreparedFiles() {
-        interactor.deleteFiles(filesToDelete)
-                .subscribeOnUi(this::onDeleteCompositionsSuccess, this::onDeleteCompositionsError)
+        lastDeleteAction = interactor.deleteFiles(filesToDelete)
+                .observeOn(uiScheduler)
+                .doOnSuccess(this::onDeleteCompositionsSuccess)
+                .ignoreElement()
+        lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
     }
 
     private fun onDeleteFolderSuccess(deletedCompositions: List<Composition>) {

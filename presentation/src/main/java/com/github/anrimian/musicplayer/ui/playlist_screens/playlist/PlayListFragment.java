@@ -29,6 +29,8 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter;
@@ -39,7 +41,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNav
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -55,6 +56,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class PlayListFragment extends MvpAppCompatFragment
@@ -63,6 +65,8 @@ public class PlayListFragment extends MvpAppCompatFragment
     @InjectPresenter
     PlayListPresenter presenter;
 
+    private FragmentBaseFabListBinding viewBinding;
+
     private RecyclerView recyclerView;
     private View fab;
     private CoordinatorLayout clListContainer;
@@ -70,9 +74,10 @@ public class PlayListFragment extends MvpAppCompatFragment
     private AdvancedToolbar toolbar;
     private PlayListItemAdapter adapter;
     private LinearLayoutManager layoutManager;
-    private ProgressViewWrapper progressViewWrapper;
 
     private DialogFragmentRunner<CompositionActionDialogFragment> compositionActionDialogRunner;
+
+    private ErrorHandler deletingErrorHandler;
 
     public static PlayListFragment newInstance(long playListId) {
         Bundle args = new Bundle();
@@ -90,7 +95,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        FragmentBaseFabListBinding viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false);
+        viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false);
         recyclerView = viewBinding.recyclerView;
         fab = viewBinding.fab;
         clListContainer = viewBinding.listContainer;
@@ -103,9 +108,6 @@ public class PlayListFragment extends MvpAppCompatFragment
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitleClickListener(null);
-
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.hideAll();
 
         DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(recyclerView,
                 getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
@@ -135,6 +137,11 @@ public class PlayListFragment extends MvpAppCompatFragment
         SlidrPanel.simpleSwipeBack(clListContainer, this, toolbar::onStackFragmentSlided);
 
         FragmentManager fm = getChildFragmentManager();
+
+        deletingErrorHandler = new DeleteErrorHandler(getChildFragmentManager(),
+                presenter::onRetryFailedDeleteActionClicked,
+                this::showEditorRequestDeniedMessage);
+
         ChoosePlayListDialogFragment playListDialog = (ChoosePlayListDialogFragment) fm
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
         if (playListDialog != null) {
@@ -163,19 +170,18 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void showEmptyList() {
         fab.setVisibility(View.GONE);
-        progressViewWrapper.hideAll();
-        progressViewWrapper.showMessage(R.string.play_list_is_empty, false);
+        viewBinding.progressStateView.showMessage(R.string.play_list_is_empty, false);
     }
 
     @Override
     public void showList() {
         fab.setVisibility(View.VISIBLE);
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        viewBinding.progressStateView.showProgress();
     }
 
     @Override
@@ -218,10 +224,12 @@ public class PlayListFragment extends MvpAppCompatFragment
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer,
-                getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+        deletingErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clListContainer,
+                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
+                        Snackbar.LENGTH_SHORT)
+                        .show()
+        );
     }
 
     @Override
@@ -390,5 +398,9 @@ public class PlayListFragment extends MvpAppCompatFragment
                 break;
             }
         }
+    }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(clListContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
     }
 }

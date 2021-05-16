@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.common.error.parser;
 
+import android.app.RecoverableSecurityException;
 import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.StringRes;
 
@@ -15,7 +17,10 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
+import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
+import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFoundException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
@@ -83,11 +88,15 @@ public class DefaultErrorParser implements ErrorParser {
         if (throwable instanceof GenreAlreadyExistsException) {
             return error(R.string.genre_already_exists);
         }
-        if (throwable instanceof SecurityException) {
-            return new EditorErrorCommand((SecurityException) throwable);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                && (throwable instanceof RecoverableSecurityException || throwable instanceof RecoverableSecurityExceptionExt)) {
+            return new EditorErrorCommand(throwable);
         }
         if (throwable instanceof EditorTimeoutException) {
             return error(R.string.editor_timeout_error);
+        }
+        if (throwable instanceof EditorReadException) {
+            return new ErrorCommand(throwable.getMessage());
         }
         if (throwable instanceof NullPointerException) {
             logException(throwable);
@@ -95,6 +104,9 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof StorageTimeoutException) {
             return error(R.string.storage_timeout_error_message);
+        }
+        if (throwable instanceof UnavailableMediaStoreException) {
+            return error(R.string.system_media_store_system_error);
         }
         logException(throwable);
         return new ErrorCommand(getString(R.string.unexpected_error, throwable.getMessage()));

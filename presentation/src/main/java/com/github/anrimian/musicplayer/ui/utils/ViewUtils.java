@@ -19,6 +19,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
@@ -55,7 +56,7 @@ public class ViewUtils {
         }
     }
 
-    public static BottomSheetBehavior findBottomSheetBehavior(Dialog dialog) {
+    public static BottomSheetBehavior<FrameLayout> findBottomSheetBehavior(Dialog dialog) {
         BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) dialog;
         return bottomSheetDialog.getBehavior();
     }

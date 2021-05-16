@@ -271,7 +271,6 @@ public class TestDataProvider {
             return new StorageFullComposition(null,
                     title,
                     "fileName",
-                    "",
                     relativePath,
                     0,
                     0,

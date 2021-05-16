@@ -36,9 +36,11 @@
         <item name="dialogButtonColor">@color/colorAccentDark</item>
 
         <!--controls-->
+        <item name="disabledColor">@color/disabled_color_dark</item>
         <item name="buttonColor">@color/primary_button_color_dark</item>
         <item name="secondaryButtonColor">@color/secondary_button_color_dark</item>
         <item name="colorControlHighlight">@color/color_control_highlight_dark</item>
+        <item name="dialogColorControlHighlight">@color/color_control_highlight_dark</item>
         <item name="buttonColorInverse">@color/primary_button_color_dark</item>
         <item name="colorControlHighlightInverse">@color/color_control_highlight_light</item>
         <item name="colorControlThird">@color/dialog_background_color_dark</item>
@@ -76,6 +78,18 @@
 
         <!--navigation view-->
         <item name="navigationViewPrimaryColor">@color/colorTealPrimary</item>
+    </style>
+
+    <style name="PrimaryRedTheme" parent="PrimaryLightTheme">
+        <item name="colorPrimary">@color/colorRedPrimary</item>
+        <item name="colorPrimaryDark">@color/colorRedPrimaryDark</item>
+        <item name="colorAccent">@color/colorRedPrimary</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@color/colorRedPrimary</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@color/colorRedPrimary</item>
     </style>
 
     <style name="DarkOrangeTheme" parent="@style/PrimaryDarkTheme">

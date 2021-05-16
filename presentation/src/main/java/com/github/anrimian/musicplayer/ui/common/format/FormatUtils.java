@@ -36,6 +36,46 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class FormatUtils {
 
+    public static String formatDecibels(short milliDecibels) {
+        short firstNumber = (short) (milliDecibels / 100);
+        int secondNumber = Math.abs(milliDecibels % 100);
+
+        StringBuilder sb = new StringBuilder();
+        if (milliDecibels > 0) {
+            sb.append('+');
+        }
+        if (firstNumber == 0 && milliDecibels < 0) {
+            sb.append('-');
+        }
+        sb.append(milliDecibels / 100);
+        sb.append('.');
+        sb.append(String.format(Locale.getDefault(),"%02d", secondNumber));
+        sb.append(" dB");
+        return sb.toString();//00.00 dB
+    }
+
+    public static String formatMilliHz(int mhz) {
+        int hz = mhz / 1000;
+        int mhzLeft = (mhz % 1000) / 10;
+        int kHz = hz / 1000;
+        int hzLeft = (hz % 1000) / 10;
+
+        StringBuilder sb = new StringBuilder();
+        if (kHz == 0) {
+            sb.append(hz);
+            sb.append('.');
+            sb.append(String.format(Locale.getDefault(),"%02d", mhzLeft));
+            sb.append(" Hz");
+        } else {
+            sb.append(kHz);
+            sb.append('.');
+            sb.append(String.format(Locale.getDefault(),"%02d", hzLeft));
+            sb.append(" kHz");
+        }
+
+        return sb.toString();//000.00Hz or 000.00kHz
+    }
+
     public static String formatCompositionsCount(Context context, int compositionsCount) {
         return context.getResources().getQuantityString(
                 R.plurals.compositions_count,
@@ -66,16 +106,20 @@ public class FormatUtils {
     }
 
     public static String formatMilliseconds(long millis) {
+        return formatMilliseconds(millis, true);
+    }
+
+    public static String formatMilliseconds(long millis, boolean cutZeroNumbers) {
         StringBuilder sb = new StringBuilder();
 
         long hours = MILLISECONDS.toHours(millis);
-        if (hours != 0) {
+        if (hours != 0 || !cutZeroNumbers) {
             sb.append(format(Locale.getDefault(), "%02d", hours));
             sb.append(":");
         }
 
         long minutes = MILLISECONDS.toMinutes(millis) - HOURS.toMinutes(hours);
-        if (minutes != 0 || hours != 0) {
+        if (minutes != 0 || hours != 0 || !cutZeroNumbers) {
             sb.append(format(Locale.getDefault(), "%02d", minutes));
 
         } else {

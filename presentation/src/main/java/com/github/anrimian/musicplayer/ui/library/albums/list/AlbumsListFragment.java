@@ -25,18 +25,18 @@ import com.github.anrimian.musicplayer.ui.common.serialization.AlbumSerializer;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
-import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.wrappers.ProgressViewWrapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -58,7 +58,6 @@ public class AlbumsListFragment extends LibraryFragment implements
 
     private AdvancedToolbar toolbar;
     private AlbumsAdapter adapter;
-    private ProgressViewWrapper progressViewWrapper;
     private LinearLayoutManager layoutManager;
 
     private DialogFragmentRunner<MenuDialogFragment> albumMenuDialogRunner;
@@ -85,9 +84,7 @@ public class AlbumsListFragment extends LibraryFragment implements
 
         toolbar = requireActivity().findViewById(R.id.toolbar);
 
-        progressViewWrapper = new ProgressViewWrapper(view);
-        progressViewWrapper.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
 
         adapter = new AlbumsAdapter(recyclerView, this::goToAlbumScreen, this::onAlbumLongClick);
         recyclerView.setAdapter(adapter);
@@ -133,27 +130,27 @@ public class AlbumsListFragment extends LibraryFragment implements
 
     @Override
     public void showEmptyList() {
-        progressViewWrapper.showMessage(R.string.no_albums_in_library);
+        viewBinding.progressStateView.showMessage(R.string.no_albums_in_library);
     }
 
     @Override
     public void showEmptySearchResult() {
-        progressViewWrapper.showMessage(R.string.compositions_for_search_not_found);
+        viewBinding.progressStateView.showMessage(R.string.compositions_for_search_not_found);
     }
 
     @Override
     public void showList() {
-        progressViewWrapper.hideAll();
+        viewBinding.progressStateView.hideAll();
     }
 
     @Override
     public void showLoading() {
-        progressViewWrapper.showProgress();
+        viewBinding.progressStateView.showProgress();
     }
 
     @Override
     public void showLoadingError(ErrorCommand errorCommand) {
-        progressViewWrapper.showMessage(errorCommand.getMessage(), true);
+        viewBinding.progressStateView.showMessage(errorCommand.getMessage(), true);
     }
 
     @Override
@@ -215,8 +212,12 @@ public class AlbumsListFragment extends LibraryFragment implements
                 toolbar.setSearchModeEnabled(true);
                 break;
             }
+            case R.id.menu_sleep_timer: {
+                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
+                break;
+            }
             case R.id.menu_equalizer: {
-                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
+                new EqualizerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_rescan_storage: {

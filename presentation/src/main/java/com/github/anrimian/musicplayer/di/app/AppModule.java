@@ -4,18 +4,25 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.github.anrimian.musicplayer.data.repositories.logger.LoggerRepositoryImpl;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerPresenter;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
-import com.github.anrimian.musicplayer.utils.filelog.FileLog;
+import com.github.anrimian.musicplayer.utils.logger.AppLogger;
+import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -34,7 +41,7 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 @Module
 public class AppModule {
 
-    private Context appContext;
+    private final Context appContext;
 
     public AppModule(@NonNull Context appContext) {
         this.appContext = appContext;
@@ -84,6 +91,20 @@ public class AppModule {
     }
 
     @Provides
+    @Nonnull
+    @Singleton
+    LoggerRepository loggerRepository(Context context) {
+        return new LoggerRepositoryImpl(context);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    AppLogger appLogger(FileLog fileLog, LoggerRepository loggerRepository) {
+        return new AppLogger(fileLog, loggerRepository);
+    }
+
+    @Provides
     @NonNull
     @Singleton
     WidgetUpdater widgetUpdater(Context context,
@@ -98,5 +119,21 @@ public class AppModule {
     @Singleton
     ThemeController themeController(Context context) {
         return new ThemeController(context);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    SleepTimerInteractor sleepTimerInteractor(LibraryPlayerInteractor libraryPlayerInteractor,
+                                              SettingsRepository settingsRepository) {
+        return new SleepTimerInteractor(libraryPlayerInteractor, settingsRepository);
+    }
+
+    @Provides
+    @NonNull
+    SleepTimerPresenter sleepTimerPresenter(SleepTimerInteractor sleepTimerInteractor,
+                                            @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                            ErrorParser errorParser) {
+        return new SleepTimerPresenter(sleepTimerInteractor, uiScheduler, errorParser);
     }
 }

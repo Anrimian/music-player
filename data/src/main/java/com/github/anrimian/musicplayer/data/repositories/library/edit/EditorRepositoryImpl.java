@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.library.edit;
 
+import androidx.core.util.Pair;
+
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
@@ -9,6 +11,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.EditorTimeoutException;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
@@ -49,7 +52,7 @@ import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class EditorRepositoryImpl implements EditorRepository {
 
-    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 15000;
+    private static final long CHANGE_COVER_TIMEOUT_MILLIS = 25000;
 
     private final CompositionSourceEditor sourceEditor;
     private final StorageFilesDataSource filesDataSource;
@@ -114,7 +117,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 })
                 .subscribeOn(scheduler);
     }
-    
+
     @Override
     public Completable addCompositionGenre(FullComposition composition,
                                            String newGenre) {
@@ -189,11 +192,11 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionFileName(FullComposition composition, String fileName) {
         return Completable.fromAction(() -> {
-            String newPath = filesDataSource.renameCompositionFile(composition, fileName);
-            if (newPath != null) {
-                compositionsDao.updateFilePath(composition.getId(), newPath);
+            Pair<String, String> newPathAndName = filesDataSource.renameCompositionFile(composition, fileName);
+            if (newPathAndName.first != null) {
+                compositionsDao.updateFilePath(composition.getId(), newPathAndName.first);
             }
-            compositionsDao.updateCompositionFileName(composition.getId(), fileName);
+            compositionsDao.updateCompositionFileName(composition.getId(), newPathAndName.second);
         }).subscribeOn(scheduler);
     }
 
@@ -240,7 +243,11 @@ public class EditorRepositoryImpl implements EditorRepository {
                                                @Nullable Long fromFolderId,
                                                @Nullable Long targetParentFolderId,
                                                String directoryName) {
-        return Single.zip(getFullFolderPath(fromFolderId),
+        return Completable.fromRunnable(() -> {
+            if (foldersDao.isFolderWithNameExists(targetParentFolderId, directoryName)) {
+                throw new FileExistsException();
+            }
+        }).andThen(Single.zip(getFullFolderPath(fromFolderId),
                 getFullFolderPath(targetParentFolderId),
                 foldersDao.extractAllCompositionsFromFiles(files),
                 (fromPath, toParentPath, compositions) -> {
@@ -254,7 +261,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                     compositionsDao.updateFilesPath(updatedCompositions);
 
                     return foldersDao.createFolder(targetParentFolderId, name);
-                })
+                }))
                 .doOnSuccess(folderId -> foldersDao.updateFolderId(files, folderId))
                 .ignoreElement()
                 .subscribeOn(scheduler);
@@ -264,9 +271,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable updateAlbumName(String name, long albumId) {
         return checkAlbumExists(name)
                 .andThen(Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId)))
-                .flatMap(compositions -> Observable.fromIterable(compositions)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbum(composition, name))
-                        .toSingleDefault(compositions))
+                .flatMap(compositions -> sourceEditor.setCompositionsAlbum(compositions, name))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumName(name, albumId);
                     for (Composition composition: compositions) {
@@ -280,9 +285,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable updateAlbumArtist(String newArtistName, long albumId) {
         return Single.fromCallable(() -> albumsDao.getCompositionsInAlbum(albumId))
-                .flatMap(compositions -> Observable.fromIterable(compositions)
-                        .flatMapCompletable(composition -> sourceEditor.setCompositionAlbumArtist(composition, newArtistName))// not working, we can't edit album artist?
-                        .toSingleDefault(compositions))
+                .flatMap(compositions -> sourceEditor.setCompositionsAlbumArtist(compositions, newArtistName))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumArtist(albumId, newArtistName);
                     for (Composition composition: compositions) {
@@ -350,7 +353,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource) {
         return sourceEditor.changeCompositionAlbumArt(composition, imageSource)
-                .doOnComplete(() -> onCompositionFileChanged(composition))
+                .doOnSuccess(newSize -> onCompositionFileChanged(composition, newSize))
+                .ignoreElement()
                 .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
     }
@@ -358,7 +362,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable removeCompositionAlbumArt(FullComposition composition) {
         return sourceEditor.removeCompositionAlbumArt(composition)
-                .doOnComplete(() -> onCompositionFileChanged(composition))
+                .doOnSuccess(newSize -> onCompositionFileChanged(composition, newSize))
+                .ignoreElement()
                 .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
                 .subscribeOn(scheduler);
     }
@@ -406,11 +411,8 @@ public class EditorRepositoryImpl implements EditorRepository {
         });
     }
 
-    private void onCompositionFileChanged(FullComposition composition) {
-        long size = filesDataSource.getCompositionFileSize(composition);
-        if (size > 0) {
-            compositionsDao.updateModifyTimeAndSize(composition.getId(), size, new Date());
-        }
+    private void onCompositionFileChanged(FullComposition composition, long newSize) {
+        compositionsDao.updateModifyTimeAndSize(composition.getId(), newSize, new Date());
         runSystemRescan(composition);
     }
 

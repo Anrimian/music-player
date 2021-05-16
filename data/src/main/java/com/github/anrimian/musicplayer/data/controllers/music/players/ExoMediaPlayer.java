@@ -3,6 +3,8 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.content.Context;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
@@ -10,13 +12,17 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProv
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
@@ -43,7 +49,8 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private final Context context;
     private final CompositionSourceProvider sourceRepository;
-    private final Scheduler scheduler;
+    private final Scheduler uiScheduler;
+    private final Scheduler ioScheduler;
     private final PlayerErrorParser playerErrorParser;
     private final EqualizerController equalizerController;
 
@@ -59,13 +66,15 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     public ExoMediaPlayer(Context context,
                           CompositionSourceProvider sourceRepository,
-                          Scheduler scheduler,
+                          Scheduler uiScheduler,
+                          Scheduler ioScheduler,
                           PlayerErrorParser playerErrorParser,
                           EqualizerController equalizerController) {
         this.context = context;
         this.playerErrorParser = playerErrorParser;
         this.sourceRepository = sourceRepository;
-        this.scheduler = scheduler;
+        this.uiScheduler = uiScheduler;
+        this.ioScheduler = ioScheduler;
         this.equalizerController = equalizerController;
     }
 
@@ -75,14 +84,16 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public void prepareToPlay(CompositionSource composition, long startPosition) {
+    public void prepareToPlay(CompositionSource composition,
+                              long startPosition,
+                              @Nullable ErrorType previousErrorType) {
         isPreparing = true;
         this.currentComposition = composition;
         Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
                 .onErrorComplete()
-                .subscribeOn(scheduler)
+                .subscribeOn(uiScheduler)
                 .subscribe();
     }
 
@@ -92,7 +103,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
             seekTo(0);
             pausePlayer();
             stopTracingTrackPosition();
-        }).subscribeOn(scheduler).subscribe();
+        }).subscribeOn(uiScheduler).subscribe();
     }
 
     @Override
@@ -109,21 +120,25 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         Completable.fromRunnable(() -> {
             pausePlayer();
             stopTracingTrackPosition();
-        }).subscribeOn(scheduler).subscribe();
+        }).subscribeOn(uiScheduler).subscribe();
     }
 
     @Override
     public void seekTo(long position) {
         Completable.fromRunnable(() -> {
-            getPlayer().seekTo(position);
+            try {
+                getPlayer().seekTo(position);
+            } catch (IndexOutOfBoundsException ignored) {//crash inside exoplayer
+                return;
+            }
             trackPositionSubject.onNext(position);
-        }).subscribeOn(scheduler).subscribe();
+        }).subscribeOn(uiScheduler).subscribe();
     }
 
     @Override
     public void setVolume(float volume) {
         Completable.fromRunnable(() -> getPlayer().setVolume(volume))
-                .subscribeOn(scheduler)
+                .subscribeOn(uiScheduler)
                 .subscribe();
     }
 
@@ -133,42 +148,55 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     @Override
-    public long getTrackPosition() {
-        return getPlayer().getCurrentPosition();
+    public Single<Long> getTrackPosition() {
+        return Single.fromCallable(() -> getPlayer().getCurrentPosition())
+                .subscribeOn(uiScheduler);
     }
 
     @Override
-    public long seekBy(long millis) {
-        long currentPosition = getTrackPosition();
-        long targetPosition = currentPosition + millis;
-        if (targetPosition < 0) {
-            targetPosition = 0;
-        }
-        if (targetPosition > getPlayer().getDuration()) {
-            return currentPosition;
-        }
-        seekTo(targetPosition);
-        return targetPosition;
+    public Single<Long> seekBy(long millis) {
+        return getTrackPosition()
+                .map(currentPosition -> {
+                    long targetPosition = currentPosition + millis;
+                    if (targetPosition < 0) {
+                        targetPosition = 0;
+                    }
+                    if (targetPosition > getPlayer().getDuration()) {
+                        return currentPosition;
+                    }
+                    seekTo(targetPosition);
+                    return targetPosition;
+                });
+    }
+
+    @Override
+    public void setPlaySpeed(float speed) {
+        usePlayer(player -> {
+            PlaybackParameters param = new PlaybackParameters(speed);
+            player.setPlaybackParameters(param);
+        });
     }
 
     @Override
     public void release() {
-        pausePlayer();
-        stopTracingTrackPosition();
-        try {
-            getPlayer().release();
-        } catch (Exception ignored) {
-            //can be IllegalArgumentException here, remove after exo player will fix release
-            //https://github.com/google/ExoPlayer/issues/8087z
-        }
+        usePlayer(player -> {
+            equalizerController.detachEqualizer();
+            pausePlayer();
+            stopTracingTrackPosition();
+            player.release();
+        });
+    }
+
+    @Override
+    public Observable<Boolean> getSpeedChangeAvailableObservable() {
+        return Observable.fromCallable(() -> true);
     }
 
     private void startPlayWhenReady() {
         Completable.fromRunnable(() -> {
-            equalizerController.attachEqualizer(context, getPlayer().getAudioSessionId());
             getPlayer().setPlayWhenReady(true);
             startTracingTrackPosition();
-        }).subscribeOn(scheduler).subscribe();
+        }).subscribeOn(uiScheduler).subscribe();
     }
 
     private void onCompositionPrepared(Throwable throwable, long startPosition) {
@@ -188,7 +216,6 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     private void pausePlayer() {
-        equalizerController.detachEqualizer(context);
         getPlayer().setPlayWhenReady(false);
     }
 
@@ -196,7 +223,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         if (currentComposition != null) {
             //workaround for prepareError in newest exo player versions
             if (isStrangeLoaderException(throwable)) {
-                prepareToPlay(currentComposition, getPlayer().getCurrentPosition());
+                prepareToPlay(currentComposition, getPlayer().getCurrentPosition(), null);
                 return;
             }
 
@@ -210,7 +237,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     private void startTracingTrackPosition() {
         stopTracingTrackPosition();
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
-                .observeOn(scheduler)
+                .observeOn(uiScheduler)
                 .map(o -> getPlayer().getCurrentPosition())
                 .subscribe(trackPositionSubject::onNext);
     }
@@ -225,8 +252,9 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     private Completable prepareMediaSource(CompositionSource composition) {
         return getCompositionUri(composition)
                 .flatMap(this::createMediaSource)
-                .timeout(2, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
-                .observeOn(scheduler)
+                .subscribeOn(ioScheduler)
+                .timeout(4, TimeUnit.SECONDS)//read from uri can be freeze for some reason, check
+                .observeOn(uiScheduler)
                 .doOnSuccess(mediaSource -> {
                     getPlayer().setMediaSource(mediaSource);
                     getPlayer().prepare();
@@ -265,20 +293,39 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         });
     }
 
+    private void usePlayer(Callback<SimpleExoPlayer> function) {
+        Completable.fromAction(() -> function.call(getPlayer()))
+                .subscribeOn(uiScheduler)
+                .subscribe();
+    }
+
     private SimpleExoPlayer getPlayer() {
         if (player == null) {
             synchronized (this) {
                 if (player == null) {
-                    player = new SimpleExoPlayer.Builder(context).build();
+
+                    player = new SimpleExoPlayer.Builder(context)
+                            .build();
 
                     PlayerEventListener playerEventListener = new PlayerEventListener(
                             () -> playerEventSubject.onNext(new FinishedEvent(currentComposition)),
                             this::sendErrorEvent
                     );
                     player.addListener(playerEventListener);
+                    equalizerController.attachEqualizer(player.getAudioSessionId());
+                    player.addAnalyticsListener(new AnalyticsListener() {
+
+                        @Override
+                        public void onAudioSessionIdChanged(@NonNull EventTime eventTime, int audioSessionId) {
+                            equalizerController.attachEqualizer(audioSessionId);
+                        }
+
+                    });
+
                 }
             }
         }
         return player;
     }
+
 }

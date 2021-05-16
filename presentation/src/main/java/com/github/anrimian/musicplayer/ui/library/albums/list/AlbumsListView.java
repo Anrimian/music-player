@@ -10,8 +10,8 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import java.util.List;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.OneExecution;
 
 public interface AlbumsListView extends MvpView {
 
@@ -36,12 +36,12 @@ public interface AlbumsListView extends MvpView {
     @StateStrategyType(ListStateStrategy.class)
     void submitList(List<Album> albums);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showSelectOrderScreen(Order order);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void restoreListPosition(ListPosition listPosition);
 }

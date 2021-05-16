@@ -6,11 +6,17 @@
         android:id="@+id/menu_search"
         android:title="@string/search"
         android:icon="@drawable/ic_magnify"
+        app:iconTint="?attr/toolbarTextColorPrimary"
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/menu_order"
         android:title="@string/order"
         android:icon="@drawable/ic_sort"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_sleep_timer"
+        android:icon="@drawable/ic_timer"
+        android:title="@string/sleep_timer"
         app:showAsAction="never"/>
 
     <item android:id="@+id/menu_equalizer"

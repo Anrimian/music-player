@@ -118,10 +118,6 @@ public class FoldersDaoWrapper {
         foldersDao.insert(new IgnoredFolderEntity(folder.getRelativePath(), folder.getAddDate()));
     }
 
-    public void deleteFolders(List<Long> ids) {
-        foldersDao.deleteFolders(ids);
-    }
-
     public void deleteFolder(Long folderId, List<Composition> childCompositions) {
         appDatabase.runInTransaction(() -> {
             compositionsDao.deleteAll(mapList(childCompositions, Composition::getId));
@@ -194,6 +190,10 @@ public class FoldersDaoWrapper {
         foldersDao.deleteIgnoredFolder(folder.getRelativePath());
     }
 
+    public boolean isFolderWithNameExists(Long parentId, String name) {
+        return foldersDao.isFolderWithNameExists(parentId, name);
+    }
+
     private Observable<List<FolderFileSource>> getFoldersObservable(Long parentFolderId,
                                                                     Order order,
                                                                     @Nullable String searchText) {
@@ -263,5 +263,4 @@ public class FoldersDaoWrapper {
         }
         throw new IllegalStateException("unexpected file source: " + fileSource);
     }
-
 }

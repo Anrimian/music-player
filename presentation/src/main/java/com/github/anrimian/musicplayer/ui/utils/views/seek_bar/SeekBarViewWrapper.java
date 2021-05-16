@@ -7,7 +7,7 @@ import android.widget.SeekBar;
  */
 public class SeekBarViewWrapper {
 
-    private SeekBar seekBar;
+    private final SeekBar seekBar;
 
     private ProgressChangeListener progressChangeListener;
     private OnSeekStartListener onSeekStartListener;
@@ -30,13 +30,17 @@ public class SeekBarViewWrapper {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 isOnTouch = true;
-                onSeekStartListener.onSeekStart();
+                if (onSeekStartListener != null) {
+                    onSeekStartListener.onSeekStart();
+                }
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 isOnTouch = false;
-                onSeekStopListener.onSeekStop(seekBar.getProgress());
+                if (onSeekStopListener != null) {
+                    onSeekStopListener.onSeekStop(seekBar.getProgress());
+                }
             }
         });
     }

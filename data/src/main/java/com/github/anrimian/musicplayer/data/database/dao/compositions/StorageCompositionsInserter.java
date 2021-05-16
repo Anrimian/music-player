@@ -61,8 +61,15 @@ public class StorageCompositionsInserter {
                     deletedCompositions,
                     changedCompositions,
                     addedFilesFolderMap);
-            foldersDao.deleteFolders(foldersToDelete);
+            deleteFolders(foldersToDelete);
         });
+    }
+
+    //list can be too large to be executed in sql statement loop
+    private void deleteFolders(List<Long> folderIds) {
+        for (Long folderId: folderIds) {
+            foldersDao.deleteFolder(folderId);
+        }
     }
 
     private void applyCompositionChanges(List<StorageFullComposition> addedCompositions,
@@ -118,7 +125,7 @@ public class StorageCompositionsInserter {
         compositionsDao.update(
                 composition.getTitle(),
                 composition.getFileName(),
-                composition.getFilePath(),
+                composition.getRelativePath(),
                 composition.getDuration(),
                 composition.getSize(),
                 composition.getDateAdded(),

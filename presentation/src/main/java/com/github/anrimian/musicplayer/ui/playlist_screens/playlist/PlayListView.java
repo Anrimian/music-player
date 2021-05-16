@@ -11,10 +11,10 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import java.util.List;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.AddToEndSingleStrategy;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
-import moxy.viewstate.strategy.SkipStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.viewstate.strategy.alias.OneExecution;
+import moxy.viewstate.strategy.alias.Skip;
 
 public interface PlayListView extends MvpView {
 
@@ -32,66 +32,66 @@ public interface PlayListView extends MvpView {
     @StateStrategyType(ListStateStrategy.class)
     void updateItemsList(List<PlayListItem> list);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void closeScreen();
 
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @AddToEndSingle
     void showPlayListInfo(PlayList playList);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteCompositionError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeletedCompositionMessage(List<Composition> compositionsToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showSelectPlayListDialog();
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddingToPlayListError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteItemError(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showConfirmDeletePlayListDialog(PlayList playListToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showPlayListDeleteSuccess(PlayList playListToDelete);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showDeletePlayListError(ErrorCommand errorCommand);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void notifyItemMoved(int from, int to);
 
-    @StateStrategyType(SkipStrategy.class)
+    @Skip
     void showCompositionActionDialog(PlayListItem playListItem, int position);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showErrorMessage(ErrorCommand errorCommand);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void notifyItemRemoved(int position);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showEditPlayListNameDialog(PlayList playListInMenu);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void onCompositionsAddedToPlayNext(List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void onCompositionsAddedToQueue(List<Composition> compositions);
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void restoreListPosition(ListPosition listPosition);
 }

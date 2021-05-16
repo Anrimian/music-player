@@ -57,6 +57,8 @@
     <color name="colorAccentDark">#03A9F4</color>
     <color name="darkColorPrimaryVariant">#F57C00</color>
 
+    <color name="disabled_color_dark">#ACACAC</color>
+
     <color name="dark_background_level_2">#292929</color>
     <color name="dark_background_level_1">#1D1D1D</color>
     <color name="dark_background_level_0">#121212</color>
@@ -93,6 +95,10 @@
     <color name="colorTealPrimary">#009688</color>
     <color name="colorTealPrimaryDark">#00796B</color>
     <color name="colorPinkAccent">#FF4081</color>
+
+    <!--light theme(read)-->
+    <color name="colorRedPrimary">#d50000</color>
+    <color name="colorRedPrimaryDark">#9b0000</color>
 
     <!--completely white theme-->
     <color name="colorPrimaryWhiteGray">#848282</color>

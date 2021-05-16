@@ -156,11 +156,11 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
     }
 
     public void setItemSelected(int position) {
-        notifyItemChanged(position, ITEM_SELECTED);
+        notifyItemChanged(++position, ITEM_SELECTED);
     }
 
     public void setItemUnselected(int position) {
-        notifyItemChanged(position, ITEM_UNSELECTED);
+        notifyItemChanged(++position, ITEM_UNSELECTED);
     }
 
     public void setItemsSelected(boolean selected) {

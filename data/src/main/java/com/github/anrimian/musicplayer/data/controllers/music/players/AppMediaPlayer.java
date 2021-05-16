@@ -1,15 +1,21 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public interface AppMediaPlayer {
 
     Observable<PlayerEvent> getEventsObservable();
 
-    void prepareToPlay(CompositionSource composition, long startPosition);
+    void prepareToPlay(CompositionSource composition,
+                       long startPosition,
+                       @Nullable ErrorType previousErrorType);
 
     void stop();
 
@@ -23,9 +29,14 @@ public interface AppMediaPlayer {
 
     Observable<Long> getTrackPositionObservable();
 
-    long getTrackPosition();
+    Single<Long> getTrackPosition();
 
-    long seekBy(long millis);
+    Single<Long> seekBy(long millis);
+
+    void setPlaySpeed(float speed);
 
     void release();
+
+    Observable<Boolean> getSpeedChangeAvailableObservable();
+
 }

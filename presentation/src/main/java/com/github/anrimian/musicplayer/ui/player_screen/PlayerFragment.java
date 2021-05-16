@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
 import android.Manifest;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +23,7 @@ import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.widget.ActionMenuView;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -32,9 +35,11 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractorKt;
 import com.github.anrimian.musicplayer.domain.models.Screens;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
@@ -46,8 +51,10 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
-import com.github.anrimian.musicplayer.ui.equalizer.EqualizerChooserDialogFragment;
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
@@ -63,6 +70,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
@@ -95,6 +103,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
@@ -160,6 +169,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Nullable
     private Composition previousCoverComposition;
+
+    private ErrorHandler deletingErrorHandler;
 
     public static PlayerFragment newInstance() {
         return newInstance(false);
@@ -285,7 +296,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         rvPlayList.setLayoutManager(playQueueLayoutManager);
 
         playQueueAdapter = new PlayQueueAdapter(rvPlayList);
-        playQueueAdapter.setOnCompositionClickListener(presenter::onCompositionItemClicked);
+        playQueueAdapter.setOnCompositionClickListener(presenter::onQueueItemClicked);
         playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
         playQueueAdapter.setIconClickListener(presenter::onQueueItemIconClicked);
         rvPlayList.setAdapter(playQueueAdapter);
@@ -297,8 +308,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 R.drawable.ic_remove_from_queue,
                 R.string.delete_from_queue);
         callback.setOnMovedListener(presenter::onItemMoved);
-        callback.setOnStartDragListener(presenter::onDragStarted);
-        callback.setOnEndDragListener(presenter::onDragEnded);
+        callback.setOnStartDragListener(position -> presenter.onDragStarted());
+        callback.setOnEndDragListener(position -> presenter.onDragEnded());
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvPlayList);
 
@@ -323,6 +334,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         CompatUtils.setMainButtonStyle(btnRandomPlay);
         CompatUtils.setMainButtonStyle(btnRepeatMode);
         CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
+        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvPlaybackSpeed);
+        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvSleepTime);
+
+        deletingErrorHandler = new DeleteErrorHandler(getChildFragmentManager(),
+                presenter::onRetryFailedDeleteActionClicked,
+                this::showEditorRequestDeniedMessage);
 
         ChoosePlayListDialogFragment fragment = (ChoosePlayListDialogFragment) getChildFragmentManager()
                 .findFragmentByTag(SELECT_PLAYLIST_TAG);
@@ -336,7 +353,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
         }
 
-        //noinspection ConstantConditions
         if (getArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
             getArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();
@@ -414,13 +430,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void expandBottomPanel() {
-        playerPanelWrapper.expandBottomPanel();
-    }
-
-    @Override
-    public void collapseBottomPanel() {
-        playerPanelWrapper.collapseBottomPanel();
+    public void setButtonPanelState(boolean expanded) {
+        if (expanded) {
+            playerPanelWrapper.expandBottomPanel();
+        } else {
+            playerPanelWrapper.collapseBottomPanel();
+        }
     }
 
     @Override
@@ -478,19 +493,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     }
 
     @Override
-    public void showStopState() {
-        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
-        ivPlayPause.setContentDescription(getString(R.string.play));
-        ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
-        playQueueAdapter.showPlaying(false);
-    }
-
-    @Override
-    public void showPlayState() {
-        AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
-        ivPlayPause.setContentDescription(getString(R.string.pause));
-        ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
-        playQueueAdapter.showPlaying(true);
+    public void showPlayerState(PlayerState state) {
+        if (state == PlayerState.PLAY) {
+            AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
+            ivPlayPause.setContentDescription(getString(R.string.pause));
+            ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
+            playQueueAdapter.showPlaying(true);
+        } else {
+            AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
+            ivPlayPause.setContentDescription(getString(R.string.play));
+            ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
+            playQueueAdapter.showPlaying(false);
+        }
     }
 
     @Override
@@ -502,6 +516,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         btnRandomPlay.setEnabled(show);
         sbTrackState.setEnabled(show);
         acvPlayQueueMenu.getMenu().findItem(R.id.menu_save_as_playlist).setEnabled(show);
+        panelBinding.tvPlaybackSpeed.setEnabled(show);
     }
 
     @Override
@@ -671,21 +686,67 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showConfirmDeleteDialog(List<Composition> compositionsToDelete) {
         DialogUtils.showConfirmDeleteDialog(requireContext(),
                 compositionsToDelete,
-                presenter::onDeleteCompositionsDialogConfirmed);
+                () -> presenter.onDeleteCompositionsDialogConfirmed(compositionsToDelete));
     }
 
     @Override
     public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clPlayQueueContainer,
-                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+        deletingErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clPlayQueueContainer,
+                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
+                        Snackbar.LENGTH_SHORT)
+                        .show()
+        );
     }
 
     @Override
     public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
         String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
         MessagesUtils.makeSnackbar(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void displayPlaybackSpeed(float speed) {
+        panelBinding.tvPlaybackSpeed.setText(getString(R.string.playback_speed_template, speed));
+        panelBinding.tvPlaybackSpeed.setOnClickListener(v ->
+                DialogUtils.showSpeedSelectorDialog(requireContext(),
+                        speed,
+                        presenter::onPlaybackSpeedSelected)
+        );
+    }
+
+    @Override
+    public void showSpeedChangeFeatureVisible(boolean visible) {
+        panelBinding.tvPlaybackSpeed.setVisibility(visible? VISIBLE: View.GONE);
+    }
+
+    @Override
+    public void showSleepTimerRemainingTime(long remainingMillis) {
+        //setVisibility() don't work in motion layout
+        if (remainingMillis == SleepTimerInteractorKt.NO_TIMER) {
+            panelBinding.tvSleepTime.setText("");
+            panelBinding.tvSleepTime.setBackground(null);
+            panelBinding.tvSleepTime.setCompoundDrawables(null, null, null, null);
+            panelBinding.tvSleepTime.setOnClickListener(null);
+            return;
+        }
+        if (!panelBinding.tvSleepTime.hasOnClickListeners()) {
+            //initialize, set visible
+            Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_timer);
+            Resources resources = requireContext().getResources();
+            int iconSize = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_size);
+            icon.setBounds(0, 0, iconSize, iconSize);
+            icon.setTint(getColorFromAttr(requireContext(), android.R.attr.textColorSecondary));
+            panelBinding.tvSleepTime.setCompoundDrawables(icon, null, null, null);
+            int iconPadding = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_padding);
+            panelBinding.tvSleepTime.setCompoundDrawablePadding(iconPadding);
+            panelBinding.tvSleepTime.setBackgroundResource(R.drawable.bg_outline_text_button);
+            panelBinding.tvSleepTime.setOnClickListener(v ->
+                    new SleepTimerDialogFragment().show(getChildFragmentManager(), null)
+            );
+        }
+
+        panelBinding.tvSleepTime.setText(FormatUtils.formatMilliseconds(remainingMillis));
     }
 
     public void openPlayQueue() {
@@ -701,8 +762,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
                 break;
             }
+            case R.id.menu_sleep_timer: {
+                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
+                break;
+            }
             case R.id.menu_equalizer: {
-                new EqualizerChooserDialogFragment().show(getChildFragmentManager(), null);
+                new EqualizerDialogFragment().show(getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_clear_play_queue: {
@@ -841,4 +906,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private void onShareCompositionClicked(Composition composition) {
         DialogUtils.shareComposition(requireContext(), composition);
     }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(clPlayQueueContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
+    }
+
 }

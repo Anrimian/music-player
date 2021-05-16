@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerTypes;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
@@ -37,11 +37,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String COLORED_NOTIFICATION = "colored_notification";
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
 
+    private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
+
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
 
     private static final String EXTERNAL_PLAYER_REPEAT_MODE = "external_player_repeat_mode";
     private static final String EXTERNAL_PLAYER_KEEP_IN_BACKGROUND = "external_player_keep_in_background";
+
+    private static final String SLEEP_TIMER_TIME = "sleep_timer_time";
+    private static final String SLEEP_TIMER_PLAY_LAST = "sleep_timer_play_last";
 
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
@@ -53,11 +58,12 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
     private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
 
     private final BehaviorSubject<Integer> externalPlayerRepeatModeSubject = BehaviorSubject.create();
 
-    private SharedPreferencesHelper preferences;
+    private final SharedPreferencesHelper preferences;
 
     public SettingsRepositoryImpl(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -297,7 +303,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public int getSelectedEqualizerType() {
-        return preferences.getInt(SELECTED_EQUALIZER_TYPE, EqualizerTypes.NONE);
+        return preferences.getInt(SELECTED_EQUALIZER_TYPE, EqualizerType.NONE);
     }
 
     @Override
@@ -306,8 +312,46 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
+    public Observable<Boolean> getAppConfirmDeleteDialogEnabledObservable() {
+        return withDefaultValue(showAppConfirmDeleteDialog, this::isAppConfirmDeleteDialogEnabled);
+    }
+
+    @Override
+    public void setAppConfirmDeleteDialogEnabled(boolean enabled) {
+        if (enabled != isAppConfirmDeleteDialogEnabled()) {
+            preferences.putBoolean(SHOW_APP_CONFIRM_DELETE_DIALOG, enabled);
+            showAppConfirmDeleteDialog.onNext(enabled);
+        }
+    }
+
+    @Override
+    public boolean isAppConfirmDeleteDialogEnabled() {
+        return preferences.getBoolean(SHOW_APP_CONFIRM_DELETE_DIALOG, true);
+    }
+
+    @Override
     public long getRewindValueMillis() {
         return 10000;
+    }
+
+    @Override
+    public void setSleepTimerTime(long millis) {
+        preferences.putLong(SLEEP_TIMER_TIME, millis);
+    }
+
+    @Override
+    public long getSleepTimerTime() {
+        return preferences.getLong(SLEEP_TIMER_TIME, 30 * 60 * 1000);
+    }
+
+    @Override
+    public void setSleepTimerPlayLastSong(boolean playLastSong) {
+        preferences.putBoolean(SLEEP_TIMER_PLAY_LAST, playLastSong);
+    }
+
+    @Override
+    public boolean isSleepTimerPlayLastSong() {
+        return preferences.getBoolean(SLEEP_TIMER_PLAY_LAST);
     }
 
     private Order orderFromInt(int order) {

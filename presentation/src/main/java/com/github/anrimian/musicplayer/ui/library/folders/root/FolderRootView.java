@@ -6,14 +6,14 @@ import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 import java.util.List;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.OneExecutionStateStrategy;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.OneExecution;
 
 public interface FolderRootView extends MvpView {
 
     String LOADING_STATE = "loading_state";
 
-    @StateStrategyType(OneExecutionStateStrategy.class)
+    @OneExecution
     void showFolderScreens(List<Long> ids);
 
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LOADING_STATE)

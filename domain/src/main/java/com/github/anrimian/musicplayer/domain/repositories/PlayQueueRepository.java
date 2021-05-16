@@ -47,4 +47,6 @@ public interface PlayQueueRepository {
     Single<Boolean> isCurrentCompositionAtEndOfQueue();
 
     void clearPlayQueue();
+
+    Observable<Integer> getPlayQueueSizeObservable();
 }

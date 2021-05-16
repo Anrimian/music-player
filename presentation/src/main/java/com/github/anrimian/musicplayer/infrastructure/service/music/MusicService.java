@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
@@ -11,6 +12,7 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 
 import androidx.annotation.Nullable;
@@ -53,13 +55,13 @@ import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_G
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_INVALID;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE;
+import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_ALL;
 import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE;
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
-import static com.github.anrimian.musicplayer.infrastructure.service.music.models.mappers.PlayerStateMapper.toMediaState;
 
 /**
  * Created on 03.11.2017.
@@ -69,7 +71,8 @@ public class MusicService extends Service {
 
     public static final String REQUEST_CODE = "request_code";
     public static final String START_FOREGROUND_SIGNAL = "start_foreground_signal";
-    
+    public static final String PLAY_DELAY_MILLIS = "play_delay";
+
     private final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
     private final Builder stateBuilder = new Builder()
             .setActions(ACTION_PLAY
@@ -92,11 +95,13 @@ public class MusicService extends Service {
 
     private MediaSessionCompat mediaSession;
 
-    private PlayerState playerState = PlayerState.PLAY;
+    private PlayerState playerState = PlayerState.IDLE;
     @Nullable
     private CompositionSource currentSource;
     private long trackPosition;
+    private float playbackSpeed = 1f;
     private int repeatMode = RepeatMode.NONE;
+    private boolean randomMode;
     private MusicNotificationSetting notificationSetting;
     private AppTheme currentAppTheme;
 
@@ -107,31 +112,36 @@ public class MusicService extends Service {
             notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
             stopForeground(true);
             stopSelf();
+            //noinspection UnnecessaryReturnStatement
             return;
         }
 
         //reduce chance to show first notification without info
-        currentSource = playerInteractor().getCurrentSource();
-        notificationSetting = musicServiceInteractor().getNotificationSettings();
+//        currentSource = playerInteractor().getCurrentSource();
+//        notificationSetting = musicServiceInteractor().getNotificationSettings();
 
         //we must start foreground in onCreate, strange ANR otherwise
-        notificationsDisplayer().startForegroundNotification(this,
-                playerState == PlayerState.PLAY,
-                currentSource,
-                mediaSession(),
-                repeatMode,
-                notificationSetting,
-                true);
-        //update state that depends on current item and settings to keep it actual
-        if (currentSource != null) {
-            updateMediaSessionState();
-            updateMediaSessionMetadata();
-            updateMediaSessionAlbumArt();
-        }
+//        notificationsDisplayer().startForegroundNotification(this,
+//                playerState == PlayerState.PLAY,
+//                currentSource,
+//                mediaSession(),
+//                repeatMode,
+//                notificationSetting,
+//                true);
+//        //update state that depends on current item and settings to keep it actual
+//        if (currentSource != null) {
+//            updateMediaSessionState();
+//            updateMediaSessionMetadata();
+//            updateMediaSessionAlbumArt();
+//        }
 
-        subscribeOnServiceState();
+//        subscribeOnServiceState();
     }
 
+    //app stopped
+    //add widget
+    //start play from widget
+    //wrong notification state(stopped)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
@@ -139,19 +149,17 @@ public class MusicService extends Service {
             stopSelf();
             return START_NOT_STICKY;
         }
-        int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
-            notificationsDisplayer().startForegroundNotification(this,
-                    playerState == PlayerState.PLAY,
-                    currentSource,
-                    mediaSession(),
-                    repeatMode,
-                    notificationSetting,
-                    false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerState == PlayerState.IDLE) {
+                //should reduce chance of RemoteServiceException
+                notificationsDisplayer().startStubForegroundNotification(this, mediaSession());
+            }
+            startForeground();
         }
+        int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         if (requestCode != -1) {
-            handleNotificationAction(requestCode);
+            handleNotificationAction(requestCode, intent);
         } else {
             KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession(), intent);
             if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
@@ -165,6 +173,7 @@ public class MusicService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+//        return new LocalBinder();
     }
 
     @Override
@@ -175,25 +184,54 @@ public class MusicService extends Service {
         serviceDisposable.dispose();
     }
 
+    public void startForeground() {
+        //reduce chance to show first notification without info
+        boolean reloadCover = false;
+        if (notificationSetting == null) {
+            reloadCover = true;
+            currentSource = playerInteractor().getCurrentSource();
+            notificationSetting = musicServiceInteractor().getNotificationSettings();
+        }
+        //update state that depends on current item and settings to keep it actual
+        if (currentSource != null) {
+            updateMediaSessionState();
+            updateMediaSessionMetadata();
+            updateMediaSessionAlbumArt();
+        }
+
+        notificationsDisplayer().startForegroundNotification(this,
+                playerState == PlayerState.PLAY,
+                currentSource,
+                mediaSession(),
+                repeatMode,
+                notificationSetting,
+                reloadCover);
+
+        subscribeOnServiceState();
+    }
+
     private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
         /* player interactor not null check because case:
-        * 1) start-stop play
-        * 2) enable bluetooth connection receiver
-        * 3) hide activity
-        * 4) revoke permission
-        * 5) connect bluetooth device
-        * 6) use play button from device
-        * 7) resume activity from task manager
-        */
-        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY && playerInteractor() != null) {
+         * 1) start-stop play
+         * 2) enable bluetooth connection receiver
+         * 3) hide activity
+         * 4) revoke permission
+         * 5) connect bluetooth device
+         * 6) use play button from device
+         * 7) resume activity from task manager
+         *
+         * not actual, but leave, it's interesting memory
+         */
+        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
             playerInteractor().play();
         }
     }
 
-    private void handleNotificationAction(int requestCode) {
+    private void handleNotificationAction(int requestCode, Intent intent) {
         switch (requestCode) {
             case PLAY: {
-                playerInteractor().play();
+                int playDelay = intent.getIntExtra(PLAY_DELAY_MILLIS, 0);
+                playerInteractor().play(playDelay);
                 break;
             }
             case PAUSE: {
@@ -216,15 +254,21 @@ public class MusicService extends Service {
     }
 
     private void subscribeOnServiceState() {
+        if (serviceDisposable.size() != 0) {
+            return;
+        }
         serviceDisposable.add(Observable.combineLatest(playerInteractor().getPlayerStateObservable(),
                 playerInteractor().getCurrentSourceObservable(),
                 playerInteractor().getTrackPositionObservable(),
+                playerInteractor().getCurrentPlaybackSpeedObservable(),
                 musicServiceInteractor().getRepeatModeObservable(),
+                musicServiceInteractor().getRandomModeObservable(),
                 musicServiceInteractor().getNotificationSettingObservable(),
                 Components.getAppComponent().themeController().getAppThemeObservable(),
                 serviceState::set)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onServiceStateReceived));
+
     }
 
     private void onServiceStateReceived(ServiceState serviceState) {
@@ -281,12 +325,24 @@ public class MusicService extends Service {
             updateNotification = true;
         }
 
+        if (this.randomMode != serviceState.randomMode) {
+            this.randomMode = serviceState.randomMode;
+            updateMediaSessionState = true;
+        }
+
+        if (this.playbackSpeed != serviceState.playbackSpeed) {
+            this.playbackSpeed = serviceState.playbackSpeed;
+            updateMediaSessionState = true;
+        }
+
         MusicNotificationSetting newSettings = serviceState.settings;
         if (!newSettings.equals(this.notificationSetting)) {
-            if (notificationSetting.isCoversOnLockScreen() != newSettings.isCoversOnLockScreen()) {
+            if (notificationSetting == null
+                    || notificationSetting.isCoversOnLockScreen() != newSettings.isCoversOnLockScreen()) {
                 updateMediaSessionAlbumArt = true;
             }
-            if (notificationSetting.isShowCovers() != newSettings.isShowCovers()
+            if (notificationSetting == null
+                    || notificationSetting.isShowCovers() != newSettings.isShowCovers()
                     || notificationSetting.isColoredNotification() != newSettings.isColoredNotification()) {
                 updateNotification = true;
             }
@@ -329,8 +385,32 @@ public class MusicService extends Service {
     }
 
     private void updateMediaSessionState() {
-        stateBuilder.setState(toMediaState(playerState), trackPosition, 1);
+        stateBuilder.setState(toMediaState(playerState), trackPosition, playbackSpeed);
         mediaSession().setPlaybackState(stateBuilder.build());
+
+        int sessionRepeatMode;
+        switch (repeatMode) {
+            case RepeatMode.REPEAT_COMPOSITION: {
+                sessionRepeatMode = REPEAT_MODE_ONE;
+                break;
+            }
+            case RepeatMode.REPEAT_PLAY_LIST: {
+                sessionRepeatMode = REPEAT_MODE_ALL;
+                break;
+            }
+            default: {
+                sessionRepeatMode = REPEAT_MODE_NONE;
+            }
+        }
+        mediaSession().setRepeatMode(sessionRepeatMode);
+
+        int sessionShuffleMode;
+        if (randomMode) {
+            sessionShuffleMode = SHUFFLE_MODE_ALL;
+        } else {
+            sessionShuffleMode = SHUFFLE_MODE_NONE;
+        }
+        mediaSession().setShuffleMode(sessionShuffleMode);
     }
 
     private void onPlayerStateChanged(PlayerState playerState) {
@@ -352,30 +432,6 @@ public class MusicService extends Service {
                 reloadCover);
     }
 
-    private static class ServiceState {
-        PlayerState playerState;
-        Optional<CompositionSource> compositionSource;
-        long trackPosition;
-        int repeatMode;
-        MusicNotificationSetting settings;
-        AppTheme appTheme;
-
-        private ServiceState set(PlayerState playerState,
-                                 Optional<CompositionSource> compositionSource,
-                                 long trackPosition,
-                                 int repeatMode,
-                                 MusicNotificationSetting settings,
-                                 AppTheme appTheme) {
-            this.playerState = playerState;
-            this.compositionSource = compositionSource;
-            this.trackPosition = trackPosition;
-            this.repeatMode = repeatMode;
-            this.settings = settings;
-            this.appTheme = appTheme;
-            return this;
-        }
-    }
-
     private MediaSessionCompat mediaSession() {
         if (mediaSession == null) {
             mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
@@ -395,25 +451,66 @@ public class MusicService extends Service {
     private PlayerInteractor playerInteractor() {
         return Components.getAppComponent().playerInteractor();
     }
-    
+
     private MusicServiceInteractor musicServiceInteractor() {
         return Components.getAppComponent().musicServiceInteractor();
     }
-    
+
     private NotificationsDisplayer notificationsDisplayer() {
         return Components.getAppComponent().notificationDisplayer();
     }
-    
+
+    private static int toMediaState(PlayerState playerState) {
+        switch (playerState) {
+            case IDLE: return PlaybackStateCompat.STATE_NONE;
+            case LOADING: return PlaybackStateCompat.STATE_CONNECTING;
+            case PAUSE: return PlaybackStateCompat.STATE_PAUSED;
+            case PLAY: return PlaybackStateCompat.STATE_PLAYING;
+            case STOP: return PlaybackStateCompat.STATE_STOPPED;
+            default: throw new IllegalStateException("unexpected player state: " + playerState);
+        }
+    }
+
+    private static class ServiceState {
+        PlayerState playerState;
+        Optional<CompositionSource> compositionSource;
+        long trackPosition;
+        float playbackSpeed;
+        int repeatMode;
+        boolean randomMode;
+        MusicNotificationSetting settings;
+        AppTheme appTheme;
+
+        private ServiceState set(PlayerState playerState,
+                                 Optional<CompositionSource> compositionSource,
+                                 long trackPosition,
+                                 float playbackSpeed,
+                                 int repeatMode,
+                                 boolean randomMode,
+                                 MusicNotificationSetting settings,
+                                 AppTheme appTheme) {
+            this.playerState = playerState;
+            this.compositionSource = compositionSource;
+            this.trackPosition = trackPosition;
+            this.playbackSpeed = playbackSpeed;
+            this.repeatMode = repeatMode;
+            this.randomMode = randomMode;
+            this.settings = settings;
+            this.appTheme = appTheme;
+            return this;
+        }
+    }
+
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
 
         @Override
         public void onPlay() {
-            playerInteractor().playOrPause();
+            playerInteractor().play();
         }
 
         @Override
         public void onPause() {
-            playerInteractor().playOrPause();
+            playerInteractor().pause();
         }
 
         @Override
@@ -476,6 +573,11 @@ public class MusicService extends Service {
         @Override
         public void onRewind() {
             playerInteractor().fastSeekBackward();
+        }
+
+        @Override
+        public void onSetPlaybackSpeed(float speed) {
+            musicServiceInteractor().setPlaybackSpeed(speed);
         }
 
         //next - not implemented
@@ -565,4 +667,12 @@ public class MusicService extends Service {
             super.onRemoveQueueItem(description);
         }
     }
+
+//    public class LocalBinder extends Binder {
+//
+//        public MusicService getService() {
+//            return MusicService.this;
+//        }
+//    }
+
 }
