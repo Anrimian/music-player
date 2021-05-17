@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettin
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
@@ -84,6 +85,7 @@ public interface AppComponent {
     LoggerRepository loggerRepository();
     StorageAlbumsProvider storageAlbumsProvider();
 
+    MediaSessionHandler mediaSessionHandler();
     CoverImageLoader imageLoader();
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();
