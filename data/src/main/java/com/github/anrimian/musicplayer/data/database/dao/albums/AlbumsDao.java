@@ -38,7 +38,8 @@ public interface AlbumsDao {
             "dateModified as dateModified, " +
             "corruptionType as corruptionType " +
             "FROM compositions " +
-            "WHERE albumId = :albumId")
+            "WHERE albumId = :albumId " +
+            "ORDER BY title")
     Observable<List<Composition>> getCompositionsInAlbumObservable(long albumId);
 
     @Query("SELECT " +
