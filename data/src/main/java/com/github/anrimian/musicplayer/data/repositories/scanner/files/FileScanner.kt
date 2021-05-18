@@ -57,6 +57,8 @@ class FileScanner(
         //compare
         //apply data to database
 
+        //and set last modify time to prevent overwriting by scanner?
+        //no, just add condition to media analyzer
         compositionsDao.setCompositionLastFileScanTime(fullComposition.id, Date())
     }
 
