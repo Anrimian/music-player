@@ -17,9 +17,6 @@ import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonRe
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 
-//replace in service(and test first)
-//add to di
-//add to receiver
 class MediaSessionHandler(private val context: Context,
                           private val playerInteractor: PlayerInteractor,
                           private val musicServiceInteractor: MusicServiceInteractor

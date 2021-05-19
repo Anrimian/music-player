@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.infrastructure.service.music;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
@@ -95,13 +96,13 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (!Permissions.hasFilePermission(this)) {
-            notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
-            stopForeground(true);
-            stopSelf();
-            //noinspection UnnecessaryReturnStatement
-            return;
-        }
+//        if (!Permissions.hasFilePermission(this)) {
+//            notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
+//            stopForeground(true);
+//            stopSelf();
+//            //noinspection UnnecessaryReturnStatement
+//            return;
+//        }
 
         //reduce chance to show first notification without info
 //        currentSource = playerInteractor().getCurrentSource();
@@ -132,6 +133,12 @@ public class MusicService extends Service {
             stopSelf();
             return START_NOT_STICKY;
         }
+        if (!Permissions.hasFilePermission(this)) {
+            notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
+            stopForeground(true);
+            stopSelf();
+            return START_NOT_STICKY;
+        }
         int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
         if (startForegroundSignal != -1) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerState == PlayerState.IDLE) {
@@ -155,8 +162,8 @@ public class MusicService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
-//        return new LocalBinder();
+//        return null;
+        return new LocalBinder();
     }
 
     @Override
@@ -655,11 +662,11 @@ public class MusicService extends Service {
         }
     }*/
 
-//    public class LocalBinder extends Binder {
-//
-//        public MusicService getService() {
-//            return MusicService.this;
-//        }
-//    }
+    public class LocalBinder extends Binder {
+
+        public MusicService getService() {
+            return MusicService.this;
+        }
+    }
 
 }
