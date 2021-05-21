@@ -22,18 +22,29 @@ class MediaSessionHandler(private val context: Context,
                           private val musicServiceInteractor: MusicServiceInteractor
 ) {
 
-    val mediaSession by lazy {
-        MediaSessionCompat(context, MusicService::javaClass.name).apply {
-            setCallback(AppMediaSessionCallback())
+    private var mediaSession: MediaSessionCompat? = null
 
-            val activityIntent = Intent(context, MainActivity::class.java)
-            val pActivityIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
-            setSessionActivity(pActivityIntent)
+    fun getMediaSession(): MediaSessionCompat {
+        if (mediaSession == null) {
+            mediaSession = MediaSessionCompat(context, MusicService::javaClass.name).apply {
+                setCallback(AppMediaSessionCallback())
 
-            val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON, null, context, AppMediaButtonReceiver::class.java)
-            val pMediaButtonIntent = PendingIntent.getBroadcast(context, 0, mediaButtonIntent, 0)
-            setMediaButtonReceiver(pMediaButtonIntent)
+                val activityIntent = Intent(context, MainActivity::class.java)
+                val pActivityIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
+                setSessionActivity(pActivityIntent)
+
+                val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON, null, context, AppMediaButtonReceiver::class.java)
+                val pMediaButtonIntent = PendingIntent.getBroadcast(context, 0, mediaButtonIntent, 0)
+                setMediaButtonReceiver(pMediaButtonIntent)
+            }
         }
+        return mediaSession!!
+    }
+
+    fun release() {
+        getMediaSession().isActive = false
+        getMediaSession().release()
+        mediaSession = null
     }
 
     private inner class AppMediaSessionCallback : MediaSessionCompat.Callback() {

@@ -66,7 +66,7 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
                 playerInteractor.fastSeekBackward()
             }
             else -> {
-                val mediaSession = appComponent.mediaSessionHandler().mediaSession
+                val mediaSession = appComponent.mediaSessionHandler().getMediaSession()
                 handleIntent(mediaSession, intent)
             }
         }
