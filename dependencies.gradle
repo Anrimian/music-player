@@ -1,9 +1,8 @@
 allprojects {
     repositories {
+        //at least exoplayer is still here
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
+        maven { url "https://maven.google.com" }
         maven { url 'https://jitpack.io' }
         google()
     }
@@ -11,7 +10,7 @@ allprojects {
 
 ext {
     //Android
-    androidBuildToolsVersion = "29.0.3"
+    androidBuildToolsVersion = "30.0.2"
     androidMinSdkVersion = 21
     androidTargetSdkVersion = 30
     androidCompileSdkVersion = 30
