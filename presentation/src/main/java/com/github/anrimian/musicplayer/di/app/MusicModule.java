@@ -39,6 +39,7 @@ import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
@@ -249,5 +250,14 @@ class MusicModule {
     @Nonnull
     EqualizerRepository equalizerRepository(InternalEqualizer internalEqualizer) {
         return new EqualizerRepositoryImpl(internalEqualizer);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    MediaSessionHandler mediaSessionHandler(Context context,
+                                            PlayerInteractor playerInteractor,
+                                            MusicServiceInteractor musicServiceInteractor) {
+        return new MediaSessionHandler(context, playerInteractor, musicServiceInteractor);
     }
 }

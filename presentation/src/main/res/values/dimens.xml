@@ -89,6 +89,7 @@
     <dimen name="bottom_sheet_width">0dp</dimen>
 
     <!--toolbar-->
+    <dimen name="toolbar_title_menu_button_size">24dp</dimen>
     <dimen name="toolbar_content_start">72dp</dimen>
     <dimen name="toolbar_control_offset">0dp</dimen>
     <!--toolbar has own offset on large screens, remove after toolbar removing-->

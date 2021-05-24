@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
@@ -24,6 +25,7 @@ import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettin
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
@@ -65,7 +67,7 @@ public interface AppComponent {
     AlbumEditorComponent albumEditorComponent(AlbumEditorModule module);
     ExternalPlayerComponent externalPlayerComponent(ExternalPlayerModule module);
 
-    LibraryPlayerInteractor musicPlayerInteractor();
+    LibraryPlayerInteractor libraryPlayerInteractor();
     DisplaySettingsInteractor displaySettingsInteractor();
     PlayerInteractor playerInteractor();
     MusicServiceInteractor musicServiceInteractor();
@@ -83,10 +85,12 @@ public interface AppComponent {
     LoggerRepository loggerRepository();
     StorageAlbumsProvider storageAlbumsProvider();
 
+    MediaSessionHandler mediaSessionHandler();
     CoverImageLoader imageLoader();
     WidgetUpdater widgetUpdater();
     NotificationsDisplayer notificationDisplayer();
     ErrorParser errorParser();
+    Analytics analytics();
     FileLog fileLog();
     AppLogger appLogger();
     StorageFilesDataSource storageFilesDataSource();

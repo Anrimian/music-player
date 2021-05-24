@@ -32,10 +32,10 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/tv_subtitle"
-                app:layout_constraintEnd_toStartOf="@id/titles_barrier"
+                app:layout_constraintEnd_toStartOf="@id/acv_main"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constrainedWidth="true"
-                tools:text="ffhjgfkjjknhssff"/>
+                tools:text="ffhjgffhjgffhjgffhjgfkssfffkssfffkssfffkssff"/>
 
             <TextView
                 android:id="@+id/tv_subtitle"
@@ -46,10 +46,10 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_title"
                 app:layout_constraintStart_toStartOf="@id/tv_title"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/titles_barrier"
+                app:layout_constraintEnd_toStartOf="@id/acv_main"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintHorizontal_bias="0.0"
-                tools:text="dfflkssffd"/>
+                tools:text="dfffhjgfkssffffhjgfkssffffhjgfkssffflkfssffd"/>
 
             <androidx.constraintlayout.widget.Barrier
                 android:id="@+id/titles_barrier"
@@ -60,12 +60,12 @@
 
             <ImageView
                 android:id="@+id/action_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="@dimen/toolbar_title_menu_button_size"
+                android:layout_height="@dimen/toolbar_title_menu_button_size"
                 android:src="@drawable/ic_arrow_drop_down"
                 android:scaleType="center"
                 android:contentDescription="@null"
-                android:tint="?attr/toolbarTextColorPrimary"
+                app:tint="?attr/toolbarTextColorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/acv_main"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -90,7 +90,8 @@
                 android:layout_marginEnd="@dimen/toolbar_control_offset_2"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:layout_width="100dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -8,11 +8,15 @@ import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
+import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
@@ -30,7 +34,8 @@ public class InternalEqualizer implements AppEqualizer {
 
     private final BehaviorSubject<EqualizerState> currentStateSubject = BehaviorSubject.create();
 
-    private Equalizer equalizer;
+//    private Equalizer equalizer;
+    private final EqualizerObjectHolder equalizerHolder = new EqualizerObjectHolder();
 
     public InternalEqualizer(EqualizerStateRepository equalizerStateRepository) {
         this.equalizerStateRepository = equalizerStateRepository;
@@ -39,17 +44,17 @@ public class InternalEqualizer implements AppEqualizer {
     @Override
     public void attachEqualizer(int audioSessionId) {
         if (audioSessionId != 0) {
-            if (equalizer == null) {
-                equalizer = new Equalizer(1000, audioSessionId);
+            Equalizer equalizer = equalizerHolder.initEqualizer(audioSessionId, eq -> {
 
                 EqualizerState equalizerState = equalizerStateRepository.loadEqualizerState();
                 if (equalizerState != null) {
-                    applyEqualizerState(equalizer, equalizerState);
+                    applyEqualizerState(eq, equalizerState);
                     currentStateSubject.onNext(equalizerState);
                 } else {
-                    currentStateSubject.onNext(extractEqualizerState(equalizer));
+                    currentStateSubject.onNext(extractEqualizerState(eq));
                 }
-            }
+
+            });
 
             equalizer.setEnabled(true);
         }
@@ -57,36 +62,32 @@ public class InternalEqualizer implements AppEqualizer {
 
     @Override
     public void detachEqualizer(int audioSessionId) {
-        if (equalizer != null) {
-            equalizer.setEnabled(false);
-            //should prevent UnsupportedOperationException - observe
-            equalizer.release();
-            equalizer = null;
-        }
+        equalizerHolder.releaseEqualizer();
+
+//        if (equalizer != null) {
+//            equalizer.setEnabled(false);
+//            //should prevent UnsupportedOperationException - observe
+//            equalizer.release();
+//            equalizer = null;
+//        }
     }
 
     public Single<EqualizerConfig> getEqualizerConfig() {
-        return Single.fromCallable(() -> {
-            Equalizer tempEqualizer = new Equalizer(0, 1);
-            EqualizerConfig config = extractEqualizerInfo(tempEqualizer);
-            tempEqualizer.release();
-            return config;
-        });
+        return Single.fromCallable(() -> equalizerHolder.useEqualizer(this::extractEqualizerInfo));
     }
 
     public Observable<EqualizerState> getEqualizerStateObservable() {
         return withDefaultValue(currentStateSubject, () -> {
             EqualizerState equalizerState = equalizerStateRepository.loadEqualizerState();
             if (equalizerState == null) {
-                Equalizer tempEqualizer = new Equalizer(0, 1);
-                equalizerState = extractEqualizerState(tempEqualizer);
-                tempEqualizer.release();
+                equalizerState = equalizerHolder.useEqualizer(this::extractEqualizerState);
             }
             return equalizerState;
         });
     }
 
     public void setBandLevel(short bandNumber, short level) {
+        Equalizer equalizer = equalizerHolder.getEqualizer();
         if (equalizer != null) {
             equalizer.setBandLevel(bandNumber, level);
         }
@@ -108,11 +109,9 @@ public class InternalEqualizer implements AppEqualizer {
     }
 
     public void setPreset(Preset preset) {
+        Equalizer equalizer = equalizerHolder.getEqualizer();
         if (equalizer == null) {
-            Equalizer tempEqualizer = new Equalizer(0, 1);
-            tempEqualizer.usePreset(preset.getNumber());
-            EqualizerState equalizerState = extractEqualizerState(tempEqualizer);
-            tempEqualizer.release();
+            EqualizerState equalizerState = equalizerHolder.useEqualizer(this::extractEqualizerState);
 
             equalizerStateRepository.saveEqualizerState(equalizerState);
             currentStateSubject.onNext(equalizerState);
@@ -166,5 +165,54 @@ public class InternalEqualizer implements AppEqualizer {
         }
 
         return new EqualizerConfig(lowestRange, highestRange, bands, presets);
+    }
+
+    //I suppose that two instances of eq can cause state errors. Let's try this.
+    private static class EqualizerObjectHolder {
+
+        private Equalizer mainEqualizer;
+
+        private Equalizer initEqualizer(int audioSessionId, Callback<Equalizer> initFunc) {
+            synchronized (this) {
+                if (mainEqualizer == null) {
+                    mainEqualizer = new Equalizer(1000, audioSessionId);
+                    initFunc.call(mainEqualizer);
+                }
+                return mainEqualizer;
+            }
+        }
+
+        @Nullable
+        private Equalizer getEqualizer() {
+            return mainEqualizer;
+        }
+
+        private void releaseEqualizer() {
+            synchronized (this) {
+                if (mainEqualizer != null) {
+                    mainEqualizer.setEnabled(false);
+                    //should prevent UnsupportedOperationException - observe
+                    mainEqualizer.release();
+                    mainEqualizer = null;
+                }
+            }
+        }
+
+        private <T> T useEqualizer(Mapper<Equalizer, T> func) {
+            synchronized (this) {
+                Equalizer equalizer;
+                if (mainEqualizer == null) {
+                    equalizer = new Equalizer(0, 1);
+                } else {
+                    equalizer = mainEqualizer;
+                }
+                T result = func.map(equalizer);
+                if (mainEqualizer == null) {
+                    equalizer.release();
+                }
+                return result;
+            }
+        }
+
     }
 }
