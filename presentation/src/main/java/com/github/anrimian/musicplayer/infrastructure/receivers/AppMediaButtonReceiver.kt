@@ -19,16 +19,18 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
         }
         val keyEvent = intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
         if (keyEvent != null) {
-            handleExternalAction(context, keyEvent)
+            handleExternalAction(context, keyEvent, intent)
             return
         }
-        //likely we never reach it
+        //process to media browser service
         super.onReceive(context, intent)
     }
 
-    //we can move all external broadcast events to single method
-    //we can only handle KEYCODE_MEDIA_PLAY, other dispatch to media session?
-    private fun handleExternalAction(context: Context, keyEvent: KeyEvent) {
+    private fun handleExternalAction(
+        context: Context,
+        keyEvent: KeyEvent,
+        intent: Intent
+    ) {
         val appComponent = Components.getAppComponent()
         if (!Permissions.hasFilePermission(context)) {
             appComponent.notificationDisplayer().showErrorNotification(R.string.no_file_permission)
@@ -55,10 +57,6 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
             KeyEvent.KEYCODE_MEDIA_STOP -> {
                 playerInteractor.pause()
             }
-            KeyEvent.KEYCODE_HEADSETHOOK,//double click handling?, see default processing
-            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
-                playerInteractor.playOrPause()
-            }
             KeyEvent.KEYCODE_MEDIA_STEP_FORWARD,
             KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
                 playerInteractor.fastSeekForward()
@@ -67,7 +65,10 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
             KeyEvent.KEYCODE_MEDIA_REWIND -> {
                 playerInteractor.fastSeekBackward()
             }
-            else -> appComponent.analytics().logMessage("unhandled key event: ${keyEvent.keyCode}")
+            else -> {
+                val mediaSession = appComponent.mediaSessionHandler().getMediaSession()
+                handleIntent(mediaSession, intent)
+            }
         }
     }
 
