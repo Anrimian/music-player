@@ -15,6 +15,7 @@ import java.util.*
 //TODO apply album order
 //TODO apply genres data
 //TODO apply lyrics
+//TODO on error exclude composition from scan after several attempts
 class FileScanner(
     private val compositionsDao: CompositionsDaoWrapper,
     private val compositionSourceEditor: CompositionSourceEditor,
@@ -32,6 +33,7 @@ class FileScanner(
         runFileScanner()
     }
 
+    //lock sync if state is not idle
     fun getStateObservable(): Observable<FileScannerState> = stateSubject
 
     @Synchronized
