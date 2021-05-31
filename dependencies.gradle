@@ -31,7 +31,7 @@ ext {
     daggerVersion = "2.33"
     slidrVersion = "2.1.0"
     exoPlayerVersion = "2.13.2"
-    roomVersion = "2.3.0-beta02"
+    roomVersion = "2.3.0"
     jTaggerVersion = '2.0.3'
     chipsLayoutManagerVersion = "0.3.7"
     glideVersion = "4.12.0"

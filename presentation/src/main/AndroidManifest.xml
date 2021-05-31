@@ -74,6 +74,13 @@
             </intent-filter>-->
         </service>
 
+        <service android:name=".infrastructure.service.media_browser.AppMediaBrowserService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
         <receiver android:name=".infrastructure.receivers.AppMediaButtonReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
