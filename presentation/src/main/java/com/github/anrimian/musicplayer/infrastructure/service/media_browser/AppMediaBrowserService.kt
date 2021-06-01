@@ -5,6 +5,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.di.Components
 
 private const val ROOT_ID = "root_id"
 
@@ -13,8 +14,15 @@ private const val FOLDERS_NODE_ID = "folders_node_id"
 private const val ARTISTS_NODE_ID = "artists_node_id"
 private const val ALBUMS_NODE_ID = "albums_node_id"
 
-//TODO android auto doesn't see it
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
+
+    override fun onCreate() {
+        super.onCreate()
+        val mediaSession = Components.getAppComponent()
+            .mediaSessionHandler()
+            .getMediaSession()
+        this.sessionToken = mediaSession.sessionToken
+    }
 
     override fun onGetRoot(
         clientPackageName: String,
