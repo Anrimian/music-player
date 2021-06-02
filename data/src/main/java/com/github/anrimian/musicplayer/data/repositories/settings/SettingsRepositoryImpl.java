@@ -38,6 +38,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
 
     private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
+    private static final String DISPLAY_ALL_AUDIO_FILES = "scanner_display_all_audio_files";
+    private static final String AUDIO_FILE_MIN_DURATION = "audio_file_min_duration";
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
@@ -60,6 +62,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
     private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> displayAllAudioFilesSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Long> audioFileMinDurationSubject = BehaviorSubject.create();
 
     private final BehaviorSubject<Integer> externalPlayerRepeatModeSubject = BehaviorSubject.create();
 
@@ -352,6 +356,42 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public boolean isSleepTimerPlayLastSong() {
         return preferences.getBoolean(SLEEP_TIMER_PLAY_LAST);
+    }
+
+    @Override
+    public Observable<Boolean> getDisplayAllAudioFilesEnabledObservable() {
+        return withDefaultValue(displayAllAudioFilesSubject, this::isDisplayAllAudioFilesEnabled);
+    }
+
+    @Override
+    public void setDisplayAllAudioFilesEnabled(boolean enabled) {
+        if (enabled != isDisplayAllAudioFilesEnabled()) {
+            preferences.putBoolean(DISPLAY_ALL_AUDIO_FILES, enabled);
+            displayAllAudioFilesSubject.onNext(enabled);
+        }
+    }
+
+    @Override
+    public boolean isDisplayAllAudioFilesEnabled() {
+        return preferences.getBoolean(DISPLAY_ALL_AUDIO_FILES, false);
+    }
+
+    @Override
+    public Observable<Long> geAudioFileMinDurationMillisObservable() {
+        return withDefaultValue(audioFileMinDurationSubject, this::getAudioFileMinDurationMillis);
+    }
+
+    @Override
+    public void setAudioFileMinDurationMillis(long millis) {
+        if (millis != getAudioFileMinDurationMillis()) {
+            preferences.putLong(AUDIO_FILE_MIN_DURATION, millis);
+            audioFileMinDurationSubject.onNext(millis);
+        }
+    }
+
+    @Override
+    public long getAudioFileMinDurationMillis() {
+        return preferences.getLong(AUDIO_FILE_MIN_DURATION, 0L);
     }
 
     private Order orderFromInt(int order) {

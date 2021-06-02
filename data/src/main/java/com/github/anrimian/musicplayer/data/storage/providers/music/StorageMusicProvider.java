@@ -87,7 +87,10 @@ public class StorageMusicProvider {
         context.sendBroadcast(scanFileIntent);
     }
 
-    public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable() {
+    public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable(
+            boolean showAllAudioFiles,
+            long minAudioFileDurationMillis
+    ) {
         Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, unsafeGetStorageUri());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             //on new composition content observer not called on android 10
@@ -102,7 +105,7 @@ public class StorageMusicProvider {
             storageChangeObservable = Observable.merge(storageChangeObservable, playListChangeObservable);
         }
         return storageChangeObservable.flatMapSingle(o -> Single.create(emitter -> {
-            LongSparseArray<StorageFullComposition> compositions = getCompositions();
+            LongSparseArray<StorageFullComposition> compositions = getCompositions(showAllAudioFiles, minAudioFileDurationMillis);
             if (compositions != null) {
                 emitter.onSuccess(compositions);
             }
@@ -110,7 +113,8 @@ public class StorageMusicProvider {
     }
 
     @Nullable
-    public LongSparseArray<StorageFullComposition> getCompositions() {
+    public LongSparseArray<StorageFullComposition> getCompositions(boolean showAllAudioFiles,
+                                                                   long minAudioFileDurationMillis) {
         String[] query;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             query = new String[] {
@@ -147,12 +151,22 @@ public class StorageMusicProvider {
             return null;
         }
 
-        try(Cursor cursor = contentResolver.query(
-                uri,
-                query,
-                Media.IS_MUSIC + " = ?",
-                new String[] { String.valueOf(1) },
-                null)) {
+        StringBuilder selectionBuilder = new StringBuilder();
+        selectionBuilder.append(Media.DURATION);
+        selectionBuilder.append(" >= ?");
+        if (!showAllAudioFiles) {
+            selectionBuilder.append(" AND ");
+            selectionBuilder.append(Media.IS_MUSIC);
+            selectionBuilder.append(" = ?");
+        }
+
+        String selection = selectionBuilder.toString();
+        String[] projection = new String[] {
+                String.valueOf(minAudioFileDurationMillis),
+                showAllAudioFiles? null : String.valueOf(1)
+        };
+
+        try(Cursor cursor = contentResolver.query(uri, query, selection, projection, null)) {
             if (cursor == null) {
                 return new LongSparseArray<>();
             }
@@ -162,6 +176,7 @@ public class StorageMusicProvider {
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>(cursor.getCount());
             while (cursor.moveToNext()) {
+                //TODO optimize: cache indexes
                 StorageFullComposition composition = buildStorageComposition(cursorWrapper, albums);
                 if (composition != null) {
                     compositions.put(composition.getId(), composition);

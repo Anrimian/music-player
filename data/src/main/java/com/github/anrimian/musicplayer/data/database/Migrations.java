@@ -133,7 +133,7 @@ class Migrations {
                 StorageMusicProvider provider = new StorageMusicProvider(context, storageAlbumsProvider);
                 LongSparseArray<StorageFullComposition> storageCompositions;
                 if (hasFilePermission(context)) {
-                    storageCompositions = provider.getCompositions();
+                    storageCompositions = provider.getCompositions(false, 0);
                     if (storageCompositions == null) {
                         storageCompositions = new LongSparseArray<>();
                     }
@@ -280,7 +280,7 @@ class Migrations {
                 StorageMusicProvider provider = new StorageMusicProvider(context, albumsProvider);
 
                 EnumConverter enumConverter = new EnumConverter();
-                LongSparseArray<StorageFullComposition> map = provider.getCompositions();
+                LongSparseArray<StorageFullComposition> map = provider.getCompositions(false, 0);
                 if (map == null) {
                     map = new LongSparseArray<>();
                 }

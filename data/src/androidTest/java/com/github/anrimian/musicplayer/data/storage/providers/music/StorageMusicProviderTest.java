@@ -35,7 +35,7 @@ public class StorageMusicProviderTest {
 
     @Test
     public void testRepositoryReturnValues() {
-        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions();
+        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions(true, 0);
         if (map == null) {
             map = new LongSparseArray<>();
         }
@@ -58,7 +58,7 @@ public class StorageMusicProviderTest {
 
     private long load() {
         long startTime = System.currentTimeMillis();
-        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions();
+        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions(true, 0);
         if (map == null) {
             Log.d("KEK", "load failed");
         }

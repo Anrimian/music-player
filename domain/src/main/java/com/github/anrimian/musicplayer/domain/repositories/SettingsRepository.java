@@ -111,4 +111,16 @@ public interface SettingsRepository {
     void setSleepTimerPlayLastSong(boolean playLastSong);
 
     boolean isSleepTimerPlayLastSong();
+
+    Observable<Boolean> getDisplayAllAudioFilesEnabledObservable();
+
+    void setDisplayAllAudioFilesEnabled(boolean enabled);
+
+    boolean isDisplayAllAudioFilesEnabled();
+
+    Observable<Long> geAudioFileMinDurationMillisObservable();
+
+    void setAudioFileMinDurationMillis(long millis);
+
+    long getAudioFileMinDurationMillis();
 }
