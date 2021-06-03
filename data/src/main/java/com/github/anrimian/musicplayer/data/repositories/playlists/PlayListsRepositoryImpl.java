@@ -48,6 +48,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     @Override
     public Single<PlayList> createPlayList(String name) {
         return Single.fromCallable(() -> {
+            //causes errors in playlist update: it creates two instances
             Date currentDate = new Date();
             long id = playListsDao.insertPlayList(name, currentDate, currentDate);
 
