@@ -88,8 +88,7 @@ public class StorageMusicProvider {
     }
 
     public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable(
-            boolean showAllAudioFiles,
-            long minAudioFileDurationMillis
+            long minFileDurationMillis
     ) {
         Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, unsafeGetStorageUri());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -105,7 +104,7 @@ public class StorageMusicProvider {
             storageChangeObservable = Observable.merge(storageChangeObservable, playListChangeObservable);
         }
         return storageChangeObservable.flatMapSingle(o -> Single.create(emitter -> {
-            LongSparseArray<StorageFullComposition> compositions = getCompositions(showAllAudioFiles, minAudioFileDurationMillis);
+            LongSparseArray<StorageFullComposition> compositions = getCompositions(minFileDurationMillis);
             if (compositions != null) {
                 emitter.onSuccess(compositions);
             }
@@ -113,8 +112,7 @@ public class StorageMusicProvider {
     }
 
     @Nullable
-    public LongSparseArray<StorageFullComposition> getCompositions(boolean showAllAudioFiles,
-                                                                   long minAudioFileDurationMillis) {
+    public LongSparseArray<StorageFullComposition> getCompositions(long minAudioDurationMillis) {
         String[] query;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             query = new String[] {
@@ -151,20 +149,8 @@ public class StorageMusicProvider {
             return null;
         }
 
-        StringBuilder selectionBuilder = new StringBuilder();
-        selectionBuilder.append(Media.DURATION);
-        selectionBuilder.append(" >= ?");
-        if (!showAllAudioFiles) {
-            selectionBuilder.append(" AND ");
-            selectionBuilder.append(Media.IS_MUSIC);
-            selectionBuilder.append(" = ?");
-        }
-
-        String selection = selectionBuilder.toString();
-        String[] projection = new String[] {
-                String.valueOf(minAudioFileDurationMillis),
-                showAllAudioFiles? null : String.valueOf(1)
-        };
+        String selection = Media.DURATION + " >= ?";
+        String[] projection = new String[] { String.valueOf(minAudioDurationMillis) };
 
         try(Cursor cursor = contentResolver.query(uri, query, selection, projection, null)) {
             if (cursor == null) {

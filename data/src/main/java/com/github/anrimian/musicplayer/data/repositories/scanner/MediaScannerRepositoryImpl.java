@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
-import android.util.Pair;
-
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
@@ -24,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -82,8 +79,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     }
 
     private void subscribeOnMediaStoreChanges() {
-        mediaStoreDisposable.add(getScannerSettingsObservable()
-                .switchMap(settings -> musicProvider.getCompositionsObservable(settings.first, settings.second))
+        mediaStoreDisposable.add(settingsRepository.geAudioFileMinDurationMillisObservable()
+                .switchMap(musicProvider::getCompositionsObservable)
                 .subscribeOn(scheduler)
                 .subscribe(compositionAnalyzer::applyCompositionsData));
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
@@ -98,18 +95,9 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 //        subscribeOnGenresData();
     }
 
-    private Observable<Pair<Boolean, Long>> getScannerSettingsObservable() {
-        return Observable.combineLatest(
-                settingsRepository.getDisplayAllAudioFilesEnabledObservable(),
-                settingsRepository.geAudioFileMinDurationMillisObservable(),
-                Pair::new
-        );
-    }
-
     private Completable runRescanStorage() {
         return Completable.fromAction(() -> {
             LongSparseArray<StorageFullComposition> compositions = musicProvider.getCompositions(
-                    settingsRepository.isDisplayAllAudioFilesEnabled(),
                     settingsRepository.getAudioFileMinDurationMillis()
             );
             if (compositions == null) {
