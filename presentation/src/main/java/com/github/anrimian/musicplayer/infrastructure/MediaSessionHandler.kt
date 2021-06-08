@@ -120,6 +120,7 @@ class MediaSessionHandler(private val context: Context,
                 }
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     //handle permission
+                    //from empty list can not be called
                     musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)
                 }

@@ -6,6 +6,7 @@ import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
 const val RESUME_ACTION_ID = "resume_action_id"
@@ -19,8 +20,11 @@ private const val ARTISTS_NODE_ID = "artists_node_id"
 private const val ALBUMS_NODE_ID = "albums_node_id"
 
 //app starts play after android auto start
+//handle permissions
+//handle android 11 EXTRA_RECENT
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
+    private val itemUpdateDisposableMap = HashMap<String, Disposable>()
     private var currentRequestDisposable: Disposable? = null
 
     override fun onCreate() {
@@ -53,19 +57,23 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     override fun onDestroy() {
         super.onDestroy()
         currentRequestDisposable?.dispose()
+        itemUpdateDisposableMap.forEach { entry -> entry.value.dispose() }
     }
 
     //handle errors
-    //update(appear-disappear first item) //notifyChildrenChanged(ROOT_ID)
     //increase loading speed
+    //fun can be templated
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
-        currentRequestDisposable = Components.getAppComponent()
+        val observable = Components.getAppComponent()
             .libraryPlayerInteractor()
             .playQueueSizeObservable
+            .map { size -> size > 0 }
+
+        currentRequestDisposable = observable
             .firstOrError()
-            .subscribe { playQueueSize ->
+            .subscribe { isPlayQueueExists ->
                 val mediaItems = arrayListOf<MediaBrowserCompat.MediaItem>()
-                if (playQueueSize > 0) {
+                if (isPlayQueueExists) {
                     mediaItems.add(actionItem(R.string.resume, RESUME_ACTION_ID))
                 }
                 mediaItems.apply {
@@ -76,8 +84,21 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
                     add(browsableItem(R.string.albums, ALBUMS_NODE_ID))
                 }
                 resultCallback.sendResult(mediaItems)
+
+                registerBrowsableItemUpdate(observable, ROOT_ID)
             }
+
         resultCallback.detach()
+    }
+
+    private fun registerBrowsableItemUpdate(observable: Observable<*>, itemId: String) {
+        if (itemUpdateDisposableMap.containsKey(itemId)) {
+            return
+        }
+        val disposable = observable.distinctUntilChanged()
+            .onErrorComplete()//log errors?
+            .subscribe { notifyChildrenChanged(itemId) }
+        itemUpdateDisposableMap[itemId] = disposable
     }
 
     private fun actionItem(titleResId: Int, mediaId: String) =
