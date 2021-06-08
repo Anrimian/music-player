@@ -47,6 +47,7 @@ public class CompositionSourceModelHelper {
                 Components.getAppComponent()
                         .imageLoader()
                         .loadImage(composition, bitmap -> {
+                            //can we adapt glide to be able return bitmaps by uri
                             metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
