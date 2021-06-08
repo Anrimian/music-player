@@ -28,6 +28,7 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
@@ -179,10 +180,12 @@ class MusicModule {
     MusicServiceInteractor musicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                                   LibraryPlayerInteractor libraryPlayerInteractor,
                                                   ExternalPlayerInteractor externalPlayerInteractor,
+                                                  LibraryCompositionsInteractor libraryCompositionsInteractor,
                                                   SettingsRepository settingsRepository) {
         return new MusicServiceInteractor(playerCoordinatorInteractor,
                 libraryPlayerInteractor,
                 externalPlayerInteractor,
+                libraryCompositionsInteractor,
                 settingsRepository);
     }
 
@@ -257,7 +260,18 @@ class MusicModule {
     @Singleton
     MediaSessionHandler mediaSessionHandler(Context context,
                                             PlayerInteractor playerInteractor,
-                                            MusicServiceInteractor musicServiceInteractor) {
-        return new MediaSessionHandler(context, playerInteractor, musicServiceInteractor);
+                                            MusicServiceInteractor musicServiceInteractor,
+                                            ErrorParser errorParser) {
+        return new MediaSessionHandler(context, playerInteractor, musicServiceInteractor, errorParser);
+    }
+
+    @Provides
+    @Nonnull
+    LibraryCompositionsInteractor libraryCompositionsInteractor(LibraryRepository musicProviderRepository,
+                                                                SettingsRepository settingsRepository,
+                                                                UiStateRepository uiStateRepository) {
+        return new LibraryCompositionsInteractor(musicProviderRepository,
+                settingsRepository,
+                uiStateRepository);
     }
 }

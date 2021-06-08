@@ -218,6 +218,8 @@
     <string name="sleep_timer_message">Playing will be stopped in:</string>
     <string name="stop">Stop</string>
 
+    <string name="shuffle_all_and_play">Shuffle all and play</string>
+
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
         <item quantity="other">%1$s songs</item>

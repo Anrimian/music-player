@@ -193,10 +193,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public void clearPlayQueue() {
-        Completable.fromAction(playQueueDao::deletePlayQueue)
-                .subscribeOn(scheduler)
-                .subscribe();
+    public Completable clearPlayQueue() {
+        return Completable.fromAction(playQueueDao::deletePlayQueue)
+                .subscribeOn(scheduler);
     }
 
     @Override

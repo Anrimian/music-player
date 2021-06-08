@@ -7,6 +7,8 @@ import androidx.media.MediaBrowserServiceCompat
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
 
+const val SHUFFLE_ALL_AND_PLAY_ACTION_ID = "shuffle_all_and_play_action_id"
+
 private const val ROOT_ID = "root_id"
 
 private const val COMPOSITIONS_NODE_ID = "compositions_node_id"
@@ -38,16 +40,31 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     ) {
         if (parentId == ROOT_ID) {
             val mediaItems = listOf(
-                browsableItem(getString(R.string.compositions), COMPOSITIONS_NODE_ID),
-                browsableItem(getString(R.string.folders), FOLDERS_NODE_ID),
-                browsableItem(getString(R.string.artists), ARTISTS_NODE_ID),
-                browsableItem(getString(R.string.albums), ALBUMS_NODE_ID),
+                actionItem(R.string.shuffle_all_and_play, SHUFFLE_ALL_AND_PLAY_ACTION_ID),
+                browsableItem(R.string.compositions, COMPOSITIONS_NODE_ID),
+                browsableItem(R.string.folders, FOLDERS_NODE_ID),
+                browsableItem(R.string.artists, ARTISTS_NODE_ID),
+                browsableItem(R.string.albums, ALBUMS_NODE_ID),
             )
             result.sendResult(mediaItems)
             return
         }
         result.sendResult(emptyList())
     }
+
+    private fun actionItem(titleResId: Int, mediaId: String) =
+        actionItem(getString(titleResId), mediaId)
+
+    private fun actionItem(title: CharSequence?, mediaId: String) = MediaBrowserCompat.MediaItem(
+        MediaDescriptionCompat.Builder()
+            .setTitle(title)
+            .setMediaId(mediaId)
+            .build(),
+        MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
+    )
+
+    private fun browsableItem(titleResId: Int, mediaId: String) =
+        browsableItem(getString(titleResId), mediaId)
 
     private fun browsableItem(title: CharSequence?, mediaId: String) = MediaBrowserCompat.MediaItem(
         MediaDescriptionCompat.Builder()

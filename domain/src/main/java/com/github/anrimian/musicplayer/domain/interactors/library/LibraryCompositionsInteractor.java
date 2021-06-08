@@ -37,7 +37,6 @@ public class LibraryCompositionsInteractor {
         return settingsRepository.getCompositionsOrder();
     }
 
-
     public ListPosition getSavedListPosition() {
         return uiStateRepository.getSavedCompositionsListPosition();
     }

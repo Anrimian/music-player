@@ -261,8 +261,8 @@ public class LibraryPlayerInteractor {
                 .toSingleDefault(compositions);
     }
 
-    public void clearPlayQueue() {
-        playQueueRepository.clearPlayQueue();
+    public Completable clearPlayQueue() {
+        return playQueueRepository.clearPlayQueue();
     }
 
     public Observable<Integer> getPlayQueueSizeObservable() {

@@ -10,16 +10,20 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.widget.Toast
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SHUFFLE_ALL_AND_PLAY_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 
 class MediaSessionHandler(private val context: Context,
                           private val playerInteractor: PlayerInteractor,
-                          private val musicServiceInteractor: MusicServiceInteractor
+                          private val musicServiceInteractor: MusicServiceInteractor,
+                          private val errorParser: ErrorParser
 ) {
 
     private var mediaSession: MediaSessionCompat? = null
@@ -108,6 +112,17 @@ class MediaSessionHandler(private val context: Context,
             musicServiceInteractor.setPlaybackSpeed(speed)
         }
 
+        override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
+            when(mediaId) {
+                SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
+                    //handle permission
+                    //double click -> "doesn't seem to be working right now"
+                    musicServiceInteractor.shuffleAllAndPlay()
+                        .subscribe({}, this::processError)
+                }
+            }
+        }
+
         //next - not implemented
         override fun onCommand(command: String, extras: Bundle, cb: ResultReceiver) {
             super.onCommand(command, extras, cb)
@@ -127,10 +142,6 @@ class MediaSessionHandler(private val context: Context,
 
         override fun onPrepareFromUri(uri: Uri, extras: Bundle) {
             super.onPrepareFromUri(uri, extras)
-        }
-
-        override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
-            super.onPlayFromMediaId(mediaId, extras)
         }
 
         override fun onPlayFromSearch(query: String, extras: Bundle) {
@@ -175,6 +186,12 @@ class MediaSessionHandler(private val context: Context,
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             return super.onMediaButtonEvent(mediaButtonEvent)
+        }
+
+        private fun processError(throwable: Throwable) {
+            errorParser.logError(throwable)
+            val errorCommand = errorParser.parseError(throwable)
+            Toast.makeText(context, errorCommand.message, Toast.LENGTH_LONG).show()
         }
     }
 

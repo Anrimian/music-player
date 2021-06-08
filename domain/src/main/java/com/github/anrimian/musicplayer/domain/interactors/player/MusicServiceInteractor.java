@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 
 import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.EXTERNAL;
@@ -13,15 +15,18 @@ public class MusicServiceInteractor {
     private final PlayerCoordinatorInteractor playerCoordinatorInteractor;
     private final LibraryPlayerInteractor libraryPlayerInteractor;
     private final ExternalPlayerInteractor externalPlayerInteractor;
+    private final LibraryCompositionsInteractor libraryCompositionsInteractor;
     private final SettingsRepository settingsRepository;
 
     public MusicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                   LibraryPlayerInteractor libraryPlayerInteractor,
                                   ExternalPlayerInteractor externalPlayerInteractor,
+                                  LibraryCompositionsInteractor libraryCompositionsInteractor,
                                   SettingsRepository settingsRepository) {
         this.playerCoordinatorInteractor = playerCoordinatorInteractor;
         this.libraryPlayerInteractor = libraryPlayerInteractor;
         this.externalPlayerInteractor = externalPlayerInteractor;
+        this.libraryCompositionsInteractor = libraryCompositionsInteractor;
         this.settingsRepository = settingsRepository;
     }
 
@@ -65,6 +70,16 @@ public class MusicServiceInteractor {
         if (playerCoordinatorInteractor.isPlayerTypeActive(EXTERNAL)) {
             externalPlayerInteractor.setPlaybackSpeed(speed);
         }
+    }
+
+    public Completable shuffleAllAndPlay() {
+        return libraryCompositionsInteractor.getCompositionsObservable(null)
+                .firstOrError()
+                .flatMapCompletable(compositions -> libraryPlayerInteractor.clearPlayQueue()
+                        .doOnComplete(() -> {
+                            libraryPlayerInteractor.setRandomPlayingEnabled(true);
+                            libraryPlayerInteractor.startPlaying(compositions);
+                        }));
     }
 
     public Observable<Integer> getRepeatModeObservable() {
@@ -133,4 +148,5 @@ public class MusicServiceInteractor {
                 settingsRepository.getCoversOnLockScreenEnabledObservable(),
                 (coversInNotification, coversOnLockScreen) -> coversInNotification && coversOnLockScreen);
     }
+
 }

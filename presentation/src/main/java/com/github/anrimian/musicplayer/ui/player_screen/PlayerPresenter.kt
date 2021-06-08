@@ -221,7 +221,7 @@ class PlayerPresenter(
     }
 
     fun onClearPlayQueueClicked() {
-        playerInteractor.clearPlayQueue()
+        playerInteractor.clearPlayQueue().subscribe()
     }
 
     fun onFastSeekForwardCalled() {
