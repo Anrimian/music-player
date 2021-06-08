@@ -6,7 +6,9 @@ import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
+import io.reactivex.rxjava3.disposables.Disposable
 
+const val RESUME_ACTION_ID = "resume_action_id"
 const val SHUFFLE_ALL_AND_PLAY_ACTION_ID = "shuffle_all_and_play_action_id"
 
 private const val ROOT_ID = "root_id"
@@ -18,6 +20,8 @@ private const val ALBUMS_NODE_ID = "albums_node_id"
 
 //app starts play after android auto start
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
+
+    private var currentRequestDisposable: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -37,20 +41,43 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     override fun onLoadChildren(
         parentId: String,
-        result: Result<List<MediaBrowserCompat.MediaItem>>
+        resultCallback: Result<List<MediaBrowserCompat.MediaItem>>
     ) {
         if (parentId == ROOT_ID) {
-            val mediaItems = listOf(
-                actionItem(R.string.shuffle_all_and_play, SHUFFLE_ALL_AND_PLAY_ACTION_ID),
-                browsableItem(R.string.compositions, COMPOSITIONS_NODE_ID),
-                browsableItem(R.string.folders, FOLDERS_NODE_ID),
-                browsableItem(R.string.artists, ARTISTS_NODE_ID),
-                browsableItem(R.string.albums, ALBUMS_NODE_ID),
-            )
-            result.sendResult(mediaItems)
+            loadRootItems(resultCallback)
             return
         }
-        result.sendResult(emptyList())
+        resultCallback.sendResult(emptyList())
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        currentRequestDisposable?.dispose()
+    }
+
+    //handle errors
+    //update(appear-disappear first item) //notifyChildrenChanged(ROOT_ID)
+    //increase loading speed
+    private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
+        currentRequestDisposable = Components.getAppComponent()
+            .libraryPlayerInteractor()
+            .playQueueSizeObservable
+            .firstOrError()
+            .subscribe { playQueueSize ->
+                val mediaItems = arrayListOf<MediaBrowserCompat.MediaItem>()
+                if (playQueueSize > 0) {
+                    mediaItems.add(actionItem(R.string.resume, RESUME_ACTION_ID))
+                }
+                mediaItems.apply {
+                    add(actionItem(R.string.shuffle_all_and_play, SHUFFLE_ALL_AND_PLAY_ACTION_ID))
+                    add(browsableItem(R.string.compositions, COMPOSITIONS_NODE_ID))
+                    add(browsableItem(R.string.folders, FOLDERS_NODE_ID))
+                    add(browsableItem(R.string.artists, ARTISTS_NODE_ID))
+                    add(browsableItem(R.string.albums, ALBUMS_NODE_ID))
+                }
+                resultCallback.sendResult(mediaItems)
+            }
+        resultCallback.detach()
     }
 
     private fun actionItem(titleResId: Int, mediaId: String) =
