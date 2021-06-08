@@ -75,11 +75,11 @@ public class MusicServiceInteractor {
     public Completable shuffleAllAndPlay() {
         return libraryCompositionsInteractor.getCompositionsObservable(null)
                 .firstOrError()
-                .flatMapCompletable(compositions -> libraryPlayerInteractor.clearPlayQueue()
-                        .doOnComplete(() -> {
-                            libraryPlayerInteractor.setRandomPlayingEnabled(true);
-                            libraryPlayerInteractor.startPlaying(compositions);
-                        }));
+                .doOnSuccess(compositions -> {
+                    libraryPlayerInteractor.setRandomPlayingEnabled(true);
+                    libraryPlayerInteractor.startPlaying(compositions);
+                })
+                .ignoreElement();
     }
 
     public Observable<Integer> getRepeatModeObservable() {

@@ -116,7 +116,6 @@ class MediaSessionHandler(private val context: Context,
             when(mediaId) {
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     //handle permission
-                    //double click -> "doesn't seem to be working right now"
                     musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)
                 }

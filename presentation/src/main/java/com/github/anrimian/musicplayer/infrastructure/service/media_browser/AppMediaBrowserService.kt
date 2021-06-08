@@ -16,6 +16,7 @@ private const val FOLDERS_NODE_ID = "folders_node_id"
 private const val ARTISTS_NODE_ID = "artists_node_id"
 private const val ALBUMS_NODE_ID = "albums_node_id"
 
+//app starts play after android auto start
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     override fun onCreate() {
