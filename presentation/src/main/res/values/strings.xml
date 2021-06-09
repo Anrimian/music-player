@@ -217,6 +217,8 @@
     <string name="resume">Resume</string>
     <string name="sleep_timer_message">Playing will be stopped in:</string>
     <string name="stop">Stop</string>
+    <string name="exclude_compositions_with_duration_less_than">Exclude compositions with durations less than</string>
+    <string name="seconds_template">%d s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

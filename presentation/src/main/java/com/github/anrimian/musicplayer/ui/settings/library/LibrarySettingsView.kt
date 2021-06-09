@@ -8,4 +8,7 @@ interface LibrarySettingsView : MvpView {
     @AddToEndSingle
     fun showAppConfirmDeleteDialogEnabled(enabled: Boolean)
 
+    @AddToEndSingle
+    fun showAudioFileMinDurationMillis(millis: Long)
+
 }

@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/toolbar_content_start"
                 android:paddingEnd="@dimen/content_horizontal_margin"
-                android:paddingTop="@dimen/content_spacing_margin"
+                android:paddingTop="@dimen/content_spacing_vertical_margin"
                 android:paddingBottom="@dimen/content_vertical_margin"
                 tools:text="@string/no_equalizer"
                 app:layout_constraintTop_toBottomOf="@id/tvEqualizer"

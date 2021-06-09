@@ -13,10 +13,16 @@ class LibrarySettingsPresenter(private val librarySettingsInteractor: LibrarySet
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         librarySettingsInteractor.getAppConfirmDeleteDialogEnabledObservable()
-                .unsafeSubscribeOnUi(viewState::showAppConfirmDeleteDialogEnabled)
+            .unsafeSubscribeOnUi(viewState::showAppConfirmDeleteDialogEnabled)
+        librarySettingsInteractor.geAudioFileMinDurationMillisObservable()
+            .unsafeSubscribeOnUi(viewState::showAudioFileMinDurationMillis)
     }
 
     fun doNotAppConfirmDialogChecked(isChecked: Boolean) {
         librarySettingsInteractor.setAppConfirmDeleteDialogEnabled(!isChecked)
+    }
+
+    fun onAudioFileMinDurationMillisPicked(millis: Long) {
+        librarySettingsInteractor.setAudioFileMinDurationMillis(millis)
     }
 }

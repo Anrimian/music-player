@@ -1,85 +1,82 @@
-package com.github.anrimian.musicplayer.ui.settings.library;
+package com.github.anrimian.musicplayer.ui.settings.library
 
-import android.os.Build;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.databinding.FragmentLibrarySettingsBinding;
-import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment;
-import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-
-import moxy.MvpAppCompatFragment;
-import moxy.presenter.InjectPresenter;
-import moxy.presenter.ProvidePresenter;
+import android.os.Build
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.databinding.FragmentLibrarySettingsBinding
+import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
+import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
+import moxy.MvpAppCompatFragment
+import moxy.ktx.moxyPresenter
 
 /**
  * Created on 19.10.2017.
  */
+class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, LibrarySettingsView {
+    
+    private val presenter by moxyPresenter { Components.getSettingsComponent().librarySettingsPresenter() }
+    
+    private lateinit var viewBinding: FragmentLibrarySettingsBinding
+    
+    private lateinit var navigation: FragmentNavigation
 
-public class LibrarySettingsFragment extends MvpAppCompatFragment
-        implements FragmentLayerListener, LibrarySettingsView {
-
-    @InjectPresenter
-    LibrarySettingsPresenter presenter;
-
-    private FragmentLibrarySettingsBinding viewBinding;
-
-    private FragmentNavigation navigation;
-
-    @ProvidePresenter
-    LibrarySettingsPresenter providePresenter() {
-        return Components.getSettingsComponent().librarySettingsPresenter();
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        viewBinding = FragmentLibrarySettingsBinding.inflate(inflater, container, false)
+        return viewBinding.root
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        viewBinding = FragmentLibrarySettingsBinding.inflate(inflater, container, false);
-        return viewBinding.getRoot();
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        navigation = FragmentNavigation.from(parentFragmentManager)
 
-        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
-
-        navigation = FragmentNavigation.from(getParentFragmentManager());
-
-        viewBinding.tvExcludedFolders.setOnClickListener(v -> navigation.addNewFragment(new ExcludedFoldersFragment()));
+        viewBinding.tvExcludedFolders.setOnClickListener {
+            navigation.addNewFragment(ExcludedFoldersFragment())
+        }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            viewBinding.cbDoNotShowDeleteDialog.setVisibility(View.GONE);
+            viewBinding.cbDoNotShowDeleteDialog.visibility = View.GONE
         }
-        ViewUtils.onCheckChanged(viewBinding.cbDoNotShowDeleteDialog, presenter::doNotAppConfirmDialogChecked);
 
-        SlidrPanel.simpleSwipeBack(viewBinding.flContainer, this, toolbar::onStackFragmentSlided);
+        ViewUtils.onCheckChanged(viewBinding.cbDoNotShowDeleteDialog) { isChecked ->
+            presenter.doNotAppConfirmDialogChecked(isChecked)
+        }
+
+        viewBinding.flAudioMinDurationClickableArea.setOnClickListener {
+
+        }
+
+        SlidrPanel.simpleSwipeBack(viewBinding.flContainer, this, toolbar::onStackFragmentSlided)
     }
 
-    @Override
-    public void onFragmentMovedOnTop() {
-        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.settings);
-        toolbar.setSubtitle(R.string.library);
-        toolbar.setTitleClickListener(null);
+    override fun onFragmentMovedOnTop() {
+        val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
+        toolbar.setTitle(R.string.settings)
+        toolbar.setSubtitle(R.string.library)
+        toolbar.setTitleClickListener(null)
     }
 
-    @Override
-    public void showAppConfirmDeleteDialogEnabled(boolean enabled) {
-        ViewUtils.setChecked(viewBinding.cbDoNotShowDeleteDialog, !enabled);
+    override fun showAppConfirmDeleteDialogEnabled(enabled: Boolean) {
+        ViewUtils.setChecked(viewBinding.cbDoNotShowDeleteDialog, !enabled)
     }
 
+    override fun showAudioFileMinDurationMillis(millis: Long) {
+        viewBinding.tvAudioMinDurationValue.text = getString(
+            R.string.seconds_template,
+            millis/1000L
+        )
+    }
 }
