@@ -27,7 +27,7 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 
 //two instances of eq are not allowed? - done
 //release and nullify on detach? - done
-//try to init twice?
+//try to init twice? - if in constructor errors - release and try to init again
 
 //always call release to eq and android media player
 //calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
