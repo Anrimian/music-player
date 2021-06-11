@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
-import android.database.sqlite.SQLiteConstraintException;
-
 import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
@@ -75,18 +73,10 @@ public class PlayListsDaoWrapper {
                 }
                 String newName = newItem.getName();
                 if (!oldItem.getName().equals(newName)) {
-                    try {
-                        playListDao.updatePlayListNameByStorageId(
-                                id,
-                                getUniquePlayListName(newName, "-" + FileUtils.randomString(8))
-                        );
-                    } catch (SQLiteConstraintException e) {
-                        //try to handle it
-                        playListDao.updatePlayListNameByStorageId(
-                                id,
-                                newName + "-" + FileUtils.randomString(8)
-                        );
-                    }
+                    playListDao.updatePlayListNameByStorageId(
+                            id,
+                            getUniquePlayListName(newName, "-" + FileUtils.randomString(8))
+                    );
                 }
             }
         });
