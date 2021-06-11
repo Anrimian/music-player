@@ -1,16 +1,13 @@
 package com.github.anrimian.musicplayer.ui.common.mvp;
 
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import moxy.MvpView;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
 
 public interface ListMvpView<T> extends MvpView {
     
@@ -31,6 +28,6 @@ public interface ListMvpView<T> extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoadingError(ErrorCommand errorCommand);
 
-    @StateStrategyType(ListStateStrategy.class)
+    @AddToEndSingle
     void updateList(List<T> list);
 }

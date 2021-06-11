@@ -38,6 +38,7 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragmentKt;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
@@ -267,7 +268,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void showSelectPlayListDialog() {
         ChoosePlayListDialogFragment dialog = toolbar.isInActionMode()?
-                ChoosePlayListDialogFragment.newInstance(R.attr.actionModeStatusBarColor)
+                ChoosePlayListDialogFragmentKt.newChoosePlayListDialogFragment(R.attr.actionModeStatusBarColor)
                 : new ChoosePlayListDialogFragment();
 
         choosePlayListDialogRunner.show(dialog);

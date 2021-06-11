@@ -1,48 +1,42 @@
-package com.github.anrimian.musicplayer.ui.playlist_screens.choose;
+package com.github.anrimian.musicplayer.ui.playlist_screens.choose
 
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
+import moxy.MvpView
+import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
 
-import java.util.List;
+private const val LIST_STATE = "list_state"
 
-import moxy.MvpView;
-import moxy.viewstate.strategy.StateStrategyType;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
+interface ChoosePlayListView : MvpView {
 
-public interface ChoosePlayListView extends MvpView {
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showEmptyList()
 
-    String LIST_STATE = "list_state";
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showEmptyList();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showList();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showLoading();
-
-    @StateStrategyType(ListStateStrategy.class)
-    void updateList(List<PlayList> list);
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showLoading()
 
     @AddToEndSingle
-    void showBottomSheetSlided(float slideOffset);
+    fun updateList(list: List<PlayList>)
+
+    @AddToEndSingle
+    fun showBottomSheetSlided(slideOffset: Float)
 
     @OneExecution
-    void showPlayListMenu(PlayList playList);
+    fun showConfirmDeletePlayListDialog(playList: PlayList)
 
     @OneExecution
-    void showConfirmDeletePlayListDialog(PlayList playListToDelete);
+    fun showPlayListDeleteSuccess(playList: PlayList)
 
     @OneExecution
-    void showPlayListDeleteSuccess(PlayList playListToDelete);
+    fun showDeletePlayListError(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showDeletePlayListError(ErrorCommand errorCommand);
+    fun showEditPlayListNameDialog(playList: PlayList)
 
-    @OneExecution
-    void showEditPlayListNameDialog(PlayList playListInMenu);
 }

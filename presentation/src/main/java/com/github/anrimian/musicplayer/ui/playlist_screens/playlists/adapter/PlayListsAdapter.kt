@@ -1,44 +1,34 @@
-package com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter;
+package com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter
 
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.utils.PlayListHelper
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter.DiffListAdapter
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+class PlayListsAdapter(
+    recyclerView: RecyclerView,
+    private val onItemClickListener: (PlayList) -> Unit,
+    private val onItemLongClickListener: (PlayList, View) -> Unit
+) : DiffListAdapter<PlayList, PlayListViewHolder>(
+    recyclerView, SimpleDiffItemCallback(PlayListHelper::areSourcesTheSame)
+) {
 
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.PlayListHelper;
-import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter.DiffListAdapter;
-
-public class PlayListsAdapter extends DiffListAdapter<PlayList, PlayListViewHolder> {
-
-    private final OnItemClickListener<PlayList> onItemClickListener;
-    private final OnItemClickListener<PlayList> onItemLongClickListener;
-
-    public PlayListsAdapter(RecyclerView recyclerView,
-                            OnItemClickListener<PlayList> onItemClickListener,
-                            OnItemClickListener<PlayList> onItemLongClickListener) {
-        super(recyclerView, new SimpleDiffItemCallback<>(PlayListHelper::areSourcesTheSame));
-        this.onItemClickListener = onItemClickListener;
-        this.onItemLongClickListener = onItemLongClickListener;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayListViewHolder {
+        return PlayListViewHolder(
+            LayoutInflater.from(parent.context),
+            parent,
+            onItemClickListener,
+            onItemLongClickListener
+        )
     }
 
-    @NonNull
-    @Override
-    public PlayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new PlayListViewHolder(LayoutInflater.from(parent.getContext()),
-                parent,
-                onItemClickListener,
-                onItemLongClickListener);
+    override fun onBindViewHolder(holder: PlayListViewHolder, position: Int) {
+        val playList = getItem(position)
+        holder.bind(playList)
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull PlayListViewHolder holder, int position) {
-        PlayList playList = getItem(position);
-        holder.bind(playList);
-    }
 }
-
-
