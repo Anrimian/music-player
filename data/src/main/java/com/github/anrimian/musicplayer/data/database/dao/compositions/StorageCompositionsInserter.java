@@ -145,6 +145,7 @@ public class StorageCompositionsInserter {
         //optimization with cache, ~33% faster
         Map<String, Long> artistsCache = new HashMap<>();
         Map<String, Long> albumsCache = new HashMap<>();
+        //TODO can cause sqlite constraint exception, figure out how
         compositionsDao.insert(mapList(
                 addedCompositions,
                 composition -> toCompositionEntity(composition, artistsCache, albumsCache, addedFilesFolderMap))
