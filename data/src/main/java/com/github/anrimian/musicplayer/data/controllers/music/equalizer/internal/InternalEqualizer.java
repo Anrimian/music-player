@@ -27,13 +27,16 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 
 //two instances of eq are not allowed? - done
 //release and nullify on detach? - done
-//try to init twice? - if in constructor errors - release and try to init again
+//try to init twice?
 
 //always call release to eq and android media player
-//calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
 // + 4/5 errors caused from fragment onFirstViewAttach()
 //always attach session id(do not use audio session id = 0) for using correct audio session id
+//attachEqualizer - what if session id was changed? - reinit
+
+//calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
 //last resort: retry + handle errors
+
 public class InternalEqualizer implements AppEqualizer {
 
     private final EqualizerStateRepository equalizerStateRepository;
