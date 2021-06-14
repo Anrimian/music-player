@@ -30,7 +30,7 @@ ext {
     moxyVersion = "2.2.1"
     daggerVersion = "2.33"
     slidrVersion = "2.1.0"
-    exoPlayerVersion = "2.14.0"
+    exoPlayerVersion = "2.14.1"
     roomVersion = "2.3.0"
     jTaggerVersion = '2.0.3'
     chipsLayoutManagerVersion = "0.3.7"

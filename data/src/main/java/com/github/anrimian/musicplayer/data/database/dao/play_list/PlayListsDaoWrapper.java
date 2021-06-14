@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
-import android.database.sqlite.SQLiteConstraintException;
-
 import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
@@ -11,13 +9,14 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
-import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
+import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,34 +73,26 @@ public class PlayListsDaoWrapper {
                 }
                 String newName = newItem.getName();
                 if (!oldItem.getName().equals(newName)) {
-                    try {
-                        playListDao.updatePlayListNameByStorageId(
-                                id,
-                                getUniquePlayListName(newName, "-" + FileUtils.randomString(8))
-                        );
-                    } catch (SQLiteConstraintException e) {
-                        //try to handle it
-                        playListDao.updatePlayListNameByStorageId(
-                                id,
-                                newName + "-" + FileUtils.randomString(8)
-                        );
-                    }
+                    playListDao.updatePlayListNameByStorageId(
+                            id,
+                            getUniquePlayListName(newName, "-" + FileUtils.randomString(8))
+                    );
                 }
             }
         });
     }
 
-    public long insertPlayList(String name, Date dateAdded, Date dateModified) {
-        PlayListEntity entity = new PlayListEntity(null, name, dateAdded, dateModified);
-        try {
-            long id = playListDao.insertPlayListEntity(entity);
-            if (id == -1) {
-                throw new IllegalStateException("db not modified");
-            }
-            return id;
-        } catch (SQLiteConstraintException e) {
-            throw new PlayListNotCreatedException();
+    public long insertPlayList(String name, Date dateAdded, Date dateModified, Function<Long> storagePlayListFetcher) {
+        if (playListDao.isPlayListWithNameExists(name)) {
+            throw new PlayListAlreadyExistsException();
         }
+        Long storageId = storagePlayListFetcher.call();
+        PlayListEntity entity = new PlayListEntity(storageId, name, dateAdded, dateModified);
+        long id = playListDao.insertPlayListEntity(entity);
+        if (id == -1) {
+            throw new IllegalStateException("db not modified");
+        }
+        return id;
     }
 
     public long insertPlayList(StoragePlayList playList) {
@@ -127,7 +118,7 @@ public class PlayListsDaoWrapper {
 
     public void updatePlayListName(long id, String name) {
         if (playListDao.isPlayListWithNameExists(name)) {
-            throw new PlayListNotCreatedException();
+            throw new PlayListAlreadyExistsException();
         }
         playListDao.updatePlayListName(id, name);
     }

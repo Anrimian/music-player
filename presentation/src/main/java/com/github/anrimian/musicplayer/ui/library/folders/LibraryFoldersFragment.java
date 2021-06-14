@@ -46,6 +46,7 @@ import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialog
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
 import com.github.anrimian.musicplayer.ui.library.folders.wrappers.HeaderViewWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
+import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragmentKt;
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
@@ -368,7 +369,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     public void showSelectPlayListForFolderDialog(FolderFileSource folder) {
         Bundle bundle = new Bundle();
         bundle.putLong(ID_ARG, folder.getId());
-        ChoosePlayListDialogFragment dialog = ChoosePlayListDialogFragment.newInstance(bundle);
+        ChoosePlayListDialogFragment dialog = ChoosePlayListDialogFragmentKt.newChoosePlayListDialogFragment(bundle);
         choosePlaylistForFolderDialogRunner.show(dialog);
     }
 

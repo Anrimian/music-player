@@ -13,9 +13,7 @@ class ChoosePlayListPresenter(
 ) : AppPresenter<ChoosePlayListView>(uiScheduler, errorParser) {
     
     private var slideOffset = 0f
-    private var playListInMenu: PlayList? = null
-    private var playListToDelete: PlayList? = null
-    
+
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.showBottomSheetSlided(0f)
@@ -32,35 +30,26 @@ class ChoosePlayListPresenter(
         viewState.showBottomSheetSlided(slideOffset)
     }
 
-    fun onPlayListLongClick(playList: PlayList) {
-        playListInMenu = playList
-        viewState.showPlayListMenu(playList)
+    fun onDeletePlayListButtonClicked(playList: PlayList) {
+        viewState.showConfirmDeletePlayListDialog(playList)
     }
 
-    fun onDeletePlayListButtonClicked() {
-        playListToDelete = playListInMenu
-        viewState.showConfirmDeletePlayListDialog(playListToDelete)
-        playListInMenu = null
+    fun onDeletePlayListDialogConfirmed(playList: PlayList) {
+        playListsInteractor.deletePlayList(playList.id)
+                .subscribeOnUi({ onPlayListDeleted(playList) }, this::onPlayListDeletingError)
     }
 
-    fun onDeletePlayListDialogConfirmed() {
-        playListsInteractor.deletePlayList(playListToDelete!!.id)
-                .subscribeOnUi(this::onPlayListDeleted, this::onPlayListDeletingError)
-    }
-
-    fun onChangePlayListNameButtonClicked() {
-        viewState.showEditPlayListNameDialog(playListInMenu)
+    fun onChangePlayListNameButtonClicked(playList: PlayList) {
+        viewState.showEditPlayListNameDialog(playList)
     }
 
     private fun onPlayListDeletingError(throwable: Throwable) {
         val errorCommand = errorParser.parseError(throwable)
         viewState.showDeletePlayListError(errorCommand)
-        playListToDelete = null
     }
 
-    private fun onPlayListDeleted() {
-        viewState.showPlayListDeleteSuccess(playListToDelete)
-        playListToDelete = null
+    private fun onPlayListDeleted(playList: PlayList) {
+        viewState.showPlayListDeleteSuccess(playList)
     }
 
     private fun subscribeOnPlayLists() {

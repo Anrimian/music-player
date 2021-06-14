@@ -69,7 +69,7 @@ public class PlayListsDaoWrapperTest {
 
     @Test
     public void testMoveItems() {
-        long playlistId = daoWrapper.insertPlayList("playlist", new Date(), new Date());
+        long playlistId = daoWrapper.insertPlayList("playlist", new Date(), new Date(), () -> null);
 
         for (int i = 0; i < 10; i++) {
             long id = compositionsDao.insert(composition(null, null, String.valueOf(i)));
@@ -110,6 +110,18 @@ public class PlayListsDaoWrapperTest {
                 new Change<>(playList3, duplicatePlayList3)
         ));
 
+        System.out.println("KEKAS" + daoWrapper.getPlayListsObservable().blockingFirst());
+    }
+
+    @Test
+    public void testInsertPlaylistThatAlreadyExistsButWithoutStorageId() {
+        Date date = new Date();
+        daoWrapper.insertPlayList("test", date, date, () -> null);
+
+        StoragePlayList playList = new StoragePlayList(1L, "test", date, date);
+        daoWrapper.applyChanges(asList(new Pair<>(playList, emptyList())), emptyList());
+
+        //got 2 playlists
         System.out.println("KEKAS" + daoWrapper.getPlayListsObservable().blockingFirst());
     }
 
