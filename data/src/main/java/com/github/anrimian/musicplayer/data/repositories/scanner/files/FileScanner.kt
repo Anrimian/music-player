@@ -33,7 +33,6 @@ class FileScanner(
         runFileScanner()
     }
 
-    //lock sync if state is not idle
     fun getStateObservable(): Observable<FileScannerState> = stateSubject
 
     @Synchronized
@@ -57,13 +56,16 @@ class FileScanner(
     private fun processCompositionScan(fullComposition: FullComposition,
                                        fileTags: CompositionSourceTags) {
         //compare
-        //apply data to database
+        //apply data to database(in one transaction)
 
         //and set last modify time to prevent overwriting by scanner?
-        //no, just add condition to media analyzer
+        //no, just add condition to media analyzer(hasActualChanges - also compare last file scan time and last modify time)
         compositionsDao.setCompositionLastFileScanTime(fullComposition.id, Date())
     }
 
+    //on error - rerun?
+    //+try several times and them skip?
+    //onErrorResumeNext?
     private fun processError(throwable: Throwable) {
         if (throwable is FileNotFoundException) {
             return
