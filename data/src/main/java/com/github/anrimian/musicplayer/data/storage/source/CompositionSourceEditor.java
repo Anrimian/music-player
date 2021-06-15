@@ -16,9 +16,10 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagOptionSingleton;
-import org.jaudiotagger.tag.datatype.Artwork;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
+import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
+import org.jaudiotagger.tag.images.AndroidArtwork;
+import org.jaudiotagger.tag.images.Artwork;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +38,10 @@ import io.reactivex.rxjava3.core.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 
+//TODO update lib: repo: https://github.com/AdrienPoupa/jaudiotagger
+// artwork doesn't work
+// check on android < 26
+// check on qa build
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';
@@ -49,8 +54,6 @@ public class CompositionSourceEditor {
                                    FileSourceProvider fileSourceProvider) {
         this.storageMusicProvider = storageMusicProvider;
         this.fileSourceProvider = fileSourceProvider;
-
-        TagOptionSingleton.getInstance().setAndroid(true);
     }
 
     public Completable setCompositionTitle(FullComposition composition, String title) {
@@ -328,8 +331,9 @@ public class CompositionSourceEditor {
                             return;
                         }
                         byte[] data = FileUtils.getScaledBitmapByteArray(stream, MAX_COVER_SIZE);
-                        Artwork artwork = new Artwork();
+                        Artwork artwork = new AndroidArtwork();
                         artwork.setBinaryData(data);
+                        artwork.setMimeType(ImageFormats.getMimeTypeForBinarySignature(data));
                         tag.deleteArtworkField();
                         tag.setField(artwork);
                     }

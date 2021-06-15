@@ -32,7 +32,7 @@ ext {
     slidrVersion = "2.1.0"
     exoPlayerVersion = "2.14.1"
     roomVersion = "2.3.0"
-    jTaggerVersion = '2.0.3'
+    jTaggerVersion = '2.2.3'
     chipsLayoutManagerVersion = "0.3.7"
     glideVersion = "4.12.0"
 
@@ -89,6 +89,8 @@ ext {
 
     glide = "com.github.bumptech.glide:glide:$glideVersion"
     glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
+
+    jAudioTagger = "com.github.AdrienPoupa:jaudiotagger:$jTaggerVersion"
 
     //develop
     javaxAnnotation = "com.google.code.findbugs:jsr305:$javaxAnnotationVersion"
