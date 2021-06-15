@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.choose;
 
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public interface ChoosePlayListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
     void showLoading();
 
-    @StateStrategyType(ListStateStrategy.class)
+    @AddToEndSingle
     void updateList(List<PlayList> list);
 
     @AddToEndSingle
