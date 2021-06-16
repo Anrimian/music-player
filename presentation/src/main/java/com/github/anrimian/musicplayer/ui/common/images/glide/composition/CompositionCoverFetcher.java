@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.ui.common.images.glide.composition;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -60,12 +59,9 @@ public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
     private Bitmap extractImageComposition(CompositionImage composition) {
         long id = composition.getId();
 
-        MediaMetadataRetriever mmr = null;
         try {
-            mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(compositionSourceProvider.getCompositionFileDescriptor(id));
-            byte[] imageBytes = mmr.getEmbeddedPicture();
-            mmr.release();
+            byte[] imageBytes = compositionSourceProvider.getCompositionArtworkBinaryData(id)
+                    .blockingGet();
             if (imageBytes == null) {
                 return null;
             }
@@ -79,10 +75,6 @@ public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
             return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
         } catch (Exception ignored) {
             return null;
-        } finally {
-            if (mmr != null) {
-                mmr.release();
-            }
         }
     }
 

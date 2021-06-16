@@ -38,10 +38,6 @@ import io.reactivex.rxjava3.core.Single;
 
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 
-//TODO update lib: repo: https://github.com/AdrienPoupa/jaudiotagger
-// artwork doesn't work
-// check on android < 26
-// check on qa build
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';
@@ -141,7 +137,7 @@ public class CompositionSourceEditor {
     }
 
     public Single<Long> changeCompositionAlbumArt(FullComposition composition,
-                                                 ImageSource imageSource) {
+                                                  ImageSource imageSource) {
         return getPath(composition)
                 .flatMap(path -> changeCompositionAlbumArt(path, composition.getStorageId(), imageSource));
     }
@@ -154,6 +150,11 @@ public class CompositionSourceEditor {
     public Maybe<CompositionSourceTags> getFullTags(FullComposition composition) {
         return getPath(composition)
                 .flatMapMaybe(this::getFullTags);
+    }
+
+    public Maybe<byte[]> getCompositionArtworkBinaryData(long storageId) {
+        return getPath(storageId)
+                .flatMapMaybe(this::getArtworkBinaryData);
     }
 
     //genre not found case
@@ -293,6 +294,20 @@ public class CompositionSourceEditor {
                     tag.getFirst(FieldKey.ALBUM),
                     tag.getFirst(FieldKey.ALBUM_ARTIST),
                     tag.getFirst(FieldKey.LYRICS));
+        });
+    }
+
+    private Maybe<byte[]> getArtworkBinaryData(String filePath) {
+        return Maybe.fromCallable(() -> {
+            Tag tag = getFileTag(filePath);
+            if (tag == null) {
+                return null;
+            }
+            Artwork artwork = tag.getFirstArtwork();
+            if (artwork == null) {
+                return null;
+            }
+            return artwork.getBinaryData();
         });
     }
 
