@@ -250,7 +250,8 @@ public class PlayerInteractor {
                 break;
             }
             case LOSS: {
-                if (playerStateSubject.getValue() == PLAY) {
+                if (playerStateSubject.getValue() == PLAY
+                        && settingsRepository.isPauseOnAudioFocusLossEnabled()) {
                     musicPlayerController.pause();
                     playerStateSubject.onNext(PAUSED_EXTERNALLY);
                     break;

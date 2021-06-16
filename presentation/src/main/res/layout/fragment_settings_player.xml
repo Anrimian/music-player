@@ -29,12 +29,24 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbPauseOnAudioFocusLoss"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/pause_on_audiofocus_loss"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbDecreaseVolume" />
+
             <View style="@style/Divider.Horizontal.Constraint"
                 android:id="@+id/dividerDecreaseVolume"
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cbDecreaseVolume" />
+                app:layout_constraintTop_toBottomOf="@id/cbPauseOnAudioFocusLoss" />
 
             <TextView
                 style="@style/TextStyle.Medium"

@@ -40,6 +40,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
+    private static final String PAUSE_ON_AUDIO_FOCUS_LOSS = "pause_on_audio_focus_loss";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
 
     private static final String EXTERNAL_PLAYER_REPEAT_MODE = "external_player_repeat_mode";
@@ -267,6 +268,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled) {
         preferences.putBoolean(DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS, enabled);
+    }
+
+    @Override
+    public boolean isPauseOnAudioFocusLossEnabled() {
+        return preferences.getBoolean(PAUSE_ON_AUDIO_FOCUS_LOSS, true);
+    }
+
+    @Override
+    public void setPauseOnAudioFocusLossEnabled(boolean enabled) {
+        preferences.putBoolean(PAUSE_ON_AUDIO_FOCUS_LOSS, enabled);
     }
 
     @Override

@@ -80,6 +80,10 @@ public interface SettingsRepository {
 
     void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled);
 
+    boolean isPauseOnAudioFocusLossEnabled();
+
+    void setPauseOnAudioFocusLossEnabled(boolean enabled);
+
     void setExternalPlayerRepeatMode(int mode);
 
     int getExternalPlayerRepeatMode();

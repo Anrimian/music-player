@@ -1,13 +1,17 @@
-package com.github.anrimian.musicplayer.ui.settings.player;
+package com.github.anrimian.musicplayer.ui.settings.player
 
-import moxy.MvpView;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.MvpView
+import moxy.viewstate.strategy.alias.AddToEndSingle
 
-public interface PlayerSettingsView extends MvpView {
-
-    @AddToEndSingle
-    void showDecreaseVolumeOnAudioFocusLossEnabled(boolean checked);
+interface PlayerSettingsView : MvpView {
 
     @AddToEndSingle
-    void showSelectedEqualizerType(int type);
+    fun showDecreaseVolumeOnAudioFocusLossEnabled(checked: Boolean)
+
+    @AddToEndSingle
+    fun showPauseOnAudioFocusLossEnabled(checked: Boolean)
+
+    @AddToEndSingle
+    fun showSelectedEqualizerType(type: Int)
+
 }
