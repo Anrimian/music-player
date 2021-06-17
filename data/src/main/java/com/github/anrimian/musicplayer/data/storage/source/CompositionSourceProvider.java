@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.core.Single;
 
 public class CompositionSourceProvider {
 
+    private static final int STORAGE_TIMEOUT_SECONDS = 3;
+
     private final CompositionsDaoWrapper compositionsDao;
     private final StorageMusicProvider storageMusicProvider;
     private final Scheduler scheduler;
@@ -35,7 +37,7 @@ public class CompositionSourceProvider {
     public Single<Uri> getCompositionUri(long compositionId) {
         return Single.fromCallable(() -> compositionsDao.getStorageId(compositionId))
                 .map(storageMusicProvider::getCompositionUri)
-                .timeout(1, TimeUnit.SECONDS)
+                .timeout(STORAGE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .subscribeOn(scheduler);
     }
 
@@ -48,7 +50,7 @@ public class CompositionSourceProvider {
     public Single<FileDescriptor> getCompositionFileDescriptorSingle(long compositionId) {
         return Single.fromCallable(() -> compositionsDao.getStorageId(compositionId))
                 .map(storageMusicProvider::getFileDescriptor)
-                .timeout(1, TimeUnit.SECONDS)
+                .timeout(STORAGE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .subscribeOn(scheduler);
     }
 
