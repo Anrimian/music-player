@@ -59,6 +59,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils.safeShow;
 
 public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment implements
         LibraryCompositionsView, BackButtonListener, FragmentLayerListener {
@@ -365,7 +366,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
                 break;
             }
             case R.id.menu_sleep_timer: {
-                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
+                safeShow(new SleepTimerDialogFragment(), getChildFragmentManager(), null);
                 break;
             }
             case R.id.menu_equalizer: {

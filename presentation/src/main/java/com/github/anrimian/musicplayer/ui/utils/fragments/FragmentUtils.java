@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.fragments;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -17,5 +18,14 @@ public class FragmentUtils {
                     .replace(container, fragment)
                     .commit();
         }
+    }
+
+    public static void safeShow(DialogFragment dialogFragment,
+                                FragmentManager fragmentManager,
+                                String tag) {
+        try {
+            dialogFragment.show(fragmentManager, tag);
+        } catch (IllegalStateException ignored) {} //we don't have showAllowingStateLoss, so just consume error
+
     }
 }
