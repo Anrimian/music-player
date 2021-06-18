@@ -37,6 +37,7 @@ import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistIt
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
@@ -260,7 +261,7 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     override fun showSelectPlayListDialog() {
         val dialog = if (toolbar.isInActionMode) {
-            ChoosePlayListDialogFragment.newInstance(R.attr.actionModeStatusBarColor)
+            newChoosePlayListDialogFragment(R.attr.actionModeStatusBarColor)
         } else {
             ChoosePlayListDialogFragment()
         }

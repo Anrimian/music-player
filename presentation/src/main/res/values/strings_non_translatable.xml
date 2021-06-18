@@ -43,6 +43,9 @@
         <br/>
         <br/><big><b>Where is habitual for music players big cover screen?</b></big>
         <br/>High amount of similar looking apps with big covers screens was one of the main reason for creation this app. I don\'t like big cover, it just takes screen space. Let there be current play queue in this place.
+        <br/>
+        <br/><big><b>Where are repeat/shuffle buttons?</b></big>
+        <br/>Bottom panel can be opened by click or gesture. These buttons are placed there.
     ]]>
     </string>
     <string name="about_app_text_write" translatable="false">email me</string>

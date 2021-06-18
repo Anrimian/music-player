@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
+import android.database.sqlite.SQLiteCantOpenDatabaseException;
+
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
@@ -27,6 +29,8 @@ public class PlayQueueDaoWrapper {
 
     private final AppDatabase appDatabase;
     private final PlayQueueDao playQueueDao;
+
+    private static final int DB_OBSERVABLE_RETRY_COUNT = 5;
 
     @Nullable
     private PlayQueueEntity deletedItem;
@@ -222,7 +226,9 @@ public class PlayQueueDaoWrapper {
         } else {
             observable = playQueueDao.getPositionObservable(id);
         }
-        return observable.distinctUntilChanged();
+        return observable
+                .retry(DB_OBSERVABLE_RETRY_COUNT, t -> t instanceof SQLiteCantOpenDatabaseException)
+                .distinctUntilChanged();
     }
 
     public Observable<Integer> getIndexPositionObservable(long id, boolean isShuffle) {

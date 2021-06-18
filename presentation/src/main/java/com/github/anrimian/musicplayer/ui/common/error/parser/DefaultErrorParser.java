@@ -8,6 +8,7 @@ import androidx.annotation.StringRes;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
+import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
@@ -58,7 +59,8 @@ public class DefaultErrorParser implements ErrorParser {
                 }
             }
         }
-        if (throwable instanceof PlayListNotCreatedException) {
+        if (throwable instanceof PlayListNotCreatedException
+                || throwable instanceof PlayListAlreadyExistsException) {
             return error(R.string.play_list_with_this_name_already_exists);
         }
         if (throwable instanceof PlayListAlreadyDeletedException) {

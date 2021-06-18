@@ -77,8 +77,8 @@
     <string name="delete_playlist">Delete playlist</string>
     <string name="storage_timeout_error_message">
         Device media storage is not responding.
-        This is a really strange and rare issue.
-        Try to reboot the device, perhaps it will solve this problem.
+        This is a really strange and rare issue.
+        Try to reboot the device, perhaps it will solve this problem.
     </string>
     <string name="select_all">Select all</string>
     <string name="file_uri_extract_error">

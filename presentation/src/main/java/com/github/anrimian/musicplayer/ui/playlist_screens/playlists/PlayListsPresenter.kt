@@ -25,10 +25,6 @@ class PlayListsPresenter(
         playListsInteractor.saveListPosition(listPosition)
     }
 
-    fun onPlayListLongClick(playList: PlayList?) {
-        viewState.showPlayListMenu(playList)
-    }
-
     fun onDeletePlayListButtonClicked(playList: PlayList) {
         viewState.showConfirmDeletePlayListDialog(playList)
     }
