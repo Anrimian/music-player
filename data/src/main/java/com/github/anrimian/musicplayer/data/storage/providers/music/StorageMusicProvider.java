@@ -89,7 +89,7 @@ public class StorageMusicProvider {
     }
 
     public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable(
-            long minFileDurationMillis
+            long minAudioDurationMillis
     ) {
         Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, unsafeGetStorageUri());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -104,12 +104,8 @@ public class StorageMusicProvider {
             //maybe filter often events?
             storageChangeObservable = Observable.merge(storageChangeObservable, playListChangeObservable);
         }
-        return storageChangeObservable.flatMapSingle(o -> Single.create(emitter -> {
-            LongSparseArray<StorageFullComposition> compositions = getCompositions(minFileDurationMillis);
-            if (compositions != null) {
-                emitter.onSuccess(compositions);
-            }
-        }));
+        return storageChangeObservable
+                .flatMapSingle(o -> getCompositionsSingle(minAudioDurationMillis));
     }
 
     @Nullable
@@ -417,6 +413,16 @@ public class StorageMusicProvider {
                 throw new RecoverableSecurityExceptionExt(pIntent, throwable.getMessage());
             }
             throw throwable;
+        });
+    }
+
+    private Single<LongSparseArray<StorageFullComposition>> getCompositionsSingle(
+            long minAudioDurationMillis) {
+        return Single.create(emitter -> {
+            LongSparseArray<StorageFullComposition> compositions = getCompositions(minAudioDurationMillis);
+            if (compositions != null) {
+                emitter.onSuccess(compositions);
+            }
         });
     }
 

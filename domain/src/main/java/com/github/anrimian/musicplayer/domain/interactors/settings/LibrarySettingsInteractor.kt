@@ -18,4 +18,6 @@ class LibrarySettingsInteractor(private val settingsRepository: SettingsReposito
         settingsRepository.audioFileMinDurationMillis = millis
     }
 
+    fun getAudioFileMinDurationMillis() = settingsRepository.audioFileMinDurationMillis
+
 }

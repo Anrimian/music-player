@@ -217,8 +217,9 @@
     <string name="resume">Resume</string>
     <string name="sleep_timer_message">Playing will be stopped in:</string>
     <string name="stop">Stop</string>
-    <string name="exclude_compositions_with_duration_less_than">Exclude compositions with durations less than</string>
-    <string name="seconds_template">%d s</string>
+
+    <string name="exclude_compositions_with_duration_less_than">Exclude compositions from scanning</string>
+    <string name="seconds_template">With duration less than %s</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
@@ -263,6 +264,11 @@
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d song deleted</item>
         <item quantity="other">%1$d songs deleted</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d second</item>
+        <item quantity="other">%1$d seconds</item>
     </plurals>
 
 </resources>

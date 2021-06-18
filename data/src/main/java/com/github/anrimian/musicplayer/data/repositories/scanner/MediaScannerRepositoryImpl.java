@@ -82,6 +82,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         mediaStoreDisposable.add(settingsRepository.geAudioFileMinDurationMillisObservable()
                 .switchMap(musicProvider::getCompositionsObservable)
                 .subscribeOn(scheduler)
+                .observeOn(scheduler)
                 .subscribe(compositionAnalyzer::applyCompositionsData));
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)

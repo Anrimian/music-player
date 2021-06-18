@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLibrarySettingsBinding
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
@@ -21,11 +22,11 @@ import moxy.ktx.moxyPresenter
  * Created on 19.10.2017.
  */
 class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, LibrarySettingsView {
-    
+
     private val presenter by moxyPresenter { Components.getSettingsComponent().librarySettingsPresenter() }
-    
+
     private lateinit var viewBinding: FragmentLibrarySettingsBinding
-    
+
     private lateinit var navigation: FragmentNavigation
 
     override fun onCreateView(
@@ -56,7 +57,7 @@ class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, L
         }
 
         viewBinding.flAudioMinDurationClickableArea.setOnClickListener {
-
+            presenter.onSelectMinDurationClicked()
         }
 
         SlidrPanel.simpleSwipeBack(viewBinding.flContainer, this, toolbar::onStackFragmentSlided)
@@ -74,9 +75,20 @@ class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, L
     }
 
     override fun showAudioFileMinDurationMillis(millis: Long) {
+        val seconds = (millis/1000L).toInt()
         viewBinding.tvAudioMinDurationValue.text = getString(
             R.string.seconds_template,
-            millis/1000L
+            resources.getQuantityString(R.plurals.seconds_template, seconds, seconds)
         )
     }
+
+    override fun showSelectMinAudioDurationDialog(currentValue: Long) {
+        DialogUtils.showNumberPickerDialog(
+            requireContext(),
+            0,
+            60,
+            (currentValue / 1000L).toInt()
+        ) { value -> presenter.onAudioFileMinDurationMillisPicked(value * 1000L) }
+    }
+
 }

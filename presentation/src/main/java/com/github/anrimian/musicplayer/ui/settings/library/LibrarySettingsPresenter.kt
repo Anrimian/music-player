@@ -25,4 +25,11 @@ class LibrarySettingsPresenter(private val librarySettingsInteractor: LibrarySet
     fun onAudioFileMinDurationMillisPicked(millis: Long) {
         librarySettingsInteractor.setAudioFileMinDurationMillis(millis)
     }
+
+    fun onSelectMinDurationClicked() {
+        viewState.showSelectMinAudioDurationDialog(
+            librarySettingsInteractor.getAudioFileMinDurationMillis()
+        )
+    }
+
 }
