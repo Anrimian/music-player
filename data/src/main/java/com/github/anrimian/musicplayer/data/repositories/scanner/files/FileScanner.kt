@@ -66,6 +66,10 @@ class FileScanner(
     //on error - rerun?
     //+try several times and them skip?
     //onErrorResumeNext?
+    //variant:
+    //--retry three times
+    //on error exclude from scan(how, just set file scan time?..no, it should rescan again, right),
+    // log if need, and consume event
     private fun processError(throwable: Throwable) {
         if (throwable is FileNotFoundException) {
             return
