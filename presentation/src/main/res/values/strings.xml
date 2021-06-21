@@ -220,7 +220,7 @@
 
     <string name="exclude_compositions_with_duration_less_than">Exclude compositions from scanning</string>
     <string name="seconds_template">With duration less than %s</string>
-    <string name="pause_on_audiofocus_loss">Pause on audio focus loss</string>
+    <string name="pause_on_audiofocus_loss">Stop playing on calling, music/video playing, etc.</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

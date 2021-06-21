@@ -15,7 +15,6 @@ import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
-//TODO cbPauseOnAudioFocusLoss - more clear description
 class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
     private val presenter by moxyPresenter { Components.getSettingsComponent().playerSettingsPresenter() }
