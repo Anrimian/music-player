@@ -58,7 +58,7 @@ dependencies {
     implementation deps.roomRx
     annotationProcessor deps.roomCompiler
 
-    implementation group: 'org', name: 'jaudiotagger', version: jTaggerVersion
+    implementation deps.jAudioTagger
 
     testImplementation deps.junit
     testImplementation deps.mockito

@@ -5,14 +5,12 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import moxy.MvpView;
-import moxy.viewstate.strategy.StateStrategyType;
 import moxy.viewstate.strategy.alias.AddToEndSingle;
 import moxy.viewstate.strategy.alias.OneExecution;
 import moxy.viewstate.strategy.alias.Skip;
@@ -38,7 +36,7 @@ public interface PlayerView extends MvpView {
     @OneExecution
     void scrollQueueToPosition(int position);
 
-    @StateStrategyType(ListStateStrategy.class)
+    @AddToEndSingle
     void updatePlayQueue(List<PlayQueueItem> items);
 
     @AddToEndSingle

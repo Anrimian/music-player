@@ -302,18 +302,16 @@ public class LibraryPlayerInteractor {
             //if file changed - re prepare with actual position
             //if not - check if changes exists - if true - update source with actual position
             boolean isFileChanged = hasSourceChanges(previousItem, currentItem);
-            boolean isModelChanged = areSourcesTheSame(previousItem, currentItem);
+            boolean isModelChanged = !areSourcesTheSame(previousItem, currentItem);
             if (isFileChanged || isModelChanged) {
                 //noinspection ResultOfMethodCallIgnored
                 getActualTrackPosition().subscribe(actualTrackPosition -> {
                     LibraryCompositionSource source = new LibraryCompositionSource(currentComposition, actualTrackPosition);
                     if (isFileChanged) {
                         playerCoordinatorInteractor.prepareToPlay(source, LIBRARY);
-                        return;
+                        return;//and cover will be not updated, f.e.?
                     }
-                    if (isModelChanged) {
-                        playerCoordinatorInteractor.updateSource(source, LIBRARY);
-                    }
+                    playerCoordinatorInteractor.updateSource(source, LIBRARY);
                 });
             }
             return;

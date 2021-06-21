@@ -214,7 +214,7 @@
     <string name="playback_speed">Velocidad de reproducción</string>
     <string name="reset">Reset</string>
     <string name="apply">Aplicar</string>
-    <string name="sleep_timer">Temporizador de Sleep</string>
+    <string name="sleep_timer">Temporizador de Sueño</string>
     <string name="start">Iniciar</string>
     <string name="resume">Reiniciar</string>
     <string name="sleep_timer_message">Reproducción se detendrá en:</string>

@@ -14,28 +14,34 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 
 public class CompositionSourceProvider {
 
+    private static final int STORAGE_TIMEOUT_SECONDS = 3;
+
     private final CompositionsDaoWrapper compositionsDao;
     private final StorageMusicProvider storageMusicProvider;
+    private final CompositionSourceEditor compositionSourceEditor;
     private final Scheduler scheduler;
 
     public CompositionSourceProvider(CompositionsDaoWrapper compositionsDao,
                                      StorageMusicProvider storageMusicProvider,
+                                     CompositionSourceEditor compositionSourceEditor,
                                      Scheduler scheduler) {
         this.compositionsDao = compositionsDao;
         this.storageMusicProvider = storageMusicProvider;
+        this.compositionSourceEditor = compositionSourceEditor;
         this.scheduler = scheduler;
     }
 
     public Single<Uri> getCompositionUri(long compositionId) {
         return Single.fromCallable(() -> compositionsDao.getStorageId(compositionId))
                 .map(storageMusicProvider::getCompositionUri)
-                .timeout(1, TimeUnit.SECONDS)
+                .timeout(STORAGE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .subscribeOn(scheduler);
     }
 
@@ -48,17 +54,22 @@ public class CompositionSourceProvider {
     public Single<FileDescriptor> getCompositionFileDescriptorSingle(long compositionId) {
         return Single.fromCallable(() -> compositionsDao.getStorageId(compositionId))
                 .map(storageMusicProvider::getFileDescriptor)
-                .timeout(1, TimeUnit.SECONDS)
+                .timeout(STORAGE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .subscribeOn(scheduler);
     }
 
+    public Maybe<byte[]> getCompositionArtworkBinaryData(long compositionId) {
+        return Maybe.fromCallable(() -> compositionsDao.getStorageId(compositionId))
+                .flatMap(compositionSourceEditor::getCompositionArtworkBinaryData);
+    }
+
     public InputStream getCompositionStream(long compositionId) throws FileNotFoundException {
-        long storageId =  compositionsDao.getStorageId(compositionId);
+        long storageId = compositionsDao.getStorageId(compositionId);
         return storageMusicProvider.getCompositionStream(storageId);
     }
 
     public FileDescriptor getCompositionFileDescriptor(long compositionId) throws FileNotFoundException {
-        long storageId =  compositionsDao.getStorageId(compositionId);
+        long storageId = compositionsDao.getStorageId(compositionId);
         return storageMusicProvider.getFileDescriptor(storageId);
     }
 

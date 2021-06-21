@@ -27,12 +27,12 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 
 //two instances of eq are not allowed? - done
 //release and nullify on detach? - done
+//attachEqualizer - what if session id was changed? - reinit - done
 //try to init twice?
 
 //always call release to eq and android media player
 // + 4/5 errors caused from fragment onFirstViewAttach()
 //always attach session id(do not use audio session id = 0) for using correct audio session id
-//attachEqualizer - what if session id was changed? - reinit
 
 //calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
 //last resort: retry + handle errors
@@ -171,10 +171,16 @@ public class InternalEqualizer implements AppEqualizer {
     private static class EqualizerObjectHolder {
 
         private Equalizer mainEqualizer;
+        private int currentAudioSessionId = 1;
 
         private Equalizer initEqualizer(int audioSessionId, Callback<Equalizer> initFunc) {
             synchronized (this) {
+                if (currentAudioSessionId != audioSessionId) {
+                    releaseEqualizer();
+                }
+
                 if (mainEqualizer == null) {
+                    currentAudioSessionId = audioSessionId;
                     mainEqualizer = new Equalizer(1000, audioSessionId);
                     initFunc.call(mainEqualizer);
                 }
@@ -193,6 +199,7 @@ public class InternalEqualizer implements AppEqualizer {
                     mainEqualizer.setEnabled(false);
                     mainEqualizer.release();
                     mainEqualizer = null;
+                    currentAudioSessionId = 1;
                 }
             }
         }
@@ -201,7 +208,7 @@ public class InternalEqualizer implements AppEqualizer {
             synchronized (this) {
                 Equalizer equalizer;
                 if (mainEqualizer == null) {
-                    equalizer = new Equalizer(0, 1);
+                    equalizer = new Equalizer(0, currentAudioSessionId);
                 } else {
                     equalizer = mainEqualizer;
                 }

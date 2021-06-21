@@ -4,13 +4,13 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.ListStateStrategy;
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
 
 import java.util.List;
 
 import moxy.MvpView;
 import moxy.viewstate.strategy.StateStrategyType;
+import moxy.viewstate.strategy.alias.AddToEndSingle;
 import moxy.viewstate.strategy.alias.OneExecution;
 
 public interface ArtistsListView extends MvpView {
@@ -39,7 +39,7 @@ public interface ArtistsListView extends MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
     void hideRenameProgress();
 
-    @StateStrategyType(ListStateStrategy.class)
+    @AddToEndSingle
     void submitList(List<Artist> artists);
 
     @OneExecution
