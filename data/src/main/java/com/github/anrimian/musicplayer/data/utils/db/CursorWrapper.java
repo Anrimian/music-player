@@ -1,8 +1,11 @@
 package com.github.anrimian.musicplayer.data.utils.db;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.room.util.CursorUtil;
 
 public class CursorWrapper {
 
@@ -15,6 +18,11 @@ public class CursorWrapper {
     @Nullable
     public String getString(String columnName) {
         int columnIndex = cursor.getColumnIndex(columnName);
+        return getString(columnIndex);
+    }
+
+    @Nullable
+    public String getString(int columnIndex) {
         if (columnIndex < 0 || cursor.isNull(columnIndex)) {
             return null;
         } else {
@@ -24,6 +32,10 @@ public class CursorWrapper {
 
     public long getLong(String columnName) {
         int columnIndex = cursor.getColumnIndex(columnName);
+        return getLong(columnIndex);
+    }
+
+    public long getLong(int columnIndex) {
         if (columnIndex < 0 || cursor.isNull(columnIndex)) {
             return 0;
         } else {
@@ -33,11 +45,20 @@ public class CursorWrapper {
 
     public int getInt(String columnName) {
         int columnIndex = cursor.getColumnIndex(columnName);
+        return getInt(columnIndex);
+    }
+
+    public int getInt(int columnIndex) {
         if (columnIndex < 0 || cursor.isNull(columnIndex)) {
             return 0;
         } else {
             return cursor.getInt(columnIndex);
         }
+    }
+
+    @SuppressLint("RestrictedApi")
+    public static int getColumnIndex(@NonNull Cursor c, @NonNull String name) {
+        return CursorUtil.getColumnIndex(c, name);
     }
 
     public boolean getBoolean(String columnName) {

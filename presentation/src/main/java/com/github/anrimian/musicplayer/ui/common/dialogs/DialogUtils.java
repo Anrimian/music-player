@@ -18,6 +18,7 @@ import androidx.core.content.FileProvider;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.DialogSpeedSelectorBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDeleteDialogBinding;
+import com.github.anrimian.musicplayer.databinding.PartialNumberPickerDialogBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -237,6 +238,28 @@ public class DialogUtils {
         });
 
         dialog.show();
+    }
+
+    public static void showNumberPickerDialog(Context context,
+                                              int minValue,
+                                              int maxValue,
+                                              int currentValue,
+                                              Callback<Integer> pickCallback) {
+        PartialNumberPickerDialogBinding binding = PartialNumberPickerDialogBinding.inflate(
+                LayoutInflater.from(context)
+        );
+
+        binding.numberPicker.setMinValue(minValue);
+        binding.numberPicker.setMaxValue(maxValue);
+        binding.numberPicker.setValue(currentValue);
+
+        new AlertDialog.Builder(context)
+                .setView(binding.getRoot())
+                .setPositiveButton(
+                        android.R.string.ok,
+                        (dialog, which) -> pickCallback.call(binding.numberPicker.getValue())
+                ).setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private static Uri createUri(Context context, String filePath) {

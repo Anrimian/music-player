@@ -115,4 +115,10 @@ public interface SettingsRepository {
     void setSleepTimerPlayLastSong(boolean playLastSong);
 
     boolean isSleepTimerPlayLastSong();
+
+    Observable<Long> geAudioFileMinDurationMillisObservable();
+
+    void setAudioFileMinDurationMillis(long millis);
+
+    long getAudioFileMinDurationMillis();
 }

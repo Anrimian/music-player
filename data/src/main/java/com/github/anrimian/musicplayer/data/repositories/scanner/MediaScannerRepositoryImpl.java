@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.playlists.StorageP
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final StoragePlayListsProvider playListsProvider;
     private final StorageGenresProvider genresProvider;
     private final GenresDaoWrapper genresDao;
+    private final SettingsRepository settingsRepository;
     private final StorageCompositionAnalyzer compositionAnalyzer;
     private final StoragePlaylistAnalyzer playlistAnalyzer;
     private final LoggerRepository loggerRepository;
@@ -43,6 +45,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                                       StoragePlayListsProvider playListsProvider,
                                       StorageGenresProvider genresProvider,
                                       GenresDaoWrapper genresDao,
+                                      SettingsRepository settingsRepository,
                                       StorageCompositionAnalyzer compositionAnalyzer,
                                       StoragePlaylistAnalyzer playlistAnalyzer,
                                       LoggerRepository loggerRepository,
@@ -51,6 +54,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         this.playListsProvider = playListsProvider;
         this.genresProvider = genresProvider;
         this.genresDao = genresDao;
+        this.settingsRepository = settingsRepository;
         this.compositionAnalyzer = compositionAnalyzer;
         this.playlistAnalyzer = playlistAnalyzer;
         this.loggerRepository = loggerRepository;
@@ -75,8 +79,10 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     }
 
     private void subscribeOnMediaStoreChanges() {
-        mediaStoreDisposable.add(musicProvider.getCompositionsObservable()
+        mediaStoreDisposable.add(settingsRepository.geAudioFileMinDurationMillisObservable()
+                .switchMap(musicProvider::getCompositionsObservable)
                 .subscribeOn(scheduler)
+                .observeOn(scheduler)
                 .subscribe(compositionAnalyzer::applyCompositionsData));
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)
@@ -92,7 +98,9 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 
     private Completable runRescanStorage() {
         return Completable.fromAction(() -> {
-            LongSparseArray<StorageFullComposition> compositions = musicProvider.getCompositions();
+            LongSparseArray<StorageFullComposition> compositions = musicProvider.getCompositions(
+                    settingsRepository.getAudioFileMinDurationMillis()
+            );
             if (compositions == null) {
                 return;
             }
