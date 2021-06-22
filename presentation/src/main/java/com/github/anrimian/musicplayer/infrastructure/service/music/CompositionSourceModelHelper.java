@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
@@ -37,11 +38,11 @@ public class CompositionSourceModelHelper {
         return false;
     }
 
-    public static void updateMediaSessionAlbumArt(CompositionSource source,
+    public static void updateMediaSessionAlbumArt(@Nullable CompositionSource source,
                                                   MediaMetadataCompat.Builder metadataBuilder,
                                                   MediaSessionCompat mediaSession,
                                                   boolean isEnabled) {
-        if (isEnabled) {
+        if (isEnabled && source != null) {
             if (source instanceof LibraryCompositionSource) {
                 Composition composition = ((LibraryCompositionSource) source).getComposition();
                 Components.getAppComponent()
@@ -66,7 +67,7 @@ public class CompositionSourceModelHelper {
         }
     }
 
-    public static void updateMediaSessionMetadata(CompositionSource source,
+    public static void updateMediaSessionMetadata(@Nullable CompositionSource source,
                                                   MediaMetadataCompat.Builder metadataBuilder,
                                                   MediaSessionCompat mediaSession,
                                                   Context context) {
@@ -78,6 +79,7 @@ public class CompositionSourceModelHelper {
                     .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatCompositionAuthor(composition, context).toString())
                     .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.getDuration());
             mediaSession.setMetadata(builder.build());
+            return;
         }
         if (source instanceof UriCompositionSource) {
             UriCompositionSource uriSource = (UriCompositionSource) source;
@@ -88,7 +90,14 @@ public class CompositionSourceModelHelper {
                     .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatAuthor(uriSource.getArtist(), context).toString())
                     .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, uriSource.getDuration());
             mediaSession.setMetadata(builder.build());
+            return;
         }
+        MediaMetadataCompat.Builder builder = metadataBuilder
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, null)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, null)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, null)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0);
+        mediaSession.setMetadata(builder.build());
     }
 
     public static long getTrackPosition(@Nonnull CompositionSource source) {

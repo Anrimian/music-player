@@ -270,6 +270,7 @@ public class MusicService extends Service {
         long newTrackPosition = serviceState.trackPosition;
 
         if (newCompositionSource == null || newPlayerState == PlayerState.STOP) {
+            //update media session state and media session metadata
             currentSource = null;
             trackPosition = 0;
             notificationsDisplayer().cancelCoverLoadingForForegroundNotification();
@@ -362,7 +363,6 @@ public class MusicService extends Service {
     }
 
     private void updateMediaSessionAlbumArt() {
-        assert currentSource != null;
         CompositionSourceModelHelper.updateMediaSessionAlbumArt(currentSource,
                 metadataBuilder,
                 mediaSession(),
@@ -370,7 +370,6 @@ public class MusicService extends Service {
     }
 
     private void updateMediaSessionMetadata() {
-        assert currentSource != null;
         CompositionSourceModelHelper.updateMediaSessionMetadata(currentSource,
                 metadataBuilder,
                 mediaSession(),

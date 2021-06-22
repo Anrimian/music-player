@@ -19,9 +19,9 @@ private const val FOLDERS_NODE_ID = "folders_node_id"
 private const val ARTISTS_NODE_ID = "artists_node_id"
 private const val ALBUMS_NODE_ID = "albums_node_id"
 
-//app starts play after android auto start
 //handle permissions
 //handle android 11 EXTRA_RECENT
+//media state is not cleared on stop
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private val itemUpdateDisposableMap = HashMap<String, Disposable>()

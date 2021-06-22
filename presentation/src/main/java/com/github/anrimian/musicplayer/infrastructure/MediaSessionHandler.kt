@@ -121,6 +121,10 @@ class MediaSessionHandler(private val context: Context,
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     //handle permission
                     //from empty list can not be called
+                    /* (Auto app) Exists play queue, start play, return back to list.
+                       Go to player though notification, clear play queue.
+                       Go to auto app, press shuffleAllAndPlay() -> stuck
+                    */
                     musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)
                 }
