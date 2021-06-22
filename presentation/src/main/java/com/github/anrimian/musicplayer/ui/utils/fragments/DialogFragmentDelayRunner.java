@@ -39,11 +39,13 @@ public class DialogFragmentDelayRunner {
     }
 
     public void cancel() {
-        DialogFragment fragment = (DialogFragment) fragmentManager
-                .findFragmentByTag(tag);
-        if (fragment != null) {
-            fragment.dismissAllowingStateLoss();
-        }
         handler.removeCallbacksAndMessages(null);
+        handler.post(() -> {
+            DialogFragment fragment = (DialogFragment) fragmentManager
+                    .findFragmentByTag(tag);
+            if (fragment != null) {
+                fragment.dismissAllowingStateLoss();
+            }
+        });
     }
 }

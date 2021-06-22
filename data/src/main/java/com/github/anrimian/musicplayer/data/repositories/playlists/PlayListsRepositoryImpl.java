@@ -49,18 +49,13 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     public Single<PlayList> createPlayList(String name) {
         return Single.fromCallable(() -> {
             Date currentDate = new Date();
-            long id = playListsDao.insertPlayList(name, currentDate, currentDate);
-
-            Long storageId = storagePlayListsProvider.createPlayList(name,
-                    currentDate,
-                    currentDate);
-            playListsDao.updateStorageId(id, storageId);
-            return new PlayList(id,
+            long id = playListsDao.insertPlayList(
                     name,
                     currentDate,
                     currentDate,
-                    0,
-                    0);
+                    () -> storagePlayListsProvider.createPlayList(name, currentDate, currentDate)
+            );
+            return new PlayList(id, name, currentDate, currentDate, 0, 0);
         }).subscribeOn(scheduler);
     }
 
@@ -68,9 +63,9 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     public Completable addCompositionsToPlayList(List<Composition> compositions,
                                                  PlayList playList,
                                                  int position) {
-        return Completable.fromAction(() -> {
-            playListsDao.addCompositions(compositions, playList.getId(), position);
-        }).subscribeOn(scheduler)
+        return Completable.fromAction(() ->
+                playListsDao.addCompositions(compositions, playList.getId(), position)
+        ).subscribeOn(scheduler)
                 .doOnComplete(() -> addCompositionsToStoragePlaylist(compositions, playList, position));
     }
 

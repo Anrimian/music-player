@@ -25,16 +25,24 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
-//two instances of eq are not allowed?
+//two instances of eq are not allowed? - done
 //release and nullify on detach? - done
+//attachEqualizer - what if session id was changed? - reinit - done
 //try to init twice?
+
+//always call release to eq and android media player
+// + 4/5 errors caused from fragment onFirstViewAttach()
+//always attach session id(do not use audio session id = 0) for using correct audio session id
+
+//calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
+//last resort: retry + handle errors
+
 public class InternalEqualizer implements AppEqualizer {
 
     private final EqualizerStateRepository equalizerStateRepository;
 
     private final BehaviorSubject<EqualizerState> currentStateSubject = BehaviorSubject.create();
 
-//    private Equalizer equalizer;
     private final EqualizerObjectHolder equalizerHolder = new EqualizerObjectHolder();
 
     public InternalEqualizer(EqualizerStateRepository equalizerStateRepository) {
@@ -63,13 +71,6 @@ public class InternalEqualizer implements AppEqualizer {
     @Override
     public void detachEqualizer(int audioSessionId) {
         equalizerHolder.releaseEqualizer();
-
-//        if (equalizer != null) {
-//            equalizer.setEnabled(false);
-//            //should prevent UnsupportedOperationException - observe
-//            equalizer.release();
-//            equalizer = null;
-//        }
     }
 
     public Single<EqualizerConfig> getEqualizerConfig() {
@@ -167,14 +168,19 @@ public class InternalEqualizer implements AppEqualizer {
         return new EqualizerConfig(lowestRange, highestRange, bands, presets);
     }
 
-    //I suppose that two instances of eq can cause state errors. Let's try this.
     private static class EqualizerObjectHolder {
 
         private Equalizer mainEqualizer;
+        private int currentAudioSessionId = 1;
 
         private Equalizer initEqualizer(int audioSessionId, Callback<Equalizer> initFunc) {
             synchronized (this) {
+                if (currentAudioSessionId != audioSessionId) {
+                    releaseEqualizer();
+                }
+
                 if (mainEqualizer == null) {
+                    currentAudioSessionId = audioSessionId;
                     mainEqualizer = new Equalizer(1000, audioSessionId);
                     initFunc.call(mainEqualizer);
                 }
@@ -191,9 +197,9 @@ public class InternalEqualizer implements AppEqualizer {
             synchronized (this) {
                 if (mainEqualizer != null) {
                     mainEqualizer.setEnabled(false);
-                    //should prevent UnsupportedOperationException - observe
                     mainEqualizer.release();
                     mainEqualizer = null;
+                    currentAudioSessionId = 1;
                 }
             }
         }
@@ -202,7 +208,7 @@ public class InternalEqualizer implements AppEqualizer {
             synchronized (this) {
                 Equalizer equalizer;
                 if (mainEqualizer == null) {
-                    equalizer = new Equalizer(0, 1);
+                    equalizer = new Equalizer(0, currentAudioSessionId);
                 } else {
                     equalizer = mainEqualizer;
                 }

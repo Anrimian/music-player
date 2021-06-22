@@ -23,6 +23,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.LibraryReposito
 import com.github.anrimian.musicplayer.data.repositories.play_queue.PlayQueueRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
@@ -201,8 +202,14 @@ class MusicModule {
     @Singleton
     CompositionSourceProvider sourceRepository(CompositionsDaoWrapper compositionsDao,
                                                StorageMusicProvider storageMusicProvider,
+                                               CompositionSourceEditor compositionSourceEditor,
                                                @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new CompositionSourceProvider(compositionsDao, storageMusicProvider, scheduler);
+        return new CompositionSourceProvider(
+                compositionsDao,
+                storageMusicProvider,
+                compositionSourceEditor,
+                scheduler
+        );
     }
 
     @Provides

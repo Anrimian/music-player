@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import android.database.sqlite.SQLiteException;
+
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
@@ -65,10 +67,14 @@ public class StorageCompositionsInserter {
         });
     }
 
-    //list can be too large to be executed in sql statement loop
     private void deleteFolders(List<Long> folderIds) {
-        for (Long folderId: folderIds) {
-            foldersDao.deleteFolder(folderId);
+        try {
+            foldersDao.deleteFolders(folderIds);
+        } catch (SQLiteException e) {
+            //list can be too large to be executed in sql statement loop
+            for (Long folderId : folderIds) {
+                foldersDao.deleteFolder(folderId);
+            }
         }
     }
 
@@ -139,6 +145,7 @@ public class StorageCompositionsInserter {
         //optimization with cache, ~33% faster
         Map<String, Long> artistsCache = new HashMap<>();
         Map<String, Long> albumsCache = new HashMap<>();
+        //TODO can cause sqlite constraint exception, figure out how
         compositionsDao.insert(mapList(
                 addedCompositions,
                 composition -> toCompositionEntity(composition, artistsCache, albumsCache, addedFilesFolderMap))
