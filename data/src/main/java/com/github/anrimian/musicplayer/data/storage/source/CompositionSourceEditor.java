@@ -373,7 +373,7 @@ public class CompositionSourceEditor {
     private long editAudioFileTag(String filePath, Long id, ThrowsCallback<Tag> callback)
             throws Exception {
         File fileToEdit = new File(filePath);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) { // || !fileToEdit.canWrite()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R || !fileToEdit.canWrite()) {//will see how it works
             return fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
                 copyFileUsingStream(fileToEdit, tempFile);
                 runFileAction(tempFile, callback);
