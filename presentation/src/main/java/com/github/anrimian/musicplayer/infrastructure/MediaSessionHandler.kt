@@ -125,9 +125,9 @@ class MediaSessionHandler(private val context: Context,
                        Go to player though notification, clear play queue.
                        Go to auto app
                        -- press shuffleAllAndPlay() -> stuck
-                       -- or current composition is not cleared
+                       -- current composition screen is not cleared
 
-                       ( it causes mediaSession.setActive(false) )
+                       ( it is caused by mediaSession.setActive(false) )
                     */
                     musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)

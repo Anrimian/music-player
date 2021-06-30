@@ -113,6 +113,10 @@ public class LibraryPlayerInteractor {
         playerCoordinatorInteractor.stop(LIBRARY);
     }
 
+    public void reset() {
+        playerCoordinatorInteractor.reset(LIBRARY);
+    }
+
     public void pause() {
         playerCoordinatorInteractor.pause(LIBRARY);
     }
@@ -291,7 +295,7 @@ public class LibraryPlayerInteractor {
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
             if (previousItem != null) {
-                stop();
+                reset();
             }
             return;
         }

@@ -281,7 +281,7 @@ public class MusicService extends Service {
             updateNotification = true;
             updateMediaSessionState = true;
 
-            if (playerState == PlayerState.PAUSE) {
+            if (playerState == PlayerState.PAUSE || playerState == PlayerState.STOP) {
                 stopForeground(false);
             }
         }
@@ -319,7 +319,7 @@ public class MusicService extends Service {
             updateMediaSessionState = true;
         }
 
-        if (newCompositionSource == null || newPlayerState == PlayerState.STOP) {
+        if (newCompositionSource == null || newPlayerState == PlayerState.IDLE) {
             stopService = true;
         }
 
@@ -342,7 +342,7 @@ public class MusicService extends Service {
         }
 
         //seekbar values on cover settings change
-        if (updateNotification) {
+        if (updateNotification && !stopService) {
             updateForegroundNotification(updateMediaSessionAlbumArt);
         }
         if (updateMediaSessionState) {
@@ -381,6 +381,7 @@ public class MusicService extends Service {
     }
 
     private void updateMediaSessionState() {
+        //stopped - likely wrong media state
         stateBuilder.setState(toMediaState(playerState), trackPosition, playbackSpeed);
         mediaSession().setPlaybackState(stateBuilder.build());
 

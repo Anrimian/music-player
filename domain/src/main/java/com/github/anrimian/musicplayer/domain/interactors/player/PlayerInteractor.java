@@ -78,6 +78,15 @@ public class PlayerInteractor {
         currentSourceSubject.onNext(new Optional<>(currentSource));
     }
 
+    public void reset() {
+        currentSource = null;
+        currentSourceSubject.onNext(new Optional<>(null));
+
+        musicPlayerController.stop();
+        playerStateSubject.onNext(IDLE);
+        systemEventsDisposable.clear();
+    }
+
     public void play() {
         play(0);
     }

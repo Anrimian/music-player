@@ -73,6 +73,13 @@ public class PlayerCoordinatorInteractor {
         }
     }
 
+    public void reset(PlayerType playerType) {
+        preparedSourcesMap.remove(playerType);
+        if (playerType == activePlayerType) {
+            playerInteractor.reset();
+        }
+    }
+
     public void fastSeekForward(PlayerType playerType) {
         if (playerType == activePlayerType) {
             playerInteractor.fastSeekForward();
