@@ -21,7 +21,7 @@ private const val ALBUMS_NODE_ID = "albums_node_id"
 
 //handle permissions
 //handle android 11 EXTRA_RECENT
-//media state is not cleared on stop
+//media state is not fully cleared on stop
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private val itemUpdateDisposableMap = HashMap<String, Disposable>()

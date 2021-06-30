@@ -24,7 +24,11 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 
 public class CompositionSourceModelHelper {
 
-    public static boolean areSourcesTheSame(CompositionSource first, CompositionSource second) {
+    public static boolean areSourcesTheSame(@Nullable CompositionSource first, @Nullable CompositionSource second) {
+        if (first == null || second == null) {
+            return false;
+        }
+
         if (first.getClass().equals(second.getClass())) {
             if (first instanceof LibraryCompositionSource) {
                 return CompositionHelper.areSourcesTheSame(
@@ -100,7 +104,7 @@ public class CompositionSourceModelHelper {
         mediaSession.setMetadata(builder.build());
     }
 
-    public static long getTrackPosition(@Nonnull CompositionSource source) {
+    public static long getTrackPosition(@Nullable CompositionSource source) {
         if (source instanceof LibraryCompositionSource) {
             return ((LibraryCompositionSource) source).getTrackPosition();
         }

@@ -123,7 +123,11 @@ class MediaSessionHandler(private val context: Context,
                     //from empty list can not be called
                     /* (Auto app) Exists play queue, start play, return back to list.
                        Go to player though notification, clear play queue.
-                       Go to auto app, press shuffleAllAndPlay() -> stuck
+                       Go to auto app
+                       -- press shuffleAllAndPlay() -> stuck
+                       -- or current composition is not cleared
+
+                       ( it causes mediaSession.setActive(false) )
                     */
                     musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)

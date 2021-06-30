@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.source.Composit
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
@@ -269,43 +270,32 @@ public class MusicService extends Service {
         PlayerState newPlayerState = serviceState.playerState;
         long newTrackPosition = serviceState.trackPosition;
 
-        if (newCompositionSource == null || newPlayerState == PlayerState.STOP) {
-            //update media session state and media session metadata
-            currentSource = null;
-            trackPosition = 0;
-            notificationsDisplayer().cancelCoverLoadingForForegroundNotification();
-            mediaSession().setActive(false);
-            stopForeground(true);
-            stopSelf();
-            return;
-        }
-        if (!mediaSession().isActive()) {
-            mediaSession().setActive(true);
-        }
-
         boolean updateNotification = false;
         boolean updateMediaSessionState = false;
         boolean updateMediaSessionMetadata = false;
         boolean updateMediaSessionAlbumArt = false;
+        boolean stopService = false;
 
         if (this.playerState != serviceState.playerState) {
             this.playerState = serviceState.playerState;
             updateNotification = true;
             updateMediaSessionState = true;
 
-            onPlayerStateChanged(playerState);
+            if (playerState == PlayerState.PAUSE) {
+                stopForeground(false);
+            }
         }
 
-        if (!newCompositionSource.equals(currentSource) || !CompositionSourceModelHelper.areSourcesTheSame(currentSource, newCompositionSource)) {
-            if (!newCompositionSource.equals(currentSource)) {
+        boolean isSourceEqual = Objects.equals(newCompositionSource, currentSource);
+        boolean isContentEqual = CompositionSourceModelHelper.areSourcesTheSame(currentSource, newCompositionSource);
+        if (!isSourceEqual || !isContentEqual) {
+            if (!isSourceEqual) {
                 newTrackPosition = CompositionSourceModelHelper.getTrackPosition(newCompositionSource);
-                updateMediaSessionAlbumArt = true;
-            } else if (!CompositionSourceModelHelper.areSourcesTheSame(currentSource, newCompositionSource)) {
-                updateMediaSessionAlbumArt = true;
             }
             this.currentSource = newCompositionSource;
             updateNotification = true;
             updateMediaSessionMetadata = true;
+            updateMediaSessionAlbumArt = true;
         }
 
         if (this.trackPosition != newTrackPosition) {
@@ -327,6 +317,10 @@ public class MusicService extends Service {
         if (this.playbackSpeed != serviceState.playbackSpeed) {
             this.playbackSpeed = serviceState.playbackSpeed;
             updateMediaSessionState = true;
+        }
+
+        if (newCompositionSource == null || newPlayerState == PlayerState.STOP) {
+            stopService = true;
         }
 
         MusicNotificationSetting newSettings = serviceState.settings;
@@ -359,6 +353,16 @@ public class MusicService extends Service {
         }
         if (updateMediaSessionAlbumArt) {
             updateMediaSessionAlbumArt();
+        }
+        if (stopService) {
+            notificationsDisplayer().cancelCoverLoadingForForegroundNotification();
+            mediaSession().setActive(false);
+            stopForeground(true);
+            stopSelf();
+        } else {
+            if (!mediaSession().isActive()) {
+                mediaSession().setActive(true);
+            }
         }
     }
 
@@ -403,15 +407,6 @@ public class MusicService extends Service {
             sessionShuffleMode = SHUFFLE_MODE_NONE;
         }
         mediaSession().setShuffleMode(sessionShuffleMode);
-    }
-
-    private void onPlayerStateChanged(PlayerState playerState) {
-        switch (playerState) {
-            case PAUSE: {
-                stopForeground(false);
-                break;
-            }
-        }
     }
 
     private void updateForegroundNotification(boolean reloadCover) {
