@@ -6,9 +6,11 @@ import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
+const val REQUEST_FILE_PERMISSION_ACTION_ID = "request_file_permission_action_id"
 const val RESUME_ACTION_ID = "resume_action_id"
 const val SHUFFLE_ALL_AND_PLAY_ACTION_ID = "shuffle_all_and_play_action_id"
 
@@ -21,6 +23,8 @@ private const val ALBUMS_NODE_ID = "albums_node_id"
 
 //handle permissions
 //handle android 11 EXTRA_RECENT
+
+//support navigation hints
 
 //checklist:
 //how it will work with external player?
@@ -36,6 +40,19 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         this.sessionToken = mediaSessionHandler.getMediaSession().sessionToken
     }
 
+/*
+  val maximumRootChildLimit = rootHints.getInt(
+      MediaConstants.BROWSER_ROOT_HINTS_KEY_ROOT_CHILDREN_LIMIT,
+      /* defaultValue= */ 4)
+  val supportedRootChildFlags = rootHints.getInt(
+      MediaConstants.BROWSER_ROOT_HINTS_KEY_ROOT_CHILDREN_SUPPORTED_FLAGS,
+      /* defaultValue= */ MediaItem.FLAG_BROWSABLE)
+  https://developer.android.google.cn/training/cars/media?hl=en-au
+
+  Note: In Android Auto, only the car screen interface will show navigational tabs. Therefore, these root hints will only be sent when connecting to Android Auto for the car screen, and will not be sent when connecting to Android Auto for the phone screen.
+  Caution: Not all versions of Android Automotive OS will send these root hints. In the absence of these hints, you should assume that Android Automotive OS requires only root browsable items, and at most four of them. Take note of the default values in the code snippet above.
+
+ */
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
@@ -66,6 +83,13 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     //increase loading speed
     //fun can be templated
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
+        if (!Permissions.hasFilePermission(this)) {
+            resultCallback.sendResult(listOf(
+                actionItem(R.string.no_file_permission, REQUEST_FILE_PERMISSION_ACTION_ID)
+            ))
+            return
+        }
+
         val observable = Components.getAppComponent()
             .libraryPlayerInteractor()
             .playQueueSizeObservable
