@@ -8,12 +8,15 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentStartBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKtKt;
+import com.github.anrimian.musicplayer.utils.Permissions;
 import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import moxy.MvpAppCompatFragment;
@@ -45,12 +48,20 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
         rxPermissions = new RxPermissions(this);
 
-        viewBinding.progressStateView.onTryAgainClick(presenter::onTryAgainButtonClicked);
+        viewBinding.progressStateView.onTryAgainClick(this::onTryAgainButtonClicked);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Permissions.hasFilePermission(requireContext())) {
+            presenter.onFilesPermissionResult(true);
+        }
     }
 
     @Override
     public void requestFilesPermissions() {
-        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .subscribe(presenter::onFilesPermissionResult);
     }
 
@@ -79,5 +90,13 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
                 .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
                 .replace(R.id.main_activity_container, PlayerFragment.newInstance())
                 .commit();
+    }
+
+    private void onTryAgainButtonClicked() {
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            AndroidUtilsKtKt.startAppSettings(requireActivity());
+            return;
+        }
+        presenter.onTryAgainButtonClicked();
     }
 }

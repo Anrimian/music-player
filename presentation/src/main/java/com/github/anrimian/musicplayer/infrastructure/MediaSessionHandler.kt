@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SHUF
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
+import io.reactivex.rxjava3.disposables.Disposable
 
 class MediaSessionHandler(private val context: Context,
                           private val playerInteractor: PlayerInteractor,
@@ -29,6 +30,8 @@ class MediaSessionHandler(private val context: Context,
 
     private var mediaSession: MediaSessionCompat? = null
     private var activeServicesCount = 0
+
+    private var actionDisposable: Disposable? = null
 
     fun getMediaSession(): MediaSessionCompat {
         if (mediaSession == null) {
@@ -59,8 +62,11 @@ class MediaSessionHandler(private val context: Context,
     }
 
     private fun release() {
-        getMediaSession().isActive = false
-        getMediaSession().release()
+        actionDisposable?.dispose()
+        mediaSession?.run {
+            isActive = false
+            release()
+        }
         mediaSession = null
     }
 
@@ -131,8 +137,7 @@ class MediaSessionHandler(private val context: Context,
                     playerInteractor.play()
                 }
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
-                    //handle permission
-                    musicServiceInteractor.shuffleAllAndPlay()
+                    actionDisposable = musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)
                 }
             }

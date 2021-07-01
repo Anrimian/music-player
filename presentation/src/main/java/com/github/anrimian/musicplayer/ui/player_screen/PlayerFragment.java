@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import android.Manifest;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -80,9 +79,9 @@ import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListene
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
+import com.github.anrimian.musicplayer.utils.Permissions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -358,8 +357,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             openPlayQueue();
         }
 
-        RxPermissions rxPermissions = new RxPermissions(this);
-        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (!Permissions.hasFilePermission(requireContext())) {
             getParentFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_activity_container, new StartFragment())

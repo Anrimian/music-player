@@ -25,6 +25,10 @@ class StartPresenter : MvpPresenter<StartView>() {
         requestFilesPermissions()
     }
 
+    fun onScreenResumed() {
+        requestFilesPermissions()
+    }
+
     private fun requestFilesPermissions() {
         viewState.showStub()
         viewState.requestFilesPermissions()

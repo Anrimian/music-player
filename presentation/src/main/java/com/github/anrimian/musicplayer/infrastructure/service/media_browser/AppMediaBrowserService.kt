@@ -21,7 +21,7 @@ private const val FOLDERS_NODE_ID = "folders_node_id"
 private const val ARTISTS_NODE_ID = "artists_node_id"
 private const val ALBUMS_NODE_ID = "albums_node_id"
 
-//handle permissions
+//permission error state
 //handle android 11 EXTRA_RECENT
 
 //support navigation hints
@@ -40,19 +40,19 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         this.sessionToken = mediaSessionHandler.getMediaSession().sessionToken
     }
 
-/*
-  val maximumRootChildLimit = rootHints.getInt(
-      MediaConstants.BROWSER_ROOT_HINTS_KEY_ROOT_CHILDREN_LIMIT,
-      /* defaultValue= */ 4)
-  val supportedRootChildFlags = rootHints.getInt(
-      MediaConstants.BROWSER_ROOT_HINTS_KEY_ROOT_CHILDREN_SUPPORTED_FLAGS,
-      /* defaultValue= */ MediaItem.FLAG_BROWSABLE)
-  https://developer.android.google.cn/training/cars/media?hl=en-au
+    /*
+      val maximumRootChildLimit = rootHints.getInt(
+          MediaConstants.BROWSER_ROOT_HINTS_KEY_ROOT_CHILDREN_LIMIT,
+          /* defaultValue= */ 4)
+      val supportedRootChildFlags = rootHints.getInt(
+          MediaConstants.BROWSER_ROOT_HINTS_KEY_ROOT_CHILDREN_SUPPORTED_FLAGS,
+          /* defaultValue= */ MediaItem.FLAG_BROWSABLE)
+      https://developer.android.google.cn/training/cars/media?hl=en-au
 
-  Note: In Android Auto, only the car screen interface will show navigational tabs. Therefore, these root hints will only be sent when connecting to Android Auto for the car screen, and will not be sent when connecting to Android Auto for the phone screen.
-  Caution: Not all versions of Android Automotive OS will send these root hints. In the absence of these hints, you should assume that Android Automotive OS requires only root browsable items, and at most four of them. Take note of the default values in the code snippet above.
+      Note: In Android Auto, only the car screen interface will show navigational tabs. Therefore, these root hints will only be sent when connecting to Android Auto for the car screen, and will not be sent when connecting to Android Auto for the phone screen.
+      Caution: Not all versions of Android Automotive OS will send these root hints. In the absence of these hints, you should assume that Android Automotive OS requires only root browsable items, and at most four of them. Take note of the default values in the code snippet above.
 
- */
+     */
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
@@ -79,13 +79,14 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed()
     }
 
+    //reload after permission grant?
     //handle errors
     //increase loading speed
     //fun can be templated
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
         if (!Permissions.hasFilePermission(this)) {
             resultCallback.sendResult(listOf(
-                actionItem(R.string.no_file_permission, REQUEST_FILE_PERMISSION_ACTION_ID)
+                actionItem(REQUEST_FILE_PERMISSION_ACTION_ID, R.string.no_file_permission)
             ))
             return
         }
@@ -100,24 +101,24 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             .subscribe { isPlayQueueExists ->
                 val mediaItems = arrayListOf<MediaBrowserCompat.MediaItem>()
                 if (isPlayQueueExists) {
-                    mediaItems.add(actionItem(R.string.resume, RESUME_ACTION_ID))
+                    mediaItems.add(actionItem(RESUME_ACTION_ID, R.string.resume))
                 }
                 mediaItems.apply {
-                    add(actionItem(R.string.shuffle_all_and_play, SHUFFLE_ALL_AND_PLAY_ACTION_ID))
-                    add(browsableItem(R.string.compositions, COMPOSITIONS_NODE_ID))
-                    add(browsableItem(R.string.folders, FOLDERS_NODE_ID))
-                    add(browsableItem(R.string.artists, ARTISTS_NODE_ID))
-                    add(browsableItem(R.string.albums, ALBUMS_NODE_ID))
+                    add(actionItem(SHUFFLE_ALL_AND_PLAY_ACTION_ID, R.string.shuffle_all_and_play))
+                    add(browsableItem(COMPOSITIONS_NODE_ID, R.string.compositions))
+                    add(browsableItem(FOLDERS_NODE_ID, R.string.folders))
+                    add(browsableItem(ARTISTS_NODE_ID, R.string.artists))
+                    add(browsableItem(ALBUMS_NODE_ID, R.string.albums))
                 }
                 resultCallback.sendResult(mediaItems)
 
-                registerBrowsableItemUpdate(observable, ROOT_ID)
+                registerBrowsableItemUpdate(ROOT_ID, observable)
             }
 
         resultCallback.detach()
     }
 
-    private fun registerBrowsableItemUpdate(observable: Observable<*>, itemId: String) {
+    private fun registerBrowsableItemUpdate(itemId: String, observable: Observable<*>) {
         if (itemUpdateDisposableMap.containsKey(itemId)) {
             return
         }
@@ -127,21 +128,25 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         itemUpdateDisposableMap[itemId] = disposable
     }
 
-    private fun actionItem(titleResId: Int, mediaId: String) =
-        actionItem(getString(titleResId), mediaId)
+    private fun actionItem(mediaId: String, titleResId: Int, subtitle: CharSequence? = null) =
+        actionItem(mediaId, getString(titleResId), subtitle)
 
-    private fun actionItem(title: CharSequence?, mediaId: String) = MediaBrowserCompat.MediaItem(
+    private fun actionItem(mediaId: String,
+                           title: CharSequence?,
+                           subtitle: CharSequence? = null
+    ) = MediaBrowserCompat.MediaItem(
         MediaDescriptionCompat.Builder()
             .setTitle(title)
             .setMediaId(mediaId)
+            .setSubtitle(subtitle)
             .build(),
         MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
     )
 
-    private fun browsableItem(titleResId: Int, mediaId: String) =
-        browsableItem(getString(titleResId), mediaId)
+    private fun browsableItem(mediaId: String, titleResId: Int) =
+        browsableItem(mediaId, getString(titleResId))
 
-    private fun browsableItem(title: CharSequence?, mediaId: String) = MediaBrowserCompat.MediaItem(
+    private fun browsableItem(mediaId: String, title: CharSequence?) = MediaBrowserCompat.MediaItem(
         MediaDescriptionCompat.Builder()
             .setTitle(title)
             .setMediaId(mediaId)
