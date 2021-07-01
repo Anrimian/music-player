@@ -21,7 +21,6 @@ private const val ALBUMS_NODE_ID = "albums_node_id"
 
 //handle permissions
 //handle android 11 EXTRA_RECENT
-//media state is not fully cleared on stop
 
 //checklist:
 //how it will work with external player?
@@ -32,10 +31,9 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     override fun onCreate() {
         super.onCreate()
-        val mediaSession = Components.getAppComponent()
-            .mediaSessionHandler()
-            .getMediaSession()
-        this.sessionToken = mediaSession.sessionToken
+        val mediaSessionHandler = Components.getAppComponent().mediaSessionHandler()
+        mediaSessionHandler.dispatchServiceCreated()
+        this.sessionToken = mediaSessionHandler.getMediaSession().sessionToken
     }
 
     override fun onGetRoot(
@@ -61,6 +59,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         super.onDestroy()
         currentRequestDisposable?.dispose()
         itemUpdateDisposableMap.forEach { entry -> entry.value.dispose() }
+        Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed()
     }
 
     //handle errors

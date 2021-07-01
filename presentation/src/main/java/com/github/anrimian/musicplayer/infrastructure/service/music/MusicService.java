@@ -97,6 +97,8 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Components.getAppComponent().mediaSessionHandler().dispatchServiceCreated();
+
 //        if (!Permissions.hasFilePermission(this)) {
 //            notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
 //            stopForeground(true);
@@ -170,7 +172,7 @@ public class MusicService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Components.getAppComponent().mediaSessionHandler().release();
+        Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed();
 //        mediaSession().setActive(false);
 //        mediaSession().release();
         serviceDisposable.dispose();
@@ -356,7 +358,6 @@ public class MusicService extends Service {
         }
         if (stopService) {
             notificationsDisplayer().cancelCoverLoadingForForegroundNotification();
-            mediaSession().setActive(false);
             stopForeground(true);
             stopSelf();
         } else {

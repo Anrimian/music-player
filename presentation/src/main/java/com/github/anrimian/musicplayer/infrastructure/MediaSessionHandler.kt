@@ -28,6 +28,7 @@ class MediaSessionHandler(private val context: Context,
 ) {
 
     private var mediaSession: MediaSessionCompat? = null
+    private var activeServicesCount = 0
 
     fun getMediaSession(): MediaSessionCompat {
         if (mediaSession == null) {
@@ -46,7 +47,18 @@ class MediaSessionHandler(private val context: Context,
         return mediaSession!!
     }
 
-    fun release() {
+    fun dispatchServiceCreated() {
+        activeServicesCount++
+    }
+
+    fun dispatchServiceDestroyed() {
+        activeServicesCount--
+        if (activeServicesCount <= 0) {
+            release()
+        }
+    }
+
+    private fun release() {
         getMediaSession().isActive = false
         getMediaSession().release()
         mediaSession = null
@@ -120,15 +132,6 @@ class MediaSessionHandler(private val context: Context,
                 }
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     //handle permission
-                    //from empty list can not be called
-                    /* (Auto app) Exists play queue, start play, return back to list.
-                       Go to player though notification, clear play queue.
-                       Go to auto app
-                       -- press shuffleAllAndPlay() -> stuck
-                       -- current composition screen is not cleared
-
-                       ( it is caused by mediaSession.setActive(false) )
-                    */
                     musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)
                 }
