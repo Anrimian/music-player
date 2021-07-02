@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view
 
-const val MAX_EVENTS_TO_SKIP = 50
+private const val MAX_EVENTS_TO_SKIP: Short = 50
 
 class ListDragFilter {
 
@@ -8,7 +8,7 @@ class ListDragFilter {
     private var eventsToSkip: Short = 0
 
     fun increaseEventsToSkip() {
-        currentSize++.coerceAtMost(MAX_EVENTS_TO_SKIP)
+        eventsToSkip++.coerceAtMost(MAX_EVENTS_TO_SKIP)
     }
 
     fun filterListEmitting(list: List<Any>): Boolean {
