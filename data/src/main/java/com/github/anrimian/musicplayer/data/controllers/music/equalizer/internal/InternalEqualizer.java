@@ -25,14 +25,14 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 
-//two instances of eq are not allowed? - done
-//release and nullify on detach? - done
+//two instances of eq are not allowed? - done, doesn't help
+//release and nullify on detach? - done, doesn't help
 //attachEqualizer - what if session id was changed? - reinit - done
 //always call release to eq and android media player - done in player, always call on pause
 
 //try to init twice?
 // + 4/5 errors caused from fragment onFirstViewAttach()
-//always attach session id(do not use audio session id = 0) for using correct audio session id
+//always attach session id(do not use audio session id = 0) for using correct audio session id(can't do with android media player) - skip
 
 //calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
 //last resort: retry + handle errors
@@ -126,6 +126,10 @@ public class InternalEqualizer implements AppEqualizer {
                 currentStateSubject.onNext(equalizerState);
             }
         }
+    }
+
+    public void release() {
+        equalizerHolder.releaseEqualizer();
     }
 
     private void applyEqualizerState(Equalizer equalizer, EqualizerState equalizerState) {

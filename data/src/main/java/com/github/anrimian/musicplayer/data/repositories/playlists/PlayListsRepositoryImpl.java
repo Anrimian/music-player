@@ -102,7 +102,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     public Completable moveItemInPlayList(PlayList playList, int from, int to) {
         return Completable.fromAction(() -> {
             Long storageId = playListsDao.selectStorageId(playList.getId());
-            storagePlayListsProvider.moveItemInPlayList(storageId, from, to);
+            storagePlayListsProvider.moveItemInPlayList(storageId, from, to);//quite slow
             playListsDao.moveItems(playList.getId(), from, to);
         }).subscribeOn(scheduler);
     }

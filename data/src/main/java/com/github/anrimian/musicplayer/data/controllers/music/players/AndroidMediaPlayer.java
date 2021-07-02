@@ -214,7 +214,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
-            } catch (IllegalStateException ignored) {}
+            } catch (IllegalStateException ignored) {} //IllegalArgumentException - handle unsupported case
         }
     }
 
