@@ -28,9 +28,9 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 //two instances of eq are not allowed? - done
 //release and nullify on detach? - done
 //attachEqualizer - what if session id was changed? - reinit - done
-//try to init twice?
+//always call release to eq and android media player - done in player, always call on pause
 
-//always call release to eq and android media player
+//try to init twice?
 // + 4/5 errors caused from fragment onFirstViewAttach()
 //always attach session id(do not use audio session id = 0) for using correct audio session id
 
