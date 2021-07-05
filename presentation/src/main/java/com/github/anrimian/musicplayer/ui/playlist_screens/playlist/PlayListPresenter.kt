@@ -119,7 +119,7 @@ class PlayListPresenter(private val playListId: Long,
 
     fun onDeletePlayListDialogConfirmed() {
         playListsInteractor.deletePlayList(playList!!.id)
-                .subscribeOnUi(this::onPlayListDeleted, this::onPlayListDeletingError)
+            .subscribeOnUi(this::onPlayListDeleted, this::onPlayListDeletingError)
     }
 
     fun onFragmentMovedToTop() {
@@ -152,7 +152,7 @@ class PlayListPresenter(private val playListId: Long,
         }
         listDragFilter.increaseEventsToSkip()
         playListsInteractor.moveItemInPlayList(playList, startDragPosition, position)
-                .subscribe()
+            .justSubscribe(this::onDefaultError)
     }
 
     fun onPlayActionSelected(position: Int) {
@@ -162,9 +162,9 @@ class PlayListPresenter(private val playListId: Long,
     fun onRestoreRemovedItemClicked() {
         val removedComposition = deletedItem!!.data!!.composition
         playListsInteractor.addCompositionsToPlayList(listOf(removedComposition),
-                playList,
-                deletedItem!!.position)
-                .justSubscribe(this::onDefaultError)
+            playList,
+            deletedItem!!.position)
+            .justSubscribe(this::onDefaultError)
     }
 
     fun onChangePlayListNameButtonClicked() {
@@ -176,8 +176,8 @@ class PlayListPresenter(private val playListId: Long,
     fun onRetryFailedDeleteActionClicked() {
         if (lastDeleteAction != null) {
             lastDeleteAction!!
-                    .doFinally { lastDeleteAction = null }
-                    .justSubscribe(this::onDeleteCompositionsError)
+                .doFinally { lastDeleteAction = null }
+                .justSubscribe(this::onDeleteCompositionsError)
         }
     }
 
@@ -185,12 +185,12 @@ class PlayListPresenter(private val playListId: Long,
 
     private fun addCompositionsToPlayNext(compositions: List<Composition>) {
         playerInteractor.addCompositionsToPlayNext(compositions)
-                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
+            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
     }
 
     private fun addCompositionsToEnd(compositions: List<Composition>) {
         playerInteractor.addCompositionsToEnd(compositions)
-                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
+            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
     }
 
     private fun onDefaultError(throwable: Throwable) {
@@ -200,7 +200,7 @@ class PlayListPresenter(private val playListId: Long,
 
     private fun deleteItem(playListItem: PlayListItem, position: Int) {
         playListsInteractor.deleteItemFromPlayList(playListItem, playListId)
-                .subscribeOnUi({ onDeleteItemCompleted(playListItem, position) }, this::onDeleteItemError)
+            .subscribeOnUi({ onDeleteItemCompleted(playListItem, position) }, this::onDeleteItemError)
     }
 
     private fun swapItems(from: Int, to: Int) {
@@ -231,7 +231,7 @@ class PlayListPresenter(private val playListId: Long,
 
     private fun addPreparedCompositionsToPlayList(playList: PlayList) {
         playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
-                .subscribeOnUi({ onAddingToPlayListCompleted(playList) }, this::onAddingToPlayListError)
+            .subscribeOnUi({ onAddingToPlayListCompleted(playList) }, this::onAddingToPlayListError)
     }
 
     private fun onAddingToPlayListError(throwable: Throwable) {
@@ -246,8 +246,8 @@ class PlayListPresenter(private val playListId: Long,
 
     private fun deletePreparedCompositions() {
         lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
-                .observeOn(uiScheduler)
-                .doOnComplete(this::onDeleteCompositionsSuccess)
+            .observeOn(uiScheduler)
+            .doOnComplete(this::onDeleteCompositionsSuccess)
 
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
     }
@@ -264,22 +264,22 @@ class PlayListPresenter(private val playListId: Long,
     private fun subscribeOnCompositions() {
         viewState.showLoading()
         playListsInteractor.getCompositionsObservable(playListId)
-                .observeOn(uiScheduler)
-                .filter(listDragFilter::filterListEmitting)
-                .subscribeOnUi(
-                        this::onPlayListsReceived,
-                        { viewState.closeScreen() },
-                        viewState::closeScreen
-                )
+            .observeOn(uiScheduler)
+            .filter(listDragFilter::filterListEmitting)
+            .subscribeOnUi(
+                this::onPlayListsReceived,
+                { viewState.closeScreen() },
+                viewState::closeScreen
+            )
     }
 
     private fun subscribePlayList() {
         playListsInteractor.getPlayListObservable(playListId)
-                .subscribeOnUi(
-                        this::onPlayListInfoReceived,
-                        { viewState.closeScreen() },
-                        viewState::closeScreen
-                )
+            .subscribeOnUi(
+                this::onPlayListInfoReceived,
+                { viewState.closeScreen() },
+                viewState::closeScreen
+            )
     }
 
     private fun onPlayListInfoReceived(playList: PlayList) {
@@ -311,8 +311,8 @@ class PlayListPresenter(private val playListId: Long,
 
     private fun subscribeOnCurrentComposition() {
         currentItemDisposable = playerInteractor.currentQueueItemObservable
-                .observeOn(uiScheduler)
-                .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
+            .observeOn(uiScheduler)
+            .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
         presenterBatterySafeDisposable.add(currentItemDisposable!!)
     }
 

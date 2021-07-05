@@ -3,8 +3,6 @@ package com.github.anrimian.musicplayer.data.controllers.music.players;
 import android.content.Context;
 import android.net.Uri;
 
-import androidx.annotation.NonNull;
-
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
@@ -22,7 +20,6 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
@@ -180,7 +177,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     @Override
     public void release() {
         usePlayer(player -> {
-            equalizerController.detachEqualizer();
+//            equalizerController.detachEqualizer();
             pausePlayer();
             stopTracingTrackPosition();
             player.release();
@@ -195,6 +192,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     private void startPlayWhenReady() {
         Completable.fromRunnable(() -> {
             getPlayer().setPlayWhenReady(true);
+            equalizerController.attachEqualizer(getPlayer().getAudioSessionId());
             startTracingTrackPosition();
         }).subscribeOn(uiScheduler).subscribe();
     }
@@ -217,6 +215,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private void pausePlayer() {
         getPlayer().setPlayWhenReady(false);
+        equalizerController.detachEqualizer();
     }
 
     private void sendErrorEvent(Throwable throwable) {
@@ -312,15 +311,15 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                             this::sendErrorEvent
                     );
                     player.addListener(playerEventListener);
-                    equalizerController.attachEqualizer(player.getAudioSessionId());
-                    player.addAnalyticsListener(new AnalyticsListener() {
+//                    equalizerController.attachEqualizer(player.getAudioSessionId());
+//                    player.addAnalyticsListener(new AnalyticsListener() {
+//
+//                        @Override
+//                        public void onAudioSessionIdChanged(@NonNull EventTime eventTime, int audioSessionId) {
+//                            equalizerController.attachEqualizer(audioSessionId);
+//                        }
 
-                        @Override
-                        public void onAudioSessionIdChanged(@NonNull EventTime eventTime, int audioSessionId) {
-                            equalizerController.attachEqualizer(audioSessionId);
-                        }
-
-                    });
+//                    });
 
                 }
             }
