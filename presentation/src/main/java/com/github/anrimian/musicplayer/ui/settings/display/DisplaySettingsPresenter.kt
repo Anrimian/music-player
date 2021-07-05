@@ -16,9 +16,10 @@ class DisplaySettingsPresenter(private val interactor: DisplaySettingsInteractor
         viewState.showCoversChecked(interactor.isCoversEnabled)
         viewState.showCoversInNotificationChecked(interactor.isCoversInNotificationEnabled)
         viewState.showColoredNotificationChecked(interactor.isColoredNotificationEnabled)
+        viewState.showNotificationCoverStubChecked(interactor.isNotificationCoverStubEnabled)
         viewState.showCoversOnLockScreenChecked(interactor.isCoversOnLockScreenEnabled)
         subscribeOnCoversEnabledState()
-        subscribeOnColoredNotificationEnabledState()
+        subscribeOnNotificationCoverSettingsEnabledState()
     }
 
     fun onCoversChecked(checked: Boolean) {
@@ -36,20 +37,30 @@ class DisplaySettingsPresenter(private val interactor: DisplaySettingsInteractor
         interactor.isColoredNotificationEnabled = checked
     }
 
+    fun onNotificationCoverStubChecked(checked: Boolean) {
+        viewState.showNotificationCoverStubChecked(checked)
+        interactor.isNotificationCoverStubEnabled = checked
+    }
+
     fun onCoversOnLockScreenChecked(checked: Boolean) {
         viewState.showCoversOnLockScreenChecked(checked)
         interactor.isCoversOnLockScreenEnabled = checked
     }
 
-    private fun subscribeOnColoredNotificationEnabledState() {
+    private fun subscribeOnNotificationCoverSettingsEnabledState() {
         Observable.combineLatest(interactor.coversEnabledObservable,
                 interactor.coversInNotificationEnabledObservable,
                 { covers, notification -> covers && notification })
-                .unsafeSubscribeOnUi(viewState::showColoredNotificationEnabled)
+                .unsafeSubscribeOnUi(this::onNotificationCoverSettingsEnabled)
     }
 
     private fun subscribeOnCoversEnabledState() {
         interactor.coversEnabledObservable.unsafeSubscribeOnUi(this::onCoversEnabled)
+    }
+
+    private fun onNotificationCoverSettingsEnabled(enabled: Boolean) {
+        viewState.showColoredNotificationEnabled(enabled)
+        viewState.showNotificationCoverStubEnabled(enabled)
     }
 
     private fun onCoversEnabled(enabled: Boolean) {

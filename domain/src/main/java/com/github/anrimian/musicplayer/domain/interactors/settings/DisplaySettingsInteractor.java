@@ -51,4 +51,12 @@ public class DisplaySettingsInteractor {
     public void setCoversOnLockScreenEnabled(boolean enabled) {
         settingsRepository.setCoversOnLockScreenEnabled(enabled);
     }
+
+    public void setNotificationCoverStubEnabled(boolean enabled) {
+        settingsRepository.setNotificationCoverStubEnabled(enabled);
+    }
+
+    public boolean isNotificationCoverStubEnabled() {
+        return settingsRepository.isNotificationCoverStubEnabled();
+    }
 }

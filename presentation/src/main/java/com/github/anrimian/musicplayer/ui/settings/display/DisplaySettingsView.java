@@ -15,6 +15,9 @@ public interface DisplaySettingsView extends MvpView {
     void showColoredNotificationChecked(boolean checked);
 
     @AddToEndSingle
+    void showNotificationCoverStubChecked(boolean checked);
+
+    @AddToEndSingle
     void showCoversOnLockScreenChecked(boolean checked);
 
     @AddToEndSingle
@@ -22,6 +25,9 @@ public interface DisplaySettingsView extends MvpView {
 
     @AddToEndSingle
     void showColoredNotificationEnabled(boolean enabled);
+
+    @AddToEndSingle
+    void showNotificationCoverStubEnabled(boolean enabled);
 
     @AddToEndSingle
     void showShowCoversOnLockScreenEnabled(boolean enabled);

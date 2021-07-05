@@ -22,6 +22,7 @@ import moxy.presenter.ProvidePresenter;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
 
+//ShowCoverStubInNotification - update notification doesn't work
 public class DisplaySettingsFragment extends MvpAppCompatFragment implements DisplaySettingsView {
 
     @InjectPresenter
@@ -59,6 +60,7 @@ public class DisplaySettingsFragment extends MvpAppCompatFragment implements Dis
         onCheckChanged(viewBinding.cbCovers, presenter::onCoversChecked);
         onCheckChanged(viewBinding.cbCoversInNotification, presenter::onCoversInNotificationChecked);
         onCheckChanged(viewBinding.cbColoredNotification, presenter::onColoredNotificationChecked);
+        onCheckChanged(viewBinding.cbShowCoverStubInNotification, presenter::onNotificationCoverStubChecked);
         onCheckChanged(viewBinding.cbNotificationOnLockScreen, presenter::onCoversOnLockScreenChecked);
     }
 
@@ -95,5 +97,15 @@ public class DisplaySettingsFragment extends MvpAppCompatFragment implements Dis
     @Override
     public void showShowCoversOnLockScreenEnabled(boolean enabled) {
         viewBinding.cbNotificationOnLockScreen.setEnabled(enabled);
+    }
+
+    @Override
+    public void showNotificationCoverStubChecked(boolean checked) {
+        setChecked(viewBinding.cbShowCoverStubInNotification, checked);
+    }
+
+    @Override
+    public void showNotificationCoverStubEnabled(boolean enabled) {
+        viewBinding.cbShowCoverStubInNotification.setEnabled(enabled);
     }
 }

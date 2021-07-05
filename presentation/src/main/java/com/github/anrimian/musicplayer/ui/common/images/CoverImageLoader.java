@@ -242,9 +242,7 @@ public class CoverImageLoader {
     private Runnable loadNotificationImage(Object compositionImage,
                                            Callback<Bitmap> onCompleted) {
         CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
-            if (bitmap == null) {
-                bitmap = getDefaultNotificationBitmap();
-            } else {
+            if (bitmap != null) {
                 //possible fix for RemoteServiceException crash
                 //https://stackoverflow.com/questions/54948936/bad-notification-the-given-region-must-intersect-with-the-bitmaps-dimensions
                 bitmap = bitmap.copy(Bitmap.Config.RGB_565, false);

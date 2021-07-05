@@ -336,7 +336,8 @@ public class MusicService extends Service {
             }
             if (notificationSetting == null
                     || notificationSetting.isShowCovers() != newSettings.isShowCovers()
-                    || notificationSetting.isColoredNotification() != newSettings.isColoredNotification()) {
+                    || notificationSetting.isColoredNotification() != newSettings.isColoredNotification()
+                    || notificationSetting.isShowNotificationCoverStub() != newSettings.isShowNotificationCoverStub()) {
                 updateNotification = true;
             }
             this.notificationSetting = newSettings;

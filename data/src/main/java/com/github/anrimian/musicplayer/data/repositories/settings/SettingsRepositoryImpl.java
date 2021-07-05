@@ -35,6 +35,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String SHOW_COVERS = "show_covers";
     private static final String SHOW_COVERS_IN_NOTIFICATION = "show_covers_in_notification";
     private static final String COLORED_NOTIFICATION = "colored_notification";
+    private static final String SHOW_NOTIFICATION_COVER_STUB = "show_notification_cover_stub";
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
 
     private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
@@ -59,6 +60,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> showNotificationCoverStubSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
     private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
@@ -383,6 +385,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public long getAudioFileMinDurationMillis() {
         return preferences.getLong(AUDIO_FILE_MIN_DURATION, 30000L);
+    }
+
+    @Override
+    public Observable<Boolean> getNotificationCoverStubEnabledObservable() {
+        return withDefaultValue(showNotificationCoverStubSubject, this::isNotificationCoverStubEnabled);
+    }
+
+    @Override
+    public void setNotificationCoverStubEnabled(boolean enabled) {
+        if (enabled != isNotificationCoverStubEnabled()) {
+            preferences.putBoolean(SHOW_NOTIFICATION_COVER_STUB, enabled);
+            showNotificationCoverStubSubject.onNext(enabled);
+        }
+    }
+
+    @Override
+    public boolean isNotificationCoverStubEnabled() {
+        return preferences.getBoolean(SHOW_NOTIFICATION_COVER_STUB, true);
     }
 
     private Order orderFromInt(int order) {
