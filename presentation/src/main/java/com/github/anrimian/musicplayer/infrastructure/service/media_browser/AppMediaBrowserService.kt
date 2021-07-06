@@ -7,6 +7,9 @@ import androidx.media.MediaBrowserServiceCompat
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor
 import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -66,11 +69,11 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         parentId: String,
         resultCallback: Result<List<MediaBrowserCompat.MediaItem>>
     ) {
-        if (parentId == ROOT_ID) {
-            loadRootItems(resultCallback)
-            return
+        when (parentId) {
+            ROOT_ID -> loadRootItems(resultCallback)
+            COMPOSITIONS_NODE_ID -> loadCompositionItems(resultCallback)
+            else -> resultCallback.sendResult(emptyList())
         }
-        resultCallback.sendResult(emptyList())
     }
 
     override fun onDestroy() {
@@ -78,6 +81,19 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         currentRequestDisposable?.dispose()
         itemUpdateDisposableMap.forEach { entry -> entry.value.dispose() }
         Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed()
+    }
+
+    //figure out format for media id
+    //how to pass position? - pass position to media id
+    private fun loadCompositionItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
+        val observable = Components.getAppComponent()
+            .musicServiceInteractor()
+            .compositionsObservable
+
+        loadItems(
+            resultCallback,
+            observable
+        ) { compositions -> compositions.map(this::toActionItem) }
     }
 
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
@@ -166,6 +182,12 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     ) {
         sendResult(listOf(actionItem(mediaId, message)))
     }
+
+    private fun toActionItem(composition: Composition) = actionItem(
+        composition.id.toString(),
+        formatCompositionName(composition),
+        formatAuthor(composition.artist, this)
+    )
 
     private fun actionItem(mediaId: String, titleResId: Int, subtitle: CharSequence? = null) =
         actionItem(mediaId, getString(titleResId), subtitle)

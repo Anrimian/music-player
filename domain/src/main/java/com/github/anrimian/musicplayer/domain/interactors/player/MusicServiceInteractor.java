@@ -1,8 +1,11 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
@@ -117,6 +120,10 @@ public class MusicServiceInteractor {
                 getColoredNotificationEnabledObservable(),
                 getCoversOnLockScreenEnabledObservable(),
                 MusicNotificationSetting::new);
+    }
+
+    public Observable<List<Composition>> getCompositionsObservable() {
+        return libraryCompositionsInteractor.getCompositionsObservable(null);
     }
 
     public MusicNotificationSetting getNotificationSettings() {
