@@ -80,36 +80,47 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed()
     }
 
-    //fun can be templated
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
+        val observable = Components.getAppComponent()
+            .libraryPlayerInteractor()
+            .playQueueSizeObservable
+            .map { size -> size > 0 }
+
+        loadItems(
+            resultCallback,
+            observable
+        ) { isPlayQueueExists ->
+            return@loadItems arrayListOf<MediaBrowserCompat.MediaItem>().apply {
+                if (isPlayQueueExists) {
+                    add(actionItem(RESUME_ACTION_ID, R.string.resume))
+                }
+                add(actionItem(SHUFFLE_ALL_AND_PLAY_ACTION_ID, R.string.shuffle_all_and_play))
+                add(browsableItem(COMPOSITIONS_NODE_ID, R.string.compositions))
+                add(browsableItem(FOLDERS_NODE_ID, R.string.folders))
+                add(browsableItem(ARTISTS_NODE_ID, R.string.artists))
+                add(browsableItem(ALBUMS_NODE_ID, R.string.albums))
+            }
+        }
+    }
+
+    private fun <T> loadItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
+                              valuesObservable: Observable<T>,
+                              resultMapper: (T) -> List<MediaBrowserCompat.MediaItem>
+    ) {
         if (!Permissions.hasFilePermission(this)) {
             resultCallback.sendErrorResult(PERMISSION_ERROR_ACTION_ID, R.string.no_file_permission)
             return
         }
 
-        val observable = Components.getAppComponent()
-            .libraryPlayerInteractor()
-            .playQueueSizeObservable
-            .map { size -> size > 0 }
+        val observable = valuesObservable
             .replay(1)
             .refCount()
 
         currentRequestDisposable = observable
             .firstOrError()
             .subscribe(
-                { isPlayQueueExists ->
-                    val mediaItems = arrayListOf<MediaBrowserCompat.MediaItem>()
-                    if (isPlayQueueExists) {//solve
-                        mediaItems.add(actionItem(RESUME_ACTION_ID, R.string.resume))
-                    }
-                    mediaItems.apply {
-                        add(actionItem(SHUFFLE_ALL_AND_PLAY_ACTION_ID, R.string.shuffle_all_and_play))
-                        add(browsableItem(COMPOSITIONS_NODE_ID, R.string.compositions))
-                        add(browsableItem(FOLDERS_NODE_ID, R.string.folders))
-                        add(browsableItem(ARTISTS_NODE_ID, R.string.artists))
-                        add(browsableItem(ALBUMS_NODE_ID, R.string.albums))
-                    }
-                    resultCallback.sendResult(mediaItems)
+                { value ->
+                    resultCallback.sendResult(resultMapper(value))
 
                     registerBrowsableItemUpdate(ROOT_ID, observable)
                 },
@@ -131,7 +142,8 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         }
         val disposable = observable.distinctUntilChanged()
             .skip(1)
-//            .onErrorReturn(this::processBrowsableItemUpdateError)//solve
+            .map { TRIGGER }
+            .onErrorReturn(this::processBrowsableItemUpdateError)
             .subscribe { notifyChildrenChanged(itemId) }
         itemUpdateDisposableMap[itemId] = disposable
     }
