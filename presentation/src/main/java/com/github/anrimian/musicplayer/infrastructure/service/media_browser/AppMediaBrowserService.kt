@@ -6,11 +6,13 @@ import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
-const val REQUEST_FILE_PERMISSION_ACTION_ID = "request_file_permission_action_id"
+const val PERMISSION_ERROR_ACTION_ID = "permission_error_action_id"
+const val DEFAULT_ERROR_ACTION_ID = "default_error_action_id"
 const val RESUME_ACTION_ID = "resume_action_id"
 const val SHUFFLE_ALL_AND_PLAY_ACTION_ID = "shuffle_all_and_play_action_id"
 
@@ -21,7 +23,6 @@ private const val FOLDERS_NODE_ID = "folders_node_id"
 private const val ARTISTS_NODE_ID = "artists_node_id"
 private const val ALBUMS_NODE_ID = "albums_node_id"
 
-//permission error state
 //handle android 11 EXTRA_RECENT
 
 //support navigation hints
@@ -79,15 +80,10 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed()
     }
 
-    //reload after permission grant?
-    //handle errors
-    //increase loading speed
     //fun can be templated
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
         if (!Permissions.hasFilePermission(this)) {
-            resultCallback.sendResult(listOf(
-                actionItem(REQUEST_FILE_PERMISSION_ACTION_ID, R.string.no_file_permission)
-            ))
+            resultCallback.sendErrorResult(PERMISSION_ERROR_ACTION_ID, R.string.no_file_permission)
             return
         }
 
@@ -95,25 +91,36 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             .libraryPlayerInteractor()
             .playQueueSizeObservable
             .map { size -> size > 0 }
+            .replay(1)
+            .refCount()
 
         currentRequestDisposable = observable
             .firstOrError()
-            .subscribe { isPlayQueueExists ->
-                val mediaItems = arrayListOf<MediaBrowserCompat.MediaItem>()
-                if (isPlayQueueExists) {
-                    mediaItems.add(actionItem(RESUME_ACTION_ID, R.string.resume))
-                }
-                mediaItems.apply {
-                    add(actionItem(SHUFFLE_ALL_AND_PLAY_ACTION_ID, R.string.shuffle_all_and_play))
-                    add(browsableItem(COMPOSITIONS_NODE_ID, R.string.compositions))
-                    add(browsableItem(FOLDERS_NODE_ID, R.string.folders))
-                    add(browsableItem(ARTISTS_NODE_ID, R.string.artists))
-                    add(browsableItem(ALBUMS_NODE_ID, R.string.albums))
-                }
-                resultCallback.sendResult(mediaItems)
+            .subscribe(
+                { isPlayQueueExists ->
+                    val mediaItems = arrayListOf<MediaBrowserCompat.MediaItem>()
+                    if (isPlayQueueExists) {//solve
+                        mediaItems.add(actionItem(RESUME_ACTION_ID, R.string.resume))
+                    }
+                    mediaItems.apply {
+                        add(actionItem(SHUFFLE_ALL_AND_PLAY_ACTION_ID, R.string.shuffle_all_and_play))
+                        add(browsableItem(COMPOSITIONS_NODE_ID, R.string.compositions))
+                        add(browsableItem(FOLDERS_NODE_ID, R.string.folders))
+                        add(browsableItem(ARTISTS_NODE_ID, R.string.artists))
+                        add(browsableItem(ALBUMS_NODE_ID, R.string.albums))
+                    }
+                    resultCallback.sendResult(mediaItems)
 
-                registerBrowsableItemUpdate(ROOT_ID, observable)
-            }
+                    registerBrowsableItemUpdate(ROOT_ID, observable)
+                },
+                { throwable ->
+                    val errorParser = Components.getAppComponent().errorParser()
+                    errorParser.logError(throwable)
+                    val errorCommand = errorParser.parseError(throwable)
+                    resultCallback.sendErrorResult(DEFAULT_ERROR_ACTION_ID, errorCommand.message)
+
+                    registerBrowsableItemUpdate(ROOT_ID, observable)
+                })
 
         resultCallback.detach()
     }
@@ -123,9 +130,29 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             return
         }
         val disposable = observable.distinctUntilChanged()
-            .onErrorComplete()//log errors?
+            .skip(1)
+//            .onErrorReturn(this::processBrowsableItemUpdateError)//solve
             .subscribe { notifyChildrenChanged(itemId) }
         itemUpdateDisposableMap[itemId] = disposable
+    }
+
+    private fun processBrowsableItemUpdateError(throwable: Throwable): Any {
+        Components.getAppComponent().analytics().processNonFatalError(throwable)
+        return TRIGGER
+    }
+
+    private fun Result<List<MediaBrowserCompat.MediaItem>>.sendErrorResult(
+        mediaId: String,
+        titleResId: Int
+    ) {
+        sendErrorResult(mediaId, getString(titleResId))
+    }
+
+    private fun Result<List<MediaBrowserCompat.MediaItem>>.sendErrorResult(
+        mediaId: String,
+        message: String
+    ) {
+        sendResult(listOf(actionItem(mediaId, message)))
     }
 
     private fun actionItem(mediaId: String, titleResId: Int, subtitle: CharSequence? = null) =

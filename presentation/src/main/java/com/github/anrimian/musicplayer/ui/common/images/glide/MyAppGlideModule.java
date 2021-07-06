@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.common.images.glide;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -26,6 +27,8 @@ public final class MyAppGlideModule extends AppGlideModule {
 
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
+        builder.setLogLevel(Log.ERROR);
+
         int memoryCacheSizeBytes = 6 * 1024 * 1024;//6 MB
         builder.setMemoryCache(new LruResourceCache(memoryCacheSizeBytes));
         builder.setBitmapPool(new LruBitmapPool(memoryCacheSizeBytes));
@@ -33,7 +36,6 @@ public final class MyAppGlideModule extends AppGlideModule {
         int diskCacheSizeBytes = 10 * 1024 * 1024; // 10 MB
         String diskCacheDirectory = "image_cache";
         builder.setDiskCache(new InternalCacheDiskCacheFactory(context, diskCacheDirectory, diskCacheSizeBytes));
-
     }
 
     @Override
