@@ -328,7 +328,7 @@ public class CompositionSourceEditor {
             if (path == null) {
                 throw new RuntimeException("composition path not found in system media store");
             }
-            return storageMusicProvider.getCompositionFilePath(storageId);
+            return path;
         });
     }
 
