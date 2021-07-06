@@ -218,6 +218,10 @@
     <string name="sleep_timer_message">Playing will be stopped in:</string>
     <string name="stop">Stop</string>
 
+    <string name="exclude_compositions_with_duration_less_than">Exclude compositions from scanning</string>
+    <string name="seconds_template">With duration less than %s</string>
+    <string name="pause_on_audiofocus_loss">Stop playing on calling, music/video playing, etc.</string>
+
     <string name="shuffle_all_and_play">Shuffle all and play</string>
 
     <plurals name="compositions_count">
@@ -263,6 +267,11 @@
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d song deleted</item>
         <item quantity="other">%1$d songs deleted</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d second</item>
+        <item quantity="other">%1$d seconds</item>
     </plurals>
 
 </resources>

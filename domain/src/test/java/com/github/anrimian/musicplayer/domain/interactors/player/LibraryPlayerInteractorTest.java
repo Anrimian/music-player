@@ -71,6 +71,7 @@ public class LibraryPlayerInteractorTest {
         when(musicProviderRepository.deleteComposition(any())).thenReturn(Completable.complete());
 
         when(settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled()).thenReturn(true);
+        when(settingsRepository.isPauseOnAudioFocusLossEnabled()).thenReturn(true);
 
         libraryPlayerInteractor = new LibraryPlayerInteractor(
                 playerCoordinatorInteractor,

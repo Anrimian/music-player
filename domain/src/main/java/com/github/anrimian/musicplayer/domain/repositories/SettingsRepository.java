@@ -80,6 +80,10 @@ public interface SettingsRepository {
 
     void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled);
 
+    boolean isPauseOnAudioFocusLossEnabled();
+
+    void setPauseOnAudioFocusLossEnabled(boolean enabled);
+
     void setExternalPlayerRepeatMode(int mode);
 
     int getExternalPlayerRepeatMode();
@@ -111,4 +115,10 @@ public interface SettingsRepository {
     void setSleepTimerPlayLastSong(boolean playLastSong);
 
     boolean isSleepTimerPlayLastSong();
+
+    Observable<Long> geAudioFileMinDurationMillisObservable();
+
+    void setAudioFileMinDurationMillis(long millis);
+
+    long getAudioFileMinDurationMillis();
 }

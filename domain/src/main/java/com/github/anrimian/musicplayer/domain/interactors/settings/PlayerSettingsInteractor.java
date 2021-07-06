@@ -20,6 +20,14 @@ public class PlayerSettingsInteractor {
         settingsRepository.setDecreaseVolumeOnAudioFocusLossEnabled(enabled);
     }
 
+    public boolean isPauseOnAudioFocusLossEnabled() {
+        return settingsRepository.isPauseOnAudioFocusLossEnabled();
+    }
+
+    public void setPauseOnAudioFocusLossEnabled(boolean enabled) {
+        settingsRepository.setPauseOnAudioFocusLossEnabled(enabled);
+    }
+
     public Observable<Integer> getSelectedEqualizerTypeObservable() {
         return settingsRepository.getSelectedEqualizerTypeObservable();
     }

@@ -38,8 +38,10 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
 
     private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
+    private static final String AUDIO_FILE_MIN_DURATION = "audio_file_min_duration";
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
+    private static final String PAUSE_ON_AUDIO_FOCUS_LOSS = "pause_on_audio_focus_loss";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
 
     private static final String EXTERNAL_PLAYER_REPEAT_MODE = "external_player_repeat_mode";
@@ -60,6 +62,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
     private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Long> audioFileMinDurationSubject = BehaviorSubject.create();
 
     private final BehaviorSubject<Integer> externalPlayerRepeatModeSubject = BehaviorSubject.create();
 
@@ -270,6 +273,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
+    public boolean isPauseOnAudioFocusLossEnabled() {
+        return preferences.getBoolean(PAUSE_ON_AUDIO_FOCUS_LOSS, true);
+    }
+
+    @Override
+    public void setPauseOnAudioFocusLossEnabled(boolean enabled) {
+        preferences.putBoolean(PAUSE_ON_AUDIO_FOCUS_LOSS, enabled);
+    }
+
+    @Override
     public void setExternalPlayerRepeatMode(int mode) {
         preferences.putInt(EXTERNAL_PLAYER_REPEAT_MODE, mode);
         externalPlayerRepeatModeSubject.onNext(mode);
@@ -352,6 +365,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public boolean isSleepTimerPlayLastSong() {
         return preferences.getBoolean(SLEEP_TIMER_PLAY_LAST);
+    }
+
+    @Override
+    public Observable<Long> geAudioFileMinDurationMillisObservable() {
+        return withDefaultValue(audioFileMinDurationSubject, this::getAudioFileMinDurationMillis);
+    }
+
+    @Override
+    public void setAudioFileMinDurationMillis(long millis) {
+        if (millis != getAudioFileMinDurationMillis()) {
+            preferences.putLong(AUDIO_FILE_MIN_DURATION, millis);
+            audioFileMinDurationSubject.onNext(millis);
+        }
+    }
+
+    @Override
+    public long getAudioFileMinDurationMillis() {
+        return preferences.getLong(AUDIO_FILE_MIN_DURATION, 30000L);
     }
 
     private Order orderFromInt(int order) {
