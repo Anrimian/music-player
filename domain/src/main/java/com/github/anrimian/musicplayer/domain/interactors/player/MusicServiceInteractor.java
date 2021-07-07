@@ -85,6 +85,13 @@ public class MusicServiceInteractor {
                 .ignoreElement();
     }
 
+    public Completable startPlayingFromCompositions(int position) {
+        return libraryCompositionsInteractor.getCompositionsObservable(null)
+                .firstOrError()
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
+                .ignoreElement();
+    }
+
     public Observable<Integer> getRepeatModeObservable() {
         return playerCoordinatorInteractor.getActivePlayerTypeObservable()
                 .switchMap(playerType -> {

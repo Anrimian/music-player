@@ -14,10 +14,16 @@ import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
+
+
+
 const val PERMISSION_ERROR_ACTION_ID = "permission_error_action_id"
 const val DEFAULT_ERROR_ACTION_ID = "default_error_action_id"
 const val RESUME_ACTION_ID = "resume_action_id"
 const val SHUFFLE_ALL_AND_PLAY_ACTION_ID = "shuffle_all_and_play_action_id"
+const val COMPOSITIONS_NODE_ACTION_ID = "compositions_action_id"
+
+const val POSITION_ARG = "position_arg"
 
 private const val ROOT_ID = "root_id"
 
@@ -65,6 +71,9 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         return BrowserRoot(ROOT_ID, null)
     }
 
+    //exists also options(overloaded method), and there are:
+    //var page: Int = options.getInt(MediaBrowserCompat.EXTRA_PAGE)
+    //var pageSize: Int = options.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE)
     override fun onLoadChildren(
         parentId: String,
         resultCallback: Result<List<MediaBrowserCompat.MediaItem>>
@@ -83,17 +92,13 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed()
     }
 
-    //figure out format for media id
-    //how to pass position? - pass position to media id
+    //only use alphabetical order?
     private fun loadCompositionItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
-        val observable = Components.getAppComponent()
-            .musicServiceInteractor()
-            .compositionsObservable
-
         loadItems(
+            COMPOSITIONS_NODE_ID,
             resultCallback,
-            observable
-        ) { compositions -> compositions.map(this::toActionItem) }
+            Components.getAppComponent().musicServiceInteractor().compositionsObservable
+        ) { compositions -> compositions.mapIndexed(this::toActionItem) }
     }
 
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
@@ -103,6 +108,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             .map { size -> size > 0 }
 
         loadItems(
+            ROOT_ID,
             resultCallback,
             observable
         ) { isPlayQueueExists ->
@@ -119,7 +125,8 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         }
     }
 
-    private fun <T> loadItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
+    private fun <T> loadItems(rootItemId: String,
+                              resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
                               valuesObservable: Observable<T>,
                               resultMapper: (T) -> List<MediaBrowserCompat.MediaItem>
     ) {
@@ -138,7 +145,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
                 { value ->
                     resultCallback.sendResult(resultMapper(value))
 
-                    registerBrowsableItemUpdate(ROOT_ID, observable)
+                    registerBrowsableItemUpdate(rootItemId, observable)
                 },
                 { throwable ->
                     val errorParser = Components.getAppComponent().errorParser()
@@ -146,7 +153,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
                     val errorCommand = errorParser.parseError(throwable)
                     resultCallback.sendErrorResult(DEFAULT_ERROR_ACTION_ID, errorCommand.message)
 
-                    registerBrowsableItemUpdate(ROOT_ID, observable)
+                    registerBrowsableItemUpdate(rootItemId, observable)
                 })
 
         resultCallback.detach()
@@ -183,10 +190,11 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         sendResult(listOf(actionItem(mediaId, message)))
     }
 
-    private fun toActionItem(composition: Composition) = actionItem(
-        composition.id.toString(),
+    private fun toActionItem(position: Int, composition: Composition) = actionItem(
+        COMPOSITIONS_NODE_ACTION_ID,
         formatCompositionName(composition),
-        formatAuthor(composition.artist, this)
+        formatAuthor(composition.artist, this),
+        Bundle().apply { putInt(POSITION_ARG, position) }
     )
 
     private fun actionItem(mediaId: String, titleResId: Int, subtitle: CharSequence? = null) =
@@ -194,12 +202,14 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private fun actionItem(mediaId: String,
                            title: CharSequence?,
-                           subtitle: CharSequence? = null
+                           subtitle: CharSequence? = null,
+                           extras: Bundle? = null
     ) = MediaBrowserCompat.MediaItem(
         MediaDescriptionCompat.Builder()
             .setTitle(title)
             .setMediaId(mediaId)
             .setSubtitle(subtitle)
+            .setExtras(extras)
             .build(),
         MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
     )
