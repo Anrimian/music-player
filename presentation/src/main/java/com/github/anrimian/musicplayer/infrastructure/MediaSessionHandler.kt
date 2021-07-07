@@ -15,10 +15,7 @@ import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInt
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.COMPOSITIONS_NODE_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.POSITION_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.RESUME_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SHUFFLE_ALL_AND_PLAY_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.*
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
@@ -142,10 +139,16 @@ class MediaSessionHandler(private val context: Context,
                     actionDisposable = musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)
                 }
-                COMPOSITIONS_NODE_ACTION_ID -> {
+                COMPOSITIONS_ACTION_ID -> {
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromCompositions(position)
                         .subscribe({}, this::processError)
+                }
+                FOLDERS_ACTION_ID -> {
+                    val folderId = extras.getLong(FOLDER_ID_ARG)
+                    val folderIdOpt = if (folderId == ROOT_FOLDER) null else folderId
+                    val compositionId = extras.getLong(COMPOSITION_ID_ARG)
+                    musicServiceInteractor.play(folderIdOpt, compositionId)
                 }
             }
         }

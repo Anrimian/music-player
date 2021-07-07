@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepositor
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class LibraryFoldersInteractor {
     }
 
     public Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
-                                                            @Nullable String searchQuery) {
+                                                           @Nullable String searchQuery) {
         return libraryRepository.getFoldersInFolder(folderId, searchQuery);
     }
 
@@ -85,6 +86,17 @@ public class LibraryFoldersInteractor {
         libraryRepository.getAllCompositionsInFolder(folderId)
                 .doOnSuccess(compositions -> {
                     int firstPosition = compositions.indexOf(composition);
+                    musicPlayerInteractor.startPlaying(compositions, firstPosition);
+                })
+                .subscribe();
+    }
+
+    public void play(Long folderId, long compositionId) {
+        libraryRepository.getAllCompositionsInFolder(folderId)
+                .doOnSuccess(compositions -> {
+                    int firstPosition = ListUtils.findPosition(
+                            compositions,
+                            composition -> composition.getId() == compositionId);
                     musicPlayerInteractor.startPlaying(compositions, firstPosition);
                 })
                 .subscribe();

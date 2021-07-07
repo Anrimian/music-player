@@ -7,10 +7,6 @@ import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerIn
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
-import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -59,24 +55,6 @@ public class LibraryModule {
     @Nonnull
     SelectOrderPresenter selectOrderPresenter() {
         return new SelectOrderPresenter();
-    }
-
-    @Provides
-    @Nonnull
-    LibraryFoldersInteractor libraryFilesInteractor(LibraryRepository musicProviderRepository,
-                                                    EditorRepository editorRepository,
-                                                    LibraryPlayerInteractor musicPlayerInteractor,
-                                                    PlayListsRepository playListsRepository,
-                                                    SettingsRepository settingsRepository,
-                                                    UiStateRepository uiStateRepository,
-                                                    MediaScannerRepository mediaScannerRepository) {
-        return new LibraryFoldersInteractor(musicProviderRepository,
-                editorRepository,
-                musicPlayerInteractor,
-                playListsRepository,
-                settingsRepository,
-                uiStateRepository,
-                mediaScannerRepository);
     }
 
     @Provides

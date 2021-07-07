@@ -1,11 +1,15 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
@@ -19,17 +23,20 @@ public class MusicServiceInteractor {
     private final LibraryPlayerInteractor libraryPlayerInteractor;
     private final ExternalPlayerInteractor externalPlayerInteractor;
     private final LibraryCompositionsInteractor libraryCompositionsInteractor;
+    private final LibraryFoldersInteractor libraryFoldersInteractor;
     private final SettingsRepository settingsRepository;
 
     public MusicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                   LibraryPlayerInteractor libraryPlayerInteractor,
                                   ExternalPlayerInteractor externalPlayerInteractor,
                                   LibraryCompositionsInteractor libraryCompositionsInteractor,
+                                  LibraryFoldersInteractor libraryFoldersInteractor,
                                   SettingsRepository settingsRepository) {
         this.playerCoordinatorInteractor = playerCoordinatorInteractor;
         this.libraryPlayerInteractor = libraryPlayerInteractor;
         this.externalPlayerInteractor = externalPlayerInteractor;
         this.libraryCompositionsInteractor = libraryCompositionsInteractor;
+        this.libraryFoldersInteractor = libraryFoldersInteractor;
         this.settingsRepository = settingsRepository;
     }
 
@@ -131,6 +138,14 @@ public class MusicServiceInteractor {
 
     public Observable<List<Composition>> getCompositionsObservable() {
         return libraryCompositionsInteractor.getCompositionsObservable(null);
+    }
+
+    public Observable<List<FileSource>> getFoldersObservable(@Nullable Long folderId) {
+        return libraryFoldersInteractor.getFoldersInFolder(folderId, null);
+    }
+
+    public void play(Long folderId, long compositionId) {
+        libraryFoldersInteractor.play(folderId, compositionId);
     }
 
     public MusicNotificationSetting getNotificationSettings() {

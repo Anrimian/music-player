@@ -8,22 +8,29 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor
 import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
 
-
-
 const val PERMISSION_ERROR_ACTION_ID = "permission_error_action_id"
 const val DEFAULT_ERROR_ACTION_ID = "default_error_action_id"
 const val RESUME_ACTION_ID = "resume_action_id"
 const val SHUFFLE_ALL_AND_PLAY_ACTION_ID = "shuffle_all_and_play_action_id"
-const val COMPOSITIONS_NODE_ACTION_ID = "compositions_action_id"
+const val COMPOSITIONS_ACTION_ID = "compositions_action_id"
+const val FOLDERS_ACTION_ID = "folders_action_id"
 
 const val POSITION_ARG = "position_arg"
+const val COMPOSITION_ID_ARG = "composition_id_arg"
+const val FOLDER_ID_ARG = "folder_id_arg"
+
+const val ROOT_FOLDER = 0L
 
 private const val ROOT_ID = "root_id"
 
@@ -81,6 +88,21 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         when (parentId) {
             ROOT_ID -> loadRootItems(resultCallback)
             COMPOSITIONS_NODE_ID -> loadCompositionItems(resultCallback)
+            FOLDERS_NODE_ID -> loadFolderItems(resultCallback, ROOT_FOLDER)
+            else -> resultCallback.sendResult(emptyList())
+        }
+    }
+
+    //never called
+    override fun onLoadChildren(
+        parentId: String,
+        resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
+        options: Bundle
+    ) {
+        when (parentId) {
+            ROOT_ID -> loadRootItems(resultCallback)
+            COMPOSITIONS_NODE_ID -> loadCompositionItems(resultCallback)
+            FOLDERS_NODE_ID -> loadFolderItems(resultCallback, options.getLong(FOLDER_ID_ARG))
             else -> resultCallback.sendResult(emptyList())
         }
     }
@@ -92,13 +114,25 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed()
     }
 
-    //only use alphabetical order?
+    //use only alphabetical order?
     private fun loadCompositionItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
         loadItems(
             COMPOSITIONS_NODE_ID,
             resultCallback,
             Components.getAppComponent().musicServiceInteractor().compositionsObservable
         ) { compositions -> compositions.mapIndexed(this::toActionItem) }
+    }
+
+    private fun loadFolderItems(
+        resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
+        folderId: Long
+    ) {
+        val idOpt = if (folderId == ROOT_FOLDER) null else folderId
+        loadItems(
+            FOLDERS_NODE_ID,
+            resultCallback,
+            Components.getAppComponent().musicServiceInteractor().getFoldersObservable(idOpt)
+        ) { sources -> sources.map { source -> toActionItem(source, folderId) } }
     }
 
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
@@ -191,11 +225,37 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     }
 
     private fun toActionItem(position: Int, composition: Composition) = actionItem(
-        COMPOSITIONS_NODE_ACTION_ID,
+        COMPOSITIONS_ACTION_ID,
         formatCompositionName(composition),
         formatAuthor(composition.artist, this),
         Bundle().apply { putInt(POSITION_ARG, position) }
     )
+
+    private fun toActionItem(fileSource: FileSource, folderId: Long): MediaBrowserCompat.MediaItem {
+        return when(fileSource) {
+            is FolderFileSource -> {
+                browsableItem(
+                    FOLDERS_NODE_ID,
+                    fileSource.name,
+                    FormatUtils.formatCompositionsCount(this, fileSource.filesCount),
+                    Bundle().apply { putLong(FOLDER_ID_ARG, folderId)}
+                )
+            }
+            is CompositionFileSource -> {
+                val composition = fileSource.composition
+                actionItem(
+                    FOLDERS_ACTION_ID,
+                    formatCompositionName(composition),
+                    formatAuthor(composition.artist, this),
+                    Bundle().apply {
+                        putLong(COMPOSITION_ID_ARG, composition.id)
+                        putLong(POSITION_ARG, folderId)
+                    }
+                )
+            }
+            else -> throw IllegalStateException()
+        }
+    }
 
     private fun actionItem(mediaId: String, titleResId: Int, subtitle: CharSequence? = null) =
         actionItem(mediaId, getString(titleResId), subtitle)
@@ -217,10 +277,16 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun browsableItem(mediaId: String, titleResId: Int) =
         browsableItem(mediaId, getString(titleResId))
 
-    private fun browsableItem(mediaId: String, title: CharSequence?) = MediaBrowserCompat.MediaItem(
+    private fun browsableItem(mediaId: String,
+                              title: CharSequence?,
+                              subtitle: CharSequence? = null,
+                              extras: Bundle? = null
+    ) = MediaBrowserCompat.MediaItem(
         MediaDescriptionCompat.Builder()
             .setTitle(title)
             .setMediaId(mediaId)
+            .setSubtitle(subtitle)
+            .setExtras(extras)
             .build(),
         MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
     )

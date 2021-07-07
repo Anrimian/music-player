@@ -53,6 +53,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_A
 import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
 import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
@@ -202,10 +203,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     @Override
     public void showPlayListInfo(PlayList playList) {
         toolbar.setTitle(playList.getName());
-        toolbar.setSubtitle(getResources().getQuantityString(
-                R.plurals.compositions_count,
-                playList.getCompositionsCount(),
-                playList.getCompositionsCount()));
+        toolbar.setSubtitle(formatCompositionsCount(requireContext(), playList.getCompositionsCount()));
     }
 
     @Override

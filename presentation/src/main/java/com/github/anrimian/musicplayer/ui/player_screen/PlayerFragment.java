@@ -98,6 +98,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
@@ -629,7 +630,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showPlayQueueSubtitle(int size) {
-        tvQueueSubtitle.setText(getResources().getQuantityString(R.plurals.compositions_count, size, size));
+        tvQueueSubtitle.setText(formatCompositionsCount(requireContext(), size));
     }
 
     @Override
