@@ -106,7 +106,7 @@ public class CompositionsDaoWrapper {
     public long getStorageId(long compositionId) {
         Long storageId = compositionsDao.getStorageId(compositionId);
         if (storageId == null) {
-            throw new CompositionNotFoundException();
+            throw new CompositionNotFoundException("composition not found");
         }
         return storageId;
     }
