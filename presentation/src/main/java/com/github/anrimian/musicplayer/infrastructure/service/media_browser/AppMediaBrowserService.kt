@@ -30,14 +30,15 @@ const val POSITION_ARG = "position_arg"
 const val COMPOSITION_ID_ARG = "composition_id_arg"
 const val FOLDER_ID_ARG = "folder_id_arg"
 
-const val ROOT_FOLDER = 0L
-
 private const val ROOT_ID = "root_id"
 
 private const val COMPOSITIONS_NODE_ID = "compositions_node_id"
 private const val FOLDERS_NODE_ID = "folders_node_id"
 private const val ARTISTS_NODE_ID = "artists_node_id"
 private const val ALBUMS_NODE_ID = "albums_node_id"
+
+const val DELIMITER = '-'
+const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
 //handle android 11 EXTRA_RECENT
 
@@ -85,24 +86,10 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         parentId: String,
         resultCallback: Result<List<MediaBrowserCompat.MediaItem>>
     ) {
-        when (parentId) {
-            ROOT_ID -> loadRootItems(resultCallback)
-            COMPOSITIONS_NODE_ID -> loadCompositionItems(resultCallback)
-            FOLDERS_NODE_ID -> loadFolderItems(resultCallback, ROOT_FOLDER)
-            else -> resultCallback.sendResult(emptyList())
-        }
-    }
-
-    //never called
-    override fun onLoadChildren(
-        parentId: String,
-        resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
-        options: Bundle
-    ) {
-        when (parentId) {
-            ROOT_ID -> loadRootItems(resultCallback)
-            COMPOSITIONS_NODE_ID -> loadCompositionItems(resultCallback)
-            FOLDERS_NODE_ID -> loadFolderItems(resultCallback, options.getLong(FOLDER_ID_ARG))
+        when {
+            parentId == ROOT_ID -> loadRootItems(resultCallback)
+            parentId == COMPOSITIONS_NODE_ID -> loadCompositionItems(resultCallback)
+            parentId.startsWith(FOLDERS_NODE_ID) -> loadFolderItems(resultCallback, parentId)
             else -> resultCallback.sendResult(emptyList())
         }
     }
@@ -125,16 +112,17 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private fun loadFolderItems(
         resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
-        folderId: Long
+        folderNodeId: String
     ) {
-        val idOpt = if (folderId == ROOT_FOLDER) null else folderId
+        val parentFolderId = folderNodeId.split(DELIMITER).last().toLongOrNull()
         loadItems(
-            FOLDERS_NODE_ID,
+            folderNodeId,
             resultCallback,
-            Components.getAppComponent().musicServiceInteractor().getFoldersObservable(idOpt)
-        ) { sources -> sources.map { source -> toActionItem(source, folderId) } }
+            Components.getAppComponent().musicServiceInteractor().getFoldersObservable(parentFolderId)
+        ) { sources -> sources.map { source -> toActionItem(source, parentFolderId) } }
     }
 
+    //play-pause
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
         val observable = Components.getAppComponent()
             .libraryPlayerInteractor()
@@ -231,14 +219,13 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         Bundle().apply { putInt(POSITION_ARG, position) }
     )
 
-    private fun toActionItem(fileSource: FileSource, folderId: Long): MediaBrowserCompat.MediaItem {
+    private fun toActionItem(fileSource: FileSource, folderId: Long?): MediaBrowserCompat.MediaItem {
         return when(fileSource) {
             is FolderFileSource -> {
                 browsableItem(
-                    FOLDERS_NODE_ID,
+                    FOLDERS_NODE_ID + DELIMITER + fileSource.id,
                     fileSource.name,
-                    FormatUtils.formatCompositionsCount(this, fileSource.filesCount),
-                    Bundle().apply { putLong(FOLDER_ID_ARG, folderId)}
+                    FormatUtils.formatCompositionsCount(this, fileSource.filesCount)
                 )
             }
             is CompositionFileSource -> {
@@ -249,7 +236,9 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
                     formatAuthor(composition.artist, this),
                     Bundle().apply {
                         putLong(COMPOSITION_ID_ARG, composition.id)
-                        putLong(POSITION_ARG, folderId)
+                        if (folderId != null) {
+                            putLong(FOLDER_ID_ARG, folderId)
+                        }
                     }
                 )
             }

@@ -146,9 +146,8 @@ class MediaSessionHandler(private val context: Context,
                 }
                 FOLDERS_ACTION_ID -> {
                     val folderId = extras.getLong(FOLDER_ID_ARG)
-                    val folderIdOpt = if (folderId == ROOT_FOLDER) null else folderId
                     val compositionId = extras.getLong(COMPOSITION_ID_ARG)
-                    musicServiceInteractor.play(folderIdOpt, compositionId)
+                    musicServiceInteractor.play(folderId, compositionId)
                 }
             }
         }
