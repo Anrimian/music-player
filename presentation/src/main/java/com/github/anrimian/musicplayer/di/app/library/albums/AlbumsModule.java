@@ -1,10 +1,6 @@
 package com.github.anrimian.musicplayer.di.app.library.albums;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListPresenter;
 
@@ -19,18 +15,6 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 
 @Module
 public class AlbumsModule {
-
-    @Provides
-    @Nonnull
-    LibraryAlbumsInteractor libraryArtistsInteractor(LibraryRepository repository,
-                                                     EditorRepository editorRepository,
-                                                     SettingsRepository settingsRepository,
-                                                     UiStateRepository uiStateRepository) {
-        return new LibraryAlbumsInteractor(repository,
-                editorRepository,
-                settingsRepository,
-                uiStateRepository);
-    }
 
     @Provides
     @Nonnull

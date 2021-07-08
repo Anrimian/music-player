@@ -29,6 +29,8 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor;
@@ -37,6 +39,7 @@ import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerIn
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerCoordinatorInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.EqualizerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
@@ -187,12 +190,18 @@ class MusicModule {
                                                   ExternalPlayerInteractor externalPlayerInteractor,
                                                   LibraryCompositionsInteractor libraryCompositionsInteractor,
                                                   LibraryFoldersInteractor libraryFoldersInteractor,
+                                                  LibraryArtistsInteractor libraryArtistsInteractor,
+                                                  LibraryAlbumsInteractor libraryAlbumsInteractor,
+                                                  PlayListsInteractor playListsInteractor,
                                                   SettingsRepository settingsRepository) {
         return new MusicServiceInteractor(playerCoordinatorInteractor,
                 libraryPlayerInteractor,
                 externalPlayerInteractor,
                 libraryCompositionsInteractor,
                 libraryFoldersInteractor,
+                libraryArtistsInteractor,
+                libraryAlbumsInteractor,
+                playListsInteractor,
                 settingsRepository);
     }
 
@@ -304,5 +313,29 @@ class MusicModule {
                 settingsRepository,
                 uiStateRepository,
                 mediaScannerRepository);
+    }
+
+    @Provides
+    @Nonnull
+    LibraryArtistsInteractor libraryArtistsInteractor(LibraryRepository repository,
+                                                      EditorRepository editorRepository,
+                                                      SettingsRepository settingsRepository,
+                                                      UiStateRepository uiStateRepository) {
+        return new LibraryArtistsInteractor(repository,
+                editorRepository,
+                settingsRepository,
+                uiStateRepository);
+    }
+
+    @Provides
+    @Nonnull
+    LibraryAlbumsInteractor libraryAlbumsInteractor(LibraryRepository repository,
+                                                    EditorRepository editorRepository,
+                                                    SettingsRepository settingsRepository,
+                                                    UiStateRepository uiStateRepository) {
+        return new LibraryAlbumsInteractor(repository,
+                editorRepository,
+                settingsRepository,
+                uiStateRepository);
     }
 }

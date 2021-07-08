@@ -1,11 +1,19 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
 
@@ -24,6 +32,9 @@ public class MusicServiceInteractor {
     private final ExternalPlayerInteractor externalPlayerInteractor;
     private final LibraryCompositionsInteractor libraryCompositionsInteractor;
     private final LibraryFoldersInteractor libraryFoldersInteractor;
+    private final LibraryArtistsInteractor libraryArtistsInteractor;
+    private final LibraryAlbumsInteractor libraryAlbumsInteractor;
+    private final PlayListsInteractor playListsInteractor;
     private final SettingsRepository settingsRepository;
 
     public MusicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
@@ -31,12 +42,18 @@ public class MusicServiceInteractor {
                                   ExternalPlayerInteractor externalPlayerInteractor,
                                   LibraryCompositionsInteractor libraryCompositionsInteractor,
                                   LibraryFoldersInteractor libraryFoldersInteractor,
+                                  LibraryArtistsInteractor libraryArtistsInteractor,
+                                  LibraryAlbumsInteractor libraryAlbumsInteractor,
+                                  PlayListsInteractor playListsInteractor,
                                   SettingsRepository settingsRepository) {
         this.playerCoordinatorInteractor = playerCoordinatorInteractor;
         this.libraryPlayerInteractor = libraryPlayerInteractor;
         this.externalPlayerInteractor = externalPlayerInteractor;
         this.libraryCompositionsInteractor = libraryCompositionsInteractor;
         this.libraryFoldersInteractor = libraryFoldersInteractor;
+        this.libraryArtistsInteractor = libraryArtistsInteractor;
+        this.libraryAlbumsInteractor = libraryAlbumsInteractor;
+        this.playListsInteractor = playListsInteractor;
         this.settingsRepository = settingsRepository;
     }
 
@@ -92,13 +109,6 @@ public class MusicServiceInteractor {
                 .ignoreElement();
     }
 
-    public Completable startPlayingFromCompositions(int position) {
-        return libraryCompositionsInteractor.getCompositionsObservable(null)
-                .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
-                .ignoreElement();
-    }
-
     public Observable<Integer> getRepeatModeObservable() {
         return playerCoordinatorInteractor.getActivePlayerTypeObservable()
                 .switchMap(playerType -> {
@@ -140,12 +150,69 @@ public class MusicServiceInteractor {
         return libraryCompositionsInteractor.getCompositionsObservable(null);
     }
 
+    public Completable startPlayingFromCompositions(int position) {
+        return libraryCompositionsInteractor.getCompositionsObservable(null)
+                .firstOrError()
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
+                .ignoreElement();
+    }
+
     public Observable<List<FileSource>> getFoldersObservable(@Nullable Long folderId) {
         return libraryFoldersInteractor.getFoldersInFolder(folderId, null);
     }
 
     public void play(Long folderId, long compositionId) {
         libraryFoldersInteractor.play(folderId, compositionId);
+    }
+
+    public Observable<List<Artist>> getArtistsObservable() {
+        return libraryArtistsInteractor.getArtistsObservable(null);
+    }
+
+    public Observable<List<Composition>> getCompositionsByArtist(long artistId) {
+        return libraryArtistsInteractor.getCompositionsByArtist(artistId);
+    }
+
+    public Completable startPlayingFromArtistCompositions(long artistId, int position) {
+        return getCompositionsByArtist(artistId)
+                .firstOrError()
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
+                .ignoreElement();
+    }
+
+    public Observable<List<Album>> getAlbumsObservable() {
+        return libraryAlbumsInteractor.getAlbumsObservable(null);
+    }
+
+    public Observable<List<Composition>> getAlbumItemsObservable(long albumId) {
+        return libraryAlbumsInteractor.getAlbumItemsObservable(albumId);
+    }
+
+    public Completable startPlayingFromAlbumCompositions(long albumId, int position) {
+        return getAlbumItemsObservable(albumId)
+                .firstOrError()
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
+                .ignoreElement();
+    }
+
+    public Observable<List<PlayList>> getPlayListsObservable() {
+        return playListsInteractor.getPlayListsObservable();
+    }
+
+    public Observable<List<PlayListItem>> getPlaylistItemsObservable(long playListId) {
+        return playListsInteractor.getCompositionsObservable(playListId);
+    }
+
+    public Completable startPlayingFromPlaylistItems(long playListId, int position) {
+        return getPlaylistItemsObservable(playListId)
+                .firstOrError()
+                .doOnSuccess(compositions ->
+                        libraryPlayerInteractor.startPlaying(
+                                ListUtils.mapList(compositions, PlayListItem::getComposition),
+                                position
+                        )
+                )
+                .ignoreElement();
     }
 
     public MusicNotificationSetting getNotificationSettings() {

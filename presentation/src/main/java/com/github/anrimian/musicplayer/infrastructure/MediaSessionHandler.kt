@@ -145,9 +145,30 @@ class MediaSessionHandler(private val context: Context,
                         .subscribe({}, this::processError)
                 }
                 FOLDERS_ACTION_ID -> {
-                    val folderId = extras.getLong(FOLDER_ID_ARG)
+                    var folderId: Long? = extras.getLong(FOLDER_ID_ARG)
+                    if (folderId == 0L) {
+                        folderId = null
+                    }
                     val compositionId = extras.getLong(COMPOSITION_ID_ARG)
                     musicServiceInteractor.play(folderId, compositionId)
+                }
+                ARTIST_ITEMS_ACTION_ID -> {
+                    val artistId = extras.getLong(ARTIST_ID_ARG)
+                    val position = extras.getInt(POSITION_ARG)
+                    actionDisposable = musicServiceInteractor.startPlayingFromArtistCompositions(artistId, position)
+                        .subscribe({}, this::processError)
+                }
+                ALBUM_ITEMS_ACTION_ID -> {
+                    val albumId = extras.getLong(ALBUM_ID_ARG)
+                    val position = extras.getInt(POSITION_ARG)
+                    actionDisposable = musicServiceInteractor.startPlayingFromAlbumCompositions(albumId, position)
+                        .subscribe({}, this::processError)
+                }
+                PLAYLIST_ITEMS_ACTION_ID -> {
+                    val playlistId = extras.getLong(PLAYLIST_ID_ARG)
+                    val position = extras.getInt(POSITION_ARG)
+                    actionDisposable = musicServiceInteractor.startPlayingFromPlaylistItems(playlistId, position)
+                        .subscribe({}, this::processError)
                 }
             }
         }
