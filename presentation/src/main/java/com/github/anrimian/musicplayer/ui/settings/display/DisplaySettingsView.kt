@@ -1,34 +1,35 @@
-package com.github.anrimian.musicplayer.ui.settings.display;
+package com.github.anrimian.musicplayer.ui.settings.display
 
-import moxy.MvpView;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
+import moxy.MvpView
+import moxy.viewstate.strategy.alias.AddToEndSingle
 
-public interface DisplaySettingsView extends MvpView {
-
-    @AddToEndSingle
-    void showCoversChecked(boolean checked);
+interface DisplaySettingsView : MvpView {
 
     @AddToEndSingle
-    void showCoversInNotificationChecked(boolean checked);
+    fun showCoversChecked(checked: Boolean)
 
     @AddToEndSingle
-    void showColoredNotificationChecked(boolean checked);
+    fun showCoversInNotificationChecked(checked: Boolean)
 
     @AddToEndSingle
-    void showNotificationCoverStubChecked(boolean checked);
+    fun showColoredNotificationChecked(checked: Boolean)
 
     @AddToEndSingle
-    void showCoversOnLockScreenChecked(boolean checked);
+    fun showNotificationCoverStubChecked(checked: Boolean)
 
     @AddToEndSingle
-    void showCoversInNotificationEnabled(boolean enabled);
+    fun showCoversOnLockScreenChecked(checked: Boolean)
 
     @AddToEndSingle
-    void showColoredNotificationEnabled(boolean enabled);
+    fun showCoversInNotificationEnabled(enabled: Boolean)
 
     @AddToEndSingle
-    void showNotificationCoverStubEnabled(boolean enabled);
+    fun showColoredNotificationEnabled(enabled: Boolean)
 
     @AddToEndSingle
-    void showShowCoversOnLockScreenEnabled(boolean enabled);
+    fun showNotificationCoverStubEnabled(enabled: Boolean)
+
+    @AddToEndSingle
+    fun showShowCoversOnLockScreenEnabled(enabled: Boolean)
+
 }

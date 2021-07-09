@@ -1,62 +1,42 @@
-package com.github.anrimian.musicplayer.domain.interactors.settings;
+package com.github.anrimian.musicplayer.domain.interactors.settings
 
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
+import io.reactivex.rxjava3.core.Observable
 
-import io.reactivex.rxjava3.core.Observable;
+class DisplaySettingsInteractor(private val settingsRepository: SettingsRepository) {
 
-public class DisplaySettingsInteractor {
+    fun getCoversEnabledObservable(): Observable<Boolean> = settingsRepository.coversEnabledObservable
 
-    private final SettingsRepository settingsRepository;
+    fun getCoversInNotificationEnabledObservable(): Observable<Boolean> = settingsRepository.coversInNotificationEnabledObservable
 
-    public DisplaySettingsInteractor(SettingsRepository settingsRepository) {
-        this.settingsRepository = settingsRepository;
+    fun isCoversEnabled() = settingsRepository.isCoversEnabled
+
+    fun setCoversEnabled(enabled: Boolean) {
+        settingsRepository.isCoversEnabled = enabled
     }
 
-    public Observable<Boolean> getCoversEnabledObservable() {
-        return settingsRepository.getCoversEnabledObservable();
+    fun isCoversInNotificationEnabled() = settingsRepository.isCoversInNotificationEnabled
+
+    fun setCoversInNotificationEnabled(enabled: Boolean) {
+        settingsRepository.isCoversInNotificationEnabled = enabled
     }
 
-    public Observable<Boolean> getCoversInNotificationEnabledObservable() {
-        return settingsRepository.getCoversInNotificationEnabledObservable();
+    fun isColoredNotificationEnabled() = settingsRepository.isColoredNotificationEnabled
+
+    fun setColoredNotificationEnabled(enabled: Boolean) {
+        settingsRepository.isColoredNotificationEnabled = enabled
     }
 
-    public boolean isCoversEnabled() {
-        return settingsRepository.isCoversEnabled();
+    fun isCoversOnLockScreenEnabled() = settingsRepository.isCoversOnLockScreenEnabled
+
+    fun setCoversOnLockScreenEnabled(enabled: Boolean) {
+        settingsRepository.isCoversOnLockScreenEnabled = enabled
     }
 
-    public boolean isCoversInNotificationEnabled() {
-        return settingsRepository.isCoversInNotificationEnabled();
+    fun isNotificationCoverStubEnabled() = settingsRepository.isNotificationCoverStubEnabled
+
+    fun setNotificationCoverStubEnabled(enabled: Boolean) {
+        settingsRepository.isNotificationCoverStubEnabled = enabled
     }
 
-    public boolean isColoredNotificationEnabled() {
-        return settingsRepository.isColoredNotificationEnabled();
-    }
-
-    public boolean isCoversOnLockScreenEnabled() {
-        return settingsRepository.isCoversOnLockScreenEnabled();
-    }
-
-    public void setCoversEnabled(boolean enabled) {
-        settingsRepository.setCoversEnabled(enabled);
-    }
-
-    public void setCoversInNotificationEnabled(boolean enabled) {
-        settingsRepository.setCoversInNotificationEnabled(enabled);
-    }
-
-    public void setColoredNotificationEnabled(boolean enabled) {
-        settingsRepository.setColoredNotificationEnabled(enabled);
-    }
-
-    public void setCoversOnLockScreenEnabled(boolean enabled) {
-        settingsRepository.setCoversOnLockScreenEnabled(enabled);
-    }
-
-    public void setNotificationCoverStubEnabled(boolean enabled) {
-        settingsRepository.setNotificationCoverStubEnabled(enabled);
-    }
-
-    public boolean isNotificationCoverStubEnabled() {
-        return settingsRepository.isNotificationCoverStubEnabled();
-    }
 }

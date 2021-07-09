@@ -17,7 +17,7 @@
 
             <CheckBox
                 style="@style/CheckboxStyle"
-                android:id="@+id/cb_covers"
+                android:id="@+id/cbCovers"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/show_covers"
@@ -30,7 +30,7 @@
 
             <CheckBox
                 style="@style/CheckboxStyle"
-                android:id="@+id/cb_covers_in_notification"
+                android:id="@+id/cbCoversInNotification"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/show_covers_in_notification"
@@ -38,11 +38,11 @@
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cb_covers" />
+                app:layout_constraintTop_toBottomOf="@id/cbCovers" />
 
             <CheckBox
                 style="@style/CheckboxStyle"
-                android:id="@+id/cb_colored_notification"
+                android:id="@+id/cbColoredNotification"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/colored_notification"
@@ -50,7 +50,7 @@
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cb_covers_in_notification" />
+                app:layout_constraintTop_toBottomOf="@id/cbCoversInNotification" />
 
             <CheckBox
                 style="@style/CheckboxStyle"
@@ -62,11 +62,11 @@
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cb_colored_notification" />
+                app:layout_constraintTop_toBottomOf="@id/cbColoredNotification" />
 
             <CheckBox
                 style="@style/CheckboxStyle"
-                android:id="@+id/cb_notification_on_lock_screen"
+                android:id="@+id/cbNotificationOnLockScreen"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/show_covers_on_lock_screen"
