@@ -337,7 +337,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     private fun subscribeOnUiSettings() {
-        presenterDisposable.add(displaySettingsInteractor.coversEnabledObservable
+        presenterDisposable.add(displaySettingsInteractor.getCoversEnabledObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onUiSettingsReceived, errorParser::logError))
     }

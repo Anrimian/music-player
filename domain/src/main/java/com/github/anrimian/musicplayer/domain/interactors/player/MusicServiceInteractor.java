@@ -142,6 +142,7 @@ public class MusicServiceInteractor {
     public Observable<MusicNotificationSetting> getNotificationSettingObservable() {
         return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
                 getColoredNotificationEnabledObservable(),
+                getNotificationCoverStubEnabledObservable(),
                 getCoversOnLockScreenEnabledObservable(),
                 MusicNotificationSetting::new);
     }
@@ -219,10 +220,12 @@ public class MusicServiceInteractor {
         boolean coversEnabled = settingsRepository.isCoversEnabled();
         boolean coversInNotification = coversEnabled && settingsRepository.isCoversInNotificationEnabled();
         boolean coloredNotification = settingsRepository.isColoredNotificationEnabled();
+        boolean showNotificationCoverStub = settingsRepository.isNotificationCoverStubEnabled();
         boolean coversOnLockScreen = settingsRepository.isCoversOnLockScreenEnabled();
         return new MusicNotificationSetting(
                 coversInNotification,
                 coversInNotification && coloredNotification,
+                coversInNotification && showNotificationCoverStub,
                 coversInNotification && coversOnLockScreen
         );
     }
@@ -237,6 +240,12 @@ public class MusicServiceInteractor {
         return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
                 settingsRepository.getColoredNotificationEnabledObservable(),
                 (coversInNotification, coloredNotification) -> coversInNotification && coloredNotification);
+    }
+
+    private Observable<Boolean> getNotificationCoverStubEnabledObservable() {
+        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
+                settingsRepository.getNotificationCoverStubEnabledObservable(),
+                (coversInNotification, showNotificationCoverStub) -> coversInNotification && showNotificationCoverStub);
     }
 
     private Observable<Boolean> getCoversOnLockScreenEnabledObservable() {

@@ -181,7 +181,7 @@ class PlayListPresenter(private val playListId: Long,
         }
     }
 
-    fun isCoversEnabled() = displaySettingsInteractor.isCoversEnabled
+    fun isCoversEnabled() = displaySettingsInteractor.isCoversEnabled()
 
     private fun addCompositionsToPlayNext(compositions: List<Composition>) {
         playerInteractor.addCompositionsToPlayNext(compositions)

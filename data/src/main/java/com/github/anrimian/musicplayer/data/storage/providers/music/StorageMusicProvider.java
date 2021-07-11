@@ -146,7 +146,8 @@ public class StorageMusicProvider {
             return null;
         }
 
-        String selection = Media.DURATION + " >= ?";
+        //also display unsupported or corrupted compositions
+        String selection = Media.DURATION + " >= ? OR " + Media.DURATION + " IS NULL";
         String[] projection = new String[] { String.valueOf(minAudioDurationMillis) };
 
         try(Cursor cursor = contentResolver.query(uri, query, selection, projection, null)) {

@@ -197,7 +197,7 @@ public class NotificationsDisplayer {
     }
 
     private void showMusicNotificationWithCover(@Nullable CompositionSource source,
-                                                MusicNotificationSetting notificationSetting) {
+                                                @Nullable MusicNotificationSetting notificationSetting) {
         cancelCoverLoadingForForegroundNotification();
 
         if (source == null) {
@@ -212,12 +212,21 @@ public class NotificationsDisplayer {
             return;
         }
 
-        //we cancel and get short update with old data
+        //keep in mind, we cancel and get short update with an old data
         cancellationRunnable = CompositionSourceModelHelper.getCompositionSourceCover(
                 source,
                 bitmap -> {
                     if (notificationInfoState == null) {
                         return;
+                    }
+
+                    boolean showNotificationCoverStub = true;
+                    MusicNotificationSetting setting = notificationInfoState.notificationSetting;
+                    if (setting != null) {
+                        showNotificationCoverStub = setting.isShowNotificationCoverStub();
+                    }
+                    if (bitmap == null && showNotificationCoverStub) {
+                        bitmap = coverImageLoader.getDefaultNotificationBitmap();
                     }
 
                     NotificationCompat.Builder builder = getDefaultMusicNotification(
@@ -245,9 +254,11 @@ public class NotificationsDisplayer {
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         boolean coloredNotification = false;
+        boolean showNotificationCoverStub = true;
         boolean showCovers = false;
         if (notificationSetting != null) {
             coloredNotification = notificationSetting.isColoredNotification();
+            showNotificationCoverStub = notificationSetting.isShowNotificationCoverStub();
             showCovers = notificationSetting.isShowCovers();
         }
 
@@ -267,7 +278,10 @@ public class NotificationsDisplayer {
 
         if (showCovers) {
             Bitmap bitmap = currentNotificationBitmap;
-            if (bitmap == null || bitmap.isRecycled()) {
+            if (!showNotificationCoverStub && bitmap == coverImageLoader.getDefaultNotificationBitmap()) {
+                bitmap = null;
+            }
+            if ((bitmap == null || bitmap.isRecycled()) && showNotificationCoverStub) {
                 bitmap = coverImageLoader.getDefaultNotificationBitmap();
             }
             builder.setLargeIcon(bitmap);

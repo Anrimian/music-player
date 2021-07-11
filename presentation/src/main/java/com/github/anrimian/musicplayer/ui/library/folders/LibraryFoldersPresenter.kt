@@ -557,7 +557,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     private fun subscribeOnUiSettings() {
-        displaySettingsInteractor.coversEnabledObservable
+        displaySettingsInteractor.getCoversEnabledObservable()
                 .subscribeOnUi(this::onUiSettingsReceived, errorParser::logError)
     }
 

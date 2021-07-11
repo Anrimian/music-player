@@ -13,43 +13,54 @@ class DisplaySettingsPresenter(private val interactor: DisplaySettingsInteractor
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.showCoversChecked(interactor.isCoversEnabled)
-        viewState.showCoversInNotificationChecked(interactor.isCoversInNotificationEnabled)
-        viewState.showColoredNotificationChecked(interactor.isColoredNotificationEnabled)
-        viewState.showCoversOnLockScreenChecked(interactor.isCoversOnLockScreenEnabled)
+        viewState.showCoversChecked(interactor.isCoversEnabled())
+        viewState.showCoversInNotificationChecked(interactor.isCoversInNotificationEnabled())
+        viewState.showColoredNotificationChecked(interactor.isColoredNotificationEnabled())
+        viewState.showNotificationCoverStubChecked(interactor.isNotificationCoverStubEnabled())
+        viewState.showCoversOnLockScreenChecked(interactor.isCoversOnLockScreenEnabled())
         subscribeOnCoversEnabledState()
-        subscribeOnColoredNotificationEnabledState()
+        subscribeOnNotificationCoverSettingsEnabledState()
     }
 
     fun onCoversChecked(checked: Boolean) {
         viewState.showCoversChecked(checked)
-        interactor.isCoversEnabled = checked
+        interactor.setCoversEnabled(checked)
     }
 
     fun onCoversInNotificationChecked(checked: Boolean) {
         viewState.showCoversInNotificationChecked(checked)
-        interactor.isCoversInNotificationEnabled = checked
+        interactor.setCoversInNotificationEnabled(checked)
     }
 
     fun onColoredNotificationChecked(checked: Boolean) {
         viewState.showColoredNotificationChecked(checked)
-        interactor.isColoredNotificationEnabled = checked
+        interactor.setColoredNotificationEnabled(checked)
+    }
+
+    fun onNotificationCoverStubChecked(checked: Boolean) {
+        viewState.showNotificationCoverStubChecked(checked)
+        interactor.setNotificationCoverStubEnabled(checked)
     }
 
     fun onCoversOnLockScreenChecked(checked: Boolean) {
         viewState.showCoversOnLockScreenChecked(checked)
-        interactor.isCoversOnLockScreenEnabled = checked
+        interactor.setCoversOnLockScreenEnabled(checked)
     }
 
-    private fun subscribeOnColoredNotificationEnabledState() {
-        Observable.combineLatest(interactor.coversEnabledObservable,
-                interactor.coversInNotificationEnabledObservable,
+    private fun subscribeOnNotificationCoverSettingsEnabledState() {
+        Observable.combineLatest(interactor.getCoversEnabledObservable(),
+                interactor.getCoversInNotificationEnabledObservable(),
                 { covers, notification -> covers && notification })
-                .unsafeSubscribeOnUi(viewState::showColoredNotificationEnabled)
+                .unsafeSubscribeOnUi(this::onNotificationCoverSettingsEnabled)
     }
 
     private fun subscribeOnCoversEnabledState() {
-        interactor.coversEnabledObservable.unsafeSubscribeOnUi(this::onCoversEnabled)
+        interactor.getCoversEnabledObservable().unsafeSubscribeOnUi(this::onCoversEnabled)
+    }
+
+    private fun onNotificationCoverSettingsEnabled(enabled: Boolean) {
+        viewState.showColoredNotificationEnabled(enabled)
+        viewState.showNotificationCoverStubEnabled(enabled)
     }
 
     private fun onCoversEnabled(enabled: Boolean) {

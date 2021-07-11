@@ -221,6 +221,7 @@
     <string name="exclude_compositions_with_duration_less_than">Exclude compositions from scanning</string>
     <string name="seconds_template">With duration less than %s</string>
     <string name="pause_on_audiofocus_loss">Stop playing on calling, music/video playing, etc.</string>
+    <string name="show_cover_stub_in_notification">Show cover stub in notification when cover is not exists</string>
 
     <string name="shuffle_all_and_play">Shuffle all and play</string>
 

@@ -34,6 +34,8 @@ public interface SettingsRepository {
 
     Observable<Boolean> getColoredNotificationEnabledObservable();
 
+    Observable<Boolean> getNotificationCoverStubEnabledObservable();
+
     Observable<Boolean> getCoversOnLockScreenEnabledObservable();
 
     void setCoversEnabled(boolean enabled);
@@ -41,6 +43,8 @@ public interface SettingsRepository {
     void setCoversInNotificationEnabled(boolean enabled);
 
     void setColoredNotificationEnabled(boolean enabled);
+
+    void setNotificationCoverStubEnabled(boolean enabled);
 
     void setCoversOnLockScreenEnabled(boolean enabled);
 
@@ -73,6 +77,8 @@ public interface SettingsRepository {
     boolean isCoversInNotificationEnabled();
 
     boolean isColoredNotificationEnabled();
+
+    boolean isNotificationCoverStubEnabled();
 
     boolean isCoversOnLockScreenEnabled();
 
