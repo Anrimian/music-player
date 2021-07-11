@@ -130,7 +130,7 @@ class PlayerPresenter(
         }
         currentPosition = position
         currentItem = item
-        playerInteractor.skipToItem(item)
+        playerInteractor.skipToItem(item.id)
         onCurrentCompositionChanged(item, 0)
     }
 

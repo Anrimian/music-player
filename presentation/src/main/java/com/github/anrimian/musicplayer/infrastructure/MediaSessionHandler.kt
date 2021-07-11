@@ -14,7 +14,9 @@ import android.widget.Toast
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
@@ -26,8 +28,6 @@ import com.github.anrimian.musicplayer.ui.main.MainActivity
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 
-//        stateBuilder.setActiveQueueItemId()
-// and skip to queue item action
 class MediaSessionHandler(private val context: Context,
                           private val playerInteractor: PlayerInteractor,
                           private val libraryPlayerInteractor: LibraryPlayerInteractor,
@@ -41,6 +41,21 @@ class MediaSessionHandler(private val context: Context,
     private val mediaSessionDisposable = CompositeDisposable()
     private var actionDisposable: Disposable? = null
 
+    private val playbackStateBuilder = PlaybackStateCompat.Builder()
+        .setActions(
+            PlaybackStateCompat.ACTION_PLAY
+                    or PlaybackStateCompat.ACTION_STOP
+                    or PlaybackStateCompat.ACTION_PAUSE
+                    or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                    or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                    or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                    or PlaybackStateCompat.ACTION_SEEK_TO
+                    or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
+                    or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
+                    or PlaybackStateCompat.ACTION_FAST_FORWARD
+                    or PlaybackStateCompat.ACTION_REWIND
+        )
+
     fun getMediaSession(): MediaSessionCompat {
         if (mediaSession == null) {
             mediaSession = MediaSessionCompat(context, MusicService::javaClass.name).apply {
@@ -53,9 +68,9 @@ class MediaSessionHandler(private val context: Context,
                 val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON, null, context, AppMediaButtonReceiver::class.java)
                 val pMediaButtonIntent = PendingIntent.getBroadcast(context, 0, mediaButtonIntent, 0)
                 setMediaButtonReceiver(pMediaButtonIntent)
-
-                subscribeOnPlayQueue()
             }
+            subscribeOnPlayQueue()
+            subscribeOnCurrentQueueItem()
         }
         return mediaSession!!
     }
@@ -69,6 +84,11 @@ class MediaSessionHandler(private val context: Context,
         if (activeServicesCount <= 0) {
             release()
         }
+    }
+
+    fun updatePlaybackState(playerState: PlayerState, trackPosition: Long, playbackSpeed: Float) {
+        playbackStateBuilder.setState(toMediaState(playerState), trackPosition, playbackSpeed)
+        getMediaSession().setPlaybackState(playbackStateBuilder.build())
     }
 
     private fun release() {
@@ -86,6 +106,17 @@ class MediaSessionHandler(private val context: Context,
             .subscribe(this::onPlayQueueReceived))
     }
 
+    private fun subscribeOnCurrentQueueItem() {
+        mediaSessionDisposable.add(libraryPlayerInteractor.currentQueueItemObservable
+            .subscribe(this::onPlayQueueEventReceived))
+    }
+
+    private fun onPlayQueueEventReceived(event: PlayQueueEvent) {
+        val id = event.playQueueItem?.id ?: 0L
+        playbackStateBuilder.setActiveQueueItemId(id)
+        getMediaSession().setPlaybackState(playbackStateBuilder.build())
+    }
+
     private fun onPlayQueueReceived(queue: List<PlayQueueItem>) {
         getMediaSession().setQueue(queue.map(this::toSessionQueueItem))
     }
@@ -97,6 +128,17 @@ class MediaSessionHandler(private val context: Context,
             .setSubtitle(FormatUtils.formatAuthor(composition.artist, context))
             .build()
         return MediaSessionCompat.QueueItem(mediaDescription, item.id)
+    }
+
+    private fun toMediaState(playerState: PlayerState): Int {
+        return when (playerState) {
+            PlayerState.IDLE -> PlaybackStateCompat.STATE_NONE
+            PlayerState.LOADING -> PlaybackStateCompat.STATE_CONNECTING
+            PlayerState.PAUSE -> PlaybackStateCompat.STATE_PAUSED
+            PlayerState.PLAY -> PlaybackStateCompat.STATE_PLAYING
+            PlayerState.STOP -> PlaybackStateCompat.STATE_STOPPED
+            else -> throw IllegalStateException("unexpected player state: $playerState")
+        }
     }
 
     private inner class AppMediaSessionCallback : MediaSessionCompat.Callback() {
@@ -203,6 +245,10 @@ class MediaSessionHandler(private val context: Context,
             }
         }
 
+        override fun onSkipToQueueItem(id: Long) {
+            libraryPlayerInteractor.skipToItem(id)
+        }
+
         //next - not implemented
         override fun onCommand(command: String, extras: Bundle, cb: ResultReceiver) {
             super.onCommand(command, extras, cb)
@@ -230,10 +276,6 @@ class MediaSessionHandler(private val context: Context,
 
         override fun onPlayFromUri(uri: Uri, extras: Bundle) {
             super.onPlayFromUri(uri, extras)
-        }
-
-        override fun onSkipToQueueItem(id: Long) {
-            super.onSkipToQueueItem(id)
         }
 
         override fun onSetRating(rating: RatingCompat) {

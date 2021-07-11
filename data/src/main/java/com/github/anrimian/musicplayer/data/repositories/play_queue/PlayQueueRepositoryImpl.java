@@ -129,8 +129,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public void skipToItem(PlayQueueItem item) {
-        setCurrentItem(item.getId());
+    public void skipToItem(long itemId) {
+        setCurrentItem(itemId);
     }
 
     @Override

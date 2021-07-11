@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 
 import androidx.annotation.Nullable;
 
@@ -29,18 +28,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_FAST_FORWARD;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_REWIND;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SEEK_TO;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SET_REPEAT_MODE;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP;
-import static android.support.v4.media.session.PlaybackStateCompat.Builder;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ALL;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE;
 import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE;
@@ -63,19 +50,7 @@ public class MusicService extends Service {
     public static final String PLAY_DELAY_MILLIS = "play_delay";
 
     private final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
-    private final Builder stateBuilder = new Builder()
-            .setActions(ACTION_PLAY
-                    | ACTION_STOP
-                    | ACTION_PAUSE
-                    | ACTION_PLAY_PAUSE
-                    | ACTION_SKIP_TO_NEXT
-                    | ACTION_SKIP_TO_PREVIOUS
-                    | ACTION_SEEK_TO
-                    | ACTION_SET_REPEAT_MODE
-                    | ACTION_SET_SHUFFLE_MODE
-                    | ACTION_FAST_FORWARD
-                    | ACTION_REWIND
-            );
+
     //optimization
     private final ServiceState serviceState = new ServiceState();
 
@@ -383,8 +358,9 @@ public class MusicService extends Service {
     }
 
     private void updateMediaSessionState() {
-        stateBuilder.setState(toMediaState(playerState), trackPosition, playbackSpeed);
-        mediaSession().setPlaybackState(stateBuilder.build());
+        Components.getAppComponent()
+                .mediaSessionHandler()
+                .updatePlaybackState(playerState, trackPosition, playbackSpeed);
 
         int sessionRepeatMode;
         switch (repeatMode) {
@@ -449,17 +425,6 @@ public class MusicService extends Service {
 
     private NotificationsDisplayer notificationsDisplayer() {
         return Components.getAppComponent().notificationDisplayer();
-    }
-
-    private static int toMediaState(PlayerState playerState) {
-        switch (playerState) {
-            case IDLE: return PlaybackStateCompat.STATE_NONE;
-            case LOADING: return PlaybackStateCompat.STATE_CONNECTING;
-            case PAUSE: return PlaybackStateCompat.STATE_PAUSED;
-            case PLAY: return PlaybackStateCompat.STATE_PLAYING;
-            case STOP: return PlaybackStateCompat.STATE_STOPPED;
-            default: throw new IllegalStateException("unexpected player state: " + playerState);
-        }
     }
 
     private static class ServiceState {

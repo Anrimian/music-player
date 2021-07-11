@@ -144,8 +144,8 @@ public class LibraryPlayerInteractor {
         playQueueRepository.skipToNext().subscribe();
     }
 
-    public void skipToItem(PlayQueueItem item) {
-        playQueueRepository.skipToItem(item);
+    public void skipToItem(long itemId) {
+        playQueueRepository.skipToItem(itemId);
     }
 
     public Observable<Integer> getRepeatModeObservable() {
