@@ -11,18 +11,26 @@ import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.widget.Toast
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.*
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.main.MainActivity
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 
+//        stateBuilder.setActiveQueueItemId()
+// and skip to queue item action
 class MediaSessionHandler(private val context: Context,
                           private val playerInteractor: PlayerInteractor,
+                          private val libraryPlayerInteractor: LibraryPlayerInteractor,
                           private val musicServiceInteractor: MusicServiceInteractor,
                           private val errorParser: ErrorParser
 ) {
@@ -30,6 +38,7 @@ class MediaSessionHandler(private val context: Context,
     private var mediaSession: MediaSessionCompat? = null
     private var activeServicesCount = 0
 
+    private val mediaSessionDisposable = CompositeDisposable()
     private var actionDisposable: Disposable? = null
 
     fun getMediaSession(): MediaSessionCompat {
@@ -44,6 +53,8 @@ class MediaSessionHandler(private val context: Context,
                 val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON, null, context, AppMediaButtonReceiver::class.java)
                 val pMediaButtonIntent = PendingIntent.getBroadcast(context, 0, mediaButtonIntent, 0)
                 setMediaButtonReceiver(pMediaButtonIntent)
+
+                subscribeOnPlayQueue()
             }
         }
         return mediaSession!!
@@ -62,11 +73,30 @@ class MediaSessionHandler(private val context: Context,
 
     private fun release() {
         actionDisposable?.dispose()
+        mediaSessionDisposable.clear()
         mediaSession?.run {
             isActive = false
             release()
         }
         mediaSession = null
+    }
+
+    private fun subscribeOnPlayQueue() {
+        mediaSessionDisposable.add(libraryPlayerInteractor.playQueueObservable
+            .subscribe(this::onPlayQueueReceived))
+    }
+
+    private fun onPlayQueueReceived(queue: List<PlayQueueItem>) {
+        getMediaSession().setQueue(queue.map(this::toSessionQueueItem))
+    }
+
+    private fun toSessionQueueItem(item: PlayQueueItem): MediaSessionCompat.QueueItem {
+        val composition = item.composition
+        val mediaDescription = MediaDescriptionCompat.Builder()
+            .setTitle(CompositionHelper.formatCompositionName(composition))
+            .setSubtitle(FormatUtils.formatAuthor(composition.artist, context))
+            .build()
+        return MediaSessionCompat.QueueItem(mediaDescription, item.id)
     }
 
     private inner class AppMediaSessionCallback : MediaSessionCompat.Callback() {

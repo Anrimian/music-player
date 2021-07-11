@@ -383,7 +383,6 @@ public class MusicService extends Service {
     }
 
     private void updateMediaSessionState() {
-        //stopped - likely wrong media state
         stateBuilder.setState(toMediaState(playerState), trackPosition, playbackSpeed);
         mediaSession().setPlaybackState(stateBuilder.build());
 

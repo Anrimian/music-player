@@ -282,9 +282,16 @@ class MusicModule {
     @Singleton
     MediaSessionHandler mediaSessionHandler(Context context,
                                             PlayerInteractor playerInteractor,
+                                            LibraryPlayerInteractor libraryPlayerInteractor,
                                             MusicServiceInteractor musicServiceInteractor,
                                             ErrorParser errorParser) {
-        return new MediaSessionHandler(context, playerInteractor, musicServiceInteractor, errorParser);
+        return new MediaSessionHandler(
+                context,
+                playerInteractor,
+                libraryPlayerInteractor,
+                musicServiceInteractor,
+                errorParser
+        );
     }
 
     @Provides
