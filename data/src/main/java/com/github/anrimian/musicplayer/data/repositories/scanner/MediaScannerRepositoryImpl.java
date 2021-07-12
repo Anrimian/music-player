@@ -38,8 +38,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final LoggerRepository loggerRepository;
     private final Scheduler scheduler;
 
-    private CompositeDisposable mediaStoreDisposable = new CompositeDisposable();
-    private LongSparseArray<Disposable> genreEntriesDisposable = new LongSparseArray<>();
+    private final CompositeDisposable mediaStoreDisposable = new CompositeDisposable();
+    private final LongSparseArray<Disposable> genreEntriesDisposable = new LongSparseArray<>();
 
     public MediaScannerRepositoryImpl(StorageMusicProvider musicProvider,
                                       StoragePlayListsProvider playListsProvider,

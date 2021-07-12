@@ -36,21 +36,21 @@ import static org.mockito.Mockito.when;
 
 public class PlayerInteractorTest {
 
-    private MusicPlayerController musicPlayerController = mock(MusicPlayerController.class);
-    private SettingsRepository settingsRepository = mock(SettingsRepository.class);
-    private SystemMusicController systemMusicController = mock(SystemMusicController.class);
-    private SystemServiceController systemServiceController = mock(SystemServiceController.class);
+    private final MusicPlayerController musicPlayerController = mock(MusicPlayerController.class);
+    private final SettingsRepository settingsRepository = mock(SettingsRepository.class);
+    private final SystemMusicController systemMusicController = mock(SystemMusicController.class);
+    private final SystemServiceController systemServiceController = mock(SystemServiceController.class);
 
     private PlayerInteractor musicPlayerInteractor;
 
-    private PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
-    private PublishSubject<AudioFocusEvent> audioFocusSubject = PublishSubject.create();
-    private PublishSubject<Object> noisyAudioSubject = PublishSubject.create();
-    private PublishSubject<Integer> volumeSubject = PublishSubject.create();
+    private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
+    private final PublishSubject<AudioFocusEvent> audioFocusSubject = PublishSubject.create();
+    private final PublishSubject<Object> noisyAudioSubject = PublishSubject.create();
+    private final PublishSubject<Integer> volumeSubject = PublishSubject.create();
 
     private TestObserver<PlayerState> playerStateSubscriber;
 
-    private InOrder inOrder = Mockito.inOrder(
+    private final InOrder inOrder = Mockito.inOrder(
             musicPlayerController,
             systemServiceController);
 

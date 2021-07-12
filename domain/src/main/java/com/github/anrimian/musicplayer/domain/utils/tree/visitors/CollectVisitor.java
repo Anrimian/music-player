@@ -11,7 +11,7 @@ import java.util.List;
 
 public class CollectVisitor<T> implements Visitor<T> {
 
-    private List<T> collection;
+    private final List<T> collection;
 
     public CollectVisitor(List<T> collection) {
         this.collection = collection;

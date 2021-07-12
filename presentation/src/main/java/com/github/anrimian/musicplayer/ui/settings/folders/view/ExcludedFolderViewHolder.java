@@ -13,7 +13,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHold
 
 class ExcludedFolderViewHolder extends BaseViewHolder {
 
-    private ItemExcludedFolderBinding viewBinding;
+    private final ItemExcludedFolderBinding viewBinding;
 
     private IgnoredFolder folder;
 

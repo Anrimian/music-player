@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 
 class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListener {
 
-    private CompositionItemWrapper compositionItemWrapper;
+    private final CompositionItemWrapper compositionItemWrapper;
 
     private PlayQueueItem playQueueItem;
 
@@ -37,8 +37,8 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
         View btnActionsMenu = itemView.findViewById(R.id.btn_actions_menu);
 
         compositionItemWrapper = new CompositionItemWrapper(itemView,
-                o -> iconClickListener.onItemClick(getAdapterPosition(), playQueueItem),
-                composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), playQueueItem)
+                o -> iconClickListener.onItemClick(getBindingAdapterPosition(), playQueueItem),
+                composition -> onCompositionClickListener.onItemClick(getBindingAdapterPosition(), playQueueItem)
         );
 
         btnActionsMenu.setOnClickListener(v -> menuClickListener.onItemClick(v, playQueueItem));

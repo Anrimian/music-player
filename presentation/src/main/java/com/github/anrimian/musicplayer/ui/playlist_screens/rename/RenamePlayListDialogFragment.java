@@ -19,8 +19,6 @@ import com.github.anrimian.musicplayer.databinding.DialogCommonInputBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 
-import java.util.Objects;
-
 import moxy.MvpAppCompatDialogFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
@@ -136,6 +134,6 @@ public class RenamePlayListDialogFragment extends MvpAppCompatDialogFragment
     }
 
     private long getPlayListId() {
-        return Objects.requireNonNull(getArguments()).getLong(PLAY_LIST_ID_ARG);
+        return requireArguments().getLong(PLAY_LIST_ID_ARG);
     }
 }

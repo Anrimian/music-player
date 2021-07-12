@@ -16,8 +16,8 @@ import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
 class MenuViewHolder extends RecyclerView.ViewHolder {
 
-    private TextView tvTitle;
-    private ImageView ivIcon;
+    private final TextView tvTitle;
+    private final ImageView ivIcon;
 
     private MenuItem menuItem;
 

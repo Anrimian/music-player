@@ -30,7 +30,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 class FolderViewHolder extends FileViewHolder {
 
-    private ItemStorageFolderBinding viewBinding;
+    private final ItemStorageFolderBinding viewBinding;
 
     private FolderFileSource folder;
     private String path;
@@ -46,7 +46,7 @@ class FolderViewHolder extends FileViewHolder {
 
         if (onFolderClickListener != null) {
             viewBinding.clickableItem.setOnClickListener(v ->
-                    onFolderClickListener.onItemClick(getAdapterPosition(), folder)
+                    onFolderClickListener.onItemClick(getBindingAdapterPosition(), folder)
             );
         }
         if (onLongClickListener != null) {
@@ -55,7 +55,7 @@ class FolderViewHolder extends FileViewHolder {
                     return;
                 }
                 selectImmediate();
-                onLongClickListener.onItemClick(getAdapterPosition(), folder);
+                onLongClickListener.onItemClick(getBindingAdapterPosition(), folder);
             });
         }
         viewBinding.btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));

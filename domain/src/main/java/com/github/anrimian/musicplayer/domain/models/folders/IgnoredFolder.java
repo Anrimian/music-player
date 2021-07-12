@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class IgnoredFolder {
 
-    private String relativePath;
-    private Date addDate;
+    private final String relativePath;
+    private final Date addDate;
 
     public IgnoredFolder(String relativePath, Date addDate) {
         this.relativePath = relativePath;

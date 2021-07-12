@@ -180,7 +180,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
             dragging = true;
             setIsDragging(viewHolder, true);
             if (onStartDragListener != null) {
-                onStartDragListener.onStartDrag(viewHolder.getAdapterPosition());
+                onStartDragListener.onStartDrag(viewHolder.getBindingAdapterPosition());
             }
         }
         super.onSelectedChanged(viewHolder, actionState);
@@ -192,7 +192,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
         if (dragging) {
             dragging = false;
             if (onEndDragListener != null) {
-                onEndDragListener.onEndDrag(viewHolder.getAdapterPosition());
+                onEndDragListener.onEndDrag(viewHolder.getBindingAdapterPosition());
             }
             setIsDragging(viewHolder, false);
         }
@@ -208,7 +208,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                           @NonNull RecyclerView.ViewHolder viewHolder,
                           @NonNull RecyclerView.ViewHolder target) {
         if (onMovedListener != null) {
-            onMovedListener.onItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            onMovedListener.onItemMoved(viewHolder.getBindingAdapterPosition(), target.getBindingAdapterPosition());
             return true;
         }
         return false;
@@ -216,7 +216,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-        swipeCallback.call(viewHolder.getAdapterPosition());
+        swipeCallback.call(viewHolder.getBindingAdapterPosition());
     }
 
     @Override

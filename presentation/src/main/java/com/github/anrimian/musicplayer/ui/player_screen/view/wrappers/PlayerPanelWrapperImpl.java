@@ -61,8 +61,8 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     private final Runnable onBottomSheetDragExpanded;
     private final Callback<Boolean> bottomSheetStateListener;
 
-    private BottomSheetBehavior<View> bottomSheetBehavior;
-    private SlideDelegate bottomSheetDelegate;
+    private final BottomSheetBehavior<View> bottomSheetBehavior;
+    private final SlideDelegate bottomSheetDelegate;
 
     public PlayerPanelWrapperImpl(View view,
                                   FragmentDrawerBinding viewBinding,
