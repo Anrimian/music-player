@@ -22,7 +22,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 
 public class AlbumViewHolder extends BaseViewHolder {
 
-    private ItemAlbumHorizontalBinding viewBinding;
+    private final ItemAlbumHorizontalBinding viewBinding;
 
     private Album album;
 

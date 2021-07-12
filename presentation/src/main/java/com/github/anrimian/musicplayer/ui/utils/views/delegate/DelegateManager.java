@@ -9,7 +9,7 @@ import java.util.List;
 
 public class DelegateManager implements SlideDelegate {
 
-    private List<SlideDelegate> bottomSheetDelegates = new LinkedList<>();
+    private final List<SlideDelegate> bottomSheetDelegates = new LinkedList<>();
 
     @Override
     public void onSlide(float slideOffset) {

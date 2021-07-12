@@ -11,7 +11,7 @@ public class DefferedObject<T> {
     @Nullable
     private T obj;
 
-    private LinkedList<Callback<T>> deferredFunctions = new LinkedList<>();
+    private final LinkedList<Callback<T>> deferredFunctions = new LinkedList<>();
 
     public void setObject(@Nullable T obj) {
         this.obj = obj;

@@ -26,7 +26,7 @@ public class CompositeMediaPlayerTest {
 
     private CompositeMediaPlayer compositeMediaPlayer;
 
-    private InOrder inOrder = Mockito.inOrder(player1, player2);
+    private final InOrder inOrder = Mockito.inOrder(player1, player2);
 
     private final PublishSubject<PlayerEvent> player1EventSubject = PublishSubject.create();
     private final PublishSubject<PlayerEvent> player2EventSubject = PublishSubject.create();

@@ -11,12 +11,12 @@ public enum OrderType {
     DURATION(7),
     SIZE(9);
 
-    private static Map<Integer, OrderType> map = new HashMap<>();
+    private static final Map<Integer, OrderType> map = new HashMap<>();
 
     /**
      * only odd values
      */
-    private int id;
+    private final int id;
 
     static {
         for (OrderType pageType : OrderType.values()) {

@@ -46,11 +46,11 @@ public class MusicViewHolder extends SelectableViewHolder {
         clickableItem = binding.clickableItem;
 
         compositionItemWrapper = new CompositionItemWrapper(itemView,
-                o -> iconClickListener.onItemClick(getAdapterPosition(), composition),
-                composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), composition)
+                o -> iconClickListener.onItemClick(getBindingAdapterPosition(), composition),
+                composition -> onCompositionClickListener.onItemClick(getBindingAdapterPosition(), composition)
         );
         binding.btnActionsMenu.setOnClickListener(v ->
-                menuClickListener.onItemClick(getAdapterPosition(), composition)
+                menuClickListener.onItemClick(getBindingAdapterPosition(), composition)
         );
 
         if (onLongClickListener != null) {
@@ -59,7 +59,7 @@ public class MusicViewHolder extends SelectableViewHolder {
                     return false;
                 }
                 selectImmediate();
-                onLongClickListener.onItemClick(getAdapterPosition(), composition);
+                onLongClickListener.onItemClick(getBindingAdapterPosition(), composition);
                 return true;
             });
         }

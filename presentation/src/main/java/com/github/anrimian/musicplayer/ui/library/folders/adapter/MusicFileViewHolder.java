@@ -52,10 +52,10 @@ public class MusicFileViewHolder extends FileViewHolder {
 
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 iconClickListener,
-                composition -> onCompositionClickListener.onItemClick(getAdapterPosition(), fileSource)
+                composition -> onCompositionClickListener.onItemClick(getBindingAdapterPosition(), fileSource)
         );
         binding.btnActionsMenu.setOnClickListener(v ->
-                menuClickListener.onItemClick(getAdapterPosition(), fileSource)
+                menuClickListener.onItemClick(getBindingAdapterPosition(), fileSource)
         );
 
         if (onLongClickListener != null) {
@@ -64,7 +64,7 @@ public class MusicFileViewHolder extends FileViewHolder {
                     return false;
                 }
                 selectImmediate();
-                onLongClickListener.onItemClick(getAdapterPosition(), fileSource);
+                onLongClickListener.onItemClick(getBindingAdapterPosition(), fileSource);
                 return true;
             });
         }

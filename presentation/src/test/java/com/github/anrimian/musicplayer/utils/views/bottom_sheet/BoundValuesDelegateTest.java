@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.utils.views.bottom_sheet;
 
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
  */
 public class BoundValuesDelegateTest {
 
-    private SlideDelegate mockDelegate = mock(SlideDelegate.class);
+    private final SlideDelegate mockDelegate = mock(SlideDelegate.class);
 
     private BoundValuesDelegate boundValuesDelegate;
 

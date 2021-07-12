@@ -12,8 +12,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 
 class BroadcastDisposable implements Disposable {
 
-    private BroadcastReceiver receiver;
-    private Context ctx;
+    private final BroadcastReceiver receiver;
+    private final Context ctx;
 
     private boolean isDisposed = false;
 

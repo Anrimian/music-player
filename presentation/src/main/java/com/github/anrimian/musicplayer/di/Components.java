@@ -47,7 +47,7 @@ public class Components {
 
     private static Components instance;
 
-    private AppComponent appComponent;
+    private final AppComponent appComponent;
     private LibraryComponent libraryComponent;
     private LibraryFilesComponent libraryFilesComponent;
 

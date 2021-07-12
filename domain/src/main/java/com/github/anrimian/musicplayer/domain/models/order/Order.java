@@ -7,8 +7,8 @@ import javax.annotation.Nonnull;
 public class Order implements Serializable {
 
     @Nonnull
-    private OrderType orderType;
-    private boolean reversed;
+    private final OrderType orderType;
+    private final boolean reversed;
 
     public Order(@Nonnull OrderType orderType, boolean reversed) {
         this.orderType = orderType;

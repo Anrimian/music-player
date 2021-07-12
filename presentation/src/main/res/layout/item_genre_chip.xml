@@ -29,9 +29,9 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:scaleType="center"
-            android:tint="?android:attr/textColorPrimary"
             android:contentDescription="@string/remove_genre"
             android:background="@drawable/bg_selectable_circle"
+            app:tint="?android:attr/textColorPrimary"
             app:srcCompat="@drawable/ic_close_circle" />
 
     </LinearLayout>

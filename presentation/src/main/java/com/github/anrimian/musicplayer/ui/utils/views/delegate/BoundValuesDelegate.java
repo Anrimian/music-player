@@ -6,10 +6,10 @@ package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
 public class BoundValuesDelegate implements SlideDelegate {
 
-    private float start;
-    private float end;
+    private final float start;
+    private final float end;
 
-    private SlideDelegate delegate;
+    private final SlideDelegate delegate;
 
     public BoundValuesDelegate(float start, float end, SlideDelegate delegate) {
         this.start = start;

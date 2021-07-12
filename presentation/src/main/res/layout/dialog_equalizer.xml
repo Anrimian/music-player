@@ -22,7 +22,7 @@
             android:layout_margin="4dp"
             android:background="?attr/actionBarItemBackground"
             android:contentDescription="@string/close"
-            android:tint="?attr/buttonColorInverse"
+            app:tint="?attr/buttonColorInverse"
             app:srcCompat="@drawable/ic_close"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"

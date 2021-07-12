@@ -34,11 +34,11 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder implements D
                            OnItemClickListener<Integer> onIconClickListener) {
         super(inflater.inflate(R.layout.item_storage_music, parent, false));
         compositionItemWrapper = new CompositionItemWrapper(itemView,
-                o -> onIconClickListener.onItemClick(getAdapterPosition()),
-                composition -> onIconClickListener.onItemClick(getAdapterPosition())
+                o -> onIconClickListener.onItemClick(getBindingAdapterPosition()),
+                composition -> onIconClickListener.onItemClick(getBindingAdapterPosition())
         );
         itemView.findViewById(R.id.btn_actions_menu).setOnClickListener(v ->
-                onCompositionClickListener.call(item, getAdapterPosition())
+                onCompositionClickListener.call(item, getBindingAdapterPosition())
         );
     }
 

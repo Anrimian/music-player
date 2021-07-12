@@ -19,7 +19,7 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 @Module
 public class ArtistItemsModule {
 
-    private long id;
+    private final long id;
 
     public ArtistItemsModule(long id) {
         this.id = id;
