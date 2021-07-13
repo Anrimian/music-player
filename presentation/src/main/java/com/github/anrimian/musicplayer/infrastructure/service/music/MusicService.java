@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
+import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.utils.Permissions;
@@ -28,9 +29,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
-import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ALL;
-import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE;
-import static android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE;
 import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_ALL;
 import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE;
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
@@ -358,25 +356,10 @@ public class MusicService extends Service {
     }
 
     private void updateMediaSessionState() {
-        Components.getAppComponent()
-                .mediaSessionHandler()
-                .updatePlaybackState(playerState, trackPosition, playbackSpeed);
-
-        int sessionRepeatMode;
-        switch (repeatMode) {
-            case RepeatMode.REPEAT_COMPOSITION: {
-                sessionRepeatMode = REPEAT_MODE_ONE;
-                break;
-            }
-            case RepeatMode.REPEAT_PLAY_LIST: {
-                sessionRepeatMode = REPEAT_MODE_ALL;
-                break;
-            }
-            default: {
-                sessionRepeatMode = REPEAT_MODE_NONE;
-            }
-        }
-        mediaSession().setRepeatMode(sessionRepeatMode);
+        MediaSessionHandler mediaSessionHandler = Components.getAppComponent()
+                .mediaSessionHandler();
+        mediaSessionHandler.updatePlaybackState(playerState, trackPosition, playbackSpeed);
+        mediaSessionHandler.setRepeatMode(repeatMode);
 
         int sessionShuffleMode;
         if (randomMode) {

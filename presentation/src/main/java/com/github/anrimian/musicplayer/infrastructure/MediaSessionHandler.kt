@@ -11,6 +11,7 @@ import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.widget.Toast
+import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
@@ -23,10 +24,16 @@ import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonRe
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.*
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
+
+private const val REPEAT_ACTION_ID = "repeat_action_id"
+private const val SHUFFLE_ACTION_ID = "shuffle_action_id"
+private const val FAST_FORWARD_ACTION_ID = "fast_forward_action_id"
+private const val REWIND_ACTION_ID = "rewind_action_id"
 
 class MediaSessionHandler(private val context: Context,
                           private val playerInteractor: PlayerInteractor,
@@ -55,6 +62,16 @@ class MediaSessionHandler(private val context: Context,
                     or PlaybackStateCompat.ACTION_FAST_FORWARD
                     or PlaybackStateCompat.ACTION_REWIND
         )
+            //correct subscription, move all media state\metadata subscriptions to here
+            //do not cache playbackStateBuilder
+            //correct action handling, ignore external player
+        .addCustomAction(REPEAT_ACTION_ID, context.getString(R.string.repeat_playlist), R.drawable.ic_repeat)
+        .addCustomAction(SHUFFLE_ACTION_ID, context.getString(R.string.content_description_shuffle), R.drawable.ic_shuffle)
+        //icon, description
+        .addCustomAction(REWIND_ACTION_ID, "2", R.drawable.ic_skip_previous)
+        //icon, description
+        .addCustomAction(FAST_FORWARD_ACTION_ID, "1", R.drawable.ic_skip_next)
+
 
     fun getMediaSession(): MediaSessionCompat {
         if (mediaSession == null) {
@@ -89,6 +106,22 @@ class MediaSessionHandler(private val context: Context,
     fun updatePlaybackState(playerState: PlayerState, trackPosition: Long, playbackSpeed: Float) {
         playbackStateBuilder.setState(toMediaState(playerState), trackPosition, playbackSpeed)
         getMediaSession().setPlaybackState(playbackStateBuilder.build())
+    }
+
+    fun setRepeatMode(repeatMode: Int) {
+        playbackStateBuilder.addCustomAction(
+            REPEAT_ACTION_ID,
+            context.getString(FormatUtils.getRepeatModeText(repeatMode)),
+            FormatUtils.getRepeatModeIcon(repeatMode)
+        )
+        getMediaSession().setPlaybackState(playbackStateBuilder.build())
+
+        val sessionRepeatMode = when (repeatMode) {
+            RepeatMode.REPEAT_COMPOSITION -> PlaybackStateCompat.REPEAT_MODE_ONE
+            RepeatMode.REPEAT_PLAY_LIST -> PlaybackStateCompat.REPEAT_MODE_ALL
+            else -> PlaybackStateCompat.REPEAT_MODE_NONE
+        }
+        getMediaSession().setRepeatMode(sessionRepeatMode)
     }
 
     private fun release() {
@@ -249,6 +282,12 @@ class MediaSessionHandler(private val context: Context,
             libraryPlayerInteractor.skipToItem(id)
         }
 
+        override fun onCustomAction(action: String, extras: Bundle) {
+            when(action) {
+                REPEAT_ACTION_ID -> libraryPlayerInteractor.changeRepeatMode()
+            }
+        }
+
         //next - not implemented
         override fun onCommand(command: String, extras: Bundle, cb: ResultReceiver) {
             super.onCommand(command, extras, cb)
@@ -288,10 +327,6 @@ class MediaSessionHandler(private val context: Context,
 
         override fun onSetCaptioningEnabled(enabled: Boolean) {
             super.onSetCaptioningEnabled(enabled)
-        }
-
-        override fun onCustomAction(action: String, extras: Bundle) {
-            super.onCustomAction(action, extras)
         }
 
         override fun onAddQueueItem(description: MediaDescriptionCompat) {

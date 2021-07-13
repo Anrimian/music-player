@@ -62,6 +62,9 @@ const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
 //more actions in player view
 
+//remove skip to next when it is not enabled? https://stackoverflow.com/a/45698216/5541688
+
+
 //checklist:
 //how it will work with external player?
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
