@@ -23,7 +23,7 @@ import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonRe
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.*
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -125,7 +125,7 @@ class MediaSessionHandler(private val context: Context,
         val composition = item.composition
         val mediaDescription = MediaDescriptionCompat.Builder()
             .setTitle(CompositionHelper.formatCompositionName(composition))
-            .setSubtitle(FormatUtils.formatAuthor(composition.artist, context))
+            .setSubtitle(formatCompositionAdditionalInfoForMediaBrowser(context, composition))
             .build()
         return MediaSessionCompat.QueueItem(mediaDescription, item.id)
     }

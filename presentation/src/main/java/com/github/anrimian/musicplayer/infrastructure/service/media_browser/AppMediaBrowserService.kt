@@ -17,7 +17,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.*
 import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -58,7 +58,9 @@ const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
 //support navigation hints
 
-//more info in description
+//support search
+
+//more actions in player view
 
 //checklist:
 //how it will work with external player?
@@ -307,7 +309,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun toActionItem(position: Int, composition: Composition) = actionItem(
         COMPOSITIONS_ACTION_ID,
         formatCompositionName(composition),
-        formatAuthor(composition.artist, this),
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
         Bundle().apply { putInt(POSITION_ARG, position) }
     )
 
@@ -325,7 +327,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
                 actionItem(
                     FOLDERS_ACTION_ID,
                     formatCompositionName(composition),
-                    formatAuthor(composition.artist, this),
+                    formatCompositionAdditionalInfoForMediaBrowser(this, composition),
                     Bundle().apply {
                         putLong(COMPOSITION_ID_ARG, composition.id)
                         putLong(FOLDER_ID_ARG, folderId ?: 0)
@@ -339,7 +341,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun toActionArtistItem(position: Int, composition: Composition, artistId: Long) = actionItem(
         ARTIST_ITEMS_ACTION_ID,
         formatCompositionName(composition),
-        formatAuthor(composition.artist, this),
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
         Bundle().apply {
             putInt(POSITION_ARG, position)
             putLong(ARTIST_ID_ARG, artistId)
@@ -349,7 +351,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun toActionAlbumItem(position: Int, composition: Composition, albumId: Long) = actionItem(
         ALBUM_ITEMS_ACTION_ID,
         formatCompositionName(composition),
-        formatAuthor(composition.artist, this),
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
         Bundle().apply {
             putInt(POSITION_ARG, position)
             putLong(ALBUM_ID_ARG, albumId)
@@ -365,7 +367,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         return actionItem(
             PLAYLIST_ITEMS_ACTION_ID,
             formatCompositionName(composition),
-            formatAuthor(composition.artist, this),
+            formatCompositionAdditionalInfoForMediaBrowser(this, composition),
             Bundle().apply {
                 putInt(POSITION_ARG, position)
                 putLong(PLAYLIST_ID_ARG, playlistId)
@@ -376,19 +378,19 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun toBrowsableItem(artist: Artist) = browsableItem(
         ARTIST_ITEMS_NODE_ID + DELIMITER + artist.id,
         artist.name,
-        FormatUtils.formatCompositionsCount(this, artist.compositionsCount)
+        formatCompositionsCount(this, artist.compositionsCount)
     )
 
     private fun toBrowsableItem(album: Album) = browsableItem(
         ALBUM_ITEMS_NODE_ID + DELIMITER + album.id,
         album.name,
-        FormatUtils.formatCompositionsCount(this, album.compositionsCount)
+        formatAlbumAdditionalInfoForMediaBrowser(this, album)
     )
 
     private fun toBrowsableItem(playlist: PlayList) = browsableItem(
         PLAYLIST_ITEMS_NODE_ID + DELIMITER + playlist.id,
         playlist.name,
-        FormatUtils.formatCompositionsCount(this, playlist.compositionsCount)
+        formatPlayListDescriptionForMediaBrowser(this, playlist)
     )
 
     private fun actionItem(mediaId: String, titleResId: Int, subtitle: CharSequence? = null) =
