@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import androidx.annotation.Nullable;
@@ -43,8 +42,6 @@ public class MusicService extends Service {
     public static final String REQUEST_CODE = "request_code";
     public static final String START_FOREGROUND_SIGNAL = "start_foreground_signal";
     public static final String PLAY_DELAY_MILLIS = "play_delay";
-
-    private final MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
 
     //optimization
     private final ServiceState serviceState = new ServiceState();
@@ -153,12 +150,6 @@ public class MusicService extends Service {
             currentSource = playerInteractor().getCurrentSource();
             notificationSetting = musicServiceInteractor().getNotificationSettings();
         }
-        //update state that depends on current item and settings to keep it actual
-        if (currentSource != null) {
-            updateMediaSessionMetadata();
-            updateMediaSessionAlbumArt();
-        }
-
         notificationsDisplayer().startForegroundNotification(this,
                 playerState == PlayerState.PLAY,
                 currentSource,
@@ -235,8 +226,7 @@ public class MusicService extends Service {
         PlayerState newPlayerState = serviceState.playerState;
 
         boolean updateNotification = false;
-        boolean updateMediaSessionMetadata = false;
-        boolean updateMediaSessionAlbumArt = false;
+        boolean updateCover = false;
         boolean stopService = false;
 
         if (this.playerState != serviceState.playerState) {
@@ -253,8 +243,7 @@ public class MusicService extends Service {
         if (!isSourceEqual || !isContentEqual) {
             this.currentSource = newCompositionSource;
             updateNotification = true;
-            updateMediaSessionMetadata = true;
-            updateMediaSessionAlbumArt = true;
+            updateCover = true;
         }
 
         if (this.repeatMode != serviceState.repeatMode) {
@@ -270,7 +259,7 @@ public class MusicService extends Service {
         if (!newSettings.equals(this.notificationSetting)) {
             if (notificationSetting == null
                     || notificationSetting.isCoversOnLockScreen() != newSettings.isCoversOnLockScreen()) {
-                updateMediaSessionAlbumArt = true;
+                updateCover = true;
             }
             if (notificationSetting == null
                     || notificationSetting.isShowCovers() != newSettings.isShowCovers()
@@ -287,14 +276,9 @@ public class MusicService extends Service {
 
         //seekbar values on cover settings change
         if (updateNotification && !stopService) {
-            updateForegroundNotification(updateMediaSessionAlbumArt);
+            updateForegroundNotification(updateCover);
         }
-        if (updateMediaSessionMetadata) {
-            updateMediaSessionMetadata();
-        }
-        if (updateMediaSessionAlbumArt) {
-            updateMediaSessionAlbumArt();
-        }
+
         if (stopService) {
             notificationsDisplayer().cancelCoverLoadingForForegroundNotification();
             stopForeground(true);
@@ -304,20 +288,6 @@ public class MusicService extends Service {
                 mediaSession().setActive(true);
             }
         }
-    }
-
-    private void updateMediaSessionAlbumArt() {
-        CompositionSourceModelHelper.updateMediaSessionAlbumArt(currentSource,
-                metadataBuilder,
-                mediaSession(),
-                notificationSetting.isCoversOnLockScreen());
-    }
-
-    private void updateMediaSessionMetadata() {
-        CompositionSourceModelHelper.updateMediaSessionMetadata(currentSource,
-                metadataBuilder,
-                mediaSession(),
-                this);
     }
 
     private void updateForegroundNotification(boolean reloadCover) {

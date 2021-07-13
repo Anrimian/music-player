@@ -230,6 +230,9 @@ public class PlayerInteractor {
         if (state == PLAY || state == LOADING) {
             musicPlayerController.resume();
         }
+        if (state == IDLE) {
+            playerStateSubject.onNext(PAUSE);
+        }
     }
 
     private void handleErrorWithComposition(ErrorType errorType) {

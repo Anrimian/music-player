@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -15,13 +16,17 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
+import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.*
+import com.github.anrimian.musicplayer.infrastructure.service.music.CompositionSourceModelHelper
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
@@ -50,6 +55,7 @@ class MediaSessionHandler(private val context: Context,
     private var actionDisposable: Disposable? = null
 
     private val playbackState = PlaybackState()
+    private val metadataState = MetadataState()
 
     fun getMediaSession(): MediaSessionCompat {
         if (mediaSession == null) {
@@ -65,6 +71,7 @@ class MediaSessionHandler(private val context: Context,
                 setMediaButtonReceiver(pMediaButtonIntent)
             }
             subscribeOnPlayQueue()
+            subscribeOnMediaSessionMetadata()
             subscribeOnPlaybackStateActions()
         }
         return mediaSession!!
@@ -119,8 +126,6 @@ class MediaSessionHandler(private val context: Context,
                         or PlaybackStateCompat.ACTION_REWIND
             )
 
-
-        //move media metadata subscriptions to here - it needed(just launch auto without app to check)
         //correct action handling, ignore external player
 
         playbackStateBuilder.addCustomAction(
@@ -136,6 +141,7 @@ class MediaSessionHandler(private val context: Context,
             R.drawable.ic_shuffle
         )
 
+        //also replace buttons on external player
         //icon, description
         playbackStateBuilder.addCustomAction(REWIND_ACTION_ID, "2", R.drawable.ic_skip_previous)
         //icon, description
@@ -170,6 +176,34 @@ class MediaSessionHandler(private val context: Context,
         getMediaSession().setShuffleMode(sessionShuffleMode)
     }
 
+    private fun subscribeOnMediaSessionMetadata() {
+        mediaSessionDisposable.add(Observable.combineLatest(
+            playerInteractor.currentSourceObservable,
+            musicServiceInteractor.notificationSettingObservable,
+            metadataState::set
+        ).subscribe(this::onMetadataStateReceived))
+    }
+
+    private fun onMetadataStateReceived(state: MetadataState) {
+        val metadataBuilder = MediaMetadataCompat.Builder()
+        val currentSource = state.currentSource.value
+
+        CompositionSourceModelHelper.updateMediaSessionMetadata(
+            currentSource,
+            metadataBuilder,
+            getMediaSession(),
+            context
+        )
+
+        //we can use uri
+        CompositionSourceModelHelper.updateMediaSessionAlbumArt(
+            currentSource,
+            metadataBuilder,
+            getMediaSession(),
+            state.settings.isCoversOnLockScreen
+        )
+    }
+
     private fun subscribeOnPlayQueue() {
         mediaSessionDisposable.add(libraryPlayerInteractor.playQueueObservable
             .subscribe(this::onPlayQueueReceived))
@@ -196,6 +230,20 @@ class MediaSessionHandler(private val context: Context,
             PlayerState.PLAY -> PlaybackStateCompat.STATE_PLAYING
             PlayerState.STOP -> PlaybackStateCompat.STATE_STOPPED
             else -> throw IllegalStateException("unexpected player state: $playerState")
+        }
+    }
+
+    private class MetadataState {
+        lateinit var currentSource: Optional<CompositionSource>
+        lateinit var settings: MusicNotificationSetting
+
+        fun set(
+            currentSource: Optional<CompositionSource>,
+            settings: MusicNotificationSetting
+        ): MetadataState {
+            this.currentSource = currentSource
+            this.settings = settings
+            return this
         }
     }
 
