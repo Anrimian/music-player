@@ -20,7 +20,6 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
-import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.utils.Permissions;
@@ -29,8 +28,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
-import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_ALL;
-import static android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE;
 import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
@@ -60,10 +57,7 @@ public class MusicService extends Service {
     private PlayerState playerState = PlayerState.IDLE;
     @Nullable
     private CompositionSource currentSource;
-    private long trackPosition;
-    private float playbackSpeed = 1f;
     private int repeatMode = RepeatMode.NONE;
-    private boolean randomMode;
     private MusicNotificationSetting notificationSetting;
     private AppTheme currentAppTheme;
 
@@ -161,7 +155,6 @@ public class MusicService extends Service {
         }
         //update state that depends on current item and settings to keep it actual
         if (currentSource != null) {
-            updateMediaSessionState();
             updateMediaSessionMetadata();
             updateMediaSessionAlbumArt();
         }
@@ -228,10 +221,7 @@ public class MusicService extends Service {
         }
         serviceDisposable.add(Observable.combineLatest(playerInteractor().getPlayerStateObservable(),
                 playerInteractor().getCurrentSourceObservable(),
-                playerInteractor().getTrackPositionObservable(),
-                playerInteractor().getCurrentPlaybackSpeedObservable(),
                 musicServiceInteractor().getRepeatModeObservable(),
-                musicServiceInteractor().getRandomModeObservable(),
                 musicServiceInteractor().getNotificationSettingObservable(),
                 Components.getAppComponent().themeController().getAppThemeObservable(),
                 serviceState::set)
@@ -243,10 +233,8 @@ public class MusicService extends Service {
     private void onServiceStateReceived(ServiceState serviceState) {
         CompositionSource newCompositionSource = serviceState.compositionSource.getValue();
         PlayerState newPlayerState = serviceState.playerState;
-        long newTrackPosition = serviceState.trackPosition;
 
         boolean updateNotification = false;
-        boolean updateMediaSessionState = false;
         boolean updateMediaSessionMetadata = false;
         boolean updateMediaSessionAlbumArt = false;
         boolean stopService = false;
@@ -254,7 +242,6 @@ public class MusicService extends Service {
         if (this.playerState != serviceState.playerState) {
             this.playerState = serviceState.playerState;
             updateNotification = true;
-            updateMediaSessionState = true;
 
             if (playerState == PlayerState.PAUSE || playerState == PlayerState.STOP) {
                 stopForeground(false);
@@ -264,34 +251,15 @@ public class MusicService extends Service {
         boolean isSourceEqual = Objects.equals(newCompositionSource, currentSource);
         boolean isContentEqual = CompositionSourceModelHelper.areSourcesTheSame(currentSource, newCompositionSource);
         if (!isSourceEqual || !isContentEqual) {
-            if (!isSourceEqual) {
-                newTrackPosition = CompositionSourceModelHelper.getTrackPosition(newCompositionSource);
-            }
             this.currentSource = newCompositionSource;
             updateNotification = true;
             updateMediaSessionMetadata = true;
             updateMediaSessionAlbumArt = true;
         }
 
-        if (this.trackPosition != newTrackPosition) {
-            this.trackPosition = newTrackPosition;
-            updateMediaSessionState = true;
-        }
-
         if (this.repeatMode != serviceState.repeatMode) {
             this.repeatMode = serviceState.repeatMode;
-            updateMediaSessionState = true;
             updateNotification = true;
-        }
-
-        if (this.randomMode != serviceState.randomMode) {
-            this.randomMode = serviceState.randomMode;
-            updateMediaSessionState = true;
-        }
-
-        if (this.playbackSpeed != serviceState.playbackSpeed) {
-            this.playbackSpeed = serviceState.playbackSpeed;
-            updateMediaSessionState = true;
         }
 
         if (newCompositionSource == null || newPlayerState == PlayerState.IDLE) {
@@ -320,9 +288,6 @@ public class MusicService extends Service {
         //seekbar values on cover settings change
         if (updateNotification && !stopService) {
             updateForegroundNotification(updateMediaSessionAlbumArt);
-        }
-        if (updateMediaSessionState) {
-            updateMediaSessionState();
         }
         if (updateMediaSessionMetadata) {
             updateMediaSessionMetadata();
@@ -353,21 +318,6 @@ public class MusicService extends Service {
                 metadataBuilder,
                 mediaSession(),
                 this);
-    }
-
-    private void updateMediaSessionState() {
-        MediaSessionHandler mediaSessionHandler = Components.getAppComponent()
-                .mediaSessionHandler();
-        mediaSessionHandler.updatePlaybackState(playerState, trackPosition, playbackSpeed);
-        mediaSessionHandler.setRepeatMode(repeatMode);
-
-        int sessionShuffleMode;
-        if (randomMode) {
-            sessionShuffleMode = SHUFFLE_MODE_ALL;
-        } else {
-            sessionShuffleMode = SHUFFLE_MODE_NONE;
-        }
-        mediaSession().setShuffleMode(sessionShuffleMode);
     }
 
     private void updateForegroundNotification(boolean reloadCover) {
@@ -413,27 +363,18 @@ public class MusicService extends Service {
     private static class ServiceState {
         PlayerState playerState;
         Optional<CompositionSource> compositionSource;
-        long trackPosition;
-        float playbackSpeed;
         int repeatMode;
-        boolean randomMode;
         MusicNotificationSetting settings;
         AppTheme appTheme;
 
         private ServiceState set(PlayerState playerState,
                                  Optional<CompositionSource> compositionSource,
-                                 long trackPosition,
-                                 float playbackSpeed,
                                  int repeatMode,
-                                 boolean randomMode,
                                  MusicNotificationSetting settings,
                                  AppTheme appTheme) {
             this.playerState = playerState;
             this.compositionSource = compositionSource;
-            this.trackPosition = trackPosition;
-            this.playbackSpeed = playbackSpeed;
             this.repeatMode = repeatMode;
-            this.randomMode = randomMode;
             this.settings = settings;
             this.appTheme = appTheme;
             return this;
