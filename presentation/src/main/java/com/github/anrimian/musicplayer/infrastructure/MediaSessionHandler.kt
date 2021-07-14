@@ -134,18 +134,17 @@ class MediaSessionHandler(private val context: Context,
             FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
         )
 
-        //icon, description
         playbackStateBuilder.addCustomAction(
             SHUFFLE_ACTION_ID,
-            "8",
-            R.drawable.ic_shuffle
+            context.getString(R.string.content_description_shuffle),
+            FormatUtils.getRandomModeIcon(playbackState.randomMode)
         )
 
         //also replace buttons on external player
-        //icon, description
-        playbackStateBuilder.addCustomAction(REWIND_ACTION_ID, "2", R.drawable.ic_skip_previous)
-        //icon, description
-        playbackStateBuilder.addCustomAction(FAST_FORWARD_ACTION_ID, "1", R.drawable.ic_skip_next)
+        //description
+        playbackStateBuilder.addCustomAction(REWIND_ACTION_ID, "2", R.drawable.ic_rewind)
+        //description
+        playbackStateBuilder.addCustomAction(FAST_FORWARD_ACTION_ID, "1", R.drawable.ic_fast_forward)
 
         //leave it for now
 //      if (!isSourceEqual) {
@@ -384,6 +383,7 @@ class MediaSessionHandler(private val context: Context,
         override fun onCustomAction(action: String, extras: Bundle) {
             when(action) {
                 REPEAT_ACTION_ID -> libraryPlayerInteractor.changeRepeatMode()
+                SHUFFLE_ACTION_ID -> musicServiceInteractor.changeRandomMode()
             }
         }
 

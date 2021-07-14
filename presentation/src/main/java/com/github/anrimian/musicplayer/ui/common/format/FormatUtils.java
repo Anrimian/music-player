@@ -246,6 +246,14 @@ public class FormatUtils {
         }
     }
 
+    @DrawableRes
+    public static int getRandomModeIcon(boolean isRandom) {
+        if (isRandom) {
+            return R.drawable.ic_shuffle;
+        }
+        return R.drawable.ic_shuffle_disabled;
+    }
+
     public static void formatLinkedFabView(View view, View fab) {
         run(fab, () -> {
             int width = fab.getWidth();

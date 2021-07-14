@@ -101,6 +101,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
@@ -353,8 +354,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
         }
 
-        if (getArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
-            getArguments().remove(OPEN_PLAY_QUEUE_ARG);
+        if (requireArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
+            requireArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();
         }
 
@@ -603,6 +604,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showRepeatMode(int mode) {
         @DrawableRes int iconRes = getRepeatModeIcon(mode);
         btnRepeatMode.setImageResource(iconRes);
+        String description = getString(getRepeatModeText(mode));
+        btnRepeatMode.setContentDescription(description);
     }
 
     @Override

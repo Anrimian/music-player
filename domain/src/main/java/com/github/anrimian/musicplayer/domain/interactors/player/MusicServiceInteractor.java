@@ -89,6 +89,12 @@ public class MusicServiceInteractor {
         libraryPlayerInteractor.setRandomPlayingEnabled(isEnabled);
     }
 
+    public void changeRandomMode() {
+        libraryPlayerInteractor.setRandomPlayingEnabled(
+                !libraryPlayerInteractor.isRandomPlayingEnabled()
+        );
+    }
+
     public void setPlaybackSpeed(float speed) {
         if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
             libraryPlayerInteractor.setPlaybackSpeed(speed);
