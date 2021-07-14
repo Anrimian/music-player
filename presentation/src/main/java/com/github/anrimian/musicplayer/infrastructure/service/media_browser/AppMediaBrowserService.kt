@@ -56,7 +56,7 @@ private const val PLAYLIST_ITEMS_NODE_ID = "playlist_items_node_id"
 const val DELIMITER = '-'
 const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
-//handle android 11 EXTRA_RECENT - more info?
+//handle android 11 EXTRA_RECENT - more info?(at least set icon uri)
 
 //support navigation hints
 
@@ -67,6 +67,7 @@ const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
 //checklist:
 //how it will work with external player? - displays external source info and eats play action
+//better to support
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private val itemUpdateDisposableMap = HashMap<String, Disposable>()
@@ -339,7 +340,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         val item = actionItem(
             RECENT_MEDIA_ACTION_ID,
             formatCompositionName(composition),
-            formatCompositionAdditionalInfoForMediaBrowser(this, composition)
+            formatCompositionAuthor(composition, this)
         )
         return listOf(item)
     }
