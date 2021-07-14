@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
@@ -24,6 +25,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 
 const val PERMISSION_ERROR_ACTION_ID = "permission_error_action_id"
 const val DEFAULT_ERROR_ACTION_ID = "default_error_action_id"
+const val RECENT_MEDIA_ACTION_ID = "recent_media_action_id"
 const val RESUME_ACTION_ID = "resume_action_id"
 const val SHUFFLE_ALL_AND_PLAY_ACTION_ID = "shuffle_all_and_play_action_id"
 const val COMPOSITIONS_ACTION_ID = "compositions_action_id"
@@ -40,6 +42,7 @@ const val ALBUM_ID_ARG = "artist_id_arg"
 const val PLAYLIST_ID_ARG = "artist_id_arg"
 
 private const val ROOT_ID = "root_id"
+private const val RECENT_MEDIA_ROOT_ID = "recent_media_root_id"
 
 private const val COMPOSITIONS_NODE_ID = "compositions_node_id"
 private const val FOLDERS_NODE_ID = "folders_node_id"
@@ -53,7 +56,7 @@ private const val PLAYLIST_ITEMS_NODE_ID = "playlist_items_node_id"
 const val DELIMITER = '-'
 const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
-//handle android 11 EXTRA_RECENT
+//handle android 11 EXTRA_RECENT - more info?
 
 //support navigation hints
 
@@ -63,7 +66,7 @@ const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
 
 //checklist:
-//how it will work with external player?
+//how it will work with external player? - displays external source info and eats play action
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private val itemUpdateDisposableMap = HashMap<String, Disposable>()
@@ -94,6 +97,12 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot {
+        if (rootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) == true) {
+            val extras = Bundle().apply {
+                putBoolean(BrowserRoot.EXTRA_RECENT, true)
+            }
+            return BrowserRoot(RECENT_MEDIA_ROOT_ID, extras)
+        }
         return BrowserRoot(ROOT_ID, null)
     }
 
@@ -105,6 +114,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         resultCallback: Result<List<MediaBrowserCompat.MediaItem>>
     ) {
         when {
+            parentId == RECENT_MEDIA_ROOT_ID -> loadRecentItem(resultCallback)
             parentId == ROOT_ID -> loadRootItems(resultCallback)
             parentId == COMPOSITIONS_NODE_ID -> loadCompositionItems(resultCallback)
             parentId.startsWith(FOLDERS_NODE_ID) -> loadFolderItems(resultCallback, parentId)
@@ -123,6 +133,17 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         currentRequestDisposable?.dispose()
         itemUpdateDisposableMap.forEach { entry -> entry.value.dispose() }
         Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed()
+    }
+
+    private fun loadRecentItem(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
+        resultCallback.detach()
+        currentRequestDisposable = Components.getAppComponent()
+            .libraryPlayerInteractor()
+            .currentQueueItemObservable
+            .firstOrError()
+            .map(this::toRecentItem)
+            .onErrorReturn(this::processRecentItemError)
+            .subscribe(resultCallback::sendResult)
     }
 
     //use only alphabetical order?
@@ -292,6 +313,11 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         return TRIGGER
     }
 
+    private fun <T> processRecentItemError(throwable: Throwable): List<T> {
+        Components.getAppComponent().analytics().processNonFatalError(throwable)
+        return emptyList()
+    }
+
     private fun Result<List<MediaBrowserCompat.MediaItem>>.sendErrorResult(
         mediaId: String,
         titleResId: Int
@@ -304,6 +330,18 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         message: String
     ) {
         sendResult(listOf(actionItem(mediaId, message)))
+    }
+
+    private fun toRecentItem(playQueueEvent: PlayQueueEvent): List<MediaBrowserCompat.MediaItem> {
+        val queueItem = playQueueEvent.playQueueItem ?: return emptyList()
+        val composition = queueItem.composition
+
+        val item = actionItem(
+            RECENT_MEDIA_ACTION_ID,
+            formatCompositionName(composition),
+            formatCompositionAdditionalInfoForMediaBrowser(this, composition)
+        )
+        return listOf(item)
     }
 
     private fun toActionItem(position: Int, composition: Composition) = actionItem(
