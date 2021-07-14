@@ -16,7 +16,6 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.*
 import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.core.Observable
@@ -59,8 +58,6 @@ const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 //support navigation hints
 
 //support search
-
-//more actions in player view
 
 //remove skip to next when it is not enabled? https://stackoverflow.com/a/45698216/5541688
 
@@ -322,7 +319,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
                 browsableItem(
                     FOLDERS_NODE_ID + DELIMITER + fileSource.id,
                     fileSource.name,
-                    FormatUtils.formatCompositionsCount(this, fileSource.filesCount)
+                    formatCompositionsCount(this, fileSource.filesCount)
                 )
             }
             is CompositionFileSource -> {

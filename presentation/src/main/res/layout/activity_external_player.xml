@@ -113,15 +113,15 @@
         app:layout_constraintEnd_toStartOf="@id/tv_total_time"/>
 
     <ImageView
-        android:id="@+id/iv_skip_to_previous"
+        android:id="@+id/ivRewind"
         style="@style/ButtonStyle.Main"
         android:layout_marginEnd="@dimen/content_spacing_margin"
         android:layout_marginStart="@dimen/content_spacing_margin"
-        android:contentDescription="@string/previous_track"
+        android:contentDescription="@string/rewind"
         app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
-        app:srcCompat="@drawable/ic_skip_previous" />
+        app:srcCompat="@drawable/ic_rewind" />
 
     <ImageView
         android:id="@+id/iv_play_pause"
@@ -133,14 +133,14 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_skip_to_next"
+        android:id="@+id/ivFastForward"
         style="@style/ButtonStyle.Main"
         android:layout_marginEnd="@dimen/content_spacing_margin"
         android:layout_marginStart="@dimen/content_spacing_margin"
-        android:contentDescription="@string/next_track"
+        android:contentDescription="@string/fast_forward"
         app:layout_constraintStart_toEndOf="@+id/iv_play_pause"
         app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
-        app:srcCompat="@drawable/ic_skip_next" />
+        app:srcCompat="@drawable/ic_fast_forward" />
 
     <ImageView
         android:id="@+id/iv_repeat_mode"

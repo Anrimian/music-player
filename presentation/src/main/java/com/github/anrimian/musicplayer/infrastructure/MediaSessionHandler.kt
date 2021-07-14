@@ -126,25 +126,26 @@ class MediaSessionHandler(private val context: Context,
                         or PlaybackStateCompat.ACTION_REWIND
             )
 
-        //correct action handling, ignore external player
-
         playbackStateBuilder.addCustomAction(
             REPEAT_ACTION_ID,
             context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
             FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
         )
-
         playbackStateBuilder.addCustomAction(
             SHUFFLE_ACTION_ID,
             context.getString(R.string.content_description_shuffle),
             FormatUtils.getRandomModeIcon(playbackState.randomMode)
         )
-
-        //also replace buttons on external player
-        //description
-        playbackStateBuilder.addCustomAction(REWIND_ACTION_ID, "2", R.drawable.ic_rewind)
-        //description
-        playbackStateBuilder.addCustomAction(FAST_FORWARD_ACTION_ID, "1", R.drawable.ic_fast_forward)
+        playbackStateBuilder.addCustomAction(
+            REWIND_ACTION_ID,
+            context.getString(R.string.rewind),
+            R.drawable.ic_rewind
+        )
+        playbackStateBuilder.addCustomAction(
+            FAST_FORWARD_ACTION_ID,
+            context.getString(R.string.fast_forward),
+            R.drawable.ic_fast_forward
+        )
 
         //leave it for now
 //      if (!isSourceEqual) {
@@ -384,6 +385,8 @@ class MediaSessionHandler(private val context: Context,
             when(action) {
                 REPEAT_ACTION_ID -> libraryPlayerInteractor.changeRepeatMode()
                 SHUFFLE_ACTION_ID -> musicServiceInteractor.changeRandomMode()
+                REWIND_ACTION_ID -> libraryPlayerInteractor.fastSeekBackward()
+                FAST_FORWARD_ACTION_ID -> libraryPlayerInteractor.fastSeekForward()
             }
         }
 
