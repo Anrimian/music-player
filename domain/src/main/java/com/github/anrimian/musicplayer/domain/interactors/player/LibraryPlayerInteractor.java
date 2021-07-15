@@ -290,6 +290,10 @@ public class LibraryPlayerInteractor {
         return playerCoordinatorInteractor.getSpeedChangeAvailableObservable();
     }
 
+    public void changeRandomMode() {
+        settingsRepository.setRandomPlayingEnabled(!settingsRepository.isRandomPlayingEnabled());
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();

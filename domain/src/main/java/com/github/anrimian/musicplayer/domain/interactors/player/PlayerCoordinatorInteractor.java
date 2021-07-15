@@ -176,6 +176,7 @@ public class PlayerCoordinatorInteractor {
             //not only here
             initializePlayerType(playerType);
             activePlayerType = playerType;
+            activePlayerTypeSubject.onNext(activePlayerType);
         }
     }
 

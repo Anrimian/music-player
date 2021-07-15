@@ -89,12 +89,6 @@ public class MusicServiceInteractor {
         libraryPlayerInteractor.setRandomPlayingEnabled(isEnabled);
     }
 
-    public void changeRandomMode() {
-        libraryPlayerInteractor.setRandomPlayingEnabled(
-                !libraryPlayerInteractor.isRandomPlayingEnabled()
-        );
-    }
-
     public void setPlaybackSpeed(float speed) {
         if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
             libraryPlayerInteractor.setPlaybackSpeed(speed);
@@ -102,6 +96,26 @@ public class MusicServiceInteractor {
         }
         if (playerCoordinatorInteractor.isPlayerTypeActive(EXTERNAL)) {
             externalPlayerInteractor.setPlaybackSpeed(speed);
+        }
+    }
+
+    public void fastSeekBackward() {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
+            libraryPlayerInteractor.fastSeekBackward();
+            return;
+        }
+        if (playerCoordinatorInteractor.isPlayerTypeActive(EXTERNAL)) {
+            externalPlayerInteractor.fastSeekBackward();
+        }
+    }
+
+    public void fastSeekForward() {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
+            libraryPlayerInteractor.fastSeekForward();
+            return;
+        }
+        if (playerCoordinatorInteractor.isPlayerTypeActive(EXTERNAL)) {
+            externalPlayerInteractor.fastSeekForward();
         }
     }
 
@@ -259,5 +273,4 @@ public class MusicServiceInteractor {
                 settingsRepository.getCoversOnLockScreenEnabledObservable(),
                 (coversInNotification, coversOnLockScreen) -> coversInNotification && coversOnLockScreen);
     }
-
 }

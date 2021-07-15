@@ -63,11 +63,6 @@ const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 //support search
 
 //remove skip to next when it is not enabled? https://stackoverflow.com/a/45698216/5541688
-
-
-//checklist:
-//how it will work with external player? - displays external source info and eats play action
-//better to support
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private val itemUpdateDisposableMap = HashMap<String, Disposable>()
