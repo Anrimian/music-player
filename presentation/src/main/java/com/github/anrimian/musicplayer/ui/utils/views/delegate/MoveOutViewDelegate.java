@@ -14,7 +14,7 @@ public class MoveOutViewDelegate implements SlideDelegate {
 
     private float startY = UNDEFINED;
 
-    private View view;
+    private final View view;
 
     public MoveOutViewDelegate(View view) {
         this.view = view;

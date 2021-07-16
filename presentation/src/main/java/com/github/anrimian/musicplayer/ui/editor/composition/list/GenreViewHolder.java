@@ -17,7 +17,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 class GenreViewHolder extends BaseViewHolder {
 
-    private ItemGenreChipBinding viewBinding;
+    private final ItemGenreChipBinding viewBinding;
 
     private ShortGenre genre;
 

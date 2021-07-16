@@ -89,9 +89,9 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
             return false;
         });
 
-        try {
-            equalizerController.attachEqualizer(mediaPlayer.getAudioSessionId());
-        } catch (IllegalStateException ignored) {}
+//        try {
+//            equalizerController.attachEqualizer(mediaPlayer.getAudioSessionId());
+//        } catch (IllegalStateException ignored) {}
     }
 
     @Override
@@ -214,7 +214,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
-            } catch (IllegalStateException ignored) {}
+            } catch (IllegalStateException ignored) {} //IllegalArgumentException - handle unsupported case
         }
     }
 
@@ -344,6 +344,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
         try {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
+                equalizerController.detachEqualizer();
             }
         } catch (Exception ignored) {}
     }
@@ -351,6 +352,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     private void start(MediaPlayer mediaPlayer) {
         try {
             mediaPlayer.start();
+            equalizerController.attachEqualizer(mediaPlayer.getAudioSessionId());
         } catch (IllegalStateException ignored) {}
     }
 

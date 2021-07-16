@@ -12,8 +12,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 
 public class ContentObserverDisposable implements Disposable {
 
-    private ContentObserver contentObserver;
-    private ContentResolver contentResolver;
+    private final ContentObserver contentObserver;
+    private final ContentResolver contentResolver;
 
     private boolean isDisposed = false;
 

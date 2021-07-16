@@ -16,7 +16,7 @@ public class MenuItemWrapper {
     @Nullable
     private MenuItem menuItem;
 
-    private LinkedList<Callback<MenuItem>> deferredFunctions = new LinkedList<>();
+    private final LinkedList<Callback<MenuItem>> deferredFunctions = new LinkedList<>();
 
     public void setMenuItem(Menu menu, @IdRes int resId) {
         if (menuItem == null) {

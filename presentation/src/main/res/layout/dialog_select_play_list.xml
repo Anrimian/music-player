@@ -37,7 +37,7 @@
                     android:padding="12dp"
                     android:background="?attr/actionBarItemBackground"
                     android:contentDescription="@string/close"
-                    android:tint="?attr/buttonColorInverse"
+                    app:tint="?attr/buttonColorInverse"
                     app:srcCompat="@drawable/ic_close"/>
 
             </FrameLayout>
@@ -63,7 +63,7 @@
                 android:padding="11dp"
                 android:background="?attr/actionBarItemBackground"
                 android:contentDescription="@string/create_playlist"
-                android:tint="?attr/buttonColorInverse"
+                app:tint="?attr/buttonColorInverse"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

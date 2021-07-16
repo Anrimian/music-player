@@ -16,7 +16,7 @@ public class CollapseViewDelegate implements SlideDelegate {
     private int startHeight = UNDEFINED;
     private int startWidth = UNDEFINED;
 
-    private View view;
+    private final View view;
 
     public CollapseViewDelegate(View view) {
         this.view = view;

@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public class ErrorCommand {
 
     @Nonnull
-    private String message;
+    private final String message;
 
     public ErrorCommand(@Nonnull String message) {
         this.message = message;

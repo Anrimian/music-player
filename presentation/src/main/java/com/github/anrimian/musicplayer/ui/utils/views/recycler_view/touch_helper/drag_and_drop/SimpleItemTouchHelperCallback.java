@@ -50,7 +50,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
                           @NonNull RecyclerView.ViewHolder viewHolder,
                           @NonNull RecyclerView.ViewHolder target) {
         if (onMovedListener != null) {
-            onMovedListener.onItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            onMovedListener.onItemMoved(viewHolder.getBindingAdapterPosition(), target.getBindingAdapterPosition());
             return true;
         }
         return false;

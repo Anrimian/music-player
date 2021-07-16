@@ -19,7 +19,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class ArtistViewHolder extends BaseViewHolder {
 
-    private ItemArtistBinding viewBinding;
+    private final ItemArtistBinding viewBinding;
 
     private Artist artist;
 

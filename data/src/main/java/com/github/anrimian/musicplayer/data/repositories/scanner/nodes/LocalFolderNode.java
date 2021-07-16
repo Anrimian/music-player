@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -17,10 +16,10 @@ public class LocalFolderNode<V> {
     private final LinkedHashMap<String, LocalFolderNode<V>> folders = new LinkedHashMap<>();
 
     @Nullable
-    private Long id;
+    private final Long id;
     @Nullable
-    private String key;
-    private LinkedHashSet<V> files = new LinkedHashSet<>();
+    private final String key;
+    private final LinkedHashSet<V> files = new LinkedHashSet<>();
 
     @Nullable
     private LocalFolderNode<V> parent;

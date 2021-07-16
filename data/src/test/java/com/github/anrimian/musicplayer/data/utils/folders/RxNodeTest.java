@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 public class RxNodeTest {
 
-    private RxNode<Integer> root = new RxNode<>(0, new StringNode("root"));
+    private final RxNode<Integer> root = new RxNode<>(0, new StringNode("root"));
 
     @Test
     public void addChildTest() {

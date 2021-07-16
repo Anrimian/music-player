@@ -41,18 +41,18 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibili
 
 public class CompositionItemWrapper {
 
-    private TextView tvMusicName;
-    private TextView tvAdditionalInfo;
-    private FrameLayout clickableItem;
-    private View divider;
+    private final TextView tvMusicName;
+    private final TextView tvAdditionalInfo;
+    private final FrameLayout clickableItem;
+    private final View divider;
     @Nullable
-    private ImageView ivPlay;
+    private final ImageView ivPlay;
     @Nullable
-    private ImageView ivMusicIcon;
+    private final ImageView ivMusicIcon;
     @Nullable
-    private ImageView btnActionsMenu;
+    private final ImageView btnActionsMenu;
     @Nullable
-    private View iconClickableArea;
+    private final View iconClickableArea;
 
     private Composition composition;
     private boolean showCovers;

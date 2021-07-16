@@ -24,9 +24,9 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
     private static final int DURATION_LONG_MILLIS = 5000;
     private static final int DURATION_INDEFINITE_MILLIS = Integer.MAX_VALUE;
 
-    private TextView tvMessage;
-    private Button tvAction;
-    private ProgressBar progressBar;
+    private final TextView tvMessage;
+    private final Button tvAction;
+    private final ProgressBar progressBar;
 
     private boolean launchCountDownTimer = false;
     private long durationMillis;

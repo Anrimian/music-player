@@ -68,8 +68,7 @@ public class PlayListsInteractor {
 
     public Completable moveItemInPlayList(PlayList playList, int from, int to) {
         return playListsRepository.moveItemInPlayList(playList, from, to)
-                .doOnError(analytics::processNonFatalError)
-                .onErrorComplete();
+                .doOnError(analytics::processNonFatalError);
     }
 
     public Completable updatePlayListName(long playListId, String name) {

@@ -39,19 +39,19 @@ import static org.mockito.Mockito.when;
 
 public class LibraryPlayerInteractorTest {
 
-    private PlayerCoordinatorInteractor playerCoordinatorInteractor = mock(PlayerCoordinatorInteractor.class);
-    private SettingsRepository settingsRepository = mock(SettingsRepository.class);
-    private PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
-    private LibraryRepository musicProviderRepository = mock(LibraryRepository.class);
-    private UiStateRepository uiStateRepository = mock(UiStateRepository.class);
-    private Analytics analytics = mock(Analytics.class);
+    private final PlayerCoordinatorInteractor playerCoordinatorInteractor = mock(PlayerCoordinatorInteractor.class);
+    private final SettingsRepository settingsRepository = mock(SettingsRepository.class);
+    private final PlayQueueRepository playQueueRepository = mock(PlayQueueRepository.class);
+    private final LibraryRepository musicProviderRepository = mock(LibraryRepository.class);
+    private final UiStateRepository uiStateRepository = mock(UiStateRepository.class);
+    private final Analytics analytics = mock(Analytics.class);
 
     private LibraryPlayerInteractor libraryPlayerInteractor;
 
-    private PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
-    private BehaviorSubject<PlayQueueEvent> currentCompositionSubject = BehaviorSubject.createDefault(currentItem(0));
+    private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
+    private final BehaviorSubject<PlayQueueEvent> currentCompositionSubject = BehaviorSubject.createDefault(currentItem(0));
 
-    private InOrder inOrder = Mockito.inOrder(playQueueRepository,
+    private final InOrder inOrder = Mockito.inOrder(playQueueRepository,
             playerCoordinatorInteractor,
             musicProviderRepository);
 
