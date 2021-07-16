@@ -18,10 +18,10 @@ import java.util.List;
 
 public class AlbumsViewHolder extends BaseViewHolder {
 
-    private ItemAlbumsHorizontalBinding viewBinding;
-    private RecyclerView rvAlbums;
+    private final ItemAlbumsHorizontalBinding viewBinding;
+    private final RecyclerView rvAlbums;
 
-    private AlbumsAdapter albumsAdapter;
+    private final AlbumsAdapter albumsAdapter;
 
     AlbumsViewHolder(@NonNull ViewGroup parent,
                      Callback<Album> itemClickListener,

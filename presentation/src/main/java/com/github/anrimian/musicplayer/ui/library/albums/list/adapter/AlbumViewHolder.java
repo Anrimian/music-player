@@ -21,7 +21,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class AlbumViewHolder extends BaseViewHolder {
 
-    private ItemAlbumBinding viewBinding;
+    private final ItemAlbumBinding viewBinding;
 
     private Album album;
 

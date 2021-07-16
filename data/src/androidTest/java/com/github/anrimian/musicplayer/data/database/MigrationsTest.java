@@ -28,8 +28,8 @@ public class MigrationsTest {
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE);
 
-    private Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-    private Context context = instrumentation.getContext();
+    private final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+    private final Context context = instrumentation.getContext();
 
     @Rule
     public MigrationTestHelper testHelper =

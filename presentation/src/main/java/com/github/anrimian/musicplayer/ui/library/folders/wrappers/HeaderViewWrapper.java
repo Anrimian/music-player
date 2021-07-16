@@ -15,7 +15,7 @@ import static android.view.View.VISIBLE;
 
 public class HeaderViewWrapper {
 
-    private PartialStorageHeaderBinding viewBinding;
+    private final PartialStorageHeaderBinding viewBinding;
 
     public HeaderViewWrapper(PartialStorageHeaderBinding viewBinding) {
         this.viewBinding = viewBinding;

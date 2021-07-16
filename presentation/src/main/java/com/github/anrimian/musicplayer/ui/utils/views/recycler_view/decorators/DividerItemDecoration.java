@@ -39,8 +39,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
      * Current orientation. Either {@link #HORIZONTAL} or {@link #VERTICAL}.
      */
     private int mOrientation;
-    private int dividerMarginStart;
-    private boolean drawLastDivider;
+    private final int dividerMarginStart;
+    private final boolean drawLastDivider;
 
     private final Rect mBounds = new Rect();
 

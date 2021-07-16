@@ -23,7 +23,7 @@ import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class GenreViewHolder extends BaseViewHolder {
 
-    private ItemGenreBinding viewBinding;
+    private final ItemGenreBinding viewBinding;
 
     private Genre genre;
 

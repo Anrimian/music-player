@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ArtistAlbumsPresenter {
 
-    private DefferedObject<AlbumsViewHolder> view = new DefferedObject<>();
+    private final DefferedObject<AlbumsViewHolder> view = new DefferedObject<>();
 
     public void submitAlbums(List<Album> albums) {
         view.call(view -> view.submitList(albums));

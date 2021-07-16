@@ -14,7 +14,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getOr
 
 class OrderViewHolder extends RecyclerView.ViewHolder {
 
-    private RadioButton rbOrder;
+    private final RadioButton rbOrder;
 
     private OrderType order;
 

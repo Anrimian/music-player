@@ -19,10 +19,10 @@ public class CompositionSourceEditorTest {
     @Rule
     public ResourceFile res = new ResourceFile("/Кот Леопольд - Неприятность эту мы переживем.mp3");
 
-    private StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
-    private FileSourceProvider fileSourceProvider = mock(FileSourceProvider.class);
+    private final StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
+    private final FileSourceProvider fileSourceProvider = mock(FileSourceProvider.class);
 
-    private CompositionSourceEditor sourceEditor = new CompositionSourceEditor(musicProvider, fileSourceProvider);
+    private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor(musicProvider, fileSourceProvider);
 
     @Test
     public void testEditor() throws IOException {

@@ -161,7 +161,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     private SeekBarViewWrapper seekBarViewWrapper;
 
     private DrawerLockStateProcessor drawerLockStateProcessor;
-    private CompositeDisposable viewDisposable = new CompositeDisposable();
+    private final CompositeDisposable viewDisposable = new CompositeDisposable();
 
     private FragmentNavigation navigation;
 

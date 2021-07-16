@@ -10,7 +10,7 @@ class PanelSlideListener implements SliderPanel.OnPanelSlideListener {
     private final Runnable closeAction;
     private final SlidrConfig config;
 
-    private SlidrPanel.SlideListener slideListener;
+    private final SlidrPanel.SlideListener slideListener;
 
     PanelSlideListener(@NonNull Runnable closeAction,
                        @NonNull SlidrConfig config,

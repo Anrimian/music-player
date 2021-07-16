@@ -6,7 +6,7 @@ package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
 public class ReverseDelegate implements SlideDelegate {
 
-    private SlideDelegate delegate;
+    private final SlideDelegate delegate;
 
     public ReverseDelegate(SlideDelegate delegate) {
         this.delegate = delegate;
