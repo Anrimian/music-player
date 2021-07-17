@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaS
 import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
+import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateException;
@@ -108,6 +109,10 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof UnavailableMediaStoreException) {
             return error(R.string.system_media_store_system_error);
+        }
+        if (throwable instanceof FileWriteNotAllowedException) {
+            logException(throwable);
+            return error(R.string.write_to_this_is_not_allowed);
         }
         logException(throwable);
         return new ErrorCommand(getString(R.string.unexpected_error, throwable.getMessage()));
