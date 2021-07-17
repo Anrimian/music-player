@@ -51,9 +51,11 @@ public class CompositionSourceModelHelper {
                 Composition composition = ((LibraryCompositionSource) source).getComposition();
                 Components.getAppComponent()
                         .imageLoader()
-                        .loadImage(composition, bitmap -> {
+                        .loadImageUri(composition, uri -> {
                             //can we adapt glide to be able return bitmaps by uri
-                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
+                            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uri.toString());
+                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
+//                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, uri);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
             }
@@ -61,12 +63,14 @@ public class CompositionSourceModelHelper {
                 Components.getAppComponent()
                         .imageLoader()
                         .loadImage((UriCompositionSource) source, bitmap -> {
-                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
+                            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
+                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
             }
         } else {
-            metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, null);
+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
+            metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, null);
             mediaSession.setMetadata(metadataBuilder.build());
         }
     }

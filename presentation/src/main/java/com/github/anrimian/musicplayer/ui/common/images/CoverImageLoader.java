@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
@@ -29,11 +30,13 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 
+import java.io.File;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -175,6 +178,46 @@ public class CoverImageLoader {
         loadImage(new CompositionImage(data.getId(), data.getDateModified()), onCompleted);
     }
 
+//    public Single<Uri> loadImageUri(@Nonnull Composition data) {
+//        return Single.create( emitter -> {
+//            emitter.setDisposable(n);
+//        })
+//    }
+
+    //uri and size
+    //refractor glide fetchers
+    public Runnable loadImageUri(@Nonnull Composition data, Callback<Uri> onCompleted) {
+        CustomTarget<File> target = simpleTarget(file -> {
+            if (file != null) {
+//                Uri uri = new Uri.Builder()
+//                        .scheme(ContentResolver.SCHEME_CONTENT)
+//                        .authority(context.getString(R.string.file_provider_authorities))
+//                        .appendPath(file.getPath())
+//                        .build();
+
+                Uri uri = AppAndroidUtils.createUri(context, file);
+
+//                List<ResolveInfo> resInfoList = context.getPackageManager()
+//                        .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+//                for (ResolveInfo resolveInfo : resInfoList) {
+//                    String packageName = resolveInfo.activityInfo.packageName;
+//                    context.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                }
+
+                onCompleted.call(uri);
+            } /*else {
+                onCompleted.call(null);
+            }*/
+        });
+        Glide.with(context)
+                .downloadOnly()
+                .load(new CompositionImage(data.getId(), data.getDateModified()))
+                .override(getCoverSize())
+                .timeout(TIMEOUT_MILLIS)
+                .into(target);
+        return () -> Glide.with(context).clear(target);
+    }
+
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
                              int appWidgetId,
@@ -283,6 +326,10 @@ public class CoverImageLoader {
             return !activity.isDestroyed() && !activity.isFinishing();
         }
         return true;
+    }
+
+    private int getCoverSize() {
+        return context.getResources().getInteger(R.integer.icon_image_size);
     }
 
     private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {

@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.images.glide.composition;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,9 +11,10 @@ import com.bumptech.glide.load.data.DataFetcher;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
-import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 
-public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
+import java.nio.ByteBuffer;
+
+public class CompositionCoverFetcher implements DataFetcher<ByteBuffer> {
 
     private final CompositionImage composition;
     private final Context context;
@@ -30,7 +29,7 @@ public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
     }
 
     @Override
-    public void loadData(@NonNull Priority priority, DataCallback<? super Bitmap> callback) {
+    public void loadData(@NonNull Priority priority, DataCallback<? super ByteBuffer> callback) {
         callback.onDataReady(extractImageComposition(composition));
     }
 
@@ -44,8 +43,8 @@ public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
 
     @NonNull
     @Override
-    public Class<Bitmap> getDataClass() {
-        return Bitmap.class;
+    public Class<ByteBuffer> getDataClass() {
+        return ByteBuffer.class;
     }
 
     @NonNull
@@ -56,7 +55,7 @@ public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
 
 
     @Nullable
-    private Bitmap extractImageComposition(CompositionImage composition) {
+    private ByteBuffer extractImageComposition(CompositionImage composition) {
         long id = composition.getId();
 
         try {
@@ -65,14 +64,15 @@ public class CompositionCoverFetcher implements DataFetcher<Bitmap> {
             if (imageBytes == null) {
                 return null;
             }
-            BitmapFactory.Options opt = new BitmapFactory.Options();
-            opt.outWidth = getCoverSize();
-            opt.outHeight = getCoverSize();
-            opt.inJustDecodeBounds = true;
-            BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
-            opt.inSampleSize = ImageUtils.calculateInSampleSize(opt, getCoverSize(), getCoverSize());
-            opt.inJustDecodeBounds = false;
-            return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
+            return ByteBuffer.wrap(imageBytes);
+//            BitmapFactory.Options opt = new BitmapFactory.Options();
+//            opt.outWidth = getCoverSize();
+//            opt.outHeight = getCoverSize();
+//            opt.inJustDecodeBounds = true;
+//            BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
+//            opt.inSampleSize = ImageUtils.calculateInSampleSize(opt, getCoverSize(), getCoverSize());
+//            opt.inJustDecodeBounds = false;
+//            return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
         } catch (Exception ignored) {
             return null;
         }

@@ -22,6 +22,8 @@ import com.github.anrimian.musicplayer.ui.common.images.glide.external.UriCoverL
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 
+import java.nio.ByteBuffer;
+
 @GlideModule
 public final class MyAppGlideModule extends AppGlideModule {
 
@@ -42,7 +44,7 @@ public final class MyAppGlideModule extends AppGlideModule {
     public void registerComponents(@NonNull Context context,
                                    @NonNull Glide glide,
                                    @NonNull Registry registry) {
-        registry.prepend(CompositionImage.class, Bitmap.class, new CompositionCoverLoaderFactory(context, Components.getAppComponent().sourceRepository()));
+        registry.prepend(CompositionImage.class, ByteBuffer.class, new CompositionCoverLoaderFactory(context, Components.getAppComponent().sourceRepository()));
         registry.prepend(UriCompositionImage.class, Bitmap.class, new UriCoverLoaderFactory(context));
         registry.prepend(Album.class, Bitmap.class, new AlbumCoverLoaderFactory(context));
     }

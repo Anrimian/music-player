@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.images.glide.composition;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 
@@ -11,7 +10,9 @@ import com.bumptech.glide.signature.ObjectKey;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 
-public final class CompositionCoverLoader implements ModelLoader<CompositionImage, Bitmap> {
+import java.nio.ByteBuffer;
+
+public final class CompositionCoverLoader implements ModelLoader<CompositionImage, ByteBuffer> {
 
     private final Context context;
     private final CompositionSourceProvider compositionSourceProvider;
@@ -23,7 +24,7 @@ public final class CompositionCoverLoader implements ModelLoader<CompositionImag
 
     @NonNull
     @Override
-    public ModelLoader.LoadData<Bitmap> buildLoadData(@NonNull CompositionImage model,
+    public ModelLoader.LoadData<ByteBuffer> buildLoadData(@NonNull CompositionImage model,
                                                       int width,
                                                       int height,
                                                       @NonNull Options options) {

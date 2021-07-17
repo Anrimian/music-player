@@ -13,8 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.content.FileProvider;
-
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.DialogSpeedSelectorBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDeleteDialogBinding;
@@ -31,7 +29,6 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -260,19 +257,6 @@ public class DialogUtils {
                         (dialog, which) -> pickCallback.call(binding.numberPicker.getValue())
                 ).setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
-    }
-
-    private static Uri createUri(Context context, String filePath) {
-        try {
-            return FileProvider.getUriForFile(context,
-                    context.getString(R.string.file_provider_authorities),
-                    new File(filePath));
-        } catch (Exception e) {
-            Toast.makeText(context,
-                    context.getString(R.string.file_uri_extract_error, filePath),
-                    Toast.LENGTH_LONG).show();
-            return null;
-        }
     }
 
     private static void showShareCompositionErrorMessage(Throwable throwable, Context context) {

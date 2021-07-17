@@ -57,6 +57,7 @@ const val DELIMITER = '-'
 const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
 //handle android 11 EXTRA_RECENT - more info?(at least set icon uri)
+//change setting description
 
 //support navigation hints
 
