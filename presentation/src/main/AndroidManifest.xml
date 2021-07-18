@@ -104,6 +104,14 @@
                 android:resource="@xml/file_provider_paths" />
         </provider>
 
+        <provider
+            android:name=".infrastructure.providers.CoversFileProvider"
+            android:authorities="@string/covers_file_provider_authorities"
+            android:grantUriPermissions="true"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider">
+        </provider>
+
         <receiver android:name=".ui.widgets.WidgetActionsReceiver"/>
 
         <receiver

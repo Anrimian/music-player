@@ -12,10 +12,6 @@ import java.io.File;
 
 public class AppAndroidUtils {
 
-    public static Uri createUri(Context context, String filePath) {
-        return createUri(context, new File(filePath));
-    }
-
     public static Uri createUri(Context context, File file) {
         try {
             return FileProvider.getUriForFile(context,

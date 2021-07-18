@@ -3,6 +3,9 @@
     <string name="file_provider_authorities" translatable="false">
         com.github.anrimian.simplemusicplayer.share_file_provider
     </string>
+    <string name="covers_file_provider_authorities" translatable="false">
+                com.github.anrimian.simplemusicplayer.covers_file_provider
+    </string>
     <string name="feedback_email" translatable="false">smusicplayer.feedback@gmail.com</string>
     <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
     <string name="source_code_link" translatable="false">https://github.com/Anrimian/music-player</string>

@@ -27,6 +27,8 @@ import java.nio.ByteBuffer;
 @GlideModule
 public final class MyAppGlideModule extends AppGlideModule {
 
+    public static final String IMAGE_CACHE_DIRECTORY = "image_cache";
+
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
         builder.setLogLevel(Log.ERROR);
@@ -36,8 +38,7 @@ public final class MyAppGlideModule extends AppGlideModule {
         builder.setBitmapPool(new LruBitmapPool(memoryCacheSizeBytes));
 
         int diskCacheSizeBytes = 10 * 1024 * 1024; // 10 MB
-        String diskCacheDirectory = "image_cache";
-        builder.setDiskCache(new InternalCacheDiskCacheFactory(context, diskCacheDirectory, diskCacheSizeBytes));
+        builder.setDiskCache(new InternalCacheDiskCacheFactory(context, IMAGE_CACHE_DIRECTORY, diskCacheSizeBytes));
     }
 
     @Override

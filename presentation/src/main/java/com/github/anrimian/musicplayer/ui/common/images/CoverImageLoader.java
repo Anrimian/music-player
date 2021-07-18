@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,7 +31,6 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
@@ -178,36 +178,20 @@ public class CoverImageLoader {
         loadImage(new CompositionImage(data.getId(), data.getDateModified()), onCompleted);
     }
 
-//    public Single<Uri> loadImageUri(@Nonnull Composition data) {
-//        return Single.create( emitter -> {
-//            emitter.setDisposable(n);
-//        })
-//    }
-
-    //uri and size
+    //size
     //refractor glide fetchers
     public Runnable loadImageUri(@Nonnull Composition data, Callback<Uri> onCompleted) {
         CustomTarget<File> target = simpleTarget(file -> {
-            if (file != null) {
-//                Uri uri = new Uri.Builder()
-//                        .scheme(ContentResolver.SCHEME_CONTENT)
-//                        .authority(context.getString(R.string.file_provider_authorities))
-//                        .appendPath(file.getPath())
-//                        .build();
-
-                Uri uri = AppAndroidUtils.createUri(context, file);
-
-//                List<ResolveInfo> resInfoList = context.getPackageManager()
-//                        .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-//                for (ResolveInfo resolveInfo : resInfoList) {
-//                    String packageName = resolveInfo.activityInfo.packageName;
-//                    context.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                }
-
-                onCompleted.call(uri);
-            } /*else {
+            if (file == null) {
                 onCompleted.call(null);
-            }*/
+                return;
+            }
+            Uri uri = new Uri.Builder()
+                    .scheme(ContentResolver.SCHEME_CONTENT)
+                    .authority(context.getString(R.string.covers_file_provider_authorities))
+                    .appendPath(file.getPath())
+                    .build();
+            onCompleted.call(uri);
         });
         Glide.with(context)
                 .downloadOnly()
