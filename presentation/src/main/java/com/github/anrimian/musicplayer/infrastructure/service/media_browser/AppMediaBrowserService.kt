@@ -17,9 +17,11 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.*
 import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 
 
@@ -56,8 +58,9 @@ private const val PLAYLIST_ITEMS_NODE_ID = "playlist_items_node_id"
 const val DELIMITER = '-'
 const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
-//handle android 11 EXTRA_RECENT - more info?(at least set icon uri)
-//change setting description
+//handle android 11 EXTRA_RECENT - finish refactoring glide
+//disabling cover settings not applies immediately
+//change lockscreen cover setting description
 
 //support navigation hints
 
@@ -138,7 +141,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             .libraryPlayerInteractor()
             .currentQueueItemObservable
             .firstOrError()
-            .map(this::toRecentItem)
+            .flatMap(this::toRecentItem)
             .onErrorReturn(this::processRecentItemError)
             .subscribe(resultCallback::sendResult)
     }
@@ -329,16 +332,30 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         sendResult(listOf(actionItem(mediaId, message)))
     }
 
-    private fun toRecentItem(playQueueEvent: PlayQueueEvent): List<MediaBrowserCompat.MediaItem> {
-        val queueItem = playQueueEvent.playQueueItem ?: return emptyList()
+    private fun toRecentItem(playQueueEvent: PlayQueueEvent): Single<List<MediaBrowserCompat.MediaItem>> {
+        val queueItem = playQueueEvent.playQueueItem ?: return Single.just(emptyList())
         val composition = queueItem.composition
 
-        val item = actionItem(
-            RECENT_MEDIA_ACTION_ID,
-            formatCompositionName(composition),
-            formatCompositionAuthor(composition, this)
-        )
-        return listOf(item)
+        val appComponent = Components.getAppComponent()
+        val coverUriSingle =
+            if (appComponent.musicServiceInteractor().isCoversInNotificationEnabled) {
+                appComponent.imageLoader().loadImageUri(composition)
+            } else {
+                Single.just(Optional(null))
+            }
+
+        return coverUriSingle.map { coverUriOpt ->
+            val item = MediaBrowserCompat.MediaItem(
+                MediaDescriptionCompat.Builder()
+                    .setMediaId(RECENT_MEDIA_ACTION_ID)
+                    .setTitle(formatCompositionName(composition))
+                    .setSubtitle(formatCompositionAuthor(composition, this))
+                    .setIconUri(coverUriOpt.value)
+                    .build(),
+                MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
+            )
+            return@map listOf(item)
+        }
     }
 
     private fun toActionItem(position: Int, composition: Composition) = actionItem(

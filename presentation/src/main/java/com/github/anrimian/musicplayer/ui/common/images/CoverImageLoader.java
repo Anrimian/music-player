@@ -31,6 +31,7 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
@@ -40,6 +41,8 @@ import java.io.File;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
+
+import io.reactivex.rxjava3.core.Single;
 
 import static com.bumptech.glide.request.target.Target.SIZE_ORIGINAL;
 
@@ -178,9 +181,15 @@ public class CoverImageLoader {
         loadImage(new CompositionImage(data.getId(), data.getDateModified()), onCompleted);
     }
 
+    public Single<Optional<Uri>> loadImageUri(@Nonnull Composition data) {
+        return Single.create(emitter ->
+                loadImageUri(data, uri -> emitter.onSuccess(new Optional<>(uri)))
+        );
+    }
+
     //size
     //refractor glide fetchers
-    public Runnable loadImageUri(@Nonnull Composition data, Callback<Uri> onCompleted) {
+    public void loadImageUri(@Nonnull Composition data, Callback<Uri> onCompleted) {
         CustomTarget<File> target = simpleTarget(file -> {
             if (file == null) {
                 onCompleted.call(null);
@@ -199,7 +208,6 @@ public class CoverImageLoader {
                 .override(getCoverSize())
                 .timeout(TIMEOUT_MILLIS)
                 .into(target);
-        return () -> Glide.with(context).clear(target);
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,

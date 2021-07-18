@@ -237,8 +237,7 @@ public class MusicServiceInteractor {
     }
 
     public MusicNotificationSetting getNotificationSettings() {
-        boolean coversEnabled = settingsRepository.isCoversEnabled();
-        boolean coversInNotification = coversEnabled && settingsRepository.isCoversInNotificationEnabled();
+        boolean coversInNotification = isCoversInNotificationEnabled();
         boolean coloredNotification = settingsRepository.isColoredNotificationEnabled();
         boolean showNotificationCoverStub = settingsRepository.isNotificationCoverStubEnabled();
         boolean coversOnLockScreen = settingsRepository.isCoversOnLockScreenEnabled();
@@ -248,6 +247,11 @@ public class MusicServiceInteractor {
                 coversInNotification && showNotificationCoverStub,
                 coversInNotification && coversOnLockScreen
         );
+    }
+
+    public boolean isCoversInNotificationEnabled() {
+        return settingsRepository.isCoversEnabled()
+                && settingsRepository.isCoversInNotificationEnabled();
     }
 
     private Observable<Boolean> getCoversInNotificationEnabledObservable() {
