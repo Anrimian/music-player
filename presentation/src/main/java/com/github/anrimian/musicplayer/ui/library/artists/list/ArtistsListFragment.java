@@ -23,7 +23,7 @@ import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.serialization.ArtistSerializer;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
@@ -33,7 +33,6 @@ import com.github.anrimian.musicplayer.ui.library.artists.list.adapter.ArtistsAd
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
@@ -48,7 +47,6 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_MENU_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
@@ -68,7 +66,6 @@ public class ArtistsListFragment extends LibraryFragment implements
     private ArtistsAdapter adapter;
     private LinearLayoutManager layoutManager;
 
-    private DialogFragmentRunner<MenuDialogFragment> artistMenuDialogRunner;
     private DialogFragmentRunner<InputTextDialogFragment> editArtistNameDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
     private DialogFragmentDelayRunner progressDialogRunner;
@@ -99,7 +96,7 @@ public class ArtistsListFragment extends LibraryFragment implements
 
         adapter = new ArtistsAdapter(recyclerView,
                 this::goToArtistScreen,
-                this::onArtistLongClick);
+                this::onArtistMenuClicked);
         recyclerView.setAdapter(adapter);
 
         layoutManager = new LinearLayoutManager(getContext());
@@ -108,10 +105,6 @@ public class ArtistsListFragment extends LibraryFragment implements
         RecyclerViewUtils.attachFastScroller(recyclerView);
 
         FragmentManager fm = getChildFragmentManager();
-        artistMenuDialogRunner = new DialogFragmentRunner<>(fm,
-                ARTIST_MENU_TAG,
-                fragment -> fragment.setComplexCompleteListener(this::onArtistMenuClicked)
-        );
         editArtistNameDialogRunner = new DialogFragmentRunner<>(fm,
                 ARTIST_NAME_TAG,
                 fragment -> fragment.setComplexCompleteListener((name, extra) -> {
@@ -208,16 +201,6 @@ public class ArtistsListFragment extends LibraryFragment implements
         MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
-    private void onArtistMenuClicked(MenuItem menuItem, Bundle extra) {
-        Artist artist = ArtistSerializer.deserialize(extra);
-        switch (menuItem.getItemId()) {
-            case R.id.menu_rename: {
-                showEditArtistNameDialog(artist);
-                break;
-            }
-        }
-    }
-
     private void showEditArtistNameDialog(Artist artist) {
         Bundle bundle = new Bundle();
         bundle.putLong(ID_ARG, artist.getId());
@@ -237,14 +220,15 @@ public class ArtistsListFragment extends LibraryFragment implements
                 .addNewFragment(ArtistItemsFragmentKt.newInstance(artist.getId()));
     }
 
-    private void onArtistLongClick(Artist artist) {
-        Bundle extra = ArtistSerializer.serialize(artist);
-        MenuDialogFragment fragment = MenuDialogFragment.newInstance(
-                R.menu.artist_menu,
-                artist.getName(),
-                extra
-        );
-        artistMenuDialogRunner.show(fragment);
+    private void onArtistMenuClicked(View view, Artist artist) {
+        PopupMenuWindow.showPopup(view, R.menu.artist_menu, menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.menu_rename: {
+                    showEditArtistNameDialog(artist);
+                    break;
+                }
+            }
+        });
     }
 
     private void onOptionsItemClicked(@NonNull MenuItem item) {

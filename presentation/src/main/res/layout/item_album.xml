@@ -28,7 +28,7 @@
         android:layout_marginTop="@dimen/list_vertical_margin"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
         app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -38,7 +38,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/content_spacing_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
         app:layout_constraintEnd_toEndOf="@+id/tv_album_name"
         app:layout_constraintStart_toStartOf="@+id/tv_album_name"
         app:layout_constraintTop_toBottomOf="@+id/tv_album_name"/>
@@ -59,5 +58,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tv_album_name"
         app:layout_constraintTop_toBottomOf="@id/tv_compositions_count" />
+
+    <ImageView
+        android:id="@+id/btn_actions_menu"
+        style="@style/ButtonStyle.Menu"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="@dimen/scrollbar_width"
+        android:contentDescription="@string/content_description_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_dots_vertical" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
