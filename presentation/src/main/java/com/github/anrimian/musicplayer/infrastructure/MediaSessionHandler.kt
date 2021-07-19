@@ -402,9 +402,8 @@ class MediaSessionHandler(private val context: Context,
 
         override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
             when(mediaId) {
-                RESUME_ACTION_ID -> {
-                    libraryPlayerInteractor.play()
-                }
+                RESUME_ACTION_ID -> libraryPlayerInteractor.play()
+                PAUSE_ACTION_ID -> libraryPlayerInteractor.pause()
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     actionDisposable = musicServiceInteractor.shuffleAllAndPlay()
                         .subscribe({}, this::processError)

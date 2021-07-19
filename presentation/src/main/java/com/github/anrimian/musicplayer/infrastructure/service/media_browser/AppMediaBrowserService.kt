@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSour
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
@@ -28,6 +29,7 @@ const val PERMISSION_ERROR_ACTION_ID = "permission_error_action_id"
 const val DEFAULT_ERROR_ACTION_ID = "default_error_action_id"
 const val RECENT_MEDIA_ACTION_ID = "recent_media_action_id"
 const val RESUME_ACTION_ID = "resume_action_id"
+const val PAUSE_ACTION_ID = "pause_action_id"
 const val SHUFFLE_ALL_AND_PLAY_ACTION_ID = "shuffle_all_and_play_action_id"
 const val COMPOSITIONS_ACTION_ID = "compositions_action_id"
 const val FOLDERS_ACTION_ID = "folders_action_id"
@@ -257,21 +259,27 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         }
     }
 
-    //play-pause
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
-        val observable = Components.getAppComponent()
-            .libraryPlayerInteractor()
-            .playQueueSizeObservable
-            .map { size -> size > 0 }
+        val libraryPlayerInteractor = Components.getAppComponent().libraryPlayerInteractor()
+        val observable = Observable.combineLatest(
+            libraryPlayerInteractor.playQueueSizeObservable,
+            libraryPlayerInteractor.playerStateObservable,
+            ::Pair
+        )
 
         loadItems(
             ROOT_ID,
             resultCallback,
             observable
-        ) { isPlayQueueExists ->
+        ) { (playQueueSize, playerState) ->
             return@loadItems arrayListOf<MediaBrowserCompat.MediaItem>().apply {
-                if (isPlayQueueExists) {
-                    add(actionItem(RESUME_ACTION_ID, R.string.resume))
+                if (playQueueSize > 0) {
+                    val item = if (playerState == PlayerState.PLAY) {
+                        actionItem(PAUSE_ACTION_ID, R.string.pause)
+                    } else {
+                        actionItem(RESUME_ACTION_ID, R.string.resume)
+                    }
+                    add(item)
                 }
                 add(actionItem(SHUFFLE_ALL_AND_PLAY_ACTION_ID, R.string.shuffle_all_and_play))
                 add(browsableItem(COMPOSITIONS_NODE_ID, R.string.compositions))
