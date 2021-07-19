@@ -167,8 +167,8 @@ public class MusicServiceInteractor {
                 MusicNotificationSetting::new);
     }
 
-    public Observable<List<Composition>> getCompositionsObservable() {
-        return libraryCompositionsInteractor.getCompositionsObservable(null);
+    public Observable<List<Composition>> getCompositionsObservable(String searchText) {
+        return libraryCompositionsInteractor.getCompositionsObservable(searchText);
     }
 
     public Completable startPlayingFromCompositions(int position) {
