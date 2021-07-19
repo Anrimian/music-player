@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
+import androidx.media.utils.MediaConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
@@ -60,7 +61,9 @@ const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
 //support navigation hints
 
-//support search
+//support search - find a way to check how it works
+
+//strange initial state(random? just in case of install while android auto is active?)
 
 //remove skip to next when it is not enabled? https://stackoverflow.com/a/45698216/5541688
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
@@ -93,13 +96,13 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot {
+        val extras = Bundle()
         if (rootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) == true) {
-            val extras = Bundle().apply {
-                putBoolean(BrowserRoot.EXTRA_RECENT, true)
-            }
+            extras.putBoolean(BrowserRoot.EXTRA_RECENT, true)
             return BrowserRoot(RECENT_MEDIA_ROOT_ID, extras)
         }
-        return BrowserRoot(ROOT_ID, null)
+        extras.putBoolean(MediaConstants.BROWSER_SERVICE_EXTRAS_KEY_SEARCH_SUPPORTED, true)
+        return BrowserRoot(ROOT_ID, extras)
     }
 
     //exists also options(overloaded method), and there are:
@@ -122,6 +125,28 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             parentId.startsWith(PLAYLIST_ITEMS_NODE_ID) -> loadPlaylistItems(resultCallback, parentId)
             else -> resultCallback.sendResult(emptyList())
         }
+    }
+
+    override fun onSearch(
+        query: String,
+        extras: Bundle?,
+        resultCallback: Result<List<MediaBrowserCompat.MediaItem>>
+    ) {
+        if (!Permissions.hasFilePermission(this)) {
+            resultCallback.sendErrorResult(PERMISSION_ERROR_ACTION_ID, R.string.no_file_permission)
+            return
+        }
+
+        resultCallback.detach()
+
+        currentRequestDisposable = Components.getAppComponent()
+            .musicServiceInteractor()
+            .getCompositionsObservable(query)
+            .firstOrError()
+            .subscribe(
+                { value -> resultCallback.sendResult(value.mapIndexed(this::toActionItem)) },
+                { throwable -> resultCallback.sendErrorResult(throwable) }
+            )
     }
 
     override fun onDestroy() {
@@ -147,7 +172,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         loadItems(
             COMPOSITIONS_NODE_ID,
             resultCallback,
-            Components.getAppComponent().musicServiceInteractor().compositionsObservable
+            Components.getAppComponent().musicServiceInteractor().getCompositionsObservable(null)
         ) { compositions -> compositions.mapIndexed(this::toActionItem) }
     }
 
@@ -268,6 +293,8 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             return
         }
 
+        resultCallback.detach()
+
         val observable = valuesObservable
             .replay(1)
             .refCount()
@@ -277,19 +304,12 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             .subscribe(
                 { value ->
                     resultCallback.sendResult(resultMapper(value))
-
                     registerBrowsableItemUpdate(rootItemId, observable)
                 },
                 { throwable ->
-                    val errorParser = Components.getAppComponent().errorParser()
-                    errorParser.logError(throwable)
-                    val errorCommand = errorParser.parseError(throwable)
-                    resultCallback.sendErrorResult(DEFAULT_ERROR_ACTION_ID, errorCommand.message)
-
+                    resultCallback.sendErrorResult(throwable)
                     registerBrowsableItemUpdate(rootItemId, observable)
                 })
-
-        resultCallback.detach()
     }
 
     private fun registerBrowsableItemUpdate(itemId: String, observable: Observable<*>) {
@@ -312,6 +332,13 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun <T> processRecentItemError(throwable: Throwable): List<T> {
         Components.getAppComponent().analytics().processNonFatalError(throwable)
         return emptyList()
+    }
+
+    private fun Result<List<MediaBrowserCompat.MediaItem>>.sendErrorResult(throwable: Throwable) {
+        val errorParser = Components.getAppComponent().errorParser()
+        errorParser.logError(throwable)
+        val errorCommand = errorParser.parseError(throwable)
+        sendErrorResult(DEFAULT_ERROR_ACTION_ID, errorCommand.message)
     }
 
     private fun Result<List<MediaBrowserCompat.MediaItem>>.sendErrorResult(
