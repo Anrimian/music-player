@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.List;
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class AlbumViewHolder extends BaseViewHolder {
 
@@ -27,12 +27,12 @@ public class AlbumViewHolder extends BaseViewHolder {
 
     AlbumViewHolder(@NonNull ViewGroup parent,
                     Callback<Album> itemClickListener,
-                    Callback<Album> longClickListener) {
+                    OnViewItemClickListener<Album> onItemMenuClickListener) {
         super(parent, R.layout.item_album);
         viewBinding = ItemAlbumBinding.bind(itemView);
 
         viewBinding.clickableItem.setOnClickListener(v -> itemClickListener.call(album));
-        onLongClick(viewBinding.clickableItem, () -> longClickListener.call(album));
+        viewBinding.btnActionsMenu.setOnClickListener(v -> onItemMenuClickListener.onItemClick(v, album));
     }
 
     public void bind(Album album) {

@@ -45,8 +45,8 @@ import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_MENU_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_MENU_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 
@@ -105,11 +105,11 @@ public class GenresListFragment extends LibraryFragment implements
                 ORDER_TAG,
                 f -> f.setOnCompleteListener(presenter::onOrderSelected));
         genreMenuDialogRunner = new DialogFragmentRunner<>(fm,
-                ARTIST_MENU_TAG,
+                GENRE_MENU_TAG,
                 fragment -> fragment.setComplexCompleteListener(this::onGenreMenuClicked)
         );
         editGenreNameDialogRunner = new DialogFragmentRunner<>(fm,
-                ARTIST_NAME_TAG,
+                GENRE_NAME_TAG,
                 fragment -> fragment.setComplexCompleteListener((name, extra) -> {
                     presenter.onNewGenreNameEntered(name, extra.getLong(ID_ARG));
                 })

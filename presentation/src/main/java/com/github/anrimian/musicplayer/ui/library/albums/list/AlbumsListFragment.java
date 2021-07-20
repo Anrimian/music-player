@@ -21,7 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.serialization.AlbumSerializer;
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity;
@@ -31,7 +31,6 @@ import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragmen
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
@@ -44,7 +43,6 @@ import java.util.List;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
-import static com.github.anrimian.musicplayer.Constants.Tags.ALBUM_MENU_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 
 public class AlbumsListFragment extends LibraryFragment implements
@@ -60,7 +58,6 @@ public class AlbumsListFragment extends LibraryFragment implements
     private AlbumsAdapter adapter;
     private LinearLayoutManager layoutManager;
 
-    private DialogFragmentRunner<MenuDialogFragment> albumMenuDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
 
     @ProvidePresenter
@@ -86,7 +83,7 @@ public class AlbumsListFragment extends LibraryFragment implements
 
         viewBinding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
 
-        adapter = new AlbumsAdapter(recyclerView, this::goToAlbumScreen, this::onAlbumLongClick);
+        adapter = new AlbumsAdapter(recyclerView, this::goToAlbumScreen, this::onAlbumMenuClicked);
         recyclerView.setAdapter(adapter);
 
         layoutManager = new LinearLayoutManager(getContext());
@@ -95,10 +92,6 @@ public class AlbumsListFragment extends LibraryFragment implements
         RecyclerViewUtils.attachFastScroller(recyclerView);
 
         FragmentManager fm = getChildFragmentManager();
-        albumMenuDialogRunner = new DialogFragmentRunner<>(fm,
-                ALBUM_MENU_TAG,
-                fragment -> fragment.setComplexCompleteListener(this::onAlbumMenuClicked)
-        );
         selectOrderDialogRunner = new DialogFragmentRunner<>(fm,
                 ORDER_TAG,
                 f -> f.setOnCompleteListener(presenter::onOrderSelected));
@@ -176,29 +169,20 @@ public class AlbumsListFragment extends LibraryFragment implements
         ViewUtils.scrollToPosition(layoutManager, listPosition);
     }
 
-    private void onAlbumMenuClicked(MenuItem menuItem, Bundle extra) {
-        Album album = AlbumSerializer.deserialize(extra);
-        switch (menuItem.getItemId()) {
-            case R.id.menu_edit: {
-                startActivity(AlbumEditorActivity.newIntent(requireContext(), album.getId()));
-                break;
-            }
-        }
-    }
-
     private void goToAlbumScreen(Album album) {
         FragmentNavigation.from(getParentFragmentManager())
                 .addNewFragment(AlbumItemsFragment.newInstance(album.getId()));
     }
 
-    private void onAlbumLongClick(Album album) {
-        Bundle extra = AlbumSerializer.serialize(album);
-        MenuDialogFragment fragment = MenuDialogFragment.newInstance(
-                R.menu.album_menu,
-                album.getName(),
-                extra
-        );
-        albumMenuDialogRunner.show(fragment);
+    private void onAlbumMenuClicked(View view, Album album) {
+        PopupMenuWindow.showPopup(view, R.menu.album_menu, menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.menu_edit: {
+                    startActivity(AlbumEditorActivity.newIntent(requireContext(), album.getId()));
+                    break;
+                }
+            }
+        });
     }
 
     private void onOptionsItemClicked(@NonNull MenuItem item) {

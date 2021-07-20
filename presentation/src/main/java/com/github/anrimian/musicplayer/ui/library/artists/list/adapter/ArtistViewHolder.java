@@ -9,13 +9,13 @@ import com.github.anrimian.musicplayer.databinding.ItemArtistBinding;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
 
 import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class ArtistViewHolder extends BaseViewHolder {
 
@@ -25,12 +25,12 @@ public class ArtistViewHolder extends BaseViewHolder {
 
     ArtistViewHolder(@NonNull ViewGroup parent,
                      Callback<Artist> itemClickListener,
-                     Callback<Artist> longClickListener) {
+                     OnViewItemClickListener<Artist> onItemMenuClickListener) {
         super(parent, R.layout.item_artist);
         viewBinding = ItemArtistBinding.bind(itemView);
 
         viewBinding.clickableItem.setOnClickListener(v -> itemClickListener.call(artist));
-        onLongClick(viewBinding.clickableItem, () -> longClickListener.call(artist));
+        viewBinding.btnActionsMenu.setOnClickListener(v -> onItemMenuClickListener.onItemClick(v, artist));
     }
 
     public void bind(Artist artist) {
