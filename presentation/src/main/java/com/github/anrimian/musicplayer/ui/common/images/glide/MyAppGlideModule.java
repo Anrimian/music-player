@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.images.glide;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -23,6 +22,7 @@ import com.github.anrimian.musicplayer.ui.common.images.glide.util.AppModelLoade
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 @GlideModule
@@ -38,7 +38,7 @@ public final class MyAppGlideModule extends AppGlideModule {
         builder.setMemoryCache(new LruResourceCache(memoryCacheSizeBytes));
         builder.setBitmapPool(new LruBitmapPool(memoryCacheSizeBytes));
 
-        int diskCacheSizeBytes = 10 * 1024 * 1024; // 10 MB
+        int diskCacheSizeBytes = 8 * 1024 * 1024; //8 MB
         builder.setDiskCache(new InternalCacheDiskCacheFactory(context, IMAGE_CACHE_DIRECTORY, diskCacheSizeBytes));
     }
 
@@ -46,9 +46,9 @@ public final class MyAppGlideModule extends AppGlideModule {
     public void registerComponents(@NonNull Context context,
                                    @NonNull Glide glide,
                                    @NonNull Registry registry) {
-        AppModelLoader.addModelLoader(registry, CompositionImage.class, ByteBuffer.class, new CompositionModelLoader(context, Components.getAppComponent().sourceRepository()));
-        AppModelLoader.addModelLoader(registry, UriCompositionImage.class, Bitmap.class, new ExternalCompositionModelLoader(context));
-        AppModelLoader.addModelLoader(registry, Album.class, Bitmap.class, new AlbumModelLoader(context, Components.getAppComponent().storageAlbumsProvider()));
+        AppModelLoader.addModelLoader(registry, CompositionImage.class, ByteBuffer.class, new CompositionModelLoader(Components.getAppComponent().sourceRepository()));
+        AppModelLoader.addModelLoader(registry, UriCompositionImage.class, ByteBuffer.class, new ExternalCompositionModelLoader());
+        AppModelLoader.addModelLoader(registry, Album.class, InputStream.class, new AlbumModelLoader(Components.getAppComponent().storageAlbumsProvider()));
     }
 
 }

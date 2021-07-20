@@ -61,9 +61,8 @@ private const val PLAYLIST_ITEMS_NODE_ID = "playlist_items_node_id"
 const val DELIMITER = '-'
 const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
-//handle android 11 EXTRA_RECENT - finish refactoring glide
-//disabling cover settings not applies immediately
 //change lockscreen cover setting description
+//enable by default
 
 //support navigation hints
 

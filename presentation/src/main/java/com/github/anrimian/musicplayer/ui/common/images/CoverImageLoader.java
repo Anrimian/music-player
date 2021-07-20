@@ -44,8 +44,6 @@ import javax.annotation.Nonnull;
 
 import io.reactivex.rxjava3.core.Single;
 
-import static com.bumptech.glide.request.target.Target.SIZE_ORIGINAL;
-
 public class CoverImageLoader {
 
     private static final int DEFAULT_PLACEHOLDER = R.drawable.ic_music_placeholder_simple;
@@ -72,7 +70,7 @@ public class CoverImageLoader {
         Glide.with(imageView)
                 .asBitmap()
                 .load(new CompositionImage(data.getId(), data.getDateModified()))
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
@@ -135,7 +133,7 @@ public class CoverImageLoader {
         Glide.with(imageView)
                 .asBitmap()
                 .load(album)
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
@@ -187,8 +185,6 @@ public class CoverImageLoader {
         );
     }
 
-    //size
-    //refractor glide fetchers
     public void loadImageUri(@Nonnull Composition data, Callback<Uri> onCompleted) {
         CustomTarget<File> target = simpleTarget(file -> {
             if (file == null) {
@@ -225,7 +221,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(new CompositionImage(compositionId, new Date(compositionUpdateTime)))
-                .override(150, 150)
+                .override(getCoverSize())
                 .downsample(DownsampleStrategy.AT_MOST)
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
@@ -244,11 +240,11 @@ public class CoverImageLoader {
         Glide.with(imageView)
                 .asBitmap()
                 .load(data)
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .thumbnail(Glide.with(imageView)
                         .asBitmap()
                         .load(oldData)
-                        .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                        .override(getCoverSize())
                         .timeout(TIMEOUT_MILLIS))
                 .listener(new RequestListener<Bitmap>() {
                     @Override
@@ -288,7 +284,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(compositionImage)
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
@@ -299,7 +295,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(data)
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .timeout(TIMEOUT_MILLIS)
                 .into(simpleTarget(onCompleted));
     }

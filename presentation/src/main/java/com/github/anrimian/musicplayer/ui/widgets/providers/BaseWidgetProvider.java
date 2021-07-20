@@ -25,6 +25,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AU
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_UPDATE_TIME_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COVERS_ENABLED_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
@@ -60,7 +61,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
             play = intent.getBooleanExtra(PLAY_ARG, false);
             randomPlayModeEnabled = intent.getBooleanExtra(RANDOM_PLAY_ARG, false);
             repeatMode = intent.getIntExtra(REPEAT_ARG, RepeatMode.NONE);
-            showCovers = intent.getBooleanExtra(RANDOM_PLAY_ARG, false);
+            showCovers = intent.getBooleanExtra(COVERS_ENABLED_ARG, false);
         } else {
             compositionName = WidgetDataHolder.getCompositionName(context);
             compositionAuthor = WidgetDataHolder.getCompositionAuthor(context);
