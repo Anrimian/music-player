@@ -40,8 +40,11 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        ComponentName thisAppWidget = new ComponentName(context.getPackageName(), getClass().getName());
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        if (appWidgetManager == null) {
+            return;
+        }
+        ComponentName thisAppWidget = new ComponentName(context.getPackageName(), getClass().getName());
 
         String compositionName;
         String compositionAuthor;
