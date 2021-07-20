@@ -130,6 +130,8 @@ class MediaSessionHandler(private val context: Context,
                         or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
                         or PlaybackStateCompat.ACTION_FAST_FORWARD
                         or PlaybackStateCompat.ACTION_REWIND
+                        or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                        or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
             )
 
         playbackStateBuilder.addCustomAction(
@@ -176,6 +178,9 @@ class MediaSessionHandler(private val context: Context,
                         or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
                         or PlaybackStateCompat.ACTION_FAST_FORWARD
                         or PlaybackStateCompat.ACTION_REWIND
+                        or PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM
+                        or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                        or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
             )
 
         playbackStateBuilder.addCustomAction(
@@ -455,6 +460,12 @@ class MediaSessionHandler(private val context: Context,
             }
         }
 
+        override fun onPlayFromSearch(query: String, extras: Bundle) {
+            val formattedQuery = query.ifEmpty { null }
+            actionDisposable = musicServiceInteractor.playFromSearch(formattedQuery)
+                .subscribe({}, this::processError)
+        }
+
         //next - not implemented
         override fun onCommand(command: String, extras: Bundle, cb: ResultReceiver) {
             super.onCommand(command, extras, cb)
@@ -474,10 +485,6 @@ class MediaSessionHandler(private val context: Context,
 
         override fun onPrepareFromUri(uri: Uri, extras: Bundle) {
             super.onPrepareFromUri(uri, extras)
-        }
-
-        override fun onPlayFromSearch(query: String, extras: Bundle) {
-            super.onPlayFromSearch(query, extras)
         }
 
         override fun onPlayFromUri(uri: Uri, extras: Bundle) {
@@ -508,6 +515,7 @@ class MediaSessionHandler(private val context: Context,
             super.onRemoveQueueItem(description)
         }
 
+        //must call super
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             return super.onMediaButtonEvent(mediaButtonEvent)
         }

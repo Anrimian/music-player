@@ -129,6 +129,13 @@ public class MusicServiceInteractor {
                 .ignoreElement();
     }
 
+    public Completable playFromSearch(@Nullable String searchQuery) {
+        return libraryCompositionsInteractor.getCompositionsObservable(searchQuery)
+                .firstOrError()
+                .doOnSuccess(libraryPlayerInteractor::startPlaying)
+                .ignoreElement();
+    }
+
     public Observable<Integer> getRepeatModeObservable() {
         return playerCoordinatorInteractor.getActivePlayerTypeObservable()
                 .switchMap(playerType -> {

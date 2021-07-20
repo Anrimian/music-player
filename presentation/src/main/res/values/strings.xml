@@ -97,7 +97,6 @@
     <string name="show_covers">Show covers</string>
     <string name="show_covers_in_notification">Show covers in notification</string>
     <string name="colored_notification">Color notification in cover colors</string>
-    <string name="show_covers_on_lock_screen">Show covers on lock screen</string>
     <string name="display">Display</string>
     <string name="decrease_volume_on_notification">Decrease volume when notification received</string>
     <string name="playing">Player</string>
@@ -223,10 +222,10 @@
     <string name="pause_on_audiofocus_loss">Stop playing on calling, music/video playing, etc.</string>
     <string name="show_cover_stub_in_notification">Show cover stub in notification when cover is not exists</string>
     <string name="write_to_this_is_not_allowed">Write to this file is not allowed</string>
-
     <string name="shuffle_all_and_play">Shuffle all and play</string>
     <string name="rewind">Rewind</string>
     <string name="fast_forward">Fast forward</string>
+    <string name="show_covers_on_lock_screen">Show covers on lock screen or on android auto screens</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

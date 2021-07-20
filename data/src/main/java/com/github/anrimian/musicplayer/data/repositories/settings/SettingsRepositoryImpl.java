@@ -261,7 +261,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public boolean isCoversOnLockScreenEnabled() {
-        return preferences.getBoolean(SHOW_COVERS_ON_LOCK_SCREEN, false);
+        return preferences.getBoolean(SHOW_COVERS_ON_LOCK_SCREEN, true);
     }
 
     @Override

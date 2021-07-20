@@ -61,15 +61,11 @@ private const val PLAYLIST_ITEMS_NODE_ID = "playlist_items_node_id"
 const val DELIMITER = '-'
 const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
-//change lockscreen cover setting description
-//enable by default
-
-//support navigation hints
-
-//support search - find a way to check how it works
-
 //strange initial state(random? just in case of install while android auto is active?)
 
+//later improvements:
+//for automotive - add images to items
+//default image
 //remove skip to next when it is not enabled? https://stackoverflow.com/a/45698216/5541688
 class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
@@ -83,19 +79,6 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         this.sessionToken = mediaSessionHandler.getMediaSession().sessionToken
     }
 
-    /*
-      val maximumRootChildLimit = rootHints.getInt(
-          MediaConstants.BROWSER_ROOT_HINTS_KEY_ROOT_CHILDREN_LIMIT,
-          /* defaultValue= */ 4)
-      val supportedRootChildFlags = rootHints.getInt(
-          MediaConstants.BROWSER_ROOT_HINTS_KEY_ROOT_CHILDREN_SUPPORTED_FLAGS,
-          /* defaultValue= */ MediaItem.FLAG_BROWSABLE)
-      https://developer.android.google.cn/training/cars/media?hl=en-au
-
-      Note: In Android Auto, only the car screen interface will show navigational tabs. Therefore, these root hints will only be sent when connecting to Android Auto for the car screen, and will not be sent when connecting to Android Auto for the phone screen.
-      Caution: Not all versions of Android Automotive OS will send these root hints. In the absence of these hints, you should assume that Android Automotive OS requires only root browsable items, and at most four of them. Take note of the default values in the code snippet above.
-
-     */
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
@@ -110,9 +93,6 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         return BrowserRoot(ROOT_ID, extras)
     }
 
-    //exists also options(overloaded method), and there are:
-    //var page: Int = options.getInt(MediaBrowserCompat.EXTRA_PAGE)
-    //var pageSize: Int = options.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE)
     override fun onLoadChildren(
         parentId: String,
         resultCallback: Result<List<MediaBrowserCompat.MediaItem>>
@@ -287,9 +267,9 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
                 add(actionItem(SHUFFLE_ALL_AND_PLAY_ACTION_ID, R.string.shuffle_all_and_play))
                 add(browsableItem(COMPOSITIONS_NODE_ID, R.string.compositions))
                 add(browsableItem(FOLDERS_NODE_ID, R.string.folders))
+                add(browsableItem(PLAYLISTS_NODE_ID, R.string.play_lists))
                 add(browsableItem(ARTISTS_NODE_ID, R.string.artists))
                 add(browsableItem(ALBUMS_NODE_ID, R.string.albums))
-                add(browsableItem(PLAYLISTS_NODE_ID, R.string.play_lists))
             }
         }
     }
