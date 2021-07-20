@@ -16,9 +16,10 @@ import com.bumptech.glide.load.engine.cache.LruResourceCache;
 import com.bumptech.glide.module.AppGlideModule;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.ui.common.images.glide.album.AlbumCoverLoaderFactory;
-import com.github.anrimian.musicplayer.ui.common.images.glide.composition.CompositionCoverLoaderFactory;
-import com.github.anrimian.musicplayer.ui.common.images.glide.external.UriCoverLoaderFactory;
+import com.github.anrimian.musicplayer.ui.common.images.glide.loaders.AlbumModelLoader;
+import com.github.anrimian.musicplayer.ui.common.images.glide.loaders.CompositionModelLoader;
+import com.github.anrimian.musicplayer.ui.common.images.glide.loaders.ExternalCompositionModelLoader;
+import com.github.anrimian.musicplayer.ui.common.images.glide.util.AppModelLoader;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 
@@ -45,9 +46,9 @@ public final class MyAppGlideModule extends AppGlideModule {
     public void registerComponents(@NonNull Context context,
                                    @NonNull Glide glide,
                                    @NonNull Registry registry) {
-        registry.prepend(CompositionImage.class, ByteBuffer.class, new CompositionCoverLoaderFactory(context, Components.getAppComponent().sourceRepository()));
-        registry.prepend(UriCompositionImage.class, Bitmap.class, new UriCoverLoaderFactory(context));
-        registry.prepend(Album.class, Bitmap.class, new AlbumCoverLoaderFactory(context));
+        AppModelLoader.addModelLoader(registry, CompositionImage.class, ByteBuffer.class, new CompositionModelLoader(context, Components.getAppComponent().sourceRepository()));
+        AppModelLoader.addModelLoader(registry, UriCompositionImage.class, Bitmap.class, new ExternalCompositionModelLoader(context));
+        AppModelLoader.addModelLoader(registry, Album.class, Bitmap.class, new AlbumModelLoader(context, Components.getAppComponent().storageAlbumsProvider()));
     }
 
 }

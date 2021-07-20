@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.common.images.glide.external;
+package com.github.anrimian.musicplayer.ui.common.images.glide.loaders;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -8,48 +8,32 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
+import com.github.anrimian.musicplayer.ui.common.images.glide.util.AppModelLoader;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 
-public class UriCoverFetcher implements DataFetcher<Bitmap> {
+public class ExternalCompositionModelLoader extends AppModelLoader<UriCompositionImage, Bitmap> {
 
     private final Context context;
-    private final UriCompositionImage uriCompositionImage;
 
-    UriCoverFetcher(Context context, UriCompositionImage uriCompositionImage) {
+    public ExternalCompositionModelLoader(Context context) {
         this.context = context;
-        this.uriCompositionImage = uriCompositionImage;
     }
 
     @Override
-    public void loadData(@NonNull Priority priority, DataCallback<? super Bitmap> callback) {
+    protected Object getModelKey(UriCompositionImage uriCompositionImage) {
+        return uriCompositionImage;
+    }
+
+    @Override
+    protected void loadData(UriCompositionImage uriCompositionImage,
+                            @NonNull Priority priority,
+                            @NonNull DataFetcher.DataCallback<? super Bitmap> callback) {
         callback.onDataReady(extractImageComposition(uriCompositionImage.getSource()));
     }
-
-    @Override
-    public void cleanup() {
-    }
-
-    @Override
-    public void cancel() {
-    }
-
-    @NonNull
-    @Override
-    public Class<Bitmap> getDataClass() {
-        return Bitmap.class;
-    }
-
-    @NonNull
-    @Override
-    public DataSource getDataSource() {
-        return DataSource.LOCAL;
-    }
-
 
     @Nullable
     private Bitmap extractImageComposition(UriCompositionSource uriCompositionSource) {
@@ -74,5 +58,4 @@ public class UriCoverFetcher implements DataFetcher<Bitmap> {
     private int getCoverSize() {
         return context.getResources().getInteger(R.integer.icon_image_size);
     }
-
 }
