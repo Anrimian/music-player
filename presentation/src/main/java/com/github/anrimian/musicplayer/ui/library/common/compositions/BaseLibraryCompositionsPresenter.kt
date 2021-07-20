@@ -52,11 +52,6 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         subscribeOnCompositions()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenterDisposable.dispose()
-    }
-
     fun onStart() {
         if (compositions.isNotEmpty()) {
             subscribeOnCurrentComposition()
