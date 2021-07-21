@@ -2,7 +2,7 @@
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialLayout="@layout/widget_medium"
-    android:minHeight="70dp"
+    android:minHeight="110dp"
     android:minWidth="240dp"
     android:minResizeWidth="240dp"
     android:resizeMode="horizontal"
