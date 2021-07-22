@@ -122,6 +122,9 @@ public interface FoldersDao {
             "LIMIT 1)")
     boolean isFolderWithNameExists(Long parentId, String name);
 
+    @Query("SELECT exists(SELECT 1 FROM folders WHERE id = :id OR id IS NULL LIMIT 1)")
+    boolean isFolderExists(Long id);
+
     static String getRecursiveFolderQuery(Long parentFolderId) {
         return "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
                 "SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)" +

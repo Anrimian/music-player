@@ -169,6 +169,9 @@ public class StorageCompositionsInserter {
         if (Objects.equals(folderId, FolderMerger.UNKNOWN_CURRENT_FOLDER_ID)) {
             folderId = null;
         }
+        if (!foldersDao.isFolderExists(folderId)) {//likely it causes sqlite constraint exception, let's check it
+            throw new IllegalStateException("target folder not exists");
+        }
         return CompositionMapper.toEntity(composition, artistId, albumId, folderId);
     }
 
