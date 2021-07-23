@@ -14,6 +14,9 @@
     <!--prevent rare crash on some devices with notification display-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!--remove permission from glide because we don't use internet for covers-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove"/>
+
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
 
     <!-- support for tablets -->
