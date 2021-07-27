@@ -55,7 +55,7 @@
             android:paddingEnd="@dimen/content_horizontal_margin"
             android:paddingTop="@dimen/content_spacing_margin"
             android:paddingBottom="@dimen/content_vertical_margin"
-            tools:text="@string/seconds_template"
+            tools:text="@string/with_duration_less_than"
             app:layout_constraintTop_toBottomOf="@id/tvAudioMinDurationTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>

@@ -246,7 +246,7 @@
     <string name="sleep_timer_message">Проигрывание будет остановлено через:</string>
     <string name="stop">Стоп</string>
     <string name="exclude_compositions_with_duration_less_than">Не сканировать композиции</string>
-    <string name="seconds_template">С длительность меньше %s</string>
+    <string name="with_duration_less_than">С длительность меньше %s</string>
     <string name="pause_on_audiofocus_loss">Останавливать проигрывание при звонке, проигрывании музыки/видео и т.п.</string>
     <string name="show_cover_stub_in_notification">Показывать заглушку обложки в уведомлении если обложка не найдена</string>
     <string name="write_to_this_is_not_allowed">Нет разрешения на изменение этого файла. Попробуйте через системный менеджер файлов.</string>

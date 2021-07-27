@@ -77,8 +77,8 @@
     <string name="delete_playlist">Excluir lista de reprodução</string>
     <string name="storage_timeout_error_message">
         O Armazenamento de mídia do dispositivo não está respondendo.
-        Esta é uma questão realmente estranha e rara.
-        Tente reiniciar o dispositivo, talvez ele resolva esse problema.
+        Esta é uma questão realmente estranha e rara.
+        Tente reiniciar o dispositivo, talvez ele resolva esse problema.
     </string>
     <string name="select_all">Selecionar tudo</string>
     <string name="file_uri_extract_error">
@@ -97,7 +97,6 @@
     <string name="show_covers">Mostrar capas</string>
     <string name="show_covers_in_notification">Mostrar capas na notificação</string>
     <string name="colored_notification">Cores das notificações nas cores da capa</string>
-    <string name="show_covers_on_lock_screen">Mostrar capas na tela de bloqueio</string>
     <string name="display">Exibição</string>
     <string name="decrease_volume_on_notification">Diminuir o volume quando a notificação for recebida</string>
     <string name="playing">Reprodutor</string>
@@ -219,6 +218,17 @@
     <string name="resume">Retomar</string>
     <string name="sleep_timer_message">O reprodutor será interrompido em:</string>
     <string name="stop">Pare</string>
+    <!-- not verified-->
+    <string name="exclude_compositions_with_duration_less_than">Excluir composições da digitalização</string>
+    <string name="with_duration_less_than">Com duração menor que %s</string>
+    <string name="pause_on_audiofocus_loss">Pare de tocar na chamada, reprodução de música / vídeo, etc.</string>
+    <string name="show_cover_stub_in_notification">Mostrar esboço da capa na notificação quando a capa não for encontrada</string>
+    <string name="write_to_this_is_not_allowed">Sem permissão para modificar este arquivo. Experimente através do gerenciador de arquivos.</string>
+    <string name="shuffle_all_and_play">Misture tudo e jogue</string>
+    <string name="rewind">Retroceder</string>
+    <string name="fast_forward">Avanço rápido</string>
+    <string name="show_covers_on_lock_screen">Mostrar capas na tela de bloqueio e no Android auto</string>
+    <!--    -->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s música</item>
@@ -264,5 +274,12 @@
         <item quantity="one">%1$d música excluída</item>
         <item quantity="other">%1$d músicas excluídas</item>
     </plurals>
+
+    <!-- not verified-->
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d segunda</item>
+        <item quantity="other">%1$d segundas</item>
+    </plurals>
+    <!---->
 
 </resources>

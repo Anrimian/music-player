@@ -97,7 +97,6 @@
     <string name="show_covers">Mostrar carátula</string>
     <string name="show_covers_in_notification">Mostrar carátulas en notificatión</string>
     <string name="colored_notification">Colorear notificación con el color de las carátulas</string>
-    <string name="show_covers_on_lock_screen">Mostrar carátula en la pantalla de bloqueo</string>
     <string name="display">Pantalla</string>
     <string name="decrease_volume_on_notification">Disminuir volumen cuando se recibe una notificación</string>
     <string name="playing">Reproductor</string>
@@ -219,7 +218,17 @@
     <string name="resume">Reiniciar</string>
     <string name="sleep_timer_message">Reproducción se detendrá en:</string>
     <string name="stop">Parar</string>
-
+    <!-- not verified-->
+    <string name="exclude_compositions_with_duration_less_than">Excluir composiciones del escaneo</string>
+    <string name="with_duration_less_than">Con duración inferior a %s</string>
+    <string name="pause_on_audiofocus_loss">Deje de jugar en llamadas, reproducción de música / video, etc.</string>
+    <string name="show_cover_stub_in_notification">Mostrar talón de portada en la notificación cuando no se encuentra la portada</string>
+    <string name="write_to_this_is_not_allowed">Sin permiso para modificar este archivo. Pruebe a través del administrador de archivos.</string>
+    <string name="shuffle_all_and_play">Mezclar todo y jugar</string>
+    <string name="rewind">Rebobinar</string>
+    <string name="fast_forward">Avance rápido</string>
+    <string name="show_covers_on_lock_screen">Mostrar portadas en la pantalla de bloqueo y en Android Auto</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s canción</item>
@@ -265,5 +274,12 @@
         <item quantity="one">%1$d canción eliminada</item>
         <item quantity="other">%1$d canciones eliminadas</item>
     </plurals>
+
+    <!-- not verified-->
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d segunda</item>
+        <item quantity="other">%1$d segundos</item>
+    </plurals>
+    <!---->
 
 </resources>

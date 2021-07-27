@@ -77,7 +77,7 @@ class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, L
     override fun showAudioFileMinDurationMillis(millis: Long) {
         val seconds = (millis/1000L).toInt()
         viewBinding.tvAudioMinDurationValue.text = getString(
-            R.string.seconds_template,
+            R.string.with_duration_less_than,
             resources.getQuantityString(R.plurals.seconds_template, seconds, seconds)
         )
     }
