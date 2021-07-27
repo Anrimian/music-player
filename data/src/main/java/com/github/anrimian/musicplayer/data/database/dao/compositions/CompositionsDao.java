@@ -143,6 +143,9 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET dateModified = :date, size = :size WHERE id = :id")
     void setModifyTimeAndSize(long id, long size, Date date);
 
+    @Query("SELECT count() FROM compositions")
+    long getCompositionsCount();
+
     static String getCompositionQuery() {
         return "SELECT " +
                 "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
@@ -158,4 +161,5 @@ public interface CompositionsDao {
                 "corruptionType as corruptionType  " +
                 "FROM compositions";
     }
+
 }

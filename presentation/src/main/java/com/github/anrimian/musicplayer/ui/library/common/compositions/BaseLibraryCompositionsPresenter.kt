@@ -27,8 +27,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         private val displaySettingsInteractor: DisplaySettingsInteractor,
         errorParser: ErrorParser,
         uiScheduler: Scheduler,
-)
-    : AppPresenter<T>(uiScheduler, errorParser) {
+) : AppPresenter<T>(uiScheduler, errorParser) {
 
     private val presenterBatterySafeDisposable = CompositeDisposable()
 
@@ -42,6 +41,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
 
     private var currentComposition: Composition? = null
 
+    //we can replace it with subj
     private var searchText: String? = null
 
     private var lastDeleteAction: Completable? = null
@@ -332,13 +332,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     private fun subscribeOnUiSettings() {
-        presenterDisposable.add(displaySettingsInteractor.getCoversEnabledObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onUiSettingsReceived, errorParser::logError))
-    }
-
-    private fun onUiSettingsReceived(isCoversEnabled: Boolean) {
-        viewState.setDisplayCoversEnabled(isCoversEnabled)
+        displaySettingsInteractor.getCoversEnabledObservable()
+            .subscribeOnUi(viewState::setDisplayCoversEnabled, errorParser::logError)
     }
 
     protected abstract fun getCompositionsObservable(searchText: String?): Observable<List<Composition>>

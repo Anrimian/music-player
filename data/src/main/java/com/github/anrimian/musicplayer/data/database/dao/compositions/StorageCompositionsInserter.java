@@ -57,6 +57,8 @@ public class StorageCompositionsInserter {
                              List<Change<StorageComposition, StorageFullComposition>> changedCompositions,
                              LongSparseArray<Long> addedFilesFolderMap,
                              List<Long> foldersToDelete) {
+        long previousCount = compositionsDao.getCompositionsCount();
+
         appDatabase.runInTransaction(() -> {
             addedFilesFolderMap.putAll(insertFolders(foldersToInsert));
             applyCompositionChanges(addedCompositions,
@@ -65,6 +67,11 @@ public class StorageCompositionsInserter {
                     addedFilesFolderMap);
             deleteFolders(foldersToDelete);
         });
+
+        if (previousCount == 0) {
+            //on first app launch room invalidation tracker can be not launched so call update manually
+            compositionsDaoWrapper.launchManualUpdate();
+        }
     }
 
     private void deleteFolders(List<Long> folderIds) {
