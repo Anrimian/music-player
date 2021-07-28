@@ -38,6 +38,7 @@ const val FOLDERS_ACTION_ID = "folders_action_id"
 const val ARTIST_ITEMS_ACTION_ID = "artist_items_action_id"
 const val ALBUM_ITEMS_ACTION_ID = "album_items_action_id"
 const val PLAYLIST_ITEMS_ACTION_ID = "playlist_items_action_id"
+const val SEARCH_ITEMS_ACTION_ID = "search_items_action_id"
 
 const val POSITION_ARG = "position_arg"
 const val COMPOSITION_ID_ARG = "composition_id_arg"
@@ -45,6 +46,7 @@ const val FOLDER_ID_ARG = "folder_id_arg"
 const val ARTIST_ID_ARG = "artist_id_arg"
 const val ALBUM_ID_ARG = "artist_id_arg"
 const val PLAYLIST_ID_ARG = "artist_id_arg"
+const val SEARCH_QUERY_ARG = "search_query_arg"
 
 private const val ROOT_ID = "root_id"
 private const val RECENT_MEDIA_ROOT_ID = "recent_media_root_id"
@@ -129,7 +131,9 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             .getCompositionsObservable(query)
             .firstOrError()
             .subscribe(
-                { value -> resultCallback.sendResult(value.mapIndexed(this::toActionItem)) },
+                { value -> resultCallback.sendResult(value.mapIndexed { position, composition ->
+                    toSearchActionItem(position, composition, query)
+                }) },
                 { throwable -> resultCallback.sendErrorResult(throwable) }
             )
     }
@@ -371,6 +375,20 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             return@map listOf(item)
         }
     }
+
+    private fun toSearchActionItem(
+        position: Int,
+        composition: Composition,
+        searchQuery: String?
+    ) = actionItem(
+        SEARCH_ITEMS_ACTION_ID,
+        formatCompositionName(composition),
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
+        Bundle().apply {
+            putInt(POSITION_ARG, position)
+            putString(SEARCH_QUERY_ARG, searchQuery)
+        }
+    )
 
     private fun toActionItem(position: Int, composition: Composition) = actionItem(
         COMPOSITIONS_ACTION_ID,

@@ -418,6 +418,12 @@ class MediaSessionHandler(private val context: Context,
                     actionDisposable = musicServiceInteractor.startPlayingFromCompositions(position)
                         .subscribe({}, this::processError)
                 }
+                SEARCH_ITEMS_ACTION_ID -> {
+                    val position = extras.getInt(POSITION_ARG)
+                    val searchQuery = extras.getString(SEARCH_QUERY_ARG)
+                    actionDisposable = musicServiceInteractor.playFromSearch(searchQuery, position)
+                        .subscribe({}, this::processError)
+                }
                 FOLDERS_ACTION_ID -> {
                     var folderId: Long? = extras.getLong(FOLDER_ID_ARG)
                     if (folderId == 0L) {

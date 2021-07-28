@@ -130,9 +130,13 @@ public class MusicServiceInteractor {
     }
 
     public Completable playFromSearch(@Nullable String searchQuery) {
+        return playFromSearch(searchQuery, 0);
+    }
+
+    public Completable playFromSearch(@Nullable String searchQuery, int position) {
         return libraryCompositionsInteractor.getCompositionsObservable(searchQuery)
                 .firstOrError()
-                .doOnSuccess(libraryPlayerInteractor::startPlaying)
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
                 .ignoreElement();
     }
 
