@@ -7,8 +7,6 @@ import android.content.IntentFilter;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 
 /**
  * Created on 05.11.2017.
@@ -23,21 +21,16 @@ public class RxReceivers {
     }
 
     public static Observable<Intent> from(@NonNull final IntentFilter intentFilter,
-                                          @NonNull final Context ctx) {
-        return Observable.create(new ObservableOnSubscribe<Intent>() {
-            Context appContext = ctx.getApplicationContext();
-
-            @Override
-            public void subscribe(@NonNull final ObservableEmitter<Intent> emitter) {
-                BroadcastReceiver receiver = new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        emitter.onNext(intent);
-                    }
-                };
-                emitter.setDisposable(new BroadcastDisposable(receiver, appContext));
-                appContext.registerReceiver(receiver, intentFilter);
-            }
+                                          @NonNull final Context context) {
+        return Observable.create(emitter -> {
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context1, Intent intent) {
+                    emitter.onNext(intent);
+                }
+            };
+            emitter.setCancellable(() -> context.unregisterReceiver(receiver));
+            context.registerReceiver(receiver, intentFilter);
         });
     }
 }

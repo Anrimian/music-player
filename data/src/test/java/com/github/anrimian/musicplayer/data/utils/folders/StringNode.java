@@ -1,13 +1,16 @@
 package com.github.anrimian.musicplayer.data.utils.folders;
 
+import androidx.annotation.NonNull;
+
 public class StringNode extends NodeData{
 
-    private String data;
+    private final String data;
 
     StringNode(String data) {
         this.data = data;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "StringNode{" +

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ValidateException extends RuntimeException {
 
-    private List<ValidateError> validateErrors;
+    private final List<ValidateError> validateErrors;
 
     ValidateException(List<ValidateError> validateErrors) {
         this.validateErrors = validateErrors;

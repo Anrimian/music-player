@@ -16,8 +16,8 @@ public class FolderNode<V> {
     private final LinkedHashMap<String, FolderNode<V>> folders = new LinkedHashMap<>();
 
     @Nullable
-    private String key;
-    private List<V> files = new LinkedList<>();
+    private final String key;
+    private final List<V> files = new LinkedList<>();
 
     @Nullable
     private FolderNode<V> parent;

@@ -3,8 +3,6 @@ package com.github.anrimian.musicplayer.data.utils.preferences;
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.util.JsonReader;
-import android.util.Log;
 
 import androidx.collection.LruCache;
 
@@ -15,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,7 +23,7 @@ import java.util.Set;
 @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
 public class SharedPreferencesHelper {
 
-    private SharedPreferences preferences;
+    private final SharedPreferences preferences;
 
     public SharedPreferencesHelper(SharedPreferences preferences) {
         this.preferences = preferences;

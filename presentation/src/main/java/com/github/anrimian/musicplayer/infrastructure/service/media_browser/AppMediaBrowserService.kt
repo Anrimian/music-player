@@ -61,7 +61,6 @@ private const val ALBUM_ITEMS_NODE_ID = "album_items_node_id"
 private const val PLAYLIST_ITEMS_NODE_ID = "playlist_items_node_id"
 
 const val DELIMITER = '-'
-const val ROOT_FOLDER_NODE = FOLDERS_NODE_ID + DELIMITER
 
 //strange initial state(random? just in case of install while android auto is active?)
 

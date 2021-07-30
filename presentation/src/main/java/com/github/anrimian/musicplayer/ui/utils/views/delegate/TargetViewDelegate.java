@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
-import android.view.View;
-
 import static androidx.core.view.ViewCompat.isLaidOut;
+
+import android.view.View;
 
 /**
  * Created on 13.01.2018.
@@ -12,15 +12,15 @@ public class TargetViewDelegate implements SlideDelegate {
 
     private static final float UNDEFINED = -1;
 
+    private final View view;
+    private final View targetView;
+
     private float startX = UNDEFINED;
     private float startY = UNDEFINED;
     private float startPadding = UNDEFINED;
     private float endX = UNDEFINED;
     private float endY = UNDEFINED;
     private float endPadding = UNDEFINED;
-
-    private View view;
-    private View targetView;
 
     public TargetViewDelegate(View view, View targetView) {
         this.view = view;

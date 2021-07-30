@@ -7,13 +7,13 @@ import javax.annotation.Nullable;
 
 public class StorageFolder {
 
-    private long id;
+    private final long id;
 
     @Nullable
-    private Long parentId;
+    private final Long parentId;
 
     @Nonnull
-    private String name;
+    private final String name;
 
     public StorageFolder(long id, @Nullable Long parentId, @Nonnull String name) {
         this.id = id;

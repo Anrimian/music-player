@@ -8,16 +8,16 @@ import javax.annotation.Nonnull;
 
 public class StoragePlayList {
 
-    private long storageId;
+    private final long storageId;
 
     @Nonnull
-    private String name;
+    private final String name;
 
     @Nonnull
-    private Date dateAdded;
+    private final Date dateAdded;
 
     @Nonnull
-    private Date dateModified;
+    private final Date dateModified;
 
     public StoragePlayList(long storageId,
                            @Nonnull String name,

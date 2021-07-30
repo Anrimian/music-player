@@ -2,8 +2,8 @@ package com.github.anrimian.musicplayer.data.storage.providers.playlists;
 
 public class StoragePlayListItem {
 
-    private long itemId;
-    private long audioId;
+    private final long itemId;
+    private final long audioId;
 
     public StoragePlayListItem(long itemId, long audioId) {
         this.itemId = itemId;
