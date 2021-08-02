@@ -1,6 +1,10 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -44,7 +48,6 @@ import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.EqualizerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
-import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -61,10 +64,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 02.11.2017.
@@ -309,14 +308,14 @@ class MusicModule {
     LibraryFoldersInteractor libraryFilesInteractor(LibraryRepository musicProviderRepository,
                                                     EditorRepository editorRepository,
                                                     LibraryPlayerInteractor musicPlayerInteractor,
-                                                    PlayListsRepository playListsRepository,
+                                                    PlayListsInteractor playListsInteractor,
                                                     SettingsRepository settingsRepository,
                                                     UiStateRepository uiStateRepository,
                                                     MediaScannerRepository mediaScannerRepository) {
         return new LibraryFoldersInteractor(musicProviderRepository,
                 editorRepository,
                 musicPlayerInteractor,
-                playListsRepository,
+                playListsInteractor,
                 settingsRepository,
                 uiStateRepository,
                 mediaScannerRepository);

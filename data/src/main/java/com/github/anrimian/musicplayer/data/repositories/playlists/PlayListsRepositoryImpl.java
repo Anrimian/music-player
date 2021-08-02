@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -10,6 +12,8 @@ import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 
 import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
@@ -21,6 +25,11 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     private final StoragePlayListsProvider storagePlayListsProvider;
     private final PlayListsDaoWrapper playListsDao;
     private final Scheduler scheduler;
+
+    @Nullable
+    private PlayListItem deletedItem;
+    private long deletedItemPlayListId;
+    private int deletedItemPosition;
 
     public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
                                    PlayListsDaoWrapper playListsDao,
@@ -63,16 +72,14 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     public Completable addCompositionsToPlayList(List<Composition> compositions,
                                                  PlayList playList,
                                                  int position) {
-        return Completable.fromAction(() ->
-                playListsDao.addCompositions(compositions, playList.getId(), position)
-        ).subscribeOn(scheduler)
-                .doOnComplete(() -> addCompositionsToStoragePlaylist(compositions, playList, position));
+        return addCompositionsToPlayList(compositions, playList.getId(), position);
     }
 
     @Override
-    public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
-        return addCompositionsToPlayList(compositions, playList, playList.getCompositionsCount())
-                .subscribeOn(scheduler);
+    public Completable addCompositionsToPlayList(List<Composition> compositions,
+                                                 PlayList playList,
+                                                 boolean checkForDuplicates) {
+        return addCompositionsToPlayList(compositions, playList.getId(), playList.getCompositionsCount());
     }
 
     @Override
@@ -83,8 +90,22 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
             if (storageItemId != null && storagePlayListId != null) {
                 storagePlayListsProvider.deleteItemFromPlayList(storageItemId, storagePlayListId);
             }
-            playListsDao.deletePlayListEntry(playListItem.getItemId(), playListId);
+            int position = playListsDao.deletePlayListEntry(playListItem.getItemId(), playListId);
+            deletedItem = playListItem;
+            deletedItemPlayListId = playListId;
+            deletedItemPosition = position;
         }).subscribeOn(scheduler);
+    }
+
+    @Override
+    public Completable restoreDeletedPlaylistItem() {
+        if (deletedItem == null) {
+            return Completable.complete();
+        }
+        return addCompositionsToPlayList(
+                asList(deletedItem.getComposition()),
+                deletedItemPlayListId,
+                deletedItemPosition);
     }
 
     @Override
@@ -118,12 +139,21 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         }).subscribeOn(scheduler);
     }
 
+    private Completable addCompositionsToPlayList(List<Composition> compositions,
+                                                  long playListId,
+                                                  int position) {
+        return Completable.fromAction(() ->
+                playListsDao.addCompositions(compositions, playListId, position)
+        ).subscribeOn(scheduler)
+                .doOnComplete(() -> addCompositionsToStoragePlaylist(compositions, playListId, position));
+    }
+
     //can be slow on large amount of data, run in separate task
     private void addCompositionsToStoragePlaylist(List<Composition> compositions,
-                                                  PlayList playList,
+                                                  long playListId,
                                                   int position) {
         Completable.fromAction(() -> {
-            Long storageId = playListsDao.selectStorageId(playList.getId());
+            Long storageId = playListsDao.selectStorageId(playListId);
             if (storageId != null) {
                 storagePlayListsProvider.addCompositionsToPlayList(compositions,
                         storageId,

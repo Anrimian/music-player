@@ -24,9 +24,13 @@ public interface PlayListsRepository {
                                           PlayList playList,
                                           int position);
 
-    Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList);
+    Completable addCompositionsToPlayList(List<Composition> compositions,
+                                          PlayList playList,
+                                          boolean checkForDuplicates);
 
     Completable deleteItemFromPlayList(PlayListItem playListItem, long playListId);
+
+    Completable restoreDeletedPlaylistItem();
 
     Completable deletePlayList(long playListId);
 

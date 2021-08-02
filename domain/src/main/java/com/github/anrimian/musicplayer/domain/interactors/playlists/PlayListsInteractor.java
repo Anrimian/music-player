@@ -55,11 +55,15 @@ public class PlayListsInteractor {
     }
 
     public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
-        return playListsRepository.addCompositionsToPlayList(compositions, playList);
+        return playListsRepository.addCompositionsToPlayList(compositions, playList, false);
     }
 
     public Completable deleteItemFromPlayList(PlayListItem playListItem, long playListId) {
         return playListsRepository.deleteItemFromPlayList(playListItem, playListId);
+    }
+
+    public Completable restoreDeletedPlaylistItem() {
+        return playListsRepository.restoreDeletedPlaylistItem();
     }
 
     public Completable deletePlayList(long playListId) {

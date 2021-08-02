@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.interactors.library;
 
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
@@ -10,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
-import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
@@ -32,7 +32,7 @@ public class LibraryFoldersInteractor {
     private final LibraryRepository libraryRepository;
     private final EditorRepository editorRepository;
     private final LibraryPlayerInteractor musicPlayerInteractor;
-    private final PlayListsRepository playListsRepository;
+    private final PlayListsInteractor playListsInteractor;
     private final SettingsRepository settingsRepository;
     private final UiStateRepository uiStateRepository;
     private final MediaScannerRepository mediaScannerRepository;
@@ -40,14 +40,14 @@ public class LibraryFoldersInteractor {
     public LibraryFoldersInteractor(LibraryRepository libraryRepository,
                                     EditorRepository editorRepository,
                                     LibraryPlayerInteractor musicPlayerInteractor,
-                                    PlayListsRepository playListsRepository,
+                                    PlayListsInteractor playListsInteractor,
                                     SettingsRepository settingsRepository,
                                     UiStateRepository uiStateRepository,
                                     MediaScannerRepository mediaScannerRepository) {
         this.libraryRepository = libraryRepository;
         this.editorRepository = editorRepository;
         this.musicPlayerInteractor = musicPlayerInteractor;
-        this.playListsRepository = playListsRepository;
+        this.playListsInteractor = playListsInteractor;
         this.settingsRepository = settingsRepository;
         this.uiStateRepository = uiStateRepository;
         this.mediaScannerRepository = mediaScannerRepository;
@@ -122,13 +122,13 @@ public class LibraryFoldersInteractor {
 
     public Single<List<Composition>> addCompositionsToPlayList(Long folderId, PlayList playList) {
         return libraryRepository.getAllCompositionsInFolder(folderId)
-                .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
+                .flatMap(compositions -> playListsInteractor.addCompositionsToPlayList(compositions, playList)
                         .toSingleDefault(compositions));
     }
 
     public Single<List<Composition>> addCompositionsToPlayList(List<FileSource> fileSources, PlayList playList) {
         return libraryRepository.getAllCompositionsInFolders(fileSources)
-                .flatMap(compositions -> playListsRepository.addCompositionsToPlayList(compositions, playList)
+                .flatMap(compositions -> playListsInteractor.addCompositionsToPlayList(compositions, playList)
                         .toSingleDefault(compositions));
     }
 
