@@ -33,6 +33,7 @@ import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 
 import javax.annotation.Nonnull;
@@ -137,6 +138,7 @@ public class StorageModule {
                                                   StoragePlayListsProvider playListsProvider,
                                                   StorageGenresProvider genresProvider,
                                                   GenresDaoWrapper genresDao,
+                                                  SettingsRepository settingsRepository,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
                                                   StoragePlaylistAnalyzer storagePlaylistAnalyzer,
                                                   LoggerRepository loggerRepository,
@@ -145,6 +147,7 @@ public class StorageModule {
                 playListsProvider,
                 genresProvider,
                 genresDao,
+                settingsRepository,
                 compositionAnalyzer,
                 storagePlaylistAnalyzer,
                 loggerRepository,

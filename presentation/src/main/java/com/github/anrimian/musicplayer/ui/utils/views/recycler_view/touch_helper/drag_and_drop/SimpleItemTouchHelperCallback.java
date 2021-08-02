@@ -12,11 +12,11 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     private static final float BOTTOM_Z = 0f;
     private static final float TOP_Z = 8f;
 
+    private final boolean horizontalDrag;
+
     private OnMovedListener onMovedListener;
     private OnStartDragListener onStartDragListener;
     private OnEndDragListener onEndDragListener;
-
-    private boolean horizontalDrag;
 
     public SimpleItemTouchHelperCallback() {
         this(false);

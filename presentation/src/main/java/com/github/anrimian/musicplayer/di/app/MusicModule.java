@@ -1,6 +1,10 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -29,14 +33,21 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerCoordinatorInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.EqualizerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -53,10 +64,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 02.11.2017.
@@ -180,10 +187,20 @@ class MusicModule {
     MusicServiceInteractor musicServiceInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
                                                   LibraryPlayerInteractor libraryPlayerInteractor,
                                                   ExternalPlayerInteractor externalPlayerInteractor,
+                                                  LibraryCompositionsInteractor libraryCompositionsInteractor,
+                                                  LibraryFoldersInteractor libraryFoldersInteractor,
+                                                  LibraryArtistsInteractor libraryArtistsInteractor,
+                                                  LibraryAlbumsInteractor libraryAlbumsInteractor,
+                                                  PlayListsInteractor playListsInteractor,
                                                   SettingsRepository settingsRepository) {
         return new MusicServiceInteractor(playerCoordinatorInteractor,
                 libraryPlayerInteractor,
                 externalPlayerInteractor,
+                libraryCompositionsInteractor,
+                libraryFoldersInteractor,
+                libraryArtistsInteractor,
+                libraryAlbumsInteractor,
+                playListsInteractor,
                 settingsRepository);
     }
 
@@ -264,7 +281,67 @@ class MusicModule {
     @Singleton
     MediaSessionHandler mediaSessionHandler(Context context,
                                             PlayerInteractor playerInteractor,
-                                            MusicServiceInteractor musicServiceInteractor) {
-        return new MediaSessionHandler(context, playerInteractor, musicServiceInteractor);
+                                            LibraryPlayerInteractor libraryPlayerInteractor,
+                                            MusicServiceInteractor musicServiceInteractor,
+                                            ErrorParser errorParser) {
+        return new MediaSessionHandler(
+                context,
+                playerInteractor,
+                libraryPlayerInteractor,
+                musicServiceInteractor,
+                errorParser
+        );
+    }
+
+    @Provides
+    @Nonnull
+    LibraryCompositionsInteractor libraryCompositionsInteractor(LibraryRepository musicProviderRepository,
+                                                                SettingsRepository settingsRepository,
+                                                                UiStateRepository uiStateRepository) {
+        return new LibraryCompositionsInteractor(musicProviderRepository,
+                settingsRepository,
+                uiStateRepository);
+    }
+
+    @Provides
+    @Nonnull
+    LibraryFoldersInteractor libraryFilesInteractor(LibraryRepository musicProviderRepository,
+                                                    EditorRepository editorRepository,
+                                                    LibraryPlayerInteractor musicPlayerInteractor,
+                                                    PlayListsInteractor playListsInteractor,
+                                                    SettingsRepository settingsRepository,
+                                                    UiStateRepository uiStateRepository,
+                                                    MediaScannerRepository mediaScannerRepository) {
+        return new LibraryFoldersInteractor(musicProviderRepository,
+                editorRepository,
+                musicPlayerInteractor,
+                playListsInteractor,
+                settingsRepository,
+                uiStateRepository,
+                mediaScannerRepository);
+    }
+
+    @Provides
+    @Nonnull
+    LibraryArtistsInteractor libraryArtistsInteractor(LibraryRepository repository,
+                                                      EditorRepository editorRepository,
+                                                      SettingsRepository settingsRepository,
+                                                      UiStateRepository uiStateRepository) {
+        return new LibraryArtistsInteractor(repository,
+                editorRepository,
+                settingsRepository,
+                uiStateRepository);
+    }
+
+    @Provides
+    @Nonnull
+    LibraryAlbumsInteractor libraryAlbumsInteractor(LibraryRepository repository,
+                                                    EditorRepository editorRepository,
+                                                    SettingsRepository settingsRepository,
+                                                    UiStateRepository uiStateRepository) {
+        return new LibraryAlbumsInteractor(repository,
+                editorRepository,
+                settingsRepository,
+                uiStateRepository);
     }
 }

@@ -59,6 +59,7 @@ import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_
 import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_NAME_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
@@ -202,10 +203,7 @@ public class GenreItemsFragment extends BaseLibraryCompositionsFragment implemen
     @Override
     public void showGenreInfo(Genre genre) {
         toolbar.setTitle(genre.getName());
-        toolbar.setSubtitle(getResources().getQuantityString(
-                R.plurals.compositions_count,
-                genre.getCompositionsCount(),
-                genre.getCompositionsCount()));
+        toolbar.setSubtitle(formatCompositionsCount(requireContext(), genre.getCompositionsCount()));
     }
 
     @Override

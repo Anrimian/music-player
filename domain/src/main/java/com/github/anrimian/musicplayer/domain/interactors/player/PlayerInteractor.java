@@ -78,6 +78,15 @@ public class PlayerInteractor {
         currentSourceSubject.onNext(new Optional<>(currentSource));
     }
 
+    public void reset() {
+        currentSource = null;
+        currentSourceSubject.onNext(new Optional<>(null));
+
+        musicPlayerController.stop();
+        playerStateSubject.onNext(IDLE);
+        systemEventsDisposable.clear();
+    }
+
     public void play() {
         play(0);
     }
@@ -221,6 +230,9 @@ public class PlayerInteractor {
         if (state == PLAY || state == LOADING) {
             musicPlayerController.resume();
         }
+        if (state == IDLE) {
+            playerStateSubject.onNext(PAUSE);
+        }
     }
 
     private void handleErrorWithComposition(ErrorType errorType) {
@@ -250,7 +262,8 @@ public class PlayerInteractor {
                 break;
             }
             case LOSS: {
-                if (playerStateSubject.getValue() == PLAY) {
+                if (playerStateSubject.getValue() == PLAY
+                        && settingsRepository.isPauseOnAudioFocusLossEnabled()) {
                     musicPlayerController.pause();
                     playerStateSubject.onNext(PAUSED_EXTERNALLY);
                     break;

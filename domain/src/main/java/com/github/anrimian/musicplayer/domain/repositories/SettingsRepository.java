@@ -34,6 +34,8 @@ public interface SettingsRepository {
 
     Observable<Boolean> getColoredNotificationEnabledObservable();
 
+    Observable<Boolean> getNotificationCoverStubEnabledObservable();
+
     Observable<Boolean> getCoversOnLockScreenEnabledObservable();
 
     void setCoversEnabled(boolean enabled);
@@ -41,6 +43,8 @@ public interface SettingsRepository {
     void setCoversInNotificationEnabled(boolean enabled);
 
     void setColoredNotificationEnabled(boolean enabled);
+
+    void setNotificationCoverStubEnabled(boolean enabled);
 
     void setCoversOnLockScreenEnabled(boolean enabled);
 
@@ -74,11 +78,17 @@ public interface SettingsRepository {
 
     boolean isColoredNotificationEnabled();
 
+    boolean isNotificationCoverStubEnabled();
+
     boolean isCoversOnLockScreenEnabled();
 
     boolean isDecreaseVolumeOnAudioFocusLossEnabled();
 
     void setDecreaseVolumeOnAudioFocusLossEnabled(boolean enabled);
+
+    boolean isPauseOnAudioFocusLossEnabled();
+
+    void setPauseOnAudioFocusLossEnabled(boolean enabled);
 
     void setExternalPlayerRepeatMode(int mode);
 
@@ -111,4 +121,10 @@ public interface SettingsRepository {
     void setSleepTimerPlayLastSong(boolean playLastSong);
 
     boolean isSleepTimerPlayLastSong();
+
+    Observable<Long> geAudioFileMinDurationMillisObservable();
+
+    void setAudioFileMinDurationMillis(long millis);
+
+    long getAudioFileMinDurationMillis();
 }

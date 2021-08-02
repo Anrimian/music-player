@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComp
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.io.File;
@@ -208,6 +209,9 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
         File oldFile = new File(oldPath);
         if (!oldFile.exists()) {
             throw new RuntimeException("target file not exists");
+        }
+        if (!oldFile.canWrite()) {
+            throw new FileWriteNotAllowedException("file write is not allowed");
         }
         File newFile = new File(newPath);
         boolean renamed = oldFile.renameTo(newFile);

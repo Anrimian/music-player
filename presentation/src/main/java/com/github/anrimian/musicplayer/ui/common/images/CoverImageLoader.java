@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
@@ -29,16 +31,18 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 
+import java.io.File;
 import java.util.Date;
 
 import javax.annotation.Nonnull;
 
-import static com.bumptech.glide.request.target.Target.SIZE_ORIGINAL;
+import io.reactivex.rxjava3.core.Single;
 
 public class CoverImageLoader {
 
@@ -66,7 +70,7 @@ public class CoverImageLoader {
         Glide.with(imageView)
                 .asBitmap()
                 .load(new CompositionImage(data.getId(), data.getDateModified()))
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
@@ -129,7 +133,7 @@ public class CoverImageLoader {
         Glide.with(imageView)
                 .asBitmap()
                 .load(album)
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .placeholder(errorPlaceholder)
                 .error(errorPlaceholder)
                 .timeout(TIMEOUT_MILLIS)
@@ -175,6 +179,33 @@ public class CoverImageLoader {
         loadImage(new CompositionImage(data.getId(), data.getDateModified()), onCompleted);
     }
 
+    public Single<Optional<Uri>> loadImageUri(@Nonnull Composition data) {
+        return Single.create(emitter ->
+                loadImageUri(data, uri -> emitter.onSuccess(new Optional<>(uri)))
+        );
+    }
+
+    public void loadImageUri(@Nonnull Composition data, Callback<Uri> onCompleted) {
+        CustomTarget<File> target = simpleTarget(file -> {
+            if (file == null) {
+                onCompleted.call(null);
+                return;
+            }
+            Uri uri = new Uri.Builder()
+                    .scheme(ContentResolver.SCHEME_CONTENT)
+                    .authority(context.getString(R.string.covers_file_provider_authorities))
+                    .appendPath(file.getPath())
+                    .build();
+            onCompleted.call(uri);
+        });
+        Glide.with(context)
+                .downloadOnly()
+                .load(new CompositionImage(data.getId(), data.getDateModified()))
+                .override(getCoverSize())
+                .timeout(TIMEOUT_MILLIS)
+                .into(target);
+    }
+
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
                              int appWidgetId,
@@ -190,7 +221,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(new CompositionImage(compositionId, new Date(compositionUpdateTime)))
-                .override(150, 150)
+                .override(getCoverSize())
                 .downsample(DownsampleStrategy.AT_MOST)
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
@@ -209,11 +240,11 @@ public class CoverImageLoader {
         Glide.with(imageView)
                 .asBitmap()
                 .load(data)
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .thumbnail(Glide.with(imageView)
                         .asBitmap()
                         .load(oldData)
-                        .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                        .override(getCoverSize())
                         .timeout(TIMEOUT_MILLIS))
                 .listener(new RequestListener<Bitmap>() {
                     @Override
@@ -242,9 +273,7 @@ public class CoverImageLoader {
     private Runnable loadNotificationImage(Object compositionImage,
                                            Callback<Bitmap> onCompleted) {
         CustomTarget<Bitmap> target = simpleTarget(bitmap -> {
-            if (bitmap == null) {
-                bitmap = getDefaultNotificationBitmap();
-            } else {
+            if (bitmap != null) {
                 //possible fix for RemoteServiceException crash
                 //https://stackoverflow.com/questions/54948936/bad-notification-the-given-region-must-intersect-with-the-bitmaps-dimensions
                 bitmap = bitmap.copy(Bitmap.Config.RGB_565, false);
@@ -255,7 +284,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(compositionImage)
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
@@ -266,7 +295,7 @@ public class CoverImageLoader {
         Glide.with(context)
                 .asBitmap()
                 .load(data)
-                .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
+                .override(getCoverSize())
                 .timeout(TIMEOUT_MILLIS)
                 .into(simpleTarget(onCompleted));
     }
@@ -285,6 +314,10 @@ public class CoverImageLoader {
             return !activity.isDestroyed() && !activity.isFinishing();
         }
         return true;
+    }
+
+    private int getCoverSize() {
+        return context.getResources().getInteger(R.integer.icon_image_size);
     }
 
     private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {

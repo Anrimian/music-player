@@ -130,7 +130,7 @@ class PlayerPresenter(
         }
         currentPosition = position
         currentItem = item
-        playerInteractor.skipToItem(item)
+        playerInteractor.skipToItem(item.id)
         onCurrentCompositionChanged(item, 0)
     }
 
@@ -221,7 +221,7 @@ class PlayerPresenter(
     }
 
     fun onClearPlayQueueClicked() {
-        playerInteractor.clearPlayQueue()
+        playerInteractor.clearPlayQueue().subscribe()
     }
 
     fun onFastSeekForwardCalled() {

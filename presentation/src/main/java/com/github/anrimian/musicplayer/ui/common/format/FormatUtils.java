@@ -17,8 +17,10 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 
 import java.util.Locale;
@@ -161,11 +163,33 @@ public class FormatUtils {
         if (!isEmpty(artist)) {
             sb.append(artist);
         }
-        sb.append(formatCompositionsCount(
-                context,
-                album.getCompositionsCount())
-        );
+        sb.append(formatCompositionsCount(context, album.getCompositionsCount()));
         return sb;
+    }
+
+    public static String formatAlbumAdditionalInfoForMediaBrowser(Context context, Album album) {
+        SpannableStringBuilder sb = new DescriptionStringBuilder();
+        String artist = album.getArtist();
+        if (!isEmpty(artist)) {
+            sb.append(artist);
+        }
+        sb.append(formatCompositionsCount(context, album.getCompositionsCount()));
+        return sb.toString();
+    }
+
+    public static String formatCompositionAdditionalInfoForMediaBrowser(Context context, Composition composition) {
+        SpannableStringBuilder sb = new DescriptionStringBuilder();
+        sb.append(formatCompositionAuthor(composition, context));
+        sb.append(formatMilliseconds(composition.getDuration()));
+        return sb.toString();
+    }
+
+    public static String formatPlayListDescriptionForMediaBrowser(Context context, PlayList playList) {
+        SpannableStringBuilder sb = new DescriptionStringBuilder(
+                FormatUtils.formatCompositionsCount(context, playList.getCompositionsCount())
+        );
+        sb.append(FormatUtils.formatMilliseconds(playList.getTotalDuration()));
+        return sb.toString();
     }
 
     public static int getOrderTitle(OrderType orderType) {
@@ -220,6 +244,14 @@ public class FormatUtils {
             }
             default: return R.string.do_not_repeat;
         }
+    }
+
+    @DrawableRes
+    public static int getRandomModeIcon(boolean isRandom) {
+        if (isRandom) {
+            return R.drawable.ic_shuffle;
+        }
+        return R.drawable.ic_shuffle_disabled;
     }
 
     public static void formatLinkedFabView(View view, View fab) {

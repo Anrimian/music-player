@@ -19,6 +19,7 @@ import static com.github.anrimian.musicplayer.domain.Payloads.FILES_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
@@ -119,10 +120,7 @@ class FolderViewHolder extends FileViewHolder {
     }
 
     private void showFilesCount() {
-        int filesCount = folder.getFilesCount();
-        String text = getContext().getResources().getQuantityString(R.plurals.compositions_count,
-                filesCount,
-                filesCount);
+        String text = formatCompositionsCount(getContext(), folder.getFilesCount());
         viewBinding.tvCompositionsCount.setText(text);
     }
 

@@ -4,13 +4,18 @@
     package="com.github.anrimian.musicplayer">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <!--prevent rare crash on some devices with notification display-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--remove permission from glide because we don't use internet for covers-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove"/>
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
 
@@ -44,6 +49,11 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--actually not called but serves as flag for android auto-->
+            <intent-filter>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".ui.main.external_player.ExternalPlayerActivity"
@@ -74,6 +84,18 @@
             </intent-filter>-->
         </service>
 
+        <service android:name=".infrastructure.service.media_browser.AppMediaBrowserService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc" />
+
         <receiver android:name=".infrastructure.receivers.AppMediaButtonReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
@@ -88,6 +110,14 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
+        </provider>
+
+        <provider
+            android:name=".infrastructure.providers.CoversFileProvider"
+            android:authorities="@string/covers_file_provider_authorities"
+            android:grantUriPermissions="true"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider">
         </provider>
 
         <receiver android:name=".ui.widgets.WidgetActionsReceiver"/>

@@ -25,8 +25,10 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class CompositionsDaoWrapper {
 
@@ -34,6 +36,8 @@ public class CompositionsDaoWrapper {
     private final CompositionsDao compositionsDao;
     private final ArtistsDao artistsDao;
     private final AlbumsDao albumsDao;
+
+    private final BehaviorSubject<Object> updateSubject = BehaviorSubject.createDefault(TRIGGER);
 
     public CompositionsDaoWrapper(AppDatabase appDatabase,
                                   ArtistsDao artistsDao,
@@ -57,7 +61,11 @@ public class CompositionsDaoWrapper {
         query += getSearchQuery();
         query += getOrderQuery(order);
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 3));
-        return compositionsDao.getAllObservable(sqlQuery);
+        return updateSubject.switchMap(o -> compositionsDao.getAllObservable(sqlQuery));
+    }
+
+    public void launchManualUpdate() {
+        updateSubject.onNext(TRIGGER);
     }
 
     public Observable<List<Composition>> getCompositionsInFolderObservable(Long folderId,
@@ -107,7 +115,7 @@ public class CompositionsDaoWrapper {
     public long getStorageId(long compositionId) {
         Long storageId = compositionsDao.getStorageId(compositionId);
         if (storageId == null) {
-            throw new CompositionNotFoundException();
+            throw new CompositionNotFoundException("composition not found");
         }
         return storageId;
     }

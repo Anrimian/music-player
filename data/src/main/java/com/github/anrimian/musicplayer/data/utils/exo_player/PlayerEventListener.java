@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.data.utils.exo_player;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Player;
 
-public class PlayerEventListener implements Player.EventListener {
+public class PlayerEventListener implements Player.Listener {
 
     private final Runnable onEnded;
     private final Callback<ExoPlaybackException> errorCallback;
@@ -15,7 +17,7 @@ public class PlayerEventListener implements Player.EventListener {
     }
 
     @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+    public void onPlaybackStateChanged(int state) {
         //            case Player.STATE_BUFFERING: {
         //                break;
         //            }
@@ -25,13 +27,13 @@ public class PlayerEventListener implements Player.EventListener {
         //            case Player.STATE_READY: {
         //                break;
         //            }
-        if (playbackState == Player.STATE_ENDED) {
+        if (state == Player.STATE_ENDED) {
             onEnded.run();
         }
     }
 
     @Override
-    public void onPlayerError(ExoPlaybackException error) {
+    public void onPlayerError(@NonNull ExoPlaybackException error) {
         errorCallback.call(error);
     }
 }

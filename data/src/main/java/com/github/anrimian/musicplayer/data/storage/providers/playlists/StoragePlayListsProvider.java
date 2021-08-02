@@ -120,10 +120,7 @@ public class StoragePlayListsProvider {
 
     public void deletePlayList(long id) {
         StorageMusicProvider.checkIfMediaStoreAvailable(context);
-
-        contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
-                Playlists._ID + " = ?",
-                new String[] { String.valueOf(id) });
+        contentResolver.delete(getContentUri("external", id), null, null);
     }
 
     public Observable<List<StoragePlayListItem>> getPlayListEntriesObservable(long playListId) {
@@ -205,10 +202,10 @@ public class StoragePlayListsProvider {
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
         contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
-        contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
+        contentResolver.update(getContentUri("external", playListId),
                 contentValues,
-                Playlists._ID + " = ?",
-                new String[] { String.valueOf(playListId) });
+                null,
+                null);
     }
 
     private void updateModifyTime(long playListId) {
@@ -216,19 +213,19 @@ public class StoragePlayListsProvider {
 
         ContentValues playListValues = new ContentValues();
         playListValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
-        contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
+        contentResolver.update(getContentUri("external", playListId),
                 playListValues,
-                Playlists._ID + " = ?",
-                new String[] { String.valueOf(playListId) });
+                null,
+                null);
     }
 
     @Nullable
     private StoragePlayList findPlayList(long id) {
         try(Cursor cursor = contentResolver.query(
-                Playlists.EXTERNAL_CONTENT_URI,
+                getContentUri("external", id),
                 null,
-                Playlists._ID + " = ?",
-                new String[] { String.valueOf(id) },
+                null,
+                null,
                 Playlists.DATE_ADDED + " DESC")) {
             if (cursor != null && cursor.moveToFirst()) {
                 CursorWrapper cursorWrapper = new CursorWrapper(cursor);

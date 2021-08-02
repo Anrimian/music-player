@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
@@ -23,7 +24,11 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 
 public class CompositionSourceModelHelper {
 
-    public static boolean areSourcesTheSame(CompositionSource first, CompositionSource second) {
+    public static boolean areSourcesTheSame(@Nullable CompositionSource first, @Nullable CompositionSource second) {
+        if (first == null || second == null) {
+            return false;
+        }
+
         if (first.getClass().equals(second.getClass())) {
             if (first instanceof LibraryCompositionSource) {
                 return CompositionHelper.areSourcesTheSame(
@@ -37,18 +42,22 @@ public class CompositionSourceModelHelper {
         return false;
     }
 
-    public static void updateMediaSessionAlbumArt(CompositionSource source,
+    public static void updateMediaSessionAlbumArt(@Nullable CompositionSource source,
                                                   MediaMetadataCompat.Builder metadataBuilder,
                                                   MediaSessionCompat mediaSession,
                                                   boolean isEnabled) {
-        if (isEnabled) {
+        if (isEnabled && source != null) {
             if (source instanceof LibraryCompositionSource) {
                 Composition composition = ((LibraryCompositionSource) source).getComposition();
                 Components.getAppComponent()
                         .imageLoader()
-                        .loadImage(composition, bitmap -> {
-                            //can we adapt glide to be able return bitmaps by uri
-                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
+                        .loadImageUri(composition, uri -> {
+                            String uriStr = null;
+                            if (uri != null) {
+                                uriStr = uri.toString();
+                            }
+                            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr);
+                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
             }
@@ -56,17 +65,19 @@ public class CompositionSourceModelHelper {
                 Components.getAppComponent()
                         .imageLoader()
                         .loadImage((UriCompositionSource) source, bitmap -> {
-                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
+                            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
+                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
             }
         } else {
-            metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, null);
+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
+            metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, null);
             mediaSession.setMetadata(metadataBuilder.build());
         }
     }
 
-    public static void updateMediaSessionMetadata(CompositionSource source,
+    public static void updateMediaSessionMetadata(@Nullable CompositionSource source,
                                                   MediaMetadataCompat.Builder metadataBuilder,
                                                   MediaSessionCompat mediaSession,
                                                   Context context) {
@@ -78,6 +89,7 @@ public class CompositionSourceModelHelper {
                     .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatCompositionAuthor(composition, context).toString())
                     .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.getDuration());
             mediaSession.setMetadata(builder.build());
+            return;
         }
         if (source instanceof UriCompositionSource) {
             UriCompositionSource uriSource = (UriCompositionSource) source;
@@ -88,10 +100,17 @@ public class CompositionSourceModelHelper {
                     .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatAuthor(uriSource.getArtist(), context).toString())
                     .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, uriSource.getDuration());
             mediaSession.setMetadata(builder.build());
+            return;
         }
+        MediaMetadataCompat.Builder builder = metadataBuilder
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, null)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, null)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, null)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0);
+        mediaSession.setMetadata(builder.build());
     }
 
-    public static long getTrackPosition(@Nonnull CompositionSource source) {
+    public static long getTrackPosition(@Nullable CompositionSource source) {
         if (source instanceof LibraryCompositionSource) {
             return ((LibraryCompositionSource) source).getTrackPosition();
         }

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.utils.rx;
 
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -9,14 +11,12 @@ import io.reactivex.rxjava3.observers.TestObserver;
 import io.reactivex.rxjava3.schedulers.TestScheduler;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
-
 /**
  * Created on 02.06.2018.
  */
 public class RxUtilsTest {
 
-    private TestScheduler scheduler = new TestScheduler();
+    private final TestScheduler scheduler = new TestScheduler();
 
     @Test
     public void withDefaultValueTest() {

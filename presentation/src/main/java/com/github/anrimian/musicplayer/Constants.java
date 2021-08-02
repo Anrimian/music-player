@@ -48,7 +48,6 @@ public interface Constants {
         String SELECT_PLAYLIST_TAG = "select_playlist_tag";
         String SELECT_PLAYLIST_FOR_FOLDER_TAG = "select_playlist_for_folder_tag";
         String CREATE_PLAYLIST_TAG = "create_playlist_tag";
-        String PLAY_LIST_MENU = "play_list_menu";
         String COMPOSITION_ACTION_TAG = "composition_action_tag";
         String AUTHOR_TAG = "author_tag";
         String NAME_TAG = "name_tag";
@@ -60,9 +59,7 @@ public interface Constants {
         String ADD_GENRE_TAG = "add_genre_tag";
         String EDIT_GENRE_TAG = "edit_genre_tag";
         String NEW_FOLDER_NAME_TAG = "new_folder_name_tag";
-        String ALBUM_MENU_TAG = "album_menu_tag";
-        String ALBUM_NAME_TAG = "album_name_tag";
-        String ARTIST_MENU_TAG = "artist_menu_tag";
+        String GENRE_MENU_TAG = "genre_menu_tag";
         String ARTIST_NAME_TAG = "artist_name_tag";
         String GENRE_NAME_TAG = "genre_name_tag";
         String MESSAGE_ARG = "message_arg";

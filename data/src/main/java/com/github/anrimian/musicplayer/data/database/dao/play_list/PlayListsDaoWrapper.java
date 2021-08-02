@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+
 import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
@@ -23,8 +25,6 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class PlayListsDaoWrapper {
 
@@ -150,11 +150,12 @@ public class PlayListsDaoWrapper {
         return playListDao.getPlayListItemsAsStorageItems(playlistId);
     }
 
-    public void deletePlayListEntry(long id, long playListId) {
-        appDatabase.runInTransaction(() -> {
+    public int deletePlayListEntry(long id, long playListId) {
+        return appDatabase.runInTransaction(() -> {
             int position = playListDao.selectPositionById(id);
             playListDao.deletePlayListEntry(id);
             playListDao.decreasePositionsAfter(position, playListId);
+            return position;
         });
     }
 

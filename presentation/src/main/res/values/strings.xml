@@ -97,7 +97,6 @@
     <string name="show_covers">Show covers</string>
     <string name="show_covers_in_notification">Show covers in notification</string>
     <string name="colored_notification">Color notification in cover colors</string>
-    <string name="show_covers_on_lock_screen">Show covers on lock screen</string>
     <string name="display">Display</string>
     <string name="decrease_volume_on_notification">Decrease volume when notification received</string>
     <string name="playing">Player</string>
@@ -217,6 +216,15 @@
     <string name="resume">Resume</string>
     <string name="sleep_timer_message">Playing will be stopped in:</string>
     <string name="stop">Stop</string>
+    <string name="exclude_compositions_with_duration_less_than">Exclude compositions from scanning</string>
+    <string name="with_duration_less_than">With duration less than %s</string>
+    <string name="pause_on_audiofocus_loss">Stop playing on calling, music/video playing, etc.</string>
+    <string name="show_cover_stub_in_notification">Show cover stub in notification when cover is not found</string>
+    <string name="write_to_this_is_not_allowed">No permission to modify this file. Try through file manager.</string>
+    <string name="shuffle_all_and_play">Shuffle all and play</string>
+    <string name="rewind">Rewind</string>
+    <string name="fast_forward">Fast forward</string>
+    <string name="show_covers_on_lock_screen">Show covers on lock screen and on android auto</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
@@ -261,6 +269,11 @@
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d song deleted</item>
         <item quantity="other">%1$d songs deleted</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d second</item>
+        <item quantity="other">%1$d seconds</item>
     </plurals>
 
 </resources>

@@ -9,8 +9,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class SimpleBottomSheetCallback extends BottomSheetBehavior.BottomSheetCallback {
 
-    private Callback<Integer> onStateChangedCallback;
-    private Callback<Float> onSlideCallback;
+    private final Callback<Integer> onStateChangedCallback;
+    private final Callback<Float> onSlideCallback;
 
     public SimpleBottomSheetCallback(Callback<Integer> onStateChangedCallback,
                                      Callback<Float> onSlideCallback) {

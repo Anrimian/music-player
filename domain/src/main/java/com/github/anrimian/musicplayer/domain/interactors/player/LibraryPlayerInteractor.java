@@ -113,6 +113,10 @@ public class LibraryPlayerInteractor {
         playerCoordinatorInteractor.stop(LIBRARY);
     }
 
+    public void reset() {
+        playerCoordinatorInteractor.reset(LIBRARY);
+    }
+
     public void pause() {
         playerCoordinatorInteractor.pause(LIBRARY);
     }
@@ -140,8 +144,8 @@ public class LibraryPlayerInteractor {
         playQueueRepository.skipToNext().subscribe();
     }
 
-    public void skipToItem(PlayQueueItem item) {
-        playQueueRepository.skipToItem(item);
+    public void skipToItem(long itemId) {
+        playQueueRepository.skipToItem(itemId);
     }
 
     public Observable<Integer> getRepeatModeObservable() {
@@ -261,8 +265,8 @@ public class LibraryPlayerInteractor {
                 .toSingleDefault(compositions);
     }
 
-    public void clearPlayQueue() {
-        playQueueRepository.clearPlayQueue();
+    public Completable clearPlayQueue() {
+        return playQueueRepository.clearPlayQueue();
     }
 
     public Observable<Integer> getPlayQueueSizeObservable() {
@@ -286,12 +290,16 @@ public class LibraryPlayerInteractor {
         return playerCoordinatorInteractor.getSpeedChangeAvailableObservable();
     }
 
+    public void changeRandomMode() {
+        settingsRepository.setRandomPlayingEnabled(!settingsRepository.isRandomPlayingEnabled());
+    }
+
     private void onQueueItemChanged(PlayQueueEvent compositionEvent) {
         PlayQueueItem previousItem = currentItem;
         this.currentItem = compositionEvent.getPlayQueueItem();
         if (currentItem == null) {
             if (previousItem != null) {
-                stop();
+                reset();
             }
             return;
         }

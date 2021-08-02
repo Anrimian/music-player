@@ -81,10 +81,10 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         viewBinding.ivRepeatMode.setOnClickListener(v -> presenter.onRepeatModeButtonClicked());
         onCheckChanged(viewBinding.cbKeepPlayingAfterClose, presenter::onKeepPlayerInBackgroundChecked);
 
-        viewBinding.ivSkipToNext.setOnClickListener(v -> presenter.onFastSeekForwardCalled());
-        setOnHoldListener(viewBinding.ivSkipToNext, presenter::onFastSeekForwardCalled);
-        viewBinding.ivSkipToPrevious.setOnClickListener(v -> presenter.onFastSeekBackwardCalled());
-        setOnHoldListener(viewBinding.ivSkipToPrevious, presenter::onFastSeekBackwardCalled);
+        viewBinding.ivFastForward.setOnClickListener(v -> presenter.onFastSeekForwardCalled());
+        setOnHoldListener(viewBinding.ivFastForward, presenter::onFastSeekForwardCalled);
+        viewBinding.ivRewind.setOnClickListener(v -> presenter.onFastSeekBackwardCalled());
+        setOnHoldListener(viewBinding.ivRewind, presenter::onFastSeekBackwardCalled);
 
         if (savedInstanceState == null) {
             Uri uriToPlay = getIntent().getData();

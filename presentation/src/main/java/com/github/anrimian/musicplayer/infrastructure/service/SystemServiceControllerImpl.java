@@ -113,5 +113,5 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {}
-    };
+    }
 }

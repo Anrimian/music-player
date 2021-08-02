@@ -129,8 +129,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public void skipToItem(PlayQueueItem item) {
-        setCurrentItem(item.getId());
+    public void skipToItem(long itemId) {
+        setCurrentItem(itemId);
     }
 
     @Override
@@ -193,10 +193,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public void clearPlayQueue() {
-        Completable.fromAction(playQueueDao::deletePlayQueue)
-                .subscribeOn(scheduler)
-                .subscribe();
+    public Completable clearPlayQueue() {
+        return Completable.fromAction(playQueueDao::deletePlayQueue)
+                .subscribeOn(scheduler);
     }
 
     @Override

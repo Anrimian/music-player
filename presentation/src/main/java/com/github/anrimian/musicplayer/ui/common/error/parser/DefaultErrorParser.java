@@ -22,7 +22,7 @@ import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaS
 import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
-import com.github.anrimian.musicplayer.domain.models.exceptions.FileNodeNotFoundException;
+import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateException;
@@ -66,7 +66,7 @@ public class DefaultErrorParser implements ErrorParser {
         if (throwable instanceof PlayListAlreadyDeletedException) {
             return error(R.string.play_not_exists);
         }
-        if (throwable instanceof FileNodeNotFoundException || throwable instanceof FileNotFoundException) {
+        if (throwable instanceof FileNotFoundException) {
             return error(R.string.file_not_found);
         }
         if (throwable instanceof MoveInTheSameFolderException) {
@@ -109,6 +109,10 @@ public class DefaultErrorParser implements ErrorParser {
         }
         if (throwable instanceof UnavailableMediaStoreException) {
             return error(R.string.system_media_store_system_error);
+        }
+        if (throwable instanceof FileWriteNotAllowedException) {
+            logException(throwable);
+            return error(R.string.write_to_this_is_not_allowed);
         }
         logException(throwable);
         return new ErrorCommand(getString(R.string.unexpected_error, throwable.getMessage()));

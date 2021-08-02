@@ -4,9 +4,6 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryComposi
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsPresenter;
 
@@ -42,13 +39,4 @@ public class LibraryCompositionsModule {
                 uiScheduler);
     }
 
-    @Provides
-    @Nonnull
-    LibraryCompositionsInteractor libraryCompositionsInteractor(LibraryRepository musicProviderRepository,
-                                                                SettingsRepository settingsRepository,
-                                                                UiStateRepository uiStateRepository) {
-        return new LibraryCompositionsInteractor(musicProviderRepository,
-                settingsRepository,
-                uiStateRepository);
-    }
 }

@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
-import com.github.anrimian.musicplayer.domain.utils.model.Item
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilter
@@ -42,7 +41,6 @@ class PlayListPresenter(private val playListId: Long,
 
     private var startDragPosition = 0
     private var currentItem: PlayQueueItem? = null
-    private var deletedItem: Item<PlayListItem>? = null
 
     private var lastDeleteAction: Completable? = null
 
@@ -109,8 +107,8 @@ class PlayListPresenter(private val playListId: Long,
         addPreparedCompositionsToPlayList(playList)
     }
 
-    fun onDeleteFromPlayListButtonClicked(playListItem: PlayListItem, position: Int) {
-        deleteItem(playListItem, position)
+    fun onDeleteFromPlayListButtonClicked(playListItem: PlayListItem) {
+        deleteItem(playListItem)
     }
 
     fun onDeletePlayListButtonClicked() {
@@ -127,7 +125,7 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     fun onItemSwipedToDelete(position: Int) {
-        deleteItem(items[position], position)
+        deleteItem(items[position])
     }
 
     fun onItemMoved(from: Int, to: Int) {
@@ -160,11 +158,7 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     fun onRestoreRemovedItemClicked() {
-        val removedComposition = deletedItem!!.data!!.composition
-        playListsInteractor.addCompositionsToPlayList(listOf(removedComposition),
-            playList,
-            deletedItem!!.position)
-            .justSubscribe(this::onDefaultError)
+        playListsInteractor.restoreDeletedPlaylistItem().justSubscribe(this::onDefaultError)
     }
 
     fun onChangePlayListNameButtonClicked() {
@@ -181,7 +175,7 @@ class PlayListPresenter(private val playListId: Long,
         }
     }
 
-    fun isCoversEnabled() = displaySettingsInteractor.isCoversEnabled
+    fun isCoversEnabled() = displaySettingsInteractor.isCoversEnabled()
 
     private fun addCompositionsToPlayNext(compositions: List<Composition>) {
         playerInteractor.addCompositionsToPlayNext(compositions)
@@ -198,9 +192,9 @@ class PlayListPresenter(private val playListId: Long,
         viewState.showErrorMessage(errorCommand)
     }
 
-    private fun deleteItem(playListItem: PlayListItem, position: Int) {
+    private fun deleteItem(playListItem: PlayListItem) {
         playListsInteractor.deleteItemFromPlayList(playListItem, playListId)
-            .subscribeOnUi({ onDeleteItemCompleted(playListItem, position) }, this::onDeleteItemError)
+            .subscribeOnUi({ onDeleteItemCompleted(playListItem) }, this::onDeleteItemError)
     }
 
     private fun swapItems(from: Int, to: Int) {
@@ -217,9 +211,8 @@ class PlayListPresenter(private val playListId: Long,
         viewState.showPlayListDeleteSuccess(playList)
     }
 
-    private fun onDeleteItemCompleted(item: PlayListItem, position: Int) {
+    private fun onDeleteItemCompleted(item: PlayListItem) {
         if (playList != null) {
-            deletedItem = Item(item, position)
             viewState.showDeleteItemCompleted(playList, listOf(item))
         }
     }

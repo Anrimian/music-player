@@ -94,7 +94,6 @@
     <string name="show_covers">Показувати обкладинки</string>
     <string name="show_covers_in_notification">Показувати обкладинку в сповіщенні</string>
     <string name="colored_notification">Фарбувати сповіщення в кольори обкладинки</string>
-    <string name="show_covers_on_lock_screen">Показувати обкладинку на екрані блокування</string>
     <string name="display">Відображення</string>
     <string name="decrease_volume_on_notification">Зменшувати гучність при отриманні сповіщення</string>
     <string name="playing">Програвання</string>
@@ -214,6 +213,15 @@
     <string name="resume">Відновити</string>
     <string name="sleep_timer_message">Програвання буде зупинено через:</string>
     <string name="stop">Стоп</string>
+    <string name="exclude_compositions_with_duration_less_than">Не сканувати композиції</string>
+    <string name="with_duration_less_than">С тривалістю менше %s</string>
+    <string name="pause_on_audiofocus_loss">Зупиняти відтворення при виклику, відтворення музики/відео и т.д.</string>
+    <string name="show_cover_stub_in_notification">Показувати заглушку обкладинки в сповіщенні, якщо обкладинку не знайдено</string>
+    <string name="write_to_this_is_not_allowed">Немає дозволу на змінення цього файлу. Спробуйте через системний менеджер файлів.</string>
+    <string name="shuffle_all_and_play">Перемішати все та почати відтворення</string>
+    <string name="rewind">Перемотка назад</string>
+    <string name="fast_forward">Перемотка вперед</string>
+    <string name="show_covers_on_lock_screen">Показувати обкладинку на екрані блокування і в Android Auto</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиція</item>
@@ -269,6 +277,13 @@
         <item quantity="few">%1$d композиції видалено</item>
         <item quantity="many">%1$d композицій видалено</item>
         <item quantity="other">%1$d композицій видалено</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d секунда</item>
+        <item quantity="few">%1$d секунди</item>
+        <item quantity="many">%1$d секунд</item>
+        <item quantity="other">%1$d секунд</item>
     </plurals>
 
 </resources>

@@ -1,9 +1,9 @@
 apply plugin: 'kotlin'
 
 //noinspection GroovyUnusedAssignment
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 //noinspection GroovyUnusedAssignment
-targetCompatibility = 1.8
+targetCompatibility = 11
 
 dependencies {
     def deps = rootProject.ext

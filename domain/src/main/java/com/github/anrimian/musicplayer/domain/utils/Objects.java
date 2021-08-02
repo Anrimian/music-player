@@ -8,7 +8,7 @@ public class Objects {
 
     public static <T> T requireNonNull(T obj) {
         if (obj == null)
-            throw new NullPointerException();
+            throw new NullPointerException("requireNonNull is null");
         return obj;
     }
 }

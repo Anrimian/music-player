@@ -48,6 +48,7 @@ import io.reactivex.rxjava3.core.Single;
 
 import static android.provider.MediaStore.Audio.Media;
 import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.data.utils.db.CursorWrapper.getColumnIndex;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 public class StorageMusicProvider {
@@ -87,7 +88,9 @@ public class StorageMusicProvider {
         context.sendBroadcast(scanFileIntent);
     }
 
-    public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable() {
+    public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable(
+            long minAudioDurationMillis
+    ) {
         Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, unsafeGetStorageUri());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             //on new composition content observer not called on android 10
@@ -101,16 +104,12 @@ public class StorageMusicProvider {
             //maybe filter often events?
             storageChangeObservable = Observable.merge(storageChangeObservable, playListChangeObservable);
         }
-        return storageChangeObservable.flatMapSingle(o -> Single.create(emitter -> {
-            LongSparseArray<StorageFullComposition> compositions = getCompositions();
-            if (compositions != null) {
-                emitter.onSuccess(compositions);
-            }
-        }));
+        return storageChangeObservable
+                .flatMapSingle(o -> getCompositionsSingle(minAudioDurationMillis));
     }
 
     @Nullable
-    public LongSparseArray<StorageFullComposition> getCompositions() {
+    public LongSparseArray<StorageFullComposition> getCompositions(long minAudioDurationMillis) {
         String[] query;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             query = new String[] {
@@ -147,12 +146,11 @@ public class StorageMusicProvider {
             return null;
         }
 
-        try(Cursor cursor = contentResolver.query(
-                uri,
-                query,
-                Media.IS_MUSIC + " = ?",
-                new String[] { String.valueOf(1) },
-                null)) {
+        //also display unsupported or corrupted compositions
+        String selection = Media.DURATION + " >= ? OR " + Media.DURATION + " IS NULL";
+        String[] projection = new String[] { String.valueOf(minAudioDurationMillis) };
+
+        try(Cursor cursor = contentResolver.query(uri, query, selection, projection, null)) {
             if (cursor == null) {
                 return new LongSparseArray<>();
             }
@@ -161,8 +159,40 @@ public class StorageMusicProvider {
 
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
             LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>(cursor.getCount());
+
+            int artistIndex = getColumnIndex(cursor, Media.ARTIST);
+            int titleIndex = getColumnIndex(cursor, Media.TITLE);
+            int relativePathIndex = -1;
+            int filePathIndex = -1;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                relativePathIndex = getColumnIndex(cursor, Media.RELATIVE_PATH);
+            } else {
+                filePathIndex = getColumnIndex(cursor, Media.DATA);
+            }
+            int displayNameIndex = getColumnIndex(cursor, Media.DISPLAY_NAME);
+            int durationIndex = getColumnIndex(cursor, Media.DURATION);
+            int sizeIndex = getColumnIndex(cursor, Media.SIZE);
+            int idIndex = getColumnIndex(cursor, Media._ID);
+            int albumIdIndex = getColumnIndex(cursor, Media.ALBUM_ID);
+            int dateAddedIndex = getColumnIndex(cursor, Media.DATE_ADDED);
+            int dateModifiedIndex = getColumnIndex(cursor, Media.DATE_MODIFIED);
+
             while (cursor.moveToNext()) {
-                StorageFullComposition composition = buildStorageComposition(cursorWrapper, albums);
+                StorageFullComposition composition = buildStorageComposition(
+                        artistIndex,
+                        titleIndex,
+                        relativePathIndex,
+                        filePathIndex,
+                        displayNameIndex,
+                        durationIndex,
+                        sizeIndex,
+                        idIndex,
+                        albumIdIndex,
+                        dateAddedIndex,
+                        dateModifiedIndex,
+                        cursorWrapper,
+                        albums
+                );
                 if (composition != null) {
                     compositions.put(composition.getId(), composition);
                 }
@@ -387,24 +417,47 @@ public class StorageMusicProvider {
         });
     }
 
+    private Single<LongSparseArray<StorageFullComposition>> getCompositionsSingle(
+            long minAudioDurationMillis) {
+        return Single.create(emitter -> {
+            LongSparseArray<StorageFullComposition> compositions = getCompositions(minAudioDurationMillis);
+            if (compositions != null) {
+                emitter.onSuccess(compositions);
+            }
+        });
+    }
+
     private void updateComposition(long id, String key, String value) {
         ContentValues cv = new ContentValues();
         cv.put(key, value);
         contentResolver.update(getCompositionUri(id), cv, null, null);
     }
 
-    private StorageFullComposition buildStorageComposition(CursorWrapper cursorWrapper,
-                                                           LongSparseArray<StorageAlbum> albums) {
+    private StorageFullComposition buildStorageComposition(
+            int artistIndex,
+            int titleIndex,
+            int relativePathIndex,
+            int filePathIndex,
+            int displayNameIndex,
+            int durationIndex,
+            int sizeIndex,
+            int idIndex,
+            int albumIdIndex,
+            int dateAddedIndex,
+            int dateModifiedIndex,
+            CursorWrapper cursorWrapper,
+            LongSparseArray<StorageAlbum> albums
+    ) {
 
-        String artist = cursorWrapper.getString(Media.ARTIST);
-        String title = cursorWrapper.getString(Media.TITLE);
+        String artist = cursorWrapper.getString(artistIndex);
+        String title = cursorWrapper.getString(titleIndex);
 //        String album = cursorWrapper.getString(Media.ALBUM);
 
         String filePath;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            filePath = cursorWrapper.getString(Media.RELATIVE_PATH);
+            filePath = cursorWrapper.getString(relativePathIndex);
         } else {
-            filePath = cursorWrapper.getString(Media.DATA);
+            filePath = cursorWrapper.getString(filePathIndex);
             if (isEmpty(filePath)) {
                 return null;
             }
@@ -416,20 +469,20 @@ public class StorageMusicProvider {
 
 //        String albumKey = cursorWrapper.getString(MediaStore.Audio.Media.ALBUM_KEY);
 //        String composer = cursorWrapper.getString(MediaStore.Audio.Media.COMPOSER);
-        String displayName = cursorWrapper.getString(Media.DISPLAY_NAME);
+        String displayName = cursorWrapper.getString(displayNameIndex);
         if (TextUtils.isEmpty(displayName)) {
             displayName = "<unknown>";
         }
 //        String mimeType = cursorWrapper.getString(Media.MIME_TYPE);
 
-        long duration = cursorWrapper.getLong(Media.DURATION);
-        long size = cursorWrapper.getLong(Media.SIZE);
-        long id = cursorWrapper.getLong(Media._ID);
+        long duration = cursorWrapper.getLong(durationIndex);
+        long size = cursorWrapper.getLong(sizeIndex);
+        long id = cursorWrapper.getLong(idIndex);
 //        long artistId = cursorWrapper.getLong(Media.ARTIST_ID);
 //        long bookmark = cursorWrapper.getLong(Media.BOOKMARK);
-        long albumId = cursorWrapper.getLong(Media.ALBUM_ID);
-        long dateAddedMillis = cursorWrapper.getLong(Media.DATE_ADDED);
-        long dateModifiedMillis = cursorWrapper.getLong(Media.DATE_MODIFIED);
+        long albumId = cursorWrapper.getLong(albumIdIndex);
+        long dateAddedMillis = cursorWrapper.getLong(dateAddedIndex);
+        long dateModifiedMillis = cursorWrapper.getLong(dateModifiedIndex);
 
 //        boolean isAlarm = cursorWrapper.getBoolean(Media.IS_ALARM);
 //        boolean isMusic = cursorWrapper.getBoolean(Media.IS_MUSIC);

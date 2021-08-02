@@ -1,5 +1,16 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static java.util.Collections.emptyList;
+import static utils.TestDataProvider.fakeStorageComposition;
+import static utils.TestDataProvider.fakeStorageFullComposition;
+
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
@@ -24,23 +35,12 @@ import java.util.List;
 
 import utils.TestDataProvider.StorageCompositionBuilder;
 
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
-import static java.util.Collections.emptyList;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static utils.TestDataProvider.fakeStorageComposition;
-import static utils.TestDataProvider.fakeStorageFullComposition;
-
 public class StorageCompositionAnalyzerTest {
 
-    private CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
-    private FoldersDaoWrapper foldersDao = mock(FoldersDaoWrapper.class);
-    private StateRepository stateRepository = mock(StateRepository.class);
-    private StorageCompositionsInserter compositionsInserter = mock(StorageCompositionsInserter.class);
+    private final CompositionsDaoWrapper compositionsDao = mock(CompositionsDaoWrapper.class);
+    private final FoldersDaoWrapper foldersDao = mock(FoldersDaoWrapper.class);
+    private final StateRepository stateRepository = mock(StateRepository.class);
+    private final StorageCompositionsInserter compositionsInserter = mock(StorageCompositionsInserter.class);
 
     private StorageCompositionAnalyzer analyzer;
     

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.utils.ArtistHelper;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter.DiffListAdapter;
 
@@ -16,23 +17,23 @@ import java.util.List;
 public class ArtistsAdapter extends DiffListAdapter<Artist, ArtistViewHolder> {
 
     private final Callback<Artist> onClickListener;
-    private final Callback<Artist> longClickListener;
+    private final OnViewItemClickListener<Artist> onItemMenuClickListener;
 
     public ArtistsAdapter(RecyclerView recyclerView,
                           Callback<Artist> onClickListener,
-                          Callback<Artist> longClickListener) {
+                          OnViewItemClickListener<Artist> onItemMenuClickListener) {
         super(recyclerView, new SimpleDiffItemCallback<>(
                 ArtistHelper::areSourcesTheSame,
                 ArtistHelper::getChangePayload)
         );
         this.onClickListener = onClickListener;
-        this.longClickListener = longClickListener;
+        this.onItemMenuClickListener = onItemMenuClickListener;
     }
 
     @NonNull
     @Override
     public ArtistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ArtistViewHolder(parent, onClickListener, longClickListener);
+        return new ArtistViewHolder(parent, onClickListener, onItemMenuClickListener);
     }
 
     @Override

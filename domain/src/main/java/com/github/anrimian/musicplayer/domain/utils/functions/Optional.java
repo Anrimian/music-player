@@ -1,13 +1,17 @@
 package com.github.anrimian.musicplayer.domain.utils.functions;
 
+import javax.annotation.Nullable;
+
 public class Optional<T> {
 
+    @Nullable
     private final T value;
 
-    public Optional(T value) {
+    public Optional(@Nullable T value) {
         this.value = value;
     }
 
+    @Nullable
     public T getValue() {
         return value;
     }

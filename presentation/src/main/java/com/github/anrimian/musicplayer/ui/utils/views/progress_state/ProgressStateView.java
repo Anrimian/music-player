@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils.views.progress_state;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
@@ -16,10 +20,6 @@ import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
-
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class ProgressStateView extends LinearLayout {
 
@@ -134,7 +134,7 @@ public class ProgressStateView extends LinearLayout {
             btnTryAgain = new TextView(context);
             btnTryAgain.setBackgroundResource(R.drawable.bg_outline_button);
             btnTryAgain.setTextColor(ContextCompat.getColorStateList(context, R.color.color_accent_state));
-            int buttonPadding = AndroidUtils.dpToPx(16, context);;
+            int buttonPadding = AndroidUtils.dpToPx(16, context);
             btnTryAgain.setPadding(buttonPadding, buttonPadding, buttonPadding, buttonPadding);
             btnTryAgain.setTextSize(18f);
             LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);

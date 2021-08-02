@@ -32,6 +32,7 @@
 
     <!--content margins-->
     <dimen name="content_spacing_margin">8dp</dimen>
+    <dimen name="content_spacing_vertical_margin">6dp</dimen>
     <dimen name="content_internal_margin">8dp</dimen>
     <dimen name="content_horizontal_margin">16dp</dimen>
     <dimen name="content_vertical_margin">16dp</dimen>

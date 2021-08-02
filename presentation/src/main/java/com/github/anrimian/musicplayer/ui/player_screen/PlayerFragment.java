@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
-import android.Manifest;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -80,9 +79,9 @@ import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListene
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
+import com.github.anrimian.musicplayer.utils.Permissions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,8 +98,10 @@ import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG
 import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
@@ -353,13 +354,12 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
             createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
         }
 
-        if (getArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
-            getArguments().remove(OPEN_PLAY_QUEUE_ARG);
+        if (requireArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
+            requireArguments().remove(OPEN_PLAY_QUEUE_ARG);
             openPlayQueue();
         }
 
-        RxPermissions rxPermissions = new RxPermissions(this);
-        if (!rxPermissions.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (!Permissions.hasFilePermission(requireContext())) {
             getParentFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_activity_container, new StartFragment())
@@ -604,6 +604,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     public void showRepeatMode(int mode) {
         @DrawableRes int iconRes = getRepeatModeIcon(mode);
         btnRepeatMode.setImageResource(iconRes);
+        String description = getString(getRepeatModeText(mode));
+        btnRepeatMode.setContentDescription(description);
     }
 
     @Override
@@ -631,7 +633,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void showPlayQueueSubtitle(int size) {
-        tvQueueSubtitle.setText(getResources().getQuantityString(R.plurals.compositions_count, size, size));
+        tvQueueSubtitle.setText(formatCompositionsCount(requireContext(), size));
     }
 
     @Override

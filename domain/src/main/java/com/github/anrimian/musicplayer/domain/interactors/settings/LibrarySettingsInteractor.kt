@@ -13,4 +13,12 @@ class LibrarySettingsInteractor(private val settingsRepository: SettingsReposito
 
     fun isAppConfirmDeleteDialogEnabled() = settingsRepository.isAppConfirmDeleteDialogEnabled
 
+    fun geAudioFileMinDurationMillisObservable(): Observable<Long> = settingsRepository.geAudioFileMinDurationMillisObservable()
+
+    fun setAudioFileMinDurationMillis(millis: Long) {
+        settingsRepository.audioFileMinDurationMillis = millis
+    }
+
+    fun getAudioFileMinDurationMillis() = settingsRepository.audioFileMinDurationMillis
+
 }

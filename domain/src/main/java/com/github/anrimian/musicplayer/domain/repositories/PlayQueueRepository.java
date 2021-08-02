@@ -32,7 +32,7 @@ public interface PlayQueueRepository {
 
     void skipToPrevious();
 
-    void skipToItem(PlayQueueItem item);
+    void skipToItem(long itemId);
 
     Completable removeQueueItem(PlayQueueItem item);
 
@@ -46,7 +46,7 @@ public interface PlayQueueRepository {
 
     Single<Boolean> isCurrentCompositionAtEndOfQueue();
 
-    void clearPlayQueue();
+    Completable clearPlayQueue();
 
     Observable<Integer> getPlayQueueSizeObservable();
 }

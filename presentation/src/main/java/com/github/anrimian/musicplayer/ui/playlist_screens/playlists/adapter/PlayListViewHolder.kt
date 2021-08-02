@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter
 
-import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,10 +33,9 @@ class PlayListViewHolder(
     }
 
     private fun showAdditionalInfo() {
-        val compositionsCount = playList.compositionsCount
-        val sb: SpannableStringBuilder = DescriptionSpannableStringBuilder(
+        val sb = DescriptionSpannableStringBuilder(
             getContext(),
-            FormatUtils.formatCompositionsCount(getContext(), compositionsCount)
+            FormatUtils.formatCompositionsCount(getContext(), playList.compositionsCount)
         )
         sb.append(FormatUtils.formatMilliseconds(playList.totalDuration))
         viewBinding.tvAdditionalInfo.text = sb

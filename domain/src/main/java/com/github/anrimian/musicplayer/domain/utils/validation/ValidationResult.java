@@ -4,8 +4,8 @@ import java.util.List;
 
 class ValidationResult<T> {
 
-    private T model;
-    private List<ValidateError> validateErrors;
+    private final T model;
+    private final List<ValidateError> validateErrors;
 
     ValidationResult(T model, List<ValidateError> validateErrors) {
         this.model = model;
