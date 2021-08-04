@@ -17,7 +17,7 @@ import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.newPlayListFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
@@ -146,6 +146,6 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
 
     private fun goToPlayListScreen(playList: PlayList) {
         FragmentNavigation.from(parentFragmentManager)
-            .addNewFragment(PlayListFragment.newInstance(playList.id))
+            .addNewFragment(newPlayListFragment(playList.id))
     }
 }

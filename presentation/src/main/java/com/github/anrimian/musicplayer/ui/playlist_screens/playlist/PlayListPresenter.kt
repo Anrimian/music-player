@@ -67,7 +67,7 @@ class PlayListPresenter(private val playListId: Long,
         presenterBatterySafeDisposable.clear()
     }
 
-    fun onCompositionClicked(playListItem: PlayListItem?, position: Int) {
+    fun onCompositionClicked(playListItem: PlayListItem, position: Int) {
         viewState.showCompositionActionDialog(playListItem, position)
     }
 
@@ -112,7 +112,7 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     fun onDeletePlayListButtonClicked() {
-        viewState.showConfirmDeletePlayListDialog(playList)
+        viewState.showConfirmDeletePlayListDialog(playList!!)
     }
 
     fun onDeletePlayListDialogConfirmed() {
@@ -163,7 +163,7 @@ class PlayListPresenter(private val playListId: Long,
 
     fun onChangePlayListNameButtonClicked() {
         if (playList != null) {
-            viewState.showEditPlayListNameDialog(playList)
+            viewState.showEditPlayListNameDialog(playList!!)
         }
     }
 
@@ -208,12 +208,12 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun onPlayListDeleted() {
-        viewState.showPlayListDeleteSuccess(playList)
+        viewState.showPlayListDeleteSuccess(playList!!)
     }
 
     private fun onDeleteItemCompleted(item: PlayListItem) {
         if (playList != null) {
-            viewState.showDeleteItemCompleted(playList, listOf(item))
+            viewState.showDeleteItemCompleted(playList!!, listOf(item))
         }
     }
 
