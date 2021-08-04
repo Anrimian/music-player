@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal;
 
+import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+
 import android.media.audiofx.Equalizer;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.AppEqualizer;
@@ -22,9 +25,6 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
-import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
-
 //two instances of eq are not allowed? - done, doesn't help
 //release and nullify on detach? - done, doesn't help
 //attachEqualizer - what if session id was changed? - reinit - done
@@ -36,7 +36,7 @@ import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultV
 
 //calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
 //last resort: retry + handle errors
-
+//implement error state
 public class InternalEqualizer implements AppEqualizer {
 
     private final EqualizerStateRepository equalizerStateRepository;
