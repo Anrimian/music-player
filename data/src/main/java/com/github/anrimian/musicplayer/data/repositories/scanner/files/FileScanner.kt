@@ -35,7 +35,6 @@ class FileScanner(
 
     fun getStateObservable(): Observable<FileScannerState> = stateSubject
 
-    @Synchronized
     private fun runFileScanner() {
         compositionsDao.selectNextCompositionToScan()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}

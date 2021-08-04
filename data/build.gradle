@@ -61,6 +61,7 @@ dependencies {
 
     testImplementation deps.junit
     testImplementation deps.mockito
+    testImplementation deps.mockitoKt
 
     androidTestImplementation deps.junit
     androidTestImplementation deps.supportTest
