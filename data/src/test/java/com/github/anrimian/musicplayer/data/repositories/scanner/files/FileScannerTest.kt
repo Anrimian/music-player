@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.source.Composit
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Test
+import org.mockito.Mockito
 import org.mockito.kotlin.*
 
 class FileScannerTest {
@@ -26,9 +27,9 @@ class FileScannerTest {
 
     private val testStateObserver = fileScanner.getStateObservable().test()
 
-    //error with scan - after retry set scan time and run next scan
     //check scanner version set
     //check scanner version update
+    //apply retry
 
     @Test
     fun `run successful scan`() {
@@ -82,17 +83,18 @@ class FileScannerTest {
         whenever(compositionsDao.selectNextCompositionToScan())
             .thenReturn(Maybe.just(composition1))
             .thenReturn(Maybe.just(composition2))
+            .thenReturn(Maybe.empty())
 
         val source: CompositionSourceTags = mock()
         whenever(compositionSourceEditor.getFullTags(any()))
             .thenReturn(Maybe.just(source))
 
-        val exception: RuntimeException = mock()
-        whenever(compositionsDao.applyDetailData()).thenThrow(exception)
+        val exception = RuntimeException()
+        Mockito.doThrow(exception).doNothing().whenever(compositionsDao).applyDetailData()
 
         fileScanner.scheduleFileScanner()
 
-        verify(compositionsDao).setCompositionLastFileScanTime(any(), any())
+        verify(compositionsDao, times(2)).setCompositionLastFileScanTime(any(), any())
         verify(analytics).processNonFatalError(exception)
 
         testStateObserver.assertValues(

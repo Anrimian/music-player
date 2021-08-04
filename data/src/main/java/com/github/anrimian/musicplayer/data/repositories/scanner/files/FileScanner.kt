@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.files
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor
+import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags
@@ -37,11 +38,11 @@ class FileScanner(
 
     private fun runFileScanner() {
         compositionsDao.selectNextCompositionToScan()
+            .doOnError(this::processError)
+            .onErrorComplete()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
             .flatMap(this::scanCompositionFile)
             .doOnSuccess { runFileScanner() }
-            .doOnError(this::processError)
-            .onErrorComplete()
             .doOnComplete { stateSubject.onNext(Idle) }
             .subscribeOn(scheduler)
             .subscribe()
@@ -50,7 +51,12 @@ class FileScanner(
     private fun scanCompositionFile(composition: FullComposition): Maybe<*> {
         return compositionSourceEditor.getFullTags(composition)
             .doOnSuccess { tags -> processCompositionScan(composition, tags) }
-            .doOnError { compositionsDao.setCompositionLastFileScanTime(composition.id, Date()) }
+            .doOnError(this::processError)
+            .map { TRIGGER }
+            .onErrorReturnItem(TRIGGER)
+            //and set last modify time to prevent overwriting by scanner?
+            //no, just add condition to media analyzer(hasActualChanges - also compare last file scan time and last modify time)
+            .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition.id, Date()) }
     }
 
     private fun processCompositionScan(fullComposition: FullComposition,
@@ -58,10 +64,6 @@ class FileScanner(
         //compare
         //apply data to database(in one transaction)
         compositionsDao.applyDetailData()
-
-        //and set last modify time to prevent overwriting by scanner?
-        //no, just add condition to media analyzer(hasActualChanges - also compare last file scan time and last modify time)
-        compositionsDao.setCompositionLastFileScanTime(fullComposition.id, Date())
     }
 
     //on error - rerun?
