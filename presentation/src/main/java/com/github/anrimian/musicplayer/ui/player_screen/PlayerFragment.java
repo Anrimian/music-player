@@ -1,5 +1,25 @@
 package com.github.anrimian.musicplayer.ui.player_screen;
 
+import static android.view.View.VISIBLE;
+import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
+import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
+import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
+
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -66,7 +86,7 @@ import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPane
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.TabletPlayerPanelWrapper;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment;
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragmentKt;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
@@ -90,26 +110,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static android.view.View.VISIBLE;
-import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
-import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
-import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 
 /**
  * Created on 19.10.2017.
@@ -453,7 +453,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                 List<Fragment> fragments = new ArrayList<>();
                 fragments.add(new PlayListsFragment());
                 if (selectedPlayListScreenId != 0) {
-                    fragments.add(PlayListFragment.newInstance(selectedPlayListScreenId));
+                    fragments.add(PlayListFragmentKt.newPlayListFragment(selectedPlayListScreenId));
                 }
                 navigation.newRootFragmentStack(fragments, 0, R.anim.anim_alpha_appear);
                 break;

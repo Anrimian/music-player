@@ -1,96 +1,94 @@
-package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
+package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
+import moxy.MvpView
+import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
+import moxy.viewstate.strategy.alias.Skip
 
-import java.util.List;
+private const val LIST_STATE = "list_state"
 
-import moxy.MvpView;
-import moxy.viewstate.strategy.StateStrategyType;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
-import moxy.viewstate.strategy.alias.Skip;
+interface PlayListView : MvpView {
+    
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showEmptyList()
 
-public interface PlayListView extends MvpView {
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showList()
 
-    String LIST_STATE = "list_state";
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showEmptyList();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showList();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showLoading();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showLoading()
 
     @AddToEndSingle
-    void updateItemsList(List<PlayListItem> list);
+    fun updateItemsList(list: List<PlayListItem>)
 
     @OneExecution
-    void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
+    fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>)
 
     @OneExecution
-    void closeScreen();
+    fun closeScreen()
 
     @AddToEndSingle
-    void showPlayListInfo(PlayList playList);
+    fun showPlayListInfo(playList: PlayList)
 
     @OneExecution
-    void showDeleteCompositionError(ErrorCommand errorCommand);
+    fun showDeleteCompositionError(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showDeletedCompositionMessage(List<Composition> compositionsToDelete);
+    fun showDeletedCompositionMessage(compositionsToDelete: List<Composition>)
 
     @OneExecution
-    void showSelectPlayListDialog();
+    fun showSelectPlayListDialog()
 
     @OneExecution
-    void showAddingToPlayListError(ErrorCommand errorCommand);
+    fun showAddingToPlayListError(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
+    fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>)
 
     @OneExecution
-    void showDeleteItemError(ErrorCommand errorCommand);
+    fun showDeleteItemError(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items);
+    fun showDeleteItemCompleted(playList: PlayList, items: List<PlayListItem>)
 
     @OneExecution
-    void showConfirmDeletePlayListDialog(PlayList playListToDelete);
+    fun showConfirmDeletePlayListDialog(playList: PlayList)
 
     @OneExecution
-    void showPlayListDeleteSuccess(PlayList playListToDelete);
+    fun showPlayListDeleteSuccess(playList: PlayList)
 
     @OneExecution
-    void showDeletePlayListError(ErrorCommand errorCommand);
+    fun showDeletePlayListError(errorCommand: ErrorCommand)
 
     @Skip
-    void notifyItemMoved(int from, int to);
+    fun notifyItemMoved(from: Int, to: Int)
 
     @Skip
-    void showCompositionActionDialog(PlayListItem playListItem, int position);
+    fun showCompositionActionDialog(playListItem: PlayListItem, position: Int)
 
     @OneExecution
-    void showErrorMessage(ErrorCommand errorCommand);
+    fun showErrorMessage(errorCommand: ErrorCommand)
 
     @OneExecution
-    void notifyItemRemoved(int position);
+    fun notifyItemRemoved(position: Int)
 
     @OneExecution
-    void showEditPlayListNameDialog(PlayList playListInMenu);
+    fun showEditPlayListNameDialog(playList: PlayList)
 
     @OneExecution
-    void onCompositionsAddedToPlayNext(List<Composition> compositions);
+    fun onCompositionsAddedToPlayNext(compositions: List<Composition>)
 
     @OneExecution
-    void onCompositionsAddedToQueue(List<Composition> compositions);
+    fun onCompositionsAddedToQueue(compositions: List<Composition>)
 
     @OneExecution
-    void restoreListPosition(ListPosition listPosition);
+    fun restoreListPosition(listPosition: ListPosition)
+
 }
