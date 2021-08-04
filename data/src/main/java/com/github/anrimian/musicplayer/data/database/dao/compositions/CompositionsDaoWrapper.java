@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+
 import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
@@ -26,9 +29,6 @@ import javax.annotation.Nullable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
-
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
-import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class CompositionsDaoWrapper {
 
@@ -284,6 +284,10 @@ public class CompositionsDaoWrapper {
 
     }
 
+    public void applyDetailData() {
+
+    }
+
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
@@ -313,4 +317,5 @@ public class CompositionsDaoWrapper {
     private String getSearchQuery() {
         return " WHERE (? IS NULL OR title LIKE ? OR (artist NOTNULL AND artist LIKE ?))";
     }
+
 }

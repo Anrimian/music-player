@@ -8,10 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.source.Composit
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 class FileScannerTest {
 
@@ -29,7 +26,6 @@ class FileScannerTest {
 
     private val testStateObserver = fileScanner.getStateObservable().test()
 
-    //error with getting composition from db - after retry do not run next scan
     //error with scan - after retry set scan time and run next scan
     //check scanner version set
     //check scanner version update
@@ -56,4 +52,55 @@ class FileScannerTest {
             Idle
         )
     }
+
+    @Test
+    fun `error with getting composition from db - do not run next loop`() {
+        val exception: Exception = mock()
+        whenever(compositionsDao.selectNextCompositionToScan())
+            .thenReturn(Maybe.error(exception))
+            .thenReturn(Maybe.just(mock<FullComposition>()))
+
+        val source: CompositionSourceTags = mock()
+        whenever(compositionSourceEditor.getFullTags(any()))
+            .thenReturn(Maybe.just(source))
+
+        fileScanner.scheduleFileScanner()
+
+        verify(compositionsDao, never()).setCompositionLastFileScanTime(any(), any())
+        verify(analytics).processNonFatalError(exception)
+
+        testStateObserver.assertValues(
+            Idle
+        )
+    }
+
+    @Test
+    fun `error with scan - set scan time and run next loop`() {
+        val composition1: FullComposition = mock()
+        val composition2: FullComposition = mock()
+
+        whenever(compositionsDao.selectNextCompositionToScan())
+            .thenReturn(Maybe.just(composition1))
+            .thenReturn(Maybe.just(composition2))
+
+        val source: CompositionSourceTags = mock()
+        whenever(compositionSourceEditor.getFullTags(any()))
+            .thenReturn(Maybe.just(source))
+
+        val exception: RuntimeException = mock()
+        whenever(compositionsDao.applyDetailData()).thenThrow(exception)
+
+        fileScanner.scheduleFileScanner()
+
+        verify(compositionsDao).setCompositionLastFileScanTime(any(), any())
+        verify(analytics).processNonFatalError(exception)
+
+        testStateObserver.assertValues(
+            Idle,
+            Running(composition1),
+            Running(composition2),
+            Idle
+        )
+    }
+
 }

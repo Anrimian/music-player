@@ -33,7 +33,7 @@ class FileScanner(
         runFileScanner()
     }
 
-    fun getStateObservable(): Observable<FileScannerState> = stateSubject
+    fun getStateObservable(): Observable<FileScannerState> = stateSubject.distinctUntilChanged()
 
     private fun runFileScanner() {
         compositionsDao.selectNextCompositionToScan()
@@ -50,12 +50,14 @@ class FileScanner(
     private fun scanCompositionFile(composition: FullComposition): Maybe<*> {
         return compositionSourceEditor.getFullTags(composition)
             .doOnSuccess { tags -> processCompositionScan(composition, tags) }
+            .doOnError { compositionsDao.setCompositionLastFileScanTime(composition.id, Date()) }
     }
 
     private fun processCompositionScan(fullComposition: FullComposition,
                                        fileTags: CompositionSourceTags) {
         //compare
         //apply data to database(in one transaction)
+        compositionsDao.applyDetailData()
 
         //and set last modify time to prevent overwriting by scanner?
         //no, just add condition to media analyzer(hasActualChanges - also compare last file scan time and last modify time)
