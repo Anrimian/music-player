@@ -1,5 +1,11 @@
 package com.github.anrimian.musicplayer.data.storage.providers.playlists;
 
+import static android.provider.BaseColumns._ID;
+import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
+import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
+import static android.text.TextUtils.isEmpty;
+import static java.util.Collections.emptyList;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -25,12 +31,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-
-import static android.provider.BaseColumns._ID;
-import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
-import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
-import static android.text.TextUtils.isEmpty;
-import static java.util.Collections.emptyList;
 
 public class StoragePlayListsProvider {
 
@@ -120,7 +120,10 @@ public class StoragePlayListsProvider {
 
     public void deletePlayList(long id) {
         StorageMusicProvider.checkIfMediaStoreAvailable(context);
-        contentResolver.delete(getContentUri("external", id), null, null);
+
+        contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(id) });
     }
 
     public Observable<List<StoragePlayListItem>> getPlayListEntriesObservable(long playListId) {
@@ -132,7 +135,7 @@ public class StoragePlayListsProvider {
     public List<StoragePlayListItem> getPlayListItems(long playListId) {
         try(Cursor cursor = contentResolver.query(
                 getContentUri("external", playListId),
-                new String[] {AUDIO_ID, _ID},
+                new String[] { AUDIO_ID, _ID },
                 null,
                 null,
                 Playlists.Members.PLAY_ORDER)) {
@@ -222,10 +225,10 @@ public class StoragePlayListsProvider {
     @Nullable
     private StoragePlayList findPlayList(long id) {
         try(Cursor cursor = contentResolver.query(
-                getContentUri("external", id),
+                Playlists.EXTERNAL_CONTENT_URI,
                 null,
-                null,
-                null,
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(id) },
                 Playlists.DATE_ADDED + " DESC")) {
             if (cursor != null && cursor.moveToFirst()) {
                 CursorWrapper cursorWrapper = new CursorWrapper(cursor);
