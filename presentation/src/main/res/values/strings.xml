@@ -226,6 +226,9 @@
     <string name="fast_forward">Fast forward</string>
     <string name="show_covers_on_lock_screen">Show covers on lock screen and on android auto</string>
 
+    <string name="scan_storage_description">Usually all changes in media storage will appear automatically. But on some devices or system builds it won\'t work. This button runs scan media storage manually.</string>
+    <string name="scanning_completed">Scanning completed</string>
+
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
         <item quantity="other">%1$s songs</item>

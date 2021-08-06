@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.albums.list;
 
+import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -42,8 +44,6 @@ import java.util.List;
 
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
 
 public class AlbumsListFragment extends LibraryFragment implements
         AlbumsListView, FragmentLayerListener, BackButtonListener {
@@ -202,10 +202,6 @@ public class AlbumsListFragment extends LibraryFragment implements
             }
             case R.id.menu_equalizer: {
                 new EqualizerDialogFragment().show(getChildFragmentManager(), null);
-                break;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
                 break;
             }
         }

@@ -1,5 +1,22 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.NEW_FOLDER_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareCompositions;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatLinkedFabView;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -68,23 +85,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
-import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.NEW_FOLDER_NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareCompositions;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatLinkedFabView;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 /**
  * Created on 23.10.2017.
@@ -712,10 +712,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             }
             case R.id.menu_search: {
                 presenter.onSearchButtonClicked();
-                break;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
                 break;
             }
         }
