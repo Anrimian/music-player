@@ -21,14 +21,17 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     private final StoragePlayListsProvider storagePlayListsProvider;
     private final PlayListsDaoWrapper playListsDao;
-    private final Scheduler scheduler;
+    private final Scheduler dbScheduler;
+    private final Scheduler slowBgScheduler;
 
     public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
                                    PlayListsDaoWrapper playListsDao,
-                                   Scheduler scheduler) {
+                                   Scheduler dbScheduler,
+                                   Scheduler slowBgScheduler) {
         this.storagePlayListsProvider = storagePlayListsProvider;
         this.playListsDao = playListsDao;
-        this.scheduler = scheduler;
+        this.dbScheduler = dbScheduler;
+        this.slowBgScheduler = slowBgScheduler;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                     () -> storagePlayListsProvider.createPlayList(name, currentDate, currentDate)
             );
             return new PlayList(id, name, currentDate, currentDate, 0, 0);
-        }).subscribeOn(scheduler);
+        }).subscribeOn(dbScheduler);
     }
 
     @Override
@@ -66,26 +69,22 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                                                  int position) {
         return Completable.fromAction(() ->
                 playListsDao.addCompositions(compositions, playList.getId(), position)
-        ).subscribeOn(scheduler)
+        ).subscribeOn(dbScheduler)
                 .doOnComplete(() -> addCompositionsToStoragePlaylist(compositions, playList, position));
     }
 
     @Override
     public Completable addCompositionsToPlayList(List<Composition> compositions, PlayList playList) {
         return addCompositionsToPlayList(compositions, playList, playList.getCompositionsCount())
-                .subscribeOn(scheduler);
+                .subscribeOn(dbScheduler);
     }
 
     @Override
     public Completable deleteItemFromPlayList(PlayListItem playListItem, long playListId) {
         return Completable.fromAction(() -> {
-            Long storagePlayListId = playListsDao.selectStorageId(playListId);
-            Long storageItemId = playListsDao.selectStorageItemId(playListItem.getItemId());
-            if (storageItemId != null && storagePlayListId != null) {
-                storagePlayListsProvider.deleteItemFromPlayList(storageItemId, storagePlayListId);
-            }
             playListsDao.deletePlayListEntry(playListItem.getItemId(), playListId);
-        }).subscribeOn(scheduler);
+            deleteItemFromStoragePlayList(playListItem, playListId);
+        }).subscribeOn(dbScheduler);
     }
 
     @Override
@@ -96,16 +95,15 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
             if (storageId != null) {
                 storagePlayListsProvider.deletePlayList(storageId);
             }
-        }).subscribeOn(scheduler);
+        }).subscribeOn(dbScheduler);
     }
 
     @Override
     public Completable moveItemInPlayList(PlayList playList, int from, int to) {
         return Completable.fromAction(() -> {
-            Long storageId = playListsDao.selectStorageId(playList.getId());
-            storagePlayListsProvider.moveItemInPlayList(storageId, from, to);//quite slow
             playListsDao.moveItems(playList.getId(), from, to);
-        }).subscribeOn(scheduler);
+            moveItemInStoragePlayList(playList, from, to);
+        }).subscribeOn(dbScheduler);
     }
 
     @Override
@@ -116,10 +114,10 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
             if (storageId != null) {
                 storagePlayListsProvider.updatePlayListName(storageId, name);
             }
-        }).subscribeOn(scheduler);
+        }).subscribeOn(dbScheduler);
     }
 
-    //can be slow on large amount of data, run in separate task
+    //media store playlist methods are quite slow, run on separate thread
     private void addCompositionsToStoragePlaylist(List<Composition> compositions,
                                                   PlayList playList,
                                                   int position) {
@@ -131,7 +129,28 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                         position);
             }
         }).onErrorComplete()
-                .subscribeOn(scheduler)
+                .subscribeOn(slowBgScheduler)
+                .subscribe();
+    }
+
+    private void moveItemInStoragePlayList(PlayList playList, int from, int to) {
+        Completable.fromAction(() -> {
+            Long storageId = playListsDao.selectStorageId(playList.getId());
+            storagePlayListsProvider.moveItemInPlayList(storageId, from, to);
+        }).onErrorComplete()
+                .subscribeOn(slowBgScheduler)
+                .subscribe();
+    }
+
+    private void deleteItemFromStoragePlayList(PlayListItem playListItem, long playListId) {
+        Completable.fromAction(() -> {
+            Long storagePlayListId = playListsDao.selectStorageId(playListId);
+            Long storageItemId = playListsDao.selectStorageItemId(playListItem.getItemId());
+            if (storageItemId != null && storagePlayListId != null) {
+                storagePlayListsProvider.deleteItemFromPlayList(storageItemId, storagePlayListId);
+            }
+        }).onErrorComplete()
+                .subscribeOn(slowBgScheduler)
                 .subscribe();
     }
 }
