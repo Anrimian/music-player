@@ -32,7 +32,7 @@ public class CompositionModelLoader extends AppModelLoader<CompositionImage, Byt
             byte[] imageBytes = compositionSourceProvider.getCompositionArtworkBinaryData(id)
                     .blockingGet();
             ByteBuffer result = null;
-            if (imageBytes != null) {
+            if (imageBytes != null) {//TODO load cover through media metadata retriever
                 result = ByteBuffer.wrap(imageBytes);
             }
             callback.onDataReady(result);
