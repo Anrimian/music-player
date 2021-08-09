@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.for
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.*
 import com.github.anrimian.musicplayer.utils.Permissions
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
@@ -293,6 +294,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         val observable = valuesObservable
             .replay(1)
             .refCount()
+            .observeOn(AndroidSchedulers.mainThread())
 
         currentRequestDisposable = observable
             .firstOrError()
