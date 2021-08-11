@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.library.artists.items.adapter;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
+
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -19,9 +22,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.a
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
-import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
 
 /**
  * Created on 31.10.2017.
@@ -152,6 +152,7 @@ public class ArtistItemsAdapter extends DiffListAdapter<Object, RecyclerView.Vie
         super.onViewRecycled(holder);
         if (holder instanceof MusicViewHolder) {
             viewHolders.remove(holder);
+            ((MusicViewHolder) holder).release();
         }
     }
 

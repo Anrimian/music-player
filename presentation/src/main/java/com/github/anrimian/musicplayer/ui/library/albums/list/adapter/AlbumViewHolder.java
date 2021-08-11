@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.ui.library.albums.list.adapter;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
+import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
+import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
+
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -14,10 +18,6 @@ import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
-import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
-import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 
 public class AlbumViewHolder extends BaseViewHolder {
 
@@ -61,6 +61,10 @@ public class AlbumViewHolder extends BaseViewHolder {
                 showAdditionalInfo();
             }
         }
+    }
+
+    public void release() {
+        Components.getAppComponent().imageLoader().clearImage(viewBinding.ivMusicIcon);
     }
 
     private void showAlbumName() {

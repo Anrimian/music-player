@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
+import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
+
 import android.graphics.Color;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -20,11 +25,6 @@ import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
-import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
-import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 
 /**
  * Created on 31.10.2017.
@@ -88,6 +88,11 @@ public class MusicFileViewHolder extends FileViewHolder {
                 return;
             }
         }
+    }
+
+    @Override
+    public void release() {
+        compositionItemWrapper.release();
     }
 
     public void setCoversVisible(boolean isCoversEnabled) {

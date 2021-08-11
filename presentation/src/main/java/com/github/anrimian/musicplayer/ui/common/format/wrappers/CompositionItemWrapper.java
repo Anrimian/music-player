@@ -1,5 +1,20 @@
 package com.github.anrimian.musicplayer.ui.common.format.wrappers;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
+import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
+import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
+import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
+import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Spannable;
@@ -23,21 +38,6 @@ import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionS
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 import java.util.List;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
-import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
-import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
-import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
-import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
-import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
-import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class CompositionItemWrapper {
 
@@ -127,6 +127,12 @@ public class CompositionItemWrapper {
                 ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder_simple);
                 ivMusicIcon.setColorFilter(Color.TRANSPARENT);
             }
+        }
+    }
+
+    public void release() {
+        if (ivMusicIcon != null) {
+            Components.getAppComponent().imageLoader().clearImage(ivMusicIcon);
         }
     }
 

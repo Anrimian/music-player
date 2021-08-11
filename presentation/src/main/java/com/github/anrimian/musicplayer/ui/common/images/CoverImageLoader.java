@@ -97,6 +97,13 @@ public class CoverImageLoader {
                 .into(imageView);
     }
 
+    public void clearImage(@NonNull ImageView imageView) {
+        if (!isValidContextForGlide(imageView)) {
+            return;
+        }
+        Glide.with(imageView).clear(imageView);
+    }
+
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull UriCompositionSource data,
                                              @DrawableRes int errorPlaceholder) {
