@@ -35,7 +35,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //always attach session id(do not use audio session id = 0) for using correct audio session id(can't do with android media player) - skip
 
 //calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
-//last resort: retry + handle errors
+//last resort: retry(done) + handle errors
 //implement error state
 public class InternalEqualizer implements AppEqualizer {
 
@@ -140,7 +140,7 @@ public class InternalEqualizer implements AppEqualizer {
 
     private EqualizerState extractEqualizerState(Equalizer equalizer) {
         Map<Short, Short> maps = new HashMap<>();
-        for(short i = 0; i < equalizer.getNumberOfBands(); i++) {
+        for (short i = 0; i < equalizer.getNumberOfBands(); i++) {
             maps.put(i, equalizer.getBandLevel(i));
         }
         return new EqualizerState(
@@ -185,7 +185,7 @@ public class InternalEqualizer implements AppEqualizer {
 
                 if (mainEqualizer == null) {
                     currentAudioSessionId = audioSessionId;
-                    mainEqualizer = new Equalizer(1000, audioSessionId);
+                    mainEqualizer = newEqualizer(1000, audioSessionId);
                     initFunc.call(mainEqualizer);
                 }
                 return mainEqualizer;
@@ -212,7 +212,7 @@ public class InternalEqualizer implements AppEqualizer {
             synchronized (this) {
                 Equalizer equalizer;
                 if (mainEqualizer == null) {
-                    equalizer = new Equalizer(0, currentAudioSessionId);
+                    equalizer = newEqualizer(0, currentAudioSessionId);
                 } else {
                     equalizer = mainEqualizer;
                 }
@@ -222,6 +222,18 @@ public class InternalEqualizer implements AppEqualizer {
                 }
                 return result;
             }
+        }
+
+        private static Equalizer newEqualizer(int priority, int audioSession) throws RuntimeException {
+            RuntimeException ex = null;
+            for (int i = 0; i < 3; i++) {
+                try {
+                    return new Equalizer(priority, audioSession);
+                } catch (RuntimeException e) {
+                    ex = e;
+                }
+            }
+            throw ex;
         }
 
     }
