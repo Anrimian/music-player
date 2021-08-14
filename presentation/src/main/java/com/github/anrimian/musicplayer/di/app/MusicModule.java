@@ -1,6 +1,10 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -61,10 +65,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 02.11.2017.
@@ -246,8 +246,9 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    InternalEqualizer internalEqualizer(EqualizerStateRepository equalizerStateRepository) {
-        return new InternalEqualizer(equalizerStateRepository);
+    InternalEqualizer internalEqualizer(EqualizerStateRepository equalizerStateRepository,
+                                        Analytics analytics) {
+        return new InternalEqualizer(equalizerStateRepository, analytics);
     }
 
     @Provides

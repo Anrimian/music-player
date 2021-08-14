@@ -7,6 +7,7 @@ import android.media.audiofx.Equalizer;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.AppEqualizer;
 import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
@@ -43,10 +44,12 @@ public class InternalEqualizer implements AppEqualizer {
 
     private final BehaviorSubject<EqualizerState> currentStateSubject = BehaviorSubject.create();
 
-    private final EqualizerObjectHolder equalizerHolder = new EqualizerObjectHolder();
+    private final EqualizerObjectHolder equalizerHolder;
 
-    public InternalEqualizer(EqualizerStateRepository equalizerStateRepository) {
+    public InternalEqualizer(EqualizerStateRepository equalizerStateRepository, Analytics analytics) {
         this.equalizerStateRepository = equalizerStateRepository;
+
+        equalizerHolder = new EqualizerObjectHolder(analytics::processNonFatalError);
     }
 
     @Override
@@ -64,7 +67,9 @@ public class InternalEqualizer implements AppEqualizer {
 
             });
 
-            equalizer.setEnabled(true);
+            if (equalizer != null) {
+                equalizer.setEnabled(true);
+            }
         }
     }
 
@@ -85,6 +90,14 @@ public class InternalEqualizer implements AppEqualizer {
             }
             return equalizerState;
         });
+    }
+
+    public Observable<EqInitializationState> getEqInitializationState() {
+        return equalizerHolder.getEqInitializationState();
+    }
+
+    public void tryToRelaunchEqualizer() {
+        equalizerHolder.resurrectEqualizer();
     }
 
     public void setBandLevel(short bandNumber, short level) {
@@ -174,9 +187,24 @@ public class InternalEqualizer implements AppEqualizer {
 
     private static class EqualizerObjectHolder {
 
-        private Equalizer mainEqualizer;
-        private int currentAudioSessionId = 1;
+        private static final int DEFAULT_AUDIO_SESSION_ID = 1;
+        private static final int EQ_PRIORITY = 1000;
 
+        private final BehaviorSubject<EqInitializationState> stateSubject = BehaviorSubject.createDefault(EqInitializationState.IDLE);
+
+        private final Callback<Throwable> onInitializationError;
+
+        private Equalizer mainEqualizer;
+        private int currentAudioSessionId = DEFAULT_AUDIO_SESSION_ID;
+
+        @Nullable
+        private Callback<Equalizer> deferredInitFunc;
+
+        private EqualizerObjectHolder(Callback<Throwable> onInitializationError) {
+            this.onInitializationError = onInitializationError;
+        }
+
+        @Nullable
         private Equalizer initEqualizer(int audioSessionId, Callback<Equalizer> initFunc) {
             synchronized (this) {
                 if (currentAudioSessionId != audioSessionId) {
@@ -185,10 +213,31 @@ public class InternalEqualizer implements AppEqualizer {
 
                 if (mainEqualizer == null) {
                     currentAudioSessionId = audioSessionId;
-                    mainEqualizer = newEqualizer(1000, audioSessionId);
-                    initFunc.call(mainEqualizer);
+                    mainEqualizer = newEqualizer(EQ_PRIORITY, audioSessionId);
+                    if (mainEqualizer == null) {
+                        stateSubject.onNext(EqInitializationState.INITIALIZATION_ERROR);
+                        deferredInitFunc = initFunc;
+                    } else {
+                        stateSubject.onNext(EqInitializationState.INITIALIZED);
+                        initFunc.call(mainEqualizer);
+                    }
                 }
                 return mainEqualizer;
+            }
+        }
+
+        private void resurrectEqualizer() {
+            if (mainEqualizer == null
+                    && currentAudioSessionId != DEFAULT_AUDIO_SESSION_ID
+                    && deferredInitFunc != null
+                    && stateSubject.getValue() == EqInitializationState.INITIALIZATION_ERROR) {
+                mainEqualizer = newEqualizer(EQ_PRIORITY, currentAudioSessionId);
+                if (mainEqualizer != null) {
+                    deferredInitFunc.call(mainEqualizer);
+                    deferredInitFunc = null;
+                    mainEqualizer.setEnabled(true);
+                    stateSubject.onNext(EqInitializationState.INITIALIZED);
+                }
             }
         }
 
@@ -203,7 +252,8 @@ public class InternalEqualizer implements AppEqualizer {
                     mainEqualizer.setEnabled(false);
                     mainEqualizer.release();
                     mainEqualizer = null;
-                    currentAudioSessionId = 1;
+                    currentAudioSessionId = DEFAULT_AUDIO_SESSION_ID;
+                    stateSubject.onNext(EqInitializationState.IDLE);
                 }
             }
         }
@@ -224,7 +274,12 @@ public class InternalEqualizer implements AppEqualizer {
             }
         }
 
-        private static Equalizer newEqualizer(int priority, int audioSession) throws RuntimeException {
+        private Observable<EqInitializationState> getEqInitializationState() {
+            return stateSubject;
+        }
+
+        @Nullable
+        private Equalizer newEqualizer(int priority, int audioSession) {
             RuntimeException ex = null;
             for (int i = 0; i < 3; i++) {
                 try {
@@ -233,7 +288,8 @@ public class InternalEqualizer implements AppEqualizer {
                     ex = e;
                 }
             }
-            throw ex;
+            onInitializationError.call(ex);
+            return null;
         }
 
     }
