@@ -123,22 +123,14 @@ public class InternalEqualizer implements AppEqualizer {
     }
 
     public void setPreset(Preset preset) {
-        Equalizer equalizer = equalizerHolder.getEqualizer();
-        if (equalizer == null) {
-            EqualizerState equalizerState = equalizerHolder.useEqualizer(this::extractEqualizerState);
-
-            equalizerStateRepository.saveEqualizerState(equalizerState);
-            currentStateSubject.onNext(equalizerState);
-        } else {
-            if (preset.getNumber() != equalizer.getCurrentPreset()
-                    && preset.getNumber() <= equalizer.getNumberOfPresets()) {
-                equalizer.usePreset(preset.getNumber());
-                EqualizerState equalizerState = extractEqualizerState(equalizer);
-
-                equalizerStateRepository.saveEqualizerState(equalizerState);
-                currentStateSubject.onNext(equalizerState);
+        EqualizerState equalizerState = equalizerHolder.useEqualizer(eq -> {
+            if (preset.getNumber() <= eq.getNumberOfPresets()) {
+                eq.usePreset(preset.getNumber());
             }
-        }
+            return extractEqualizerState(eq);
+        });
+        equalizerStateRepository.saveEqualizerState(equalizerState);
+        currentStateSubject.onNext(equalizerState);
     }
 
     public void release() {
@@ -248,12 +240,12 @@ public class InternalEqualizer implements AppEqualizer {
 
         private void releaseEqualizer() {
             synchronized (this) {
+                stateSubject.onNext(EqInitializationState.IDLE);
                 if (mainEqualizer != null) {
                     mainEqualizer.setEnabled(false);
                     mainEqualizer.release();
                     mainEqualizer = null;
                     currentAudioSessionId = DEFAULT_AUDIO_SESSION_ID;
-                    stateSubject.onNext(EqInitializationState.IDLE);
                 }
             }
         }
