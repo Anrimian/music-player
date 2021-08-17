@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal;
+package com.github.anrimian.musicplayer.domain.models.equalizer;
 
 public enum EqInitializationState {
     IDLE,

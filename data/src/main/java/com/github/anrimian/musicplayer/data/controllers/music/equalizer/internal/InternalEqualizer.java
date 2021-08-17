@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.controllers.music.equalizer.AppEqual
 import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Band;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqInitializationState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
@@ -96,8 +97,8 @@ public class InternalEqualizer implements AppEqualizer {
         return equalizerHolder.getEqInitializationState();
     }
 
-    public void tryToRelaunchEqualizer() {
-        equalizerHolder.resurrectEqualizer();
+    public void tryToReattachEqualizer() {
+        equalizerHolder.tryToReattachEqualizer();
     }
 
     public void setBandLevel(short bandNumber, short level) {
@@ -218,7 +219,7 @@ public class InternalEqualizer implements AppEqualizer {
             }
         }
 
-        private void resurrectEqualizer() {
+        private void tryToReattachEqualizer() {
             if (mainEqualizer == null
                     && currentAudioSessionId != DEFAULT_AUDIO_SESSION_ID
                     && deferredInitFunc != null
@@ -250,11 +251,14 @@ public class InternalEqualizer implements AppEqualizer {
             }
         }
 
-        private <T> T useEqualizer(Mapper<Equalizer, T> func) {
+        private <T> T useEqualizer(Mapper<Equalizer, T> func) throws EqInitializationException{
             synchronized (this) {
                 Equalizer equalizer;
                 if (mainEqualizer == null) {
                     equalizer = newEqualizer(0, currentAudioSessionId);
+                    if (equalizer == null) {
+                        throw new EqInitializationException();
+                    }
                 } else {
                     equalizer = mainEqualizer;
                 }
