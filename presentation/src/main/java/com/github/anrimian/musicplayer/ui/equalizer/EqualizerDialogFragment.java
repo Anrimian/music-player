@@ -235,7 +235,6 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
             binding.sbLevel.setEnabled(enabled);
         }
         viewBinding.tvPresets.setEnabled(enabled);
-        viewBinding.btnRestartSystemEqualizer.setEnabled(enabled);
     }
 
 }
