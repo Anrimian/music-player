@@ -1,5 +1,11 @@
 package com.github.anrimian.musicplayer.ui.equalizer;
 
+import static android.view.View.MeasureSpec.makeMeasureSpec;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.setupBottomSheetDialogMaxWidth;
+import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils.attachDynamicShadow;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.util.Pair;
@@ -40,12 +46,6 @@ import java.util.List;
 import moxy.MvpBottomSheetDialogFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static android.view.View.MeasureSpec.makeMeasureSpec;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.setupBottomSheetDialogMaxWidth;
-import static com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils.attachDynamicShadow;
 
 public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         implements EqualizerView {
@@ -99,12 +99,13 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         viewBinding.rbUseAppEqualizer.setOnClickListener(v -> enableAppEqualizer());
         viewBinding.rbDisableEqualizer.setOnClickListener(v -> disableEqualizer());
         viewBinding.ivClose.setOnClickListener(v -> dismissAllowingStateLoss());
+        viewBinding.btnRestartSystemEqualizer.setOnClickListener(v -> presenter.onRestartAppEqClicked());
 
         showActiveEqualizer(equalizerController.getSelectedEqualizerType());
 
         CompatUtils.setOutlineButtonStyle(viewBinding.btnOpenSystemEqualizer);
         CompatUtils.setOutlineButtonStyle(viewBinding.tvPresets);
-
+        CompatUtils.setOutlineButtonStyle(viewBinding.btnRestartSystemEqualizer);
     }
 
     @Override
@@ -193,6 +194,11 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
         }
     }
 
+    @Override
+    public void showEqualizerRestartButton(boolean show) {
+        viewBinding.btnRestartSystemEqualizer.setVisibility(show? View.VISIBLE : View.GONE);
+    }
+
     private void enableSystemEqualizer() {
         equalizerController.enableEqualizer(EqualizerType.EXTERNAL);
         showActiveEqualizer(EqualizerType.EXTERNAL);
@@ -229,6 +235,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
             binding.sbLevel.setEnabled(enabled);
         }
         viewBinding.tvPresets.setEnabled(enabled);
+        viewBinding.btnRestartSystemEqualizer.setEnabled(enabled);
     }
 
 }
