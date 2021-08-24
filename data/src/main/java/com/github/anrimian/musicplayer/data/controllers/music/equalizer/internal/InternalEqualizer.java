@@ -37,8 +37,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 //always attach session id(do not use audio session id = 0) for using correct audio session id(can't do with android media player) - skip
 
 //calling before media player is prepared?(MediaPlayer.setOnCompletionListener)
-//last resort: retry(done) + handle errors
-//implement error state
+//last resort: retry(done) + handle errors(done)
+//implement error state - done on constructor
 public class InternalEqualizer implements AppEqualizer {
 
     private final EqualizerStateRepository equalizerStateRepository;
@@ -140,7 +140,7 @@ public class InternalEqualizer implements AppEqualizer {
 
     private void applyEqualizerState(Equalizer equalizer, EqualizerState equalizerState) {
         for (Map.Entry<Short, Short> band: equalizerState.getBendLevels().entrySet()) {
-            equalizer.setBandLevel(band.getKey(), band.getValue());
+            EqualizerObjectHolder.setBandLevel(equalizer, band.getKey(), band.getValue());
         }
     }
 
@@ -180,6 +180,7 @@ public class InternalEqualizer implements AppEqualizer {
 
     private static class EqualizerObjectHolder {
 
+        private static final int EQ_RETRY_CALLS_COUNT = 3;
         private static final int DEFAULT_AUDIO_SESSION_ID = 1;
         private static final int EQ_PRIORITY = 1000;
 
@@ -277,7 +278,7 @@ public class InternalEqualizer implements AppEqualizer {
         @Nullable
         private Equalizer newEqualizer(int priority, int audioSession) {
             RuntimeException ex = null;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < EQ_RETRY_CALLS_COUNT; i++) {
                 try {
                     return new Equalizer(priority, audioSession);
                 } catch (RuntimeException e) {
@@ -286,6 +287,16 @@ public class InternalEqualizer implements AppEqualizer {
             }
             onInitializationError.call(ex);
             return null;
+        }
+
+        //let's try several times, will see how it will work
+        private static void setBandLevel(Equalizer eq, short key, short value) {
+            for (int i = 0; i < EQ_RETRY_CALLS_COUNT; i++) {
+                try {
+                    eq.setBandLevel(key, value);
+                    return;
+                } catch (RuntimeException ignored) { }
+            }
         }
 
     }
