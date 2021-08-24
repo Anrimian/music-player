@@ -80,6 +80,7 @@ public class PlayQueueAdapter extends DiffListAdapter<PlayQueueItem, PlayQueueVi
     public void onViewRecycled(@NonNull PlayQueueViewHolder holder) {
         super.onViewRecycled(holder);
         viewHolders.remove(holder);
+        holder.release();
     }
 
     public void onCurrentItemChanged(PlayQueueItem currentItem) {

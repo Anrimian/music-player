@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqInitializationState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
@@ -19,4 +20,7 @@ public interface EqualizerRepository {
 
     void setPreset(Preset preset);
 
+    Observable<EqInitializationState> getEqInitializationState();
+
+    void tryToReattachEqualizer();
 }

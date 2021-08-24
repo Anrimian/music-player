@@ -121,7 +121,7 @@
     <dimen name="chip_spacing_margin">8dp</dimen>
 
     <!--covers-->
-    <integer name="icon_image_size">100</integer>
+    <integer name="icon_image_size">140</integer>
 
     <!--snackbar-->
     <integer name="snackbar_max_lines">5</integer>

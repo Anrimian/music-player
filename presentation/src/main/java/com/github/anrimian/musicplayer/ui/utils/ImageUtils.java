@@ -5,6 +5,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Path;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 public class ImageUtils {
 
     public static Bitmap toCircleBitmap(Bitmap bitmap) {
@@ -43,6 +46,28 @@ public class ImageUtils {
         }
 
         return inSampleSize;
+    }
+
+    public static Bitmap decodeBitmap(byte[] imageBytes, int requestedSize) {
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.outWidth = requestedSize;
+        opt.outHeight = requestedSize;
+        opt.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
+        opt.inSampleSize = ImageUtils.calculateInSampleSize(opt, requestedSize, requestedSize);
+        opt.inJustDecodeBounds = false;
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
+    }
+
+    public static byte[] downscaleImageBytes(byte[] imageBytes, int requestedSize) throws IOException {
+        Bitmap bitmap = decodeBitmap(imageBytes, requestedSize);
+
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            byte[] compressedImageBytes = bos.toByteArray();
+            bitmap.recycle();
+            return compressedImageBytes;
+        }
     }
 
 }

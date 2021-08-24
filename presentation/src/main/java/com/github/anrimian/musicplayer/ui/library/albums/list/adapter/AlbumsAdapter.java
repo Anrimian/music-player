@@ -51,4 +51,10 @@ public class AlbumsAdapter extends DiffListAdapter<Album, AlbumViewHolder> {
         }
         holder.update(getItem(position), payloads);
     }
+
+    @Override
+    public void onViewRecycled(@NonNull AlbumViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.release();
+    }
 }

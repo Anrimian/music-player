@@ -18,4 +18,7 @@ public interface EqualizerView extends MvpView {
 
     @AddToEndSingle
     void displayEqualizerState(EqualizerState equalizerState, EqualizerConfig config);
+
+    @AddToEndSingle
+    void showEqualizerRestartButton(boolean show);
 }

@@ -51,4 +51,10 @@ public class PlayListItemAdapter extends DiffListAdapter<PlayListItem, PlayListI
         PlayListItem composition = getItem(position);
         holder.bind(composition, coversEnabled);
     }
+
+    @Override
+    public void onViewRecycled(@NonNull PlayListItemViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.release();
+    }
 }

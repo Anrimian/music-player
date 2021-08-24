@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
+
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -22,9 +25,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.a
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
-import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
 
 /**
  * Created on 31.10.2017.
@@ -152,6 +152,7 @@ public class MusicFileSourceAdapter extends DiffListAdapter<FileSource, FileView
     public void onViewRecycled(@NonNull FileViewHolder holder) {
         super.onViewRecycled(holder);
         viewHolders.remove(holder);
+        holder.release();
     }
 
     @Override

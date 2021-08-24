@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.library.compositions.adapter;
 
+import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
+
 import android.graphics.Color;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -18,9 +21,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableVi
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 
 /**
  * Created on 31.10.2017.
@@ -73,6 +73,10 @@ public class MusicViewHolder extends SelectableViewHolder {
     public void update(Composition composition, List<Object> payloads) {
         this.composition = composition;
         compositionItemWrapper.update(composition, payloads);
+    }
+
+    public void release() {
+        compositionItemWrapper.release();
     }
 
     public void setCoversVisible(boolean isCoversEnabled) {

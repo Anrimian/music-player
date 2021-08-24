@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding
@@ -57,10 +58,11 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         viewBinding.tvEqualizerState.setText(getEqualizerTypeDescription(type))
     }
 
+    @StringRes
     private fun getEqualizerTypeDescription(type: Int): Int {
         return when (type) {
-            EqualizerType.NONE -> R.string.no_equalizer
             EqualizerType.EXTERNAL -> R.string.system_equalizer
+            EqualizerType.APP -> R.string.app_equalizer
             else -> R.string.no_equalizer
         }
     }

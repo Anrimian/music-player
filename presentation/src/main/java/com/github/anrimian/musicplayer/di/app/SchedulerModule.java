@@ -23,6 +23,7 @@ public class SchedulerModule {
     public static final String IO_SCHEDULER = "io_scheduler";
     public static final String UI_SCHEDULER = "ui_scheduler";
     public static final String DB_SCHEDULER = "db_scheduler";
+    public static final String SLOW_BG_SCHEDULER = "slow_bg_scheduler";
 
     @Provides
     @NonNull
@@ -45,6 +46,14 @@ public class SchedulerModule {
     @Named(DB_SCHEDULER)
     @Singleton
     Scheduler provideDBScheduler() {
+        return Schedulers.from(Executors.newSingleThreadExecutor());
+    }
+
+    @Provides
+    @NonNull
+    @Named(SLOW_BG_SCHEDULER)
+    @Singleton
+    Scheduler provideSlowBgScheduler() {
         return Schedulers.from(Executors.newSingleThreadExecutor());
     }
 }

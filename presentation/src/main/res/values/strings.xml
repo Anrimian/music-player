@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="open_drawer">Open drawer</string>
     <string name="close_drawer">Close drawer</string>
@@ -17,7 +17,7 @@
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
-    <string name="content_description_menu">Open current composition menu</string>F
+    <string name="content_description_menu">Open current composition menu</string>
     <string name="content_description_menu_template">Open composition menu: %s</string>
     <string name="share">Send</string>
     <string name="content_description_repeat_mode">Repeat mode menu</string>
@@ -225,6 +225,9 @@
     <string name="rewind">Rewind</string>
     <string name="fast_forward">Fast forward</string>
     <string name="show_covers_on_lock_screen">Show covers on lock screen and on android auto</string>
+
+    <string name="equalizer_initialization_error" tools:ignore="MissingTranslation">Unable to initialize in-app equalizer. Try to restart it.</string>
+    <string name="restart" tools:ignore="MissingTranslation">Restart</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

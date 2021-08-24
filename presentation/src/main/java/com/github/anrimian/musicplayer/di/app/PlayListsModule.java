@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.di.app;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.SLOW_BG_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import android.content.Context;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
@@ -21,9 +25,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 @Module
 public class PlayListsModule {
@@ -65,10 +66,12 @@ public class PlayListsModule {
     @Singleton
     PlayListsRepository storagePlayListDataSource(StoragePlayListsProvider playListsProvider,
                                                   PlayListsDaoWrapper playListsDaoWrapper,
-                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
+                                                  @Named(DB_SCHEDULER) Scheduler dbScheduler,
+                                                  @Named(SLOW_BG_SCHEDULER) Scheduler slowBgScheduler) {
         return new PlayListsRepositoryImpl(playListsProvider,
                 playListsDaoWrapper,
-                scheduler);
+                dbScheduler,
+                slowBgScheduler);
     }
 
     @Provides
