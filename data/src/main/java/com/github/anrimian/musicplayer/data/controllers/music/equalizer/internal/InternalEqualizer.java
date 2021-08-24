@@ -291,12 +291,16 @@ public class InternalEqualizer implements AppEqualizer {
 
         //let's try several times, will see how it will work
         private static void setBandLevel(Equalizer eq, short key, short value) {
+            RuntimeException ex = null;
             for (int i = 0; i < EQ_RETRY_CALLS_COUNT; i++) {
                 try {
                     eq.setBandLevel(key, value);
                     return;
-                } catch (RuntimeException ignored) { }
+                } catch (RuntimeException e) {
+                    ex = e;
+                }
             }
+            throw ex;
         }
 
     }
