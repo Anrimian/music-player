@@ -48,7 +48,7 @@ public class ImageUtils {
         return inSampleSize;
     }
 
-    public static byte[] downscaleImageBytes(byte[] imageBytes, int requestedSize) throws IOException {
+    public static Bitmap decodeBitmap(byte[] imageBytes, int requestedSize) {
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.outWidth = requestedSize;
         opt.outHeight = requestedSize;
@@ -56,10 +56,14 @@ public class ImageUtils {
         BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
         opt.inSampleSize = ImageUtils.calculateInSampleSize(opt, requestedSize, requestedSize);
         opt.inJustDecodeBounds = false;
-        Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
+    }
+
+    public static byte[] downscaleImageBytes(byte[] imageBytes, int requestedSize) throws IOException {
+        Bitmap bitmap = decodeBitmap(imageBytes, requestedSize);
 
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             byte[] compressedImageBytes = bos.toByteArray();
             bitmap.recycle();
             return compressedImageBytes;

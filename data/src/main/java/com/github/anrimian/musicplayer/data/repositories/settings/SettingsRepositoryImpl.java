@@ -1,7 +1,12 @@
 package com.github.anrimian.musicplayer.data.repositories.settings;
 
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.musicplayer.domain.models.order.OrderType.ADD_TIME;
+import static com.github.anrimian.musicplayer.domain.models.order.OrderType.COMPOSITION_COUNT;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
@@ -12,10 +17,6 @@ import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
-
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
-import static com.github.anrimian.musicplayer.domain.models.order.OrderType.ADD_TIME;
-import static com.github.anrimian.musicplayer.domain.models.order.OrderType.COMPOSITION_COUNT;
 
 /**
  * Created on 16.04.2018.
@@ -261,7 +262,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public boolean isCoversOnLockScreenEnabled() {
-        return preferences.getBoolean(SHOW_COVERS_ON_LOCK_SCREEN, true);
+        //enabled by default only for api 30 and higher
+        boolean defaultValue = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R;
+        return preferences.getBoolean(SHOW_COVERS_ON_LOCK_SCREEN, defaultValue);
     }
 
     @Override

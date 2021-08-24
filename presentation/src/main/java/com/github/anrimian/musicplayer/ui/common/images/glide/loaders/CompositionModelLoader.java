@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common.images.glide.loaders;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 
 import androidx.annotation.NonNull;
@@ -13,9 +14,7 @@ import com.github.anrimian.musicplayer.ui.common.images.glide.util.AppModelLoade
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 
-import java.nio.ByteBuffer;
-
-public class CompositionModelLoader extends AppModelLoader<CompositionImage, ByteBuffer> {
+public class CompositionModelLoader extends AppModelLoader<CompositionImage, Bitmap> {
 
     private final Context context;
     private final CompositionSourceProvider compositionSourceProvider;
@@ -33,7 +32,7 @@ public class CompositionModelLoader extends AppModelLoader<CompositionImage, Byt
     @Override
     protected void loadData(CompositionImage compositionImage,
                             @NonNull Priority priority,
-                            @NonNull DataFetcher.DataCallback<? super ByteBuffer> callback) {
+                            @NonNull DataFetcher.DataCallback<? super Bitmap> callback) {
         MediaMetadataRetriever mmr = null;
         try {
             long id = compositionImage.getId();
@@ -46,15 +45,12 @@ public class CompositionModelLoader extends AppModelLoader<CompositionImage, Byt
                 imageBytes = mmr.getEmbeddedPicture();
             }
 
-            ByteBuffer result = null;
+            Bitmap bitmap = null;
             if (imageBytes != null) {
-                //glide uses cache for byte buffer, it's memory optimization
                 int coverSize = context.getResources().getInteger(R.integer.icon_image_size);
-                imageBytes = ImageUtils.downscaleImageBytes(imageBytes, coverSize);
-                
-                result = ByteBuffer.wrap(imageBytes);
+                bitmap = ImageUtils.decodeBitmap(imageBytes, coverSize);
             }
-            callback.onDataReady(result);
+            callback.onDataReady(bitmap);
         } catch (Exception e) {
             callback.onLoadFailed(e);
         } finally {

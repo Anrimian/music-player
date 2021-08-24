@@ -17,7 +17,7 @@
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
-    <string name="content_description_menu">Open current composition menu</string>F
+    <string name="content_description_menu">Open current composition menu</string>
     <string name="content_description_menu_template">Open composition menu: %s</string>
     <string name="share">Send</string>
     <string name="content_description_repeat_mode">Repeat mode menu</string>
