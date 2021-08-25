@@ -37,13 +37,15 @@ class FileScanner(
     fun getStateObservable(): Observable<FileScannerState> = stateSubject.distinctUntilChanged()
 
     private fun runFileScanner() {
+        //compare scanner versions, if not equal - get last scan time and select all compositions with earlier last scan time
+        //val lastScanTime = if (versions not equal) getLastScanTime else 0
         compositionsDao.selectNextCompositionToScan()
             .doOnError(this::processError)
             .onErrorComplete()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
             .flatMap(this::scanCompositionFile)
             .doOnSuccess { runFileScanner() }
-            .doOnComplete { stateSubject.onNext(Idle) }
+            .doOnComplete { stateSubject.onNext(Idle) }//set last scan time, set scanner version
             .subscribeOn(scheduler)
             .subscribe()
     }
@@ -73,6 +75,7 @@ class FileScanner(
     //--retry three times
     //on error exclude from scan(how, just set file scan time?..no, it should rescan again, right),
     // log if need, and consume event
+    //---on scanner version change rescan all files
     private fun processError(throwable: Throwable) {
         if (throwable is FileNotFoundException) {
             return

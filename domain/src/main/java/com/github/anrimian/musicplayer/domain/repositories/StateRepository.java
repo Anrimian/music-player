@@ -7,4 +7,14 @@ public interface StateRepository {
     String getRootFolderPath();
 
     void setRootFolderPath(String path);
+
+    int getCurrentFileScannerVersion();
+
+    void setLastFileScannerVersion();
+
+    int getLastFileScannerVersion();
+
+    long getLastFullScanTime();
+
+    void setLastFullScanTime();
 }

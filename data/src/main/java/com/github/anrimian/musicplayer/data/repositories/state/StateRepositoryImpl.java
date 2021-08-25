@@ -1,14 +1,14 @@
 package com.github.anrimian.musicplayer.data.repositories.state;
 
+import static com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl.Constants.PREFERENCES_NAME;
+import static com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl.Constants.ROOT_FOLDER_PATH;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
-
-import static com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl.Constants.PREFERENCES_NAME;
-import static com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl.Constants.ROOT_FOLDER_PATH;
 
 public class StateRepositoryImpl implements StateRepository {
 
@@ -40,5 +40,30 @@ public class StateRepositoryImpl implements StateRepository {
             return;
         }
         preferences.putString(ROOT_FOLDER_PATH, path);
+    }
+
+    @Override
+    public int getCurrentFileScannerVersion() {
+        return 0;
+    }
+
+    @Override
+    public void setLastFileScannerVersion() {
+
+    }
+
+    @Override
+    public int getLastFileScannerVersion() {
+        return 0;
+    }
+
+    @Override
+    public long getLastFullScanTime() {
+        return 0;
+    }
+
+    @Override
+    public void setLastFullScanTime() {
+
     }
 }

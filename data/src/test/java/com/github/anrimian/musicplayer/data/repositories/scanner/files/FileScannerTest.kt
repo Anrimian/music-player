@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEdit
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Test
@@ -15,6 +16,7 @@ class FileScannerTest {
 
     private val compositionsDao: CompositionsDaoWrapper = mock()
     private val compositionSourceEditor: CompositionSourceEditor = mock()
+    private val stateRepository: StateRepository = mock()
     private val analytics: Analytics = mock()
     private val scheduler = Schedulers.trampoline()
 
