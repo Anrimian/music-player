@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.data.controllers.music.error;
 
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
-import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.source.UnrecognizedInputFormatException;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
 
@@ -27,7 +27,7 @@ public class PlayerErrorParserImpl implements PlayerErrorParser {
         if (throwable instanceof FileNotFoundException) {
             return ErrorType.NOT_FOUND;
         }
-        if (throwable instanceof ExoPlaybackException) {
+        if (throwable instanceof PlaybackException) {
             Throwable cause = throwable.getCause();
             if (cause instanceof FileNotFoundException) {
                 return ErrorType.NOT_FOUND;

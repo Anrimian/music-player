@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore.Audio.Playlists;
 
 import androidx.collection.LongSparseArray;
@@ -200,15 +201,18 @@ public class StoragePlayListsProvider {
     }
 
     public void updatePlayListName(long playListId, String name) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            //unsupported
+            return;
+        }
         StorageMusicProvider.checkIfMediaStoreAvailable(context);
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
-        contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
-        contentResolver.update(getContentUri("external", playListId),
+        contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
                 contentValues,
-                null,
-                null);
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(playListId) });
     }
 
     private void updateModifyTime(long playListId) {
@@ -216,10 +220,10 @@ public class StoragePlayListsProvider {
 
         ContentValues playListValues = new ContentValues();
         playListValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
-        contentResolver.update(getContentUri("external", playListId),
+        contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
                 playListValues,
-                null,
-                null);
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(playListId) });
     }
 
     @Nullable

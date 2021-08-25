@@ -1,5 +1,14 @@
 package com.github.anrimian.musicplayer.ui.main.external_player;
 
+import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
+import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
@@ -22,6 +31,7 @@ import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 
 import java.util.concurrent.TimeUnit;
@@ -33,15 +43,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static android.view.View.VISIBLE;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
-import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
 
 public class ExternalPlayerActivity extends MvpAppCompatActivity implements ExternalPlayerView {
 
@@ -237,8 +238,10 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
             title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
             album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
             String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            //we can't read image from uri later, read as first as possible
-            imageBytes = mmr.getEmbeddedPicture();
+
+            int coverSize = getResources().getInteger(R.integer.icon_image_size);
+            imageBytes = ImageUtils.downscaleImageBytes(mmr.getEmbeddedPicture(), coverSize);
+
             try {
                 duration = Long.parseLong(durationStr);
             } catch (NumberFormatException ignored) {}

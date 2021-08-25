@@ -245,8 +245,9 @@ class MusicModule {
     @Provides
     @NonNull
     @Singleton
-    InternalEqualizer internalEqualizer(EqualizerStateRepository equalizerStateRepository) {
-        return new InternalEqualizer(equalizerStateRepository);
+    InternalEqualizer internalEqualizer(EqualizerStateRepository equalizerStateRepository,
+                                        Analytics analytics) {
+        return new InternalEqualizer(equalizerStateRepository, analytics);
     }
 
     @Provides

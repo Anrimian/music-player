@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqInitializationState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
@@ -34,5 +35,13 @@ public class EqualizerInteractor {
 
     public void setPreset(Preset preset) {
         equalizerRepository.setPreset(preset);
+    }
+
+    public Observable<EqInitializationState> getEqInitializationState() {
+        return equalizerRepository.getEqInitializationState();
+    }
+
+    public void tryToReattachEqualizer() {
+        equalizerRepository.tryToReattachEqualizer();
     }
 }

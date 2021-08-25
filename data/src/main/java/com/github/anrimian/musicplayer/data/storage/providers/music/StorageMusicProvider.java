@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
+import static android.provider.MediaStore.Audio.Media;
+import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.data.utils.db.CursorWrapper.getColumnIndex;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+
 import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
 import android.content.ContentProviderOperation;
@@ -45,11 +50,6 @@ import javax.annotation.Nullable;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-
-import static android.provider.MediaStore.Audio.Media;
-import static android.text.TextUtils.isEmpty;
-import static com.github.anrimian.musicplayer.data.utils.db.CursorWrapper.getColumnIndex;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 public class StorageMusicProvider {
 
@@ -141,7 +141,7 @@ public class StorageMusicProvider {
 
         Uri uri;
         try {
-            uri = getStorageUri();
+            uri = getStorageUri();//TODO select all uri's from all available volumes
         } catch (UnavailableMediaStoreException e) {
             return null;
         }

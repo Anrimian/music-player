@@ -3,15 +3,15 @@ package com.github.anrimian.musicplayer.data.utils.exo_player;
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 
 public class PlayerEventListener implements Player.Listener {
 
     private final Runnable onEnded;
-    private final Callback<ExoPlaybackException> errorCallback;
+    private final Callback<PlaybackException> errorCallback;
 
-    public PlayerEventListener(Runnable onEnded, Callback<ExoPlaybackException> errorCallback) {
+    public PlayerEventListener(Runnable onEnded, Callback<PlaybackException> errorCallback) {
         this.onEnded = onEnded;
         this.errorCallback = errorCallback;
     }
@@ -33,7 +33,7 @@ public class PlayerEventListener implements Player.Listener {
     }
 
     @Override
-    public void onPlayerError(@NonNull ExoPlaybackException error) {
+    public void onPlayerError(@NonNull PlaybackException error) {
         errorCallback.call(error);
     }
 }

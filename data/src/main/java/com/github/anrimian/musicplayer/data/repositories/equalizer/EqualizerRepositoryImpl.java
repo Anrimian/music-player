@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.equalizer;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.InternalEqualizer;
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqInitializationState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig;
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState;
 import com.github.anrimian.musicplayer.domain.models.equalizer.Preset;
@@ -40,6 +41,16 @@ public class EqualizerRepositoryImpl implements EqualizerRepository {
     @Override
     public void setPreset(Preset preset) {
         internalEqualizer.setPreset(preset);
+    }
+
+    @Override
+    public Observable<EqInitializationState> getEqInitializationState() {
+        return internalEqualizer.getEqInitializationState();
+    }
+
+    @Override
+    public void tryToReattachEqualizer() {
+        internalEqualizer.tryToReattachEqualizer();
     }
 
 }

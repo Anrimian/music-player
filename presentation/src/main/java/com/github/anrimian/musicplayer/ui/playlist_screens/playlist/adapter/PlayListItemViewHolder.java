@@ -53,6 +53,10 @@ public class PlayListItemViewHolder extends RecyclerView.ViewHolder implements D
         compositionItemWrapper.showAsDraggingItem(dragging);
     }
 
+    public void release() {
+
+    }
+
     private Context getContext() {
         return itemView.getContext();
     }

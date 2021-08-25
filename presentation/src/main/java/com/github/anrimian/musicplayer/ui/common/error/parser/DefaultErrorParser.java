@@ -7,6 +7,7 @@ import android.os.Build;
 import androidx.annotation.StringRes;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.EqInitializationException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
@@ -93,6 +94,9 @@ public class DefaultErrorParser implements ErrorParser {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
                 && (throwable instanceof RecoverableSecurityException || throwable instanceof RecoverableSecurityExceptionExt)) {
             return new EditorErrorCommand(throwable);
+        }
+        if (throwable instanceof EqInitializationException) {
+            return error(R.string.equalizer_initialization_error);
         }
         if (throwable instanceof EditorTimeoutException) {
             return error(R.string.editor_timeout_error);
