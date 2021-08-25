@@ -16,8 +16,8 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -273,7 +273,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     private boolean isStrangeLoaderException(Throwable throwable) {
-        if (throwable instanceof ExoPlaybackException) {
+        if (throwable instanceof PlaybackException) {
             Throwable cause = throwable.getCause();
             return cause instanceof Loader.UnexpectedLoaderException;
         }
