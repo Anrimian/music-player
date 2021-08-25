@@ -16,15 +16,14 @@ import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.upstream.ContentDataSource;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.Loader;
 
 import java.util.concurrent.TimeUnit;
@@ -86,6 +85,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                               @Nullable ErrorType previousErrorType) {
         isPreparing = true;
         this.currentComposition = composition;
+        //cancel previous preparation?
         Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)
                 .doOnEvent(t -> onCompositionPrepared(t, startPosition))
@@ -273,7 +273,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     }
 
     private boolean isStrangeLoaderException(Throwable throwable) {
-        if (throwable instanceof ExoPlaybackException) {
+        if (throwable instanceof PlaybackException) {
             Throwable cause = throwable.getCause();
             return cause instanceof Loader.UnexpectedLoaderException;
         }
@@ -282,13 +282,9 @@ public class ExoMediaPlayer implements AppMediaPlayer {
 
     private Single<MediaSource> createMediaSource(Uri uri) {
         return Single.fromCallable(() -> {
-            DataSpec dataSpec = new DataSpec(uri);
-            final ContentDataSource dataSource = new ContentDataSource(context);
-            dataSource.open(dataSpec);
-
-            DataSource.Factory factory = () -> dataSource;
-            MediaItem mediaItem = new MediaItem.Builder().setUri(uri).build();
-            return new ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem);
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context);
+            MediaItem mediaItem = MediaItem.fromUri(uri);
+            return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem);
         });
     }
 

@@ -16,7 +16,6 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -32,6 +31,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
+import com.github.anrimian.musicplayer.ui.common.images.glide.GlideApp;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.CustomAppWidgetTarget;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
@@ -67,7 +67,7 @@ public class CoverImageLoader {
             return;
         }
 
-        Glide.with(imageView)
+        GlideApp.with(imageView)
                 .asBitmap()
                 .load(new CompositionImage(data.getId(), data.getDateModified()))
                 .override(getCoverSize())
@@ -95,6 +95,13 @@ public class CoverImageLoader {
                     }
                 })
                 .into(imageView);
+    }
+
+    public void clearImage(@NonNull ImageView imageView) {
+        if (!isValidContextForGlide(imageView)) {
+            return;
+        }
+        GlideApp.with(imageView).clear(imageView);
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
@@ -130,7 +137,7 @@ public class CoverImageLoader {
             return;
         }
 
-        Glide.with(imageView)
+        GlideApp.with(imageView)
                 .asBitmap()
                 .load(album)
                 .override(getCoverSize())
@@ -194,12 +201,12 @@ public class CoverImageLoader {
             Uri uri = new Uri.Builder()
                     .scheme(ContentResolver.SCHEME_CONTENT)
                     .authority(context.getString(R.string.covers_file_provider_authorities))
-                    .appendPath(file.getPath())
+                    .path(file.getPath())
                     .build();
             onCompleted.call(uri);
         });
-        Glide.with(context)
-                .downloadOnly()
+        GlideApp.with(context)
+                .asFile()
                 .load(new CompositionImage(data.getId(), data.getDateModified()))
                 .override(getCoverSize())
                 .timeout(TIMEOUT_MILLIS)
@@ -218,7 +225,7 @@ public class CoverImageLoader {
                 placeholder,
                 appWidgetId);
 
-        Glide.with(context)
+        GlideApp.with(context)
                 .asBitmap()
                 .load(new CompositionImage(compositionId, new Date(compositionUpdateTime)))
                 .override(getCoverSize())
@@ -237,11 +244,11 @@ public class CoverImageLoader {
         }
 
         //here replacement with error placeholder flickers, don't know how to solve it
-        Glide.with(imageView)
+        GlideApp.with(imageView)
                 .asBitmap()
                 .load(data)
                 .override(getCoverSize())
-                .thumbnail(Glide.with(imageView)
+                .thumbnail(GlideApp.with(imageView)
                         .asBitmap()
                         .load(oldData)
                         .override(getCoverSize())
@@ -281,18 +288,18 @@ public class CoverImageLoader {
             onCompleted.call(bitmap);
         });
 
-        Glide.with(context)
+        GlideApp.with(context)
                 .asBitmap()
                 .load(compositionImage)
                 .override(getCoverSize())
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
-        return () -> Glide.with(context).clear(target);
+        return () -> GlideApp.with(context).clear(target);
     }
 
     private void loadImage(@Nonnull Object data, Callback<Bitmap> onCompleted) {
-        Glide.with(context)
+        GlideApp.with(context)
                 .asBitmap()
                 .load(data)
                 .override(getCoverSize())

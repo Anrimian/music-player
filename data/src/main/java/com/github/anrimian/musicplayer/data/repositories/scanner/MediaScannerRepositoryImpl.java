@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
+import android.database.sqlite.SQLiteDiskIOException;
+
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
@@ -27,6 +29,8 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 public class MediaScannerRepositoryImpl implements MediaScannerRepository {
+
+    private static final int RETRY_COUNT = 5;
 
     private final StorageMusicProvider musicProvider;
     private final StoragePlayListsProvider playListsProvider;
@@ -83,10 +87,14 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 .switchMap(musicProvider::getCompositionsObservable)
                 .subscribeOn(scheduler)
                 .observeOn(scheduler)
-                .subscribe(compositionAnalyzer::applyCompositionsData));//then run file scanner
+                .doOnNext(compositionAnalyzer::applyCompositionsData)
+                .retry(RETRY_COUNT, this::isStandardError)//then run file scanner
+                .subscribe(o -> {}, this::onScanError));
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)
-                .subscribe(playlistAnalyzer::applyPlayListData));
+                .doOnNext(playlistAnalyzer::applyPlayListData)
+                .retry(RETRY_COUNT, this::isStandardError)
+                .subscribe(o -> {}, this::onScanError));
 
         //genre in files and genre in media store are ofter different, we need deep file scanner for them
         //<return genres after deep scan implementation>
@@ -119,8 +127,26 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 //                long dbId = genreId.getDbId();
 //                applyGenreItemsData(dbId, genresProvider.getGenreItems(storageId));
 //            }
-        }).doOnError(e -> loggerRepository.setWasCriticalFatalError(true))
+        }).onErrorResumeNext(this::processError)
+                .doOnError(e -> loggerRepository.setWasCriticalFatalError(true))
                 .subscribeOn(scheduler);
+    }
+
+    private Completable processError(Throwable throwable) {
+        if (isStandardError(throwable)) {
+            return Completable.complete();
+        }
+        return Completable.error(throwable);
+    }
+
+    private void onScanError(Throwable throwable) throws Throwable {
+        if (!isStandardError(throwable)) {
+            throw throwable;
+        }
+    }
+
+    private boolean isStandardError(Throwable throwable) {
+        return throwable instanceof SQLiteDiskIOException;
     }
 
     private void onStorageGenresReceived(Map<String, StorageGenre> newGenres) {

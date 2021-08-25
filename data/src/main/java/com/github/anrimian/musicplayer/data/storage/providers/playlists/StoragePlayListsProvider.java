@@ -1,10 +1,17 @@
 package com.github.anrimian.musicplayer.data.storage.providers.playlists;
 
+import static android.provider.BaseColumns._ID;
+import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
+import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
+import static android.text.TextUtils.isEmpty;
+import static java.util.Collections.emptyList;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore.Audio.Playlists;
 
 import androidx.collection.LongSparseArray;
@@ -25,12 +32,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-
-import static android.provider.BaseColumns._ID;
-import static android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID;
-import static android.provider.MediaStore.Audio.Playlists.Members.getContentUri;
-import static android.text.TextUtils.isEmpty;
-import static java.util.Collections.emptyList;
 
 public class StoragePlayListsProvider {
 
@@ -120,7 +121,10 @@ public class StoragePlayListsProvider {
 
     public void deletePlayList(long id) {
         StorageMusicProvider.checkIfMediaStoreAvailable(context);
-        contentResolver.delete(getContentUri("external", id), null, null);
+
+        contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(id) });
     }
 
     public Observable<List<StoragePlayListItem>> getPlayListEntriesObservable(long playListId) {
@@ -132,7 +136,7 @@ public class StoragePlayListsProvider {
     public List<StoragePlayListItem> getPlayListItems(long playListId) {
         try(Cursor cursor = contentResolver.query(
                 getContentUri("external", playListId),
-                new String[] {AUDIO_ID, _ID},
+                new String[] { AUDIO_ID, _ID },
                 null,
                 null,
                 Playlists.Members.PLAY_ORDER)) {
@@ -197,15 +201,18 @@ public class StoragePlayListsProvider {
     }
 
     public void updatePlayListName(long playListId, String name) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            //unsupported
+            return;
+        }
         StorageMusicProvider.checkIfMediaStoreAvailable(context);
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
-        contentValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
-        contentResolver.update(getContentUri("external", playListId),
+        contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
                 contentValues,
-                null,
-                null);
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(playListId) });
     }
 
     private void updateModifyTime(long playListId) {
@@ -213,19 +220,19 @@ public class StoragePlayListsProvider {
 
         ContentValues playListValues = new ContentValues();
         playListValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);
-        contentResolver.update(getContentUri("external", playListId),
+        contentResolver.update(Playlists.EXTERNAL_CONTENT_URI,
                 playListValues,
-                null,
-                null);
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(playListId) });
     }
 
     @Nullable
     private StoragePlayList findPlayList(long id) {
         try(Cursor cursor = contentResolver.query(
-                getContentUri("external", id),
+                Playlists.EXTERNAL_CONTENT_URI,
                 null,
-                null,
-                null,
+                Playlists._ID + " = ?",
+                new String[] { String.valueOf(id) },
                 Playlists.DATE_ADDED + " DESC")) {
             if (cursor != null && cursor.moveToFirst()) {
                 CursorWrapper cursorWrapper = new CursorWrapper(cursor);

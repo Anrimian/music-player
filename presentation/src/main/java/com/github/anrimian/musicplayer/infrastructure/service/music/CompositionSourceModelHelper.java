@@ -1,8 +1,13 @@
 package com.github.anrimian.musicplayer.infrastructure.service.music;
 
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadata;
+import android.os.Build;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
@@ -17,10 +22,6 @@ import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 public class CompositionSourceModelHelper {
 
@@ -57,9 +58,21 @@ public class CompositionSourceModelHelper {
                                 uriStr = uri.toString();
                             }
                             metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr);
-                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
+
+                //uri doesn't work for lock screen background, so put it here
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                    Components.getAppComponent()
+                            .imageLoader()
+                            .loadImage(composition, bitmap -> {
+                                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
+                                mediaSession.setMetadata(metadataBuilder.build());
+                            });
+                } else {
+                    metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
+                    mediaSession.setMetadata(metadataBuilder.build());
+                }
             }
             if (source instanceof UriCompositionSource) {
                 Components.getAppComponent()

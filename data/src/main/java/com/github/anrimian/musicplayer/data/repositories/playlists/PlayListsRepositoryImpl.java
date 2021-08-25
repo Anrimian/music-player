@@ -20,11 +20,13 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 
+//TODO consider write playlists in audio file tags
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     private final StoragePlayListsProvider storagePlayListsProvider;
     private final PlayListsDaoWrapper playListsDao;
-    private final Scheduler scheduler;
+    private final Scheduler dbScheduler;
+    private final Scheduler slowBgScheduler;
 
     @Nullable
     private PlayListItem deletedItem;
@@ -33,10 +35,12 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
                                    PlayListsDaoWrapper playListsDao,
-                                   Scheduler scheduler) {
+                                   Scheduler dbScheduler,
+                                   Scheduler slowBgScheduler) {
         this.storagePlayListsProvider = storagePlayListsProvider;
         this.playListsDao = playListsDao;
-        this.scheduler = scheduler;
+        this.dbScheduler = dbScheduler;
+        this.slowBgScheduler = slowBgScheduler;
     }
 
     @Override
@@ -65,7 +69,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                     () -> storagePlayListsProvider.createPlayList(name, currentDate, currentDate)
             );
             return new PlayList(id, name, currentDate, currentDate, 0, 0);
-        }).subscribeOn(scheduler);
+        }).subscribeOn(dbScheduler);
     }
 
     @Override
@@ -79,22 +83,19 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     public Completable addCompositionsToPlayList(List<Composition> compositions,
                                                  PlayList playList,
                                                  boolean checkForDuplicates) {
-        return addCompositionsToPlayList(compositions, playList.getId(), playList.getCompositionsCount());
+        return addCompositionsToPlayList(compositions, playList, playList.getCompositionsCount())
+                .subscribeOn(dbScheduler);
     }
 
     @Override
     public Completable deleteItemFromPlayList(PlayListItem playListItem, long playListId) {
         return Completable.fromAction(() -> {
-            Long storagePlayListId = playListsDao.selectStorageId(playListId);
-            Long storageItemId = playListsDao.selectStorageItemId(playListItem.getItemId());
-            if (storageItemId != null && storagePlayListId != null) {
-                storagePlayListsProvider.deleteItemFromPlayList(storageItemId, storagePlayListId);
-            }
             int position = playListsDao.deletePlayListEntry(playListItem.getItemId(), playListId);
+            deleteItemFromStoragePlayList(playListItem, playListId);
             deletedItem = playListItem;
             deletedItemPlayListId = playListId;
             deletedItemPosition = position;
-        }).subscribeOn(scheduler);
+        }).subscribeOn(dbScheduler);
     }
 
     @Override
@@ -116,16 +117,15 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
             if (storageId != null) {
                 storagePlayListsProvider.deletePlayList(storageId);
             }
-        }).subscribeOn(scheduler);
+        }).subscribeOn(dbScheduler);
     }
 
     @Override
     public Completable moveItemInPlayList(PlayList playList, int from, int to) {
         return Completable.fromAction(() -> {
-            Long storageId = playListsDao.selectStorageId(playList.getId());
-            storagePlayListsProvider.moveItemInPlayList(storageId, from, to);//quite slow
             playListsDao.moveItems(playList.getId(), from, to);
-        }).subscribeOn(scheduler);
+            moveItemInStoragePlayList(playList, from, to);
+        }).subscribeOn(dbScheduler);
     }
 
     @Override
@@ -136,19 +136,19 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
             if (storageId != null) {
                 storagePlayListsProvider.updatePlayListName(storageId, name);
             }
-        }).subscribeOn(scheduler);
+        }).subscribeOn(dbScheduler);
     }
 
+    //media store playlist methods are quite slow, run on separate thread
     private Completable addCompositionsToPlayList(List<Composition> compositions,
                                                   long playListId,
                                                   int position) {
         return Completable.fromAction(() ->
                 playListsDao.addCompositions(compositions, playListId, position)
-        ).subscribeOn(scheduler)
+        ).subscribeOn(dbScheduler)
                 .doOnComplete(() -> addCompositionsToStoragePlaylist(compositions, playListId, position));
     }
 
-    //can be slow on large amount of data, run in separate task
     private void addCompositionsToStoragePlaylist(List<Composition> compositions,
                                                   long playListId,
                                                   int position) {
@@ -160,7 +160,28 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                         position);
             }
         }).onErrorComplete()
-                .subscribeOn(scheduler)
+                .subscribeOn(slowBgScheduler)
+                .subscribe();
+    }
+
+    private void moveItemInStoragePlayList(PlayList playList, int from, int to) {
+        Completable.fromAction(() -> {
+            Long storageId = playListsDao.selectStorageId(playList.getId());
+            storagePlayListsProvider.moveItemInPlayList(storageId, from, to);
+        }).onErrorComplete()
+                .subscribeOn(slowBgScheduler)
+                .subscribe();
+    }
+
+    private void deleteItemFromStoragePlayList(PlayListItem playListItem, long playListId) {
+        Completable.fromAction(() -> {
+            Long storagePlayListId = playListsDao.selectStorageId(playListId);
+            Long storageItemId = playListsDao.selectStorageItemId(playListItem.getItemId());
+            if (storageItemId != null && storagePlayListId != null) {
+                storagePlayListsProvider.deleteItemFromPlayList(storageItemId, storagePlayListId);
+            }
+        }).onErrorComplete()
+                .subscribeOn(slowBgScheduler)
                 .subscribe();
     }
 }

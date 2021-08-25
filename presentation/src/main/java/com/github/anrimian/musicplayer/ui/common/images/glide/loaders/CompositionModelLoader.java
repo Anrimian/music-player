@@ -1,20 +1,26 @@
 package com.github.anrimian.musicplayer.ui.common.images.glide.loaders;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
+
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.data.DataFetcher;
+import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.AppModelLoader;
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage;
+import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 
-import java.nio.ByteBuffer;
+public class CompositionModelLoader extends AppModelLoader<CompositionImage, Bitmap> {
 
-public class CompositionModelLoader extends AppModelLoader<CompositionImage, ByteBuffer> {
-
+    private final Context context;
     private final CompositionSourceProvider compositionSourceProvider;
 
-    public CompositionModelLoader(CompositionSourceProvider compositionSourceProvider) {
+    public CompositionModelLoader(Context context, CompositionSourceProvider compositionSourceProvider) {
+        this.context = context;
         this.compositionSourceProvider = compositionSourceProvider;
     }
 
@@ -26,18 +32,31 @@ public class CompositionModelLoader extends AppModelLoader<CompositionImage, Byt
     @Override
     protected void loadData(CompositionImage compositionImage,
                             @NonNull Priority priority,
-                            @NonNull DataFetcher.DataCallback<? super ByteBuffer> callback) {
+                            @NonNull DataFetcher.DataCallback<? super Bitmap> callback) {
+        MediaMetadataRetriever mmr = null;
         try {
             long id = compositionImage.getId();
             byte[] imageBytes = compositionSourceProvider.getCompositionArtworkBinaryData(id)
                     .blockingGet();
-            ByteBuffer result = null;
-            if (imageBytes != null) {
-                result = ByteBuffer.wrap(imageBytes);
+
+            if (imageBytes == null) {
+                mmr = new MediaMetadataRetriever();
+                mmr.setDataSource(compositionSourceProvider.getCompositionFileDescriptor(id));
+                imageBytes = mmr.getEmbeddedPicture();
             }
-            callback.onDataReady(result);
+
+            Bitmap bitmap = null;
+            if (imageBytes != null) {
+                int coverSize = context.getResources().getInteger(R.integer.icon_image_size);
+                bitmap = ImageUtils.decodeBitmap(imageBytes, coverSize);
+            }
+            callback.onDataReady(bitmap);
         } catch (Exception e) {
             callback.onLoadFailed(e);
+        } finally {
+            if (mmr != null) {
+                mmr.release();
+            }
         }
     }
 
