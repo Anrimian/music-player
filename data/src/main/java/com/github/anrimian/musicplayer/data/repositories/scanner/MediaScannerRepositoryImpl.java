@@ -89,12 +89,14 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 .observeOn(scheduler)
                 .doOnNext(compositionAnalyzer::applyCompositionsData)
                 .retry(RETRY_COUNT, this::isStandardError)
-                .subscribe(o -> {}, this::onScanError));
+                .onErrorComplete(this::isStandardError)
+                .subscribe(o -> {}));
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)
                 .doOnNext(playlistAnalyzer::applyPlayListData)
                 .retry(RETRY_COUNT, this::isStandardError)
-                .subscribe(o -> {}, this::onScanError));
+                .onErrorComplete(this::isStandardError)
+                .subscribe(o -> {}));
 
         //genre in files and genre in media store are ofter different, we need deep file scanner for them
         //<return genres after deep scan implementation>
@@ -137,12 +139,6 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
             return Completable.complete();
         }
         return Completable.error(throwable);
-    }
-
-    private void onScanError(Throwable throwable) throws Throwable {
-        if (!isStandardError(throwable)) {
-            throw throwable;
-        }
     }
 
     private boolean isStandardError(Throwable throwable) {
