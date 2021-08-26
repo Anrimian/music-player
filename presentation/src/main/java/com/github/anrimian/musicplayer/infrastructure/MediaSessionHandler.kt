@@ -34,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 
@@ -46,6 +47,7 @@ class MediaSessionHandler(private val context: Context,
                           private val playerInteractor: PlayerInteractor,
                           private val libraryPlayerInteractor: LibraryPlayerInteractor,
                           private val musicServiceInteractor: MusicServiceInteractor,
+                          private val uiScheduler: Scheduler,
                           private val errorParser: ErrorParser
 ) {
 
@@ -101,14 +103,14 @@ class MediaSessionHandler(private val context: Context,
 
     private fun subscribeOnPlaybackStateActions() {
         mediaSessionDisposable.add(Observable.combineLatest(
-            playerInteractor.playerStateObservable,
-            libraryPlayerInteractor.currentQueueItemObservable,
-            playerInteractor.currentSourceObservable,
-            playerInteractor.trackPositionObservable,
-            playerInteractor.currentPlaybackSpeedObservable,
-            musicServiceInteractor.repeatModeObservable,
-            musicServiceInteractor.randomModeObservable,
-            playbackState::set
+                playerInteractor.playerStateObservable,
+                libraryPlayerInteractor.currentQueueItemObservable,
+                playerInteractor.currentSourceObservable,
+                playerInteractor.trackPositionObservable,
+                playerInteractor.currentPlaybackSpeedObservable,
+                musicServiceInteractor.repeatModeObservable,
+                musicServiceInteractor.randomModeObservable,
+                playbackState::set
         ).subscribe(this::onPlayBackStateReceived))
     }
 
@@ -121,41 +123,41 @@ class MediaSessionHandler(private val context: Context,
 
     private fun processExternalPlaybackState(playbackState: PlaybackState) {
         val playbackStateBuilder = PlaybackStateCompat.Builder()
-            .setActions(
-                PlaybackStateCompat.ACTION_PLAY
-                        or PlaybackStateCompat.ACTION_STOP
-                        or PlaybackStateCompat.ACTION_PAUSE
-                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
-                        or PlaybackStateCompat.ACTION_SEEK_TO
-                        or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
-                        or PlaybackStateCompat.ACTION_FAST_FORWARD
-                        or PlaybackStateCompat.ACTION_REWIND
-                        or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-                        or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
-            )
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY
+                                or PlaybackStateCompat.ACTION_STOP
+                                or PlaybackStateCompat.ACTION_PAUSE
+                                or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                                or PlaybackStateCompat.ACTION_SEEK_TO
+                                or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
+                                or PlaybackStateCompat.ACTION_FAST_FORWARD
+                                or PlaybackStateCompat.ACTION_REWIND
+                                or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                                or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
+                )
 
         playbackStateBuilder.addCustomAction(
-            REWIND_ACTION_ID,
-            context.getString(R.string.rewind),
-            R.drawable.ic_rewind
+                REWIND_ACTION_ID,
+                context.getString(R.string.rewind),
+                R.drawable.ic_rewind
         )
 
         playbackStateBuilder.addCustomAction(
-            FAST_FORWARD_ACTION_ID,
-            context.getString(R.string.fast_forward),
-            R.drawable.ic_fast_forward
+                FAST_FORWARD_ACTION_ID,
+                context.getString(R.string.fast_forward),
+                R.drawable.ic_fast_forward
         )
 
         playbackStateBuilder.addCustomAction(
-            REPEAT_ACTION_ID,
-            context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
-            FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
+                REPEAT_ACTION_ID,
+                context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
+                FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
         )
 
         playbackStateBuilder.setState(
-            toMediaState(playbackState.playerState),
-            playbackState.trackPosition,
-            playbackState.playbackSpeed)
+                toMediaState(playbackState.playerState),
+                playbackState.trackPosition,
+                playbackState.playbackSpeed)
 
         playbackStateBuilder.setActiveQueueItemId(0L)
 
@@ -166,42 +168,42 @@ class MediaSessionHandler(private val context: Context,
 
     private fun processLibraryPlaybackState(playbackState: PlaybackState) {
         val playbackStateBuilder = PlaybackStateCompat.Builder()
-            .setActions(
-                PlaybackStateCompat.ACTION_PLAY
-                        or PlaybackStateCompat.ACTION_STOP
-                        or PlaybackStateCompat.ACTION_PAUSE
-                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
-                        or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-                        or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                        or PlaybackStateCompat.ACTION_SEEK_TO
-                        or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
-                        or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
-                        or PlaybackStateCompat.ACTION_FAST_FORWARD
-                        or PlaybackStateCompat.ACTION_REWIND
-                        or PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM
-                        or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-                        or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
-            )
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY
+                                or PlaybackStateCompat.ACTION_STOP
+                                or PlaybackStateCompat.ACTION_PAUSE
+                                or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                                or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                                or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                                or PlaybackStateCompat.ACTION_SEEK_TO
+                                or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
+                                or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
+                                or PlaybackStateCompat.ACTION_FAST_FORWARD
+                                or PlaybackStateCompat.ACTION_REWIND
+                                or PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM
+                                or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                                or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
+                )
 
         playbackStateBuilder.addCustomAction(
-            REPEAT_ACTION_ID,
-            context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
-            FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
+                REPEAT_ACTION_ID,
+                context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
+                FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
         )
         playbackStateBuilder.addCustomAction(
-            SHUFFLE_ACTION_ID,
-            context.getString(R.string.content_description_shuffle),
-            FormatUtils.getRandomModeIcon(playbackState.randomMode)
+                SHUFFLE_ACTION_ID,
+                context.getString(R.string.content_description_shuffle),
+                FormatUtils.getRandomModeIcon(playbackState.randomMode)
         )
         playbackStateBuilder.addCustomAction(
-            REWIND_ACTION_ID,
-            context.getString(R.string.rewind),
-            R.drawable.ic_rewind
+                REWIND_ACTION_ID,
+                context.getString(R.string.rewind),
+                R.drawable.ic_rewind
         )
         playbackStateBuilder.addCustomAction(
-            FAST_FORWARD_ACTION_ID,
-            context.getString(R.string.fast_forward),
-            R.drawable.ic_fast_forward
+                FAST_FORWARD_ACTION_ID,
+                context.getString(R.string.fast_forward),
+                R.drawable.ic_fast_forward
         )
 
         //leave it for now
@@ -209,9 +211,9 @@ class MediaSessionHandler(private val context: Context,
 //          newTrackPosition = CompositionSourceModelHelper.getTrackPosition(newCompositionSource);
 //      }
         playbackStateBuilder.setState(
-            toMediaState(playbackState.playerState),
-            playbackState.trackPosition,
-            playbackState.playbackSpeed)
+                toMediaState(playbackState.playerState),
+                playbackState.trackPosition,
+                playbackState.playbackSpeed)
 
         val playQueueCurrentItemId = playbackState.playQueueCurrentItem.playQueueItem?.id ?: 0L
         playbackStateBuilder.setActiveQueueItemId(playQueueCurrentItemId)
@@ -235,10 +237,11 @@ class MediaSessionHandler(private val context: Context,
 
     private fun subscribeOnMediaSessionMetadata() {
         mediaSessionDisposable.add(Observable.combineLatest(
-            playerInteractor.currentSourceObservable,
-            musicServiceInteractor.notificationSettingObservable,
-            metadataState::set
-        ).subscribe(this::onMetadataStateReceived))
+                playerInteractor.currentSourceObservable,
+                musicServiceInteractor.notificationSettingObservable,
+                metadataState::set
+        ).observeOn(uiScheduler)
+                .subscribe(this::onMetadataStateReceived))
     }
 
     private fun onMetadataStateReceived(state: MetadataState) {
@@ -246,26 +249,26 @@ class MediaSessionHandler(private val context: Context,
         val currentSource = state.currentSource.value
 
         CompositionSourceModelHelper.updateMediaSessionMetadata(
-            currentSource,
-            metadataBuilder,
-            getMediaSession(),
-            context
+                currentSource,
+                metadataBuilder,
+                getMediaSession(),
+                context
         )
 
         //we can use uri
         CompositionSourceModelHelper.updateMediaSessionAlbumArt(
-            currentSource,
-            metadataBuilder,
-            getMediaSession(),
-            state.settings.isCoversOnLockScreen
+                currentSource,
+                metadataBuilder,
+                getMediaSession(),
+                state.settings.isCoversOnLockScreen
         )
     }
 
     private fun subscribeOnPlayQueue() {
         mediaSessionDisposable.add(Observable.combineLatest(
-            libraryPlayerInteractor.playQueueObservable.toObservable(),
-            playerInteractor.currentSourceObservable,
-            ::PlayQueueState
+                libraryPlayerInteractor.playQueueObservable.toObservable(),
+                playerInteractor.currentSourceObservable,
+                ::PlayQueueState
         ).subscribe(this::onPlayQueueReceived))
     }
 
@@ -280,9 +283,9 @@ class MediaSessionHandler(private val context: Context,
     private fun toSessionQueueItem(item: PlayQueueItem): MediaSessionCompat.QueueItem {
         val composition = item.composition
         val mediaDescription = MediaDescriptionCompat.Builder()
-            .setTitle(CompositionHelper.formatCompositionName(composition))
-            .setSubtitle(formatCompositionAdditionalInfoForMediaBrowser(context, composition))
-            .build()
+                .setTitle(CompositionHelper.formatCompositionName(composition))
+                .setSubtitle(formatCompositionAdditionalInfoForMediaBrowser(context, composition))
+                .build()
         return MediaSessionCompat.QueueItem(mediaDescription, item.id)
     }
 
@@ -302,8 +305,8 @@ class MediaSessionHandler(private val context: Context,
         lateinit var settings: MusicNotificationSetting
 
         fun set(
-            currentSource: Optional<CompositionSource>,
-            settings: MusicNotificationSetting
+                currentSource: Optional<CompositionSource>,
+                settings: MusicNotificationSetting
         ): MetadataState {
             this.currentSource = currentSource
             this.settings = settings
@@ -321,13 +324,13 @@ class MediaSessionHandler(private val context: Context,
         var randomMode: Boolean = false
 
         fun set(
-            playerState: PlayerState,
-            playQueueCurrentItem: PlayQueueEvent,
-            currentSource: Optional<CompositionSource>,
-            trackPosition: Long,
-            playbackSpeed: Float,
-            repeatMode: Int,
-            randomMode: Boolean
+                playerState: PlayerState,
+                playQueueCurrentItem: PlayQueueEvent,
+                currentSource: Optional<CompositionSource>,
+                trackPosition: Long,
+                playbackSpeed: Float,
+                repeatMode: Int,
+                randomMode: Boolean
         ): PlaybackState {
             this.playerState = playerState
             this.playQueueCurrentItem = playQueueCurrentItem
@@ -341,8 +344,8 @@ class MediaSessionHandler(private val context: Context,
     }
 
     private class PlayQueueState(
-        val playQueue: List<PlayQueueItem>,
-        val currentSource: Optional<CompositionSource>
+            val playQueue: List<PlayQueueItem>,
+            val currentSource: Optional<CompositionSource>
     )
 
     private inner class AppMediaSessionCallback : MediaSessionCompat.Callback() {
@@ -411,18 +414,18 @@ class MediaSessionHandler(private val context: Context,
                 PAUSE_ACTION_ID -> libraryPlayerInteractor.pause()
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     actionDisposable = musicServiceInteractor.shuffleAllAndPlay()
-                        .subscribe({}, this::processError)
+                            .subscribe({}, this::processError)
                 }
                 COMPOSITIONS_ACTION_ID -> {
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromCompositions(position)
-                        .subscribe({}, this::processError)
+                            .subscribe({}, this::processError)
                 }
                 SEARCH_ITEMS_ACTION_ID -> {
                     val position = extras.getInt(POSITION_ARG)
                     val searchQuery = extras.getString(SEARCH_QUERY_ARG)
                     actionDisposable = musicServiceInteractor.playFromSearch(searchQuery, position)
-                        .subscribe({}, this::processError)
+                            .subscribe({}, this::processError)
                 }
                 FOLDERS_ACTION_ID -> {
                     var folderId: Long? = extras.getLong(FOLDER_ID_ARG)
@@ -436,19 +439,19 @@ class MediaSessionHandler(private val context: Context,
                     val artistId = extras.getLong(ARTIST_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromArtistCompositions(artistId, position)
-                        .subscribe({}, this::processError)
+                            .subscribe({}, this::processError)
                 }
                 ALBUM_ITEMS_ACTION_ID -> {
                     val albumId = extras.getLong(ALBUM_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromAlbumCompositions(albumId, position)
-                        .subscribe({}, this::processError)
+                            .subscribe({}, this::processError)
                 }
                 PLAYLIST_ITEMS_ACTION_ID -> {
                     val playlistId = extras.getLong(PLAYLIST_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromPlaylistItems(playlistId, position)
-                        .subscribe({}, this::processError)
+                            .subscribe({}, this::processError)
                 }
             }
         }
@@ -469,7 +472,7 @@ class MediaSessionHandler(private val context: Context,
         override fun onPlayFromSearch(query: String, extras: Bundle) {
             val formattedQuery = query.ifEmpty { null }
             actionDisposable = musicServiceInteractor.playFromSearch(formattedQuery)
-                .subscribe({}, this::processError)
+                    .subscribe({}, this::processError)
         }
 
         //next - not implemented

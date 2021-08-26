@@ -285,12 +285,14 @@ class MusicModule {
                                             PlayerInteractor playerInteractor,
                                             LibraryPlayerInteractor libraryPlayerInteractor,
                                             MusicServiceInteractor musicServiceInteractor,
+                                            @Named(UI_SCHEDULER) Scheduler scheduler,
                                             ErrorParser errorParser) {
         return new MediaSessionHandler(
                 context,
                 playerInteractor,
                 libraryPlayerInteractor,
                 musicServiceInteractor,
+                scheduler,
                 errorParser
         );
     }
