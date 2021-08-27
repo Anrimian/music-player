@@ -20,7 +20,7 @@ class CompositionEditorPresenter(
     
     private var changeDisposable: Disposable? = null
     
-    private var composition: FullComposition? = null
+    private lateinit var composition: FullComposition
     private var removedGenre: ShortGenre? = null
     private var lastEditAction: Completable? = null
     
@@ -31,7 +31,7 @@ class CompositionEditorPresenter(
     }
 
     fun onChangeAuthorClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         editorInteractor.authorNames
@@ -47,28 +47,28 @@ class CompositionEditorPresenter(
     }
 
     fun onChangeTitleClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         viewState.showEnterTitleDialog(composition)
     }
 
     fun onChangeLyricsClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         viewState.showEnterLyricsDialog(composition)
     }
 
     fun onChangeFileNameClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         viewState.showEnterFileNameDialog(composition)
     }
 
     fun onChangeAlbumClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         editorInteractor.albumNames
@@ -84,7 +84,7 @@ class CompositionEditorPresenter(
     }
 
     fun onChangeAlbumArtistClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         editorInteractor.authorNames
@@ -112,7 +112,7 @@ class CompositionEditorPresenter(
                 .subscribe()
     }
 
-    fun onGenreItemClicked(genre: ShortGenre?) {
+    fun onGenreItemClicked(genre: ShortGenre) {
         editorInteractor.genreNames
                 .observeOn(uiScheduler)
                 .doOnSuccess { genres -> viewState.showEditGenreDialog(genre, genres) }
@@ -126,7 +126,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewGenreEntered(genre: String) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -139,7 +139,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewGenreNameEntered(newName: String?, oldGenre: ShortGenre?) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -152,7 +152,7 @@ class CompositionEditorPresenter(
     }
 
     fun onRemoveGenreClicked(genre: ShortGenre) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -172,7 +172,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewAuthorEntered(author: String?) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -185,7 +185,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewAlbumEntered(album: String?) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -198,7 +198,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewAlbumArtistEntered(artist: String?) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -211,7 +211,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewTitleEntered(title: String) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -224,7 +224,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewFileNameEntered(fileName: String) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -237,7 +237,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewLyricsEntered(text: String?) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -250,21 +250,21 @@ class CompositionEditorPresenter(
     }
 
     fun onCopyFileNameClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
-        viewState.copyFileNameText(composition!!.fileName)
+        viewState.copyFileNameText(composition.fileName)
     }
 
     fun onChangeCoverClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         viewState.showCoverActionsDialog()
     }
 
     fun onClearCoverClicked() {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -281,7 +281,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewImageForCoverSelected(imageSource: ImageSource?) {
-        if (composition == null) {
+        if (!::composition.isInitialized) {
             return
         }
         RxUtils.dispose(changeDisposable, presenterDisposable)
@@ -327,7 +327,7 @@ class CompositionEditorPresenter(
     }
 
     private fun onCompositionReceived(composition: FullComposition) {
-        if (this.composition == null) {
+        if (!this::composition.isInitialized) {
             checkCompositionTagsInSource(composition)
         }
         this.composition = composition

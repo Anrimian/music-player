@@ -26,7 +26,7 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
-import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity
+import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment
@@ -307,7 +307,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, FragmentLayerList
             R.id.menu_add_to_queue -> presenter.onAddToQueueCompositionClicked(composition)
             R.id.menu_add_to_playlist -> presenter.onAddToPlayListButtonClicked(composition)
             R.id.menu_edit ->
-                startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.id))
+                startActivity(newCompositionEditorIntent(requireContext(), composition.id))
             R.id.menu_share -> DialogUtils.shareComposition(requireContext(), composition)
             R.id.menu_delete_from_play_list ->
                 presenter.onDeleteFromPlayListButtonClicked(PlayListItem(playListId, composition))

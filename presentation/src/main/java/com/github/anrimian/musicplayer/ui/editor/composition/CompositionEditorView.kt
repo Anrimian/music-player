@@ -1,80 +1,78 @@
-package com.github.anrimian.musicplayer.ui.editor.composition;
+package com.github.anrimian.musicplayer.ui.editor.composition
 
-import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
+import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
+import moxy.MvpView
+import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
+import moxy.viewstate.strategy.alias.Skip
 
-import java.util.List;
+private const val DISPLAY_COMPOSITION_STATE = "display_composition_state"
+private const val CHANGE_FILE_STATE = "change_file_state"
 
-import moxy.MvpView;
-import moxy.viewstate.strategy.StateStrategyType;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
-import moxy.viewstate.strategy.alias.Skip;
-
-public interface CompositionEditorView extends MvpView {
-
-    String DISPLAY_COMPOSITION_STATE = "display_composition_state";
-    String CHANGE_FILE_STATE = "change_file_state";
+interface CompositionEditorView : MvpView {
 
     @OneExecution
-    void closeScreen();
+    fun closeScreen()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = DISPLAY_COMPOSITION_STATE)
-    void showCompositionLoadingError(ErrorCommand errorCommand);
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = DISPLAY_COMPOSITION_STATE)
+    fun showCompositionLoadingError(errorCommand: ErrorCommand)
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = DISPLAY_COMPOSITION_STATE)
-    void showComposition(FullComposition composition);
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = DISPLAY_COMPOSITION_STATE)
+    fun showComposition(composition: FullComposition)
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_FILE_STATE)
-    void showChangeFileProgress();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = CHANGE_FILE_STATE)
+    fun showChangeFileProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = CHANGE_FILE_STATE)
-    void hideChangeFileProgress();
-
-    @OneExecution
-    void showErrorMessage(ErrorCommand errorCommand);
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = CHANGE_FILE_STATE)
+    fun hideChangeFileProgress()
 
     @OneExecution
-    void showCheckTagsErrorMessage(ErrorCommand errorCommand);
+    fun showErrorMessage(errorCommand: ErrorCommand)
+
+    @OneExecution
+    fun showCheckTagsErrorMessage(errorCommand: ErrorCommand)
 
     @Skip
-    void showEnterAuthorDialog(FullComposition composition, String[] hints);
+    fun showEnterAuthorDialog(composition: FullComposition, hints: Array<String>?)
 
     @Skip
-    void showEnterTitleDialog(FullComposition composition);
+    fun showEnterTitleDialog(composition: FullComposition)
 
     @Skip
-    void showEnterFileNameDialog(FullComposition composition);
+    fun showEnterFileNameDialog(composition: FullComposition)
 
     @Skip
-    void copyFileNameText(String filePath);
+    fun copyFileNameText(filePath: String)
 
     @Skip
-    void showEnterAlbumDialog(FullComposition composition, String[] hints);
+    fun showEnterAlbumDialog(composition: FullComposition, hints: Array<String>?)
 
     @Skip
-    void showEnterAlbumArtistDialog(FullComposition composition, String[] hints);
+    fun showEnterAlbumArtistDialog(composition: FullComposition, hints: Array<String>?)
 
     @Skip
-    void showEnterLyricsDialog(FullComposition composition);
+    fun showEnterLyricsDialog(composition: FullComposition)
 
     @Skip
-    void showAddGenreDialog(String[] genres);
+    fun showAddGenreDialog(genres: Array<String>?)
 
     @Skip
-    void showEditGenreDialog(ShortGenre shortGenre, String[] genres);
+    fun showEditGenreDialog(shortGenre: ShortGenre, genres: Array<String>?)
 
     @AddToEndSingle
-    void showGenres(List<ShortGenre> shortGenres);
+    fun showGenres(shortGenres: List<ShortGenre>)
 
     @OneExecution
-    void showRemovedGenreMessage(ShortGenre genre);
+    fun showRemovedGenreMessage(genre: ShortGenre)
 
     @Skip
-    void showCoverActionsDialog();
+    fun showCoverActionsDialog()
 
     @Skip
-    void showSelectImageFromGalleryScreen();
+    fun showSelectImageFromGalleryScreen()
+
 }
