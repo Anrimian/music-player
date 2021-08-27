@@ -1,5 +1,22 @@
 package com.github.anrimian.musicplayer.ui.library.folders;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.NEW_FOLDER_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareCompositions;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatLinkedFabView;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -68,23 +86,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
-import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.FILE_NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.NEW_FOLDER_NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils.shareCompositions;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatLinkedFabView;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 /**
  * Created on 23.10.2017.
@@ -697,9 +698,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 break;
             }
             case R.id.menu_excluded_folders: {
-                //noinspection ConstantConditions
-                FragmentNavigation.from(getParentFragment().getParentFragmentManager())
-                        .addNewFragment(new ExcludedFoldersFragment());
+                Fragment parentFragment = getParentFragment();
+                if (parentFragment != null) {
+                    FragmentNavigation.from(parentFragment.getParentFragmentManager())
+                            .addNewFragment(new ExcludedFoldersFragment());
+                }
                 break;
             }
             case R.id.menu_sleep_timer: {
