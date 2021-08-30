@@ -38,10 +38,11 @@ public class Composition {
 
     //remove filename from dao:
     //***artists
-    //***albums
     //***genres
-    //remove from models
+    //***remake selection for editor
     //add setting ui
+    //remove from models
+    //rename alphabetical order to by name order
     //add filename order
     @SuppressWarnings("NullableProblems")//annotations break room annotations processing
     public Composition(String artist,

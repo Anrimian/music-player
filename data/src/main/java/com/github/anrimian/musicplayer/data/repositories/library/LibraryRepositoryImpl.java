@@ -109,7 +109,8 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Observable<List<Composition>> getAlbumItemsObservable(long albumId) {
-        return albumsDao.getCompositionsInAlbumObservable(albumId);
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> albumsDao.getCompositionsInAlbumObservable(albumId, useFileName));
     }
 
     @Override
