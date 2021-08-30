@@ -67,9 +67,9 @@ public interface PlayQueueDao {
     @Query("SELECT " +
             "play_queue.id AS itemId," +
             "compositions.id AS id, " +
+            "compositions.storageId AS storageId, " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "compositions.storageId AS storageId, " +
             "compositions.title AS title, " +
             "compositions.fileName AS fileName, " +
             "compositions.duration AS duration, " +

@@ -1,6 +1,9 @@
 package com.github.anrimian.musicplayer.data.database.dao.folders;
 
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+
 import androidx.annotation.Nullable;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
@@ -25,9 +28,6 @@ import java.util.List;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
-
 public class FoldersDaoWrapper {
 
     private final AppDatabase appDatabase;
@@ -43,8 +43,9 @@ public class FoldersDaoWrapper {
     }
 
     public Observable<List<FileSource>> getFilesObservable(Long parentFolderId,
-                                                            Order order,
-                                                            @Nullable String searchText) {
+                                                           Order order,
+                                                           boolean useFileName,
+                                                           @Nullable String searchText) {
         Observable<List<FolderFileSource>> folderObservable = getFoldersObservable(
                 parentFolderId,
                 order,
@@ -54,6 +55,7 @@ public class FoldersDaoWrapper {
                 compositionsDao.getCompositionsInFolderObservable(
                         parentFolderId,
                         order,
+                        useFileName,
                         searchText
                 ).map(list -> mapList(list, CompositionFileSource::new));
 
@@ -77,20 +79,22 @@ public class FoldersDaoWrapper {
         return foldersDao.getAllFolders();
     }
 
-    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources) {
+    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources,
+                                                                     boolean useFileName) {
         return Observable.fromIterable(fileSources)
-                .flatMap(this::fileSourceToComposition)
+                .flatMap(source -> fileSourceToComposition(source, useFileName))
                 .collect(ArrayList::new, List::add);
     }
 
     public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources,
-                                                                     Order order) {
+                                                                     Order order,
+                                                                     boolean useFileName) {
         return Observable.fromIterable(fileSources)
-                .flatMap(fileSource -> fileSourceToComposition(fileSource, order))
+                .flatMap(fileSource -> fileSourceToComposition(fileSource, order, useFileName))
                 .collect(ArrayList::new, List::add);
     }
 
-    public List<Composition> getAllCompositionsInFolder(Long parentFolderId, Order order) {
+    public List<Composition> getAllCompositionsInFolder(Long parentFolderId, Order order, boolean useFileName) {
         List<Composition> result = new LinkedList<>();
 
         String query = FoldersDao.getRecursiveFolderQuery(parentFolderId) +
@@ -101,10 +105,10 @@ public class FoldersDaoWrapper {
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
         List<Long> folders = foldersDao.getFoldersIds(sqlQuery);
         for (Long id: folders) {
-            result.addAll(getAllCompositionsInFolder(id, order));
+            result.addAll(getAllCompositionsInFolder(id, order, useFileName));
         }
 
-        result.addAll(compositionsDao.getCompositionsInFolder(parentFolderId, order));
+        result.addAll(compositionsDao.getCompositionsInFolder(parentFolderId, order, useFileName));
         return result;
     }
 
@@ -239,26 +243,28 @@ public class FoldersDaoWrapper {
         return " AND (? IS NULL OR (name NOTNULL AND name LIKE ?))";
     }
 
-    private Observable<Composition> fileSourceToComposition(FileSource fileSource, Order order) {
+    private Observable<Composition> fileSourceToComposition(FileSource fileSource, Order order, boolean useFileName) {
         if (fileSource instanceof CompositionFileSource) {
             return Observable.just(((CompositionFileSource) fileSource).getComposition());
         }
         if (fileSource instanceof FolderFileSource) {
             return Observable.fromIterable(getAllCompositionsInFolder(
                     ((FolderFileSource) fileSource).getId(),
-                    order
+                    order,
+                    useFileName
             ));
         }
         throw new IllegalStateException("unexpected file source: " + fileSource);
     }
 
-    private Observable<Composition> fileSourceToComposition(FileSource fileSource) {
+    private Observable<Composition> fileSourceToComposition(FileSource fileSource, boolean useFilename) {
         if (fileSource instanceof CompositionFileSource) {
             return Observable.just(((CompositionFileSource) fileSource).getComposition());
         }
         if (fileSource instanceof FolderFileSource) {
             return Observable.fromIterable(compositionsDao.getAllCompositionsInFolder(
-                    ((FolderFileSource) fileSource).getId()
+                    ((FolderFileSource) fileSource).getId(),
+                    useFilename
             ));
         }
         throw new IllegalStateException("unexpected file source: " + fileSource);

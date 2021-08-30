@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.library.edit;
 
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
+
 import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
@@ -28,6 +31,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
@@ -47,9 +51,6 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 
-import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
-
 public class EditorRepositoryImpl implements EditorRepository {
 
     private static final long CHANGE_COVER_TIMEOUT_MILLIS = 25000;
@@ -64,6 +65,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     private final StorageMusicProvider storageMusicProvider;
     private final StorageGenresProvider storageGenresProvider;
     private final StateRepository stateRepository;
+    private final SettingsRepository settingsRepository;
     private final Scheduler scheduler;
 
     public EditorRepositoryImpl(CompositionSourceEditor sourceEditor,
@@ -76,6 +78,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                                 StorageMusicProvider storageMusicProvider,
                                 StorageGenresProvider storageGenresProvider,
                                 StateRepository stateRepository,
+                                SettingsRepository settingsRepository,
                                 Scheduler scheduler) {
         this.sourceEditor = sourceEditor;
         this.filesDataSource = filesDataSource;
@@ -87,6 +90,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         this.storageMusicProvider = storageMusicProvider;
         this.storageGenresProvider = storageGenresProvider;
         this.stateRepository = stateRepository;
+        this.settingsRepository = settingsRepository;
         this.scheduler = scheduler;
     }
 
@@ -204,7 +208,7 @@ public class EditorRepositoryImpl implements EditorRepository {
     public Completable changeFolderName(long folderId, String newName) {
         return getFullFolderPath(folderId)
                 .map(fullPath -> {
-                    List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId);
+                    List<Composition> compositions = compositionsDao.getAllCompositionsInFolder(folderId, settingsRepository.isDisplayFileNameEnabled());
 
                     List<FilePathComposition> updatedCompositions = new LinkedList<>();
                     String name = filesDataSource.renameCompositionsFolder(compositions,
@@ -227,7 +231,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         return verifyFolderMove(fromFolderId, toFolderId, files)
                 .andThen(Single.zip(getFullFolderPath(fromFolderId),
                         getFullFolderPath(toFolderId),
-                        foldersDao.extractAllCompositionsFromFiles(files),
+                        foldersDao.extractAllCompositionsFromFiles(files, settingsRepository.isDisplayFileNameEnabled()),
                         (fromPath, toPath, compositions) -> {
                             List<FilePathComposition> updateCompositions = filesDataSource.moveCompositionsToFolder(compositions, fromPath, toPath);
                             compositionsDao.updateFilesPath(updateCompositions);
@@ -249,7 +253,7 @@ public class EditorRepositoryImpl implements EditorRepository {
             }
         }).andThen(Single.zip(getFullFolderPath(fromFolderId),
                 getFullFolderPath(targetParentFolderId),
-                foldersDao.extractAllCompositionsFromFiles(files),
+                foldersDao.extractAllCompositionsFromFiles(files, settingsRepository.isDisplayFileNameEnabled()),
                 (fromPath, toParentPath, compositions) -> {
                     List<FilePathComposition> updatedCompositions = new LinkedList<>();
                     String name = filesDataSource.moveCompositionsToNewFolder(compositions,

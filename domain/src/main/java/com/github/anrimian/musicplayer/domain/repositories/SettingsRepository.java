@@ -127,4 +127,10 @@ public interface SettingsRepository {
     void setAudioFileMinDurationMillis(long millis);
 
     long getAudioFileMinDurationMillis();
+
+    Observable<Boolean> getDisplayFileNameObservable();
+
+    void setDisplayFileName(boolean displayFileName);
+
+    boolean isDisplayFileNameEnabled();
 }

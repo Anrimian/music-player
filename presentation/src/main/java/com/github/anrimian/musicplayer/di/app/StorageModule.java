@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.di.app;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
+
 import android.content.Context;
 import android.os.Build;
 
@@ -43,9 +46,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
 
 @Module
 public class StorageModule {
@@ -99,6 +99,7 @@ public class StorageModule {
                                                  StorageMusicProvider storageMusicProvider,
                                                  StorageGenresProvider storageGenresProvider,
                                                  StateRepository stateRepository,
+                                                 SettingsRepository settingsRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new EditorRepositoryImpl(
                 sourceEditor,
@@ -111,6 +112,7 @@ public class StorageModule {
                 storageMusicProvider,
                 storageGenresProvider,
                 stateRepository,
+                settingsRepository,
                 scheduler);
     }
 
