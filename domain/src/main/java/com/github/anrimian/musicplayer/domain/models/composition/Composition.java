@@ -37,10 +37,9 @@ public class Composition {
     private final CorruptionType corruptionType;
 
     //remove filename from dao:
-    //***artists
-    //***genres
-    //***remake selection for editor
+    //***remake composition selection for editor
     //setting ui check subtitles on tablets
+    //*** setting ui: add to order dialog?
     //adapt search filter
     //remove from models
     //rename alphabetical order to by name order

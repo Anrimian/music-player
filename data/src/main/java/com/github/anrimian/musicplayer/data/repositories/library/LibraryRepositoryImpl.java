@@ -104,7 +104,8 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Observable<List<Composition>> getGenreItemsObservable(long genreId) {
-        return genresDao.getCompositionsInGenreObservable(genreId);
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> genresDao.getCompositionsInGenreObservable(genreId, useFileName));
     }
 
     @Override
@@ -120,7 +121,8 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Observable<List<Composition>> getCompositionsByArtist(long artistId) {
-        return artistsDao.getCompositionsByArtistObservable(artistId);
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> artistsDao.getCompositionsByArtistObservable(artistId, useFileName));
     }
 
     @Override

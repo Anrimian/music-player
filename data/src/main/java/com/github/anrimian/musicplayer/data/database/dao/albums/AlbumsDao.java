@@ -109,7 +109,7 @@ public interface AlbumsDao {
     @Query("SELECT EXISTS(SELECT 1 FROM albums WHERE name = :name)")
     boolean isAlbumExists(String name);
 
-    static String getPlaylistItemsQuery(boolean useFileName) {
+    static String getCompositionsQuery(boolean useFileName) {
         return "SELECT " +
                 CompositionsDao.getCompositionSelectionQuery(useFileName) +
                 "FROM compositions " +

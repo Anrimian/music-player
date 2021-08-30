@@ -13,7 +13,6 @@
     <dimen name="content_internal_margin">16dp</dimen>
     <dimen name="content_horizontal_margin">24dp</dimen>
     <dimen name="content_vertical_margin">24dp</dimen>
-    <dimen name="content_title_margin_start">30dp</dimen>
 
     <!--list margins-->
     <dimen name="list_vertical_margin">16dp</dimen>

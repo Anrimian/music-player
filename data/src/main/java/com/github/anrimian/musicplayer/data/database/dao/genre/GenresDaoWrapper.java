@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.data.database.dao.genre;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
+
 import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
@@ -21,10 +25,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.reactivex.rxjava3.core.Observable;
-
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 
 public class GenresDaoWrapper {
 
@@ -76,8 +76,10 @@ public class GenresDaoWrapper {
                 .map(list -> list.get(0));
     }
 
-    public Observable<List<Composition>> getCompositionsInGenreObservable(long genreId) {
-        return genreDao.getCompositionsInGenreObservable(genreId);
+    public Observable<List<Composition>> getCompositionsInGenreObservable(long genreId, boolean useFileName) {
+        String query = GenreDao.getCompositionsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {genreId} );
+        return genreDao.getCompositionsInGenreObservable(sqlQuery);
     }
 
     public List<Composition> getCompositionsInGenre(long genreId) {

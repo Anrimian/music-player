@@ -48,7 +48,7 @@ public class AlbumsDaoWrapper {
     }
 
     public Observable<List<Composition>> getCompositionsInAlbumObservable(long albumId, boolean useFileName) {
-        String query = AlbumsDao.getPlaylistItemsQuery(useFileName);
+        String query = AlbumsDao.getCompositionsQuery(useFileName);
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {albumId} );
         return albumsDao.getCompositionsInAlbumObservable(sqlQuery);
     }

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.artist;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
@@ -9,8 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.order.Order;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
-
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 
 public class ArtistsDaoWrapper {
 
@@ -32,8 +32,10 @@ public class ArtistsDaoWrapper {
         return artistsDao.getAllObservable(sqlQuery);
     }
 
-    public Observable<List<Composition>> getCompositionsByArtistObservable(long artistId) {
-        return artistsDao.getCompositionsByArtistObservable(artistId);
+    public Observable<List<Composition>> getCompositionsByArtistObservable(long artistId, boolean useFileName) {
+        String query = ArtistsDao.getCompositionsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {artistId} );
+        return artistsDao.getCompositionsByArtistObservable(sqlQuery);
     }
 
     public List<Composition> getCompositionsByArtist(long artistId) {
