@@ -37,7 +37,6 @@ public class Composition {
     private final CorruptionType corruptionType;
 
     //remove filename from dao:
-    //***play queue(reshuffling became slow)
     //***play list
     //***artists
     //***albums

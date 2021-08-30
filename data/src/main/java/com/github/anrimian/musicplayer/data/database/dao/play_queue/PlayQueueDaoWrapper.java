@@ -6,6 +6,8 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
 
+import androidx.sqlite.db.SimpleSQLiteQuery;
+
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
@@ -41,12 +43,11 @@ public class PlayQueueDaoWrapper {
     }
 
     public Observable<List<PlayQueueItem>> getPlayQueueObservable(boolean isRandom, boolean useFileName) {
-//        String query = PlayQueueDao.getCompositionQuery(useFileName);
-//        query += isRandom? "ORDER BY shuffledPosition": "ORDER BY position";
-//        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
-//        return playQueueDao.getPlayQueueObservable(sqlQuery)
-//                .map(list -> mapList(list, this::toQueueItem));
-        return isRandom? getPlayQueueInShuffledOrderObservable(): getPlayQueueInNormalOrderObservable();
+        String query = PlayQueueDao.getCompositionQuery(useFileName);
+        query += isRandom? "ORDER BY shuffledPosition": "ORDER BY position";
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        return playQueueDao.getPlayQueueObservable(sqlQuery)
+                .map(list -> mapList(list, this::toQueueItem));
     }
 
     public void reshuffleQueue(long currentItemId) {
@@ -121,11 +122,10 @@ public class PlayQueueDaoWrapper {
     }
 
     public Observable<Optional<PlayQueueItem>> getItemObservable(long id, boolean useFileName) {
-//        String query = PlayQueueDao.getCompositionQuery(useFileName);
-//        query += "WHERE itemId = ? LIMIT 1";
-//        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {id} );
-//        return playQueueDao.getItemObservable(sqlQuery)
-        return playQueueDao.getItemObservable(id)
+        String query = PlayQueueDao.getCompositionQuery(useFileName);
+        query += "WHERE itemId = ? LIMIT 1";
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {id} );
+        return playQueueDao.getItemObservable(sqlQuery)
                 .map(dto -> {
                     PlayQueueItem item = null;
                     if (dto.length > 0) {
@@ -297,16 +297,6 @@ public class PlayQueueDaoWrapper {
 
     public Observable<Integer> getPlayQueueSizeObservable() {
         return playQueueDao.getPlayQueueSizeObservable();
-    }
-
-    private Observable<List<PlayQueueItem>> getPlayQueueInNormalOrderObservable() {
-        return playQueueDao.getPlayQueueInNormalOrderObservable()
-                .map(list -> mapList(list, this::toQueueItem));
-    }
-
-    private Observable<List<PlayQueueItem>> getPlayQueueInShuffledOrderObservable() {
-        return playQueueDao.getPlayQueueInShuffledOrderObservable()
-                .map(list -> mapList(list, this::toQueueItem));
     }
 
     private List<PlayQueueEntity> toEntityList(List<Composition> compositions,

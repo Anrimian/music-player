@@ -46,10 +46,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         this.scheduler = scheduler;
 
         playQueueObservable = settingsPreferences.getRandomPlayingObservable()
-//                .switchMap(isRandom -> settingsPreferences.getDisplayFileNameObservable()
-//                        .switchMap(useFileName -> playQueueDao.getPlayQueueObservable(isRandom, useFileName))
-//                )
-                .switchMap(isRandom -> playQueueDao.getPlayQueueObservable(isRandom, false))
+                .switchMap(isRandom -> settingsPreferences.getDisplayFileNameObservable()
+                        .switchMap(useFileName -> playQueueDao.getPlayQueueObservable(isRandom, useFileName))
+                )
                 .toFlowable(BackpressureStrategy.LATEST)
                 .replay(1)
                 .refCount();
@@ -239,9 +238,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             return Observable.just(new PlayQueueEvent(null));
         }
 
-        return /*settingsPreferences.getDisplayFileNameObservable()
-                .switchMap(useFileName -> playQueueDao.getItemObservable(id, useFileName))*/
-                playQueueDao.getItemObservable(id, false)
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> playQueueDao.getItemObservable(id, useFileName))
                 .flatMap(this::checkForExisting)
                 .map(this::mapToQueueEvent);
     }
