@@ -36,7 +36,12 @@ public class Composition {
     @Nullable
     private final CorruptionType corruptionType;
 
-    //remove filename from dao
+    //remove filename from dao:
+    //***play queue(reshuffling became slow)
+    //***play list
+    //***artists
+    //***albums
+    //***genres
     //remove from models
     //add setting ui
     //add filename order

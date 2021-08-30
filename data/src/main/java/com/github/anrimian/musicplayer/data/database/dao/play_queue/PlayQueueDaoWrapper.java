@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
+import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
@@ -17,10 +21,6 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
-
-import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
-import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
  * Created on 02.07.2018.
@@ -40,7 +40,12 @@ public class PlayQueueDaoWrapper {
         this.playQueueDao = playQueueDao;
     }
 
-    public Observable<List<PlayQueueItem>> getPlayQueueObservable(boolean isRandom) {
+    public Observable<List<PlayQueueItem>> getPlayQueueObservable(boolean isRandom, boolean useFileName) {
+//        String query = PlayQueueDao.getCompositionQuery(useFileName);
+//        query += isRandom? "ORDER BY shuffledPosition": "ORDER BY position";
+//        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+//        return playQueueDao.getPlayQueueObservable(sqlQuery)
+//                .map(list -> mapList(list, this::toQueueItem));
         return isRandom? getPlayQueueInShuffledOrderObservable(): getPlayQueueInNormalOrderObservable();
     }
 
@@ -115,7 +120,11 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public Observable<Optional<PlayQueueItem>> getItemObservable(long id) {
+    public Observable<Optional<PlayQueueItem>> getItemObservable(long id, boolean useFileName) {
+//        String query = PlayQueueDao.getCompositionQuery(useFileName);
+//        query += "WHERE itemId = ? LIMIT 1";
+//        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {id} );
+//        return playQueueDao.getItemObservable(sqlQuery)
         return playQueueDao.getItemObservable(id)
                 .map(dto -> {
                     PlayQueueItem item = null;
