@@ -41,6 +41,7 @@ public class Composition {
     //***genres
     //***remake selection for editor
     //add setting ui
+    //adapt search filter
     //remove from models
     //rename alphabetical order to by name order
     //add filename order
