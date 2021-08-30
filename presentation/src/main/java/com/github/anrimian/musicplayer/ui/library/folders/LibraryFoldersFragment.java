@@ -717,10 +717,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 presenter.onSearchButtonClicked();
                 break;
             }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
-                break;
-            }
         }
     }
 

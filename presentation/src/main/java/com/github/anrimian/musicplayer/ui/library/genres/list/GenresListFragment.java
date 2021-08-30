@@ -1,5 +1,11 @@
 package com.github.anrimian.musicplayer.ui.library.genres.list;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_MENU_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -43,12 +49,6 @@ import java.util.List;
 
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_MENU_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.GENRE_NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
 
 public class GenresListFragment extends LibraryFragment implements
         GenresListView, FragmentLayerListener, BackButtonListener {
@@ -245,10 +245,6 @@ public class GenresListFragment extends LibraryFragment implements
             }
             case R.id.menu_equalizer: {
                 new EqualizerDialogFragment().show(getChildFragmentManager(), null);
-                break;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
                 break;
             }
         }

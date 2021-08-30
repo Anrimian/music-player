@@ -24,9 +24,4 @@
         android:icon="@drawable/ic_equalizer"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/menu_rescan_storage"
-        android:title="@string/scan_storage"
-        android:icon="@drawable/ic_storage"
-        app:showAsAction="never"/>
-
 </menu>

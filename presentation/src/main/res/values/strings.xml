@@ -229,6 +229,8 @@
     <string name="equalizer_initialization_error" tools:ignore="MissingTranslation">Unable to initialize in-app equalizer. Try to restart it.</string>
     <string name="restart" tools:ignore="MissingTranslation">Restart</string>
 
+    <string name="scan_storage_description">Usually all changes in media storage will appear automatically. But on some devices or system builds it won\'t work. This button runs scan media storage manually.</string>
+    <string name="scanning_completed">Scanning completed</string>
     <string name="covers">Covers</string>
     <string name="display_composition_file_name">Display composition file name instead of title</string>
 
