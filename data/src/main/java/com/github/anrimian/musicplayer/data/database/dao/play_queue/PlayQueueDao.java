@@ -7,6 +7,7 @@ import androidx.room.RawQuery;
 import androidx.room.Update;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
@@ -180,16 +181,7 @@ public interface PlayQueueDao {
     static String getCompositionQuery(boolean useFileName) {
         return "SELECT " +
                 "play_queue.id AS itemId," +
-                "compositions.id AS id, " +
-                "compositions.storageId AS storageId, " +
-                "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-                "(SELECT name FROM albums WHERE id = albumId) as album, " +
-                "(" + (useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END") + ") as title, " +
-                "compositions.duration AS duration, " +
-                "compositions.size AS size, " +
-                "compositions.dateAdded AS dateAdded, " +
-                "compositions.dateModified AS dateModified, " +
-                "compositions.corruptionType AS corruptionType " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
                 "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ";
     }
 }

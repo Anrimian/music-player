@@ -148,19 +148,21 @@ public interface CompositionsDao {
 
     static StringBuilder getCompositionQuery(boolean useFileName) {
         return new StringBuilder("SELECT " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM compositions");
+    }
+
+    static String getCompositionSelectionQuery(boolean useFileName) {
+        return "compositions.id AS id, " +
+                "compositions.storageId AS storageId, " +
                 "(SELECT name FROM artists WHERE id = artistId) as artist, " +
                 "(SELECT name FROM albums WHERE id = albumId) as album, " +
-                "(")
-                .append(useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END")
-                .append(") as title, " +
-                "duration as duration, " +
-                "size as size, " +
-                "id as id, " +
-                "storageId as storageId, " +
-                "dateAdded as dateAdded, " +
-                "dateModified as dateModified, " +
-                "corruptionType as corruptionType " +
-                "FROM compositions");
+                "(" + (useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END") + ") as title, " +
+                "compositions.duration AS duration, " +
+                "compositions.size AS size, " +
+                "compositions.dateAdded AS dateAdded, " +
+                "compositions.dateModified AS dateModified, " +
+                "compositions.corruptionType AS corruptionType ";
     }
 
 }

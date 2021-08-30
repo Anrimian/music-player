@@ -37,7 +37,6 @@ public class Composition {
     private final CorruptionType corruptionType;
 
     //remove filename from dao:
-    //***play list
     //***artists
     //***albums
     //***genres
