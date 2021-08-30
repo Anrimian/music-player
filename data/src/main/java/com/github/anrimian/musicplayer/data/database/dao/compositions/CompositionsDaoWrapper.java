@@ -57,10 +57,10 @@ public class CompositionsDaoWrapper {
     public Observable<List<Composition>> getAllObservable(Order order,
                                                           boolean useFileName,
                                                           @Nullable String searchText) {
-        String query = CompositionsDao.getCompositionQuery(useFileName);
-        query += getSearchQuery();
-        query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 3));
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(getSearchQuery());
+        query.append(getOrderQuery(order));
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 3));
         return updateSubject.switchMap(o -> compositionsDao.getAllObservable(sqlQuery));
     }
 
@@ -72,7 +72,7 @@ public class CompositionsDaoWrapper {
                                                                            Order order,
                                                                            boolean useFileName,
                                                                            @Nullable String searchText) {
-        StringBuilder query = new StringBuilder(CompositionsDao.getCompositionQuery(useFileName));
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
         String searchQuery = getSearchQuery();
         query.append(searchQuery);
         query.append(" AND ");
@@ -97,14 +97,14 @@ public class CompositionsDaoWrapper {
     }
 
     public List<Composition> getCompositionsInFolder(Long parentFolderId, Order order, boolean useFileName) {
-        String query = CompositionsDao.getCompositionQuery(useFileName);
-        query += " WHERE folderId = ";
-        query += parentFolderId;
-        query += " OR (folderId IS NULL AND ";
-        query += parentFolderId;
-        query += " IS NULL)";
-        query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(" WHERE folderId = ");
+        query.append(parentFolderId);
+        query.append(" OR (folderId IS NULL AND ");
+        query.append(parentFolderId);
+        query.append(" IS NULL)");
+        query.append(getOrderQuery(order));
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString());
         return compositionsDao.executeQuery(sqlQuery);
     }
 

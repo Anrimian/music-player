@@ -146,11 +146,13 @@ public interface CompositionsDao {
     @Query("SELECT count() FROM compositions")
     long getCompositionsCount();
 
-    static String getCompositionQuery(boolean useFileName) {
-        return "SELECT " +
+    static StringBuilder getCompositionQuery(boolean useFileName) {
+        return new StringBuilder("SELECT " +
                 "(SELECT name FROM artists WHERE id = artistId) as artist, " +
                 "(SELECT name FROM albums WHERE id = albumId) as album, " +
-                "(" + (useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END") + ") as title, " +
+                "(")
+                .append(useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END")
+                .append(") as title, " +
                 "duration as duration, " +
                 "size as size, " +
                 "id as id, " +
@@ -158,7 +160,7 @@ public interface CompositionsDao {
                 "dateAdded as dateAdded, " +
                 "dateModified as dateModified, " +
                 "corruptionType as corruptionType " +
-                "FROM compositions";
+                "FROM compositions");
     }
 
 }
