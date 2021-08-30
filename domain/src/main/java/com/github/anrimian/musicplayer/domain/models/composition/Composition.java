@@ -40,7 +40,7 @@ public class Composition {
     //***artists
     //***genres
     //***remake selection for editor
-    //add setting ui
+    //setting ui check subtitles on tablets
     //adapt search filter
     //remove from models
     //rename alphabetical order to by name order

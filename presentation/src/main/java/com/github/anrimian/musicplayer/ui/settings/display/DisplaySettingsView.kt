@@ -6,6 +6,9 @@ import moxy.viewstate.strategy.alias.AddToEndSingle
 interface DisplaySettingsView : MvpView {
 
     @AddToEndSingle
+    fun showFileNameEnabled(enabled: Boolean)
+
+    @AddToEndSingle
     fun showCoversChecked(checked: Boolean)
 
     @AddToEndSingle
