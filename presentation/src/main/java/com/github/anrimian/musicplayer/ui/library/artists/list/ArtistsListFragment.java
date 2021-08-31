@@ -1,5 +1,11 @@
 package com.github.anrimian.musicplayer.ui.library.artists.list;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,10 +28,10 @@ import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragmentKt;
@@ -46,11 +52,6 @@ import java.util.List;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 
-import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
-
 public class ArtistsListFragment extends LibraryFragment implements
         ArtistsListView, FragmentLayerListener, BackButtonListener {
 
@@ -69,6 +70,8 @@ public class ArtistsListFragment extends LibraryFragment implements
     private DialogFragmentRunner<InputTextDialogFragment> editArtistNameDialogRunner;
     private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
     private DialogFragmentDelayRunner progressDialogRunner;
+
+    private ErrorHandler editorErrorHandler;
 
     @ProvidePresenter
     ArtistsListPresenter providePresenter() {
@@ -116,6 +119,10 @@ public class ArtistsListFragment extends LibraryFragment implements
                 f -> f.setOnCompleteListener(presenter::onOrderSelected));
 
         progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
+
+        editorErrorHandler = new ErrorHandler(fm,
+                presenter::onRetryFailedEditActionClicked,
+                this::showEditorRequestDeniedMessage);
     }
 
     @Override
@@ -198,7 +205,9 @@ public class ArtistsListFragment extends LibraryFragment implements
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_SHORT).show();
+        editorErrorHandler.handleError(errorCommand, () ->
+                makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
+        );
     }
 
     private void showEditArtistNameDialog(Artist artist) {
@@ -256,4 +265,9 @@ public class ArtistsListFragment extends LibraryFragment implements
             }
         }
     }
+
+    private void showEditorRequestDeniedMessage() {
+        makeSnackbar(clListContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
+    }
+
 }

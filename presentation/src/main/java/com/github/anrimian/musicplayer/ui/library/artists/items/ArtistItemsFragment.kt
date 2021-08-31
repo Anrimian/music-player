@@ -61,7 +61,7 @@ fun newInstance(artistId: Long): ArtistItemsFragment {
 }
 
 class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
-        ArtistItemsView, FragmentLayerListener, BackButtonListener {
+    ArtistItemsView, FragmentLayerListener, BackButtonListener {
 
     private val presenter by moxyPresenter { Components.artistItemsComponent(getAlbumId()).artistItemsPresenter() }
 
@@ -80,7 +80,10 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
     private lateinit var editArtistNameDialogRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var progressDialogRunner: DialogFragmentDelayRunner
     private lateinit var slidrInterface: SlidrInterface
+
     private lateinit var deletingErrorHandler: ErrorHandler
+    private lateinit var editorErrorHandler: ErrorHandler
+
 
     override fun getBasePresenter(): BaseLibraryCompositionsPresenter<ArtistItemsView> {
         return presenter
@@ -101,52 +104,57 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
         RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView, true)
 
         adapter = ArtistItemsAdapter(
-                viewBinding.recyclerView,
-                presenter.getSelectedCompositions(),
-                presenter::onCompositionClicked,
-                presenter::onCompositionLongClick,
-                presenter::onCompositionIconClicked,
-                presenter::onCompositionMenuClicked,
-                this::onAlbumClicked,
-                this::onAlbumsScrolled
+            viewBinding.recyclerView,
+            presenter.getSelectedCompositions(),
+            presenter::onCompositionClicked,
+            presenter::onCompositionLongClick,
+            presenter::onCompositionIconClicked,
+            presenter::onCompositionMenuClicked,
+            this::onAlbumClicked,
+            this::onAlbumsScrolled
         )
         viewBinding.recyclerView.adapter = adapter
         layoutManager = LinearLayoutManager(context)
         viewBinding.recyclerView.layoutManager = layoutManager
         val callback = ShortSwipeCallback(
-                requireContext(),
-                R.drawable.ic_play_next,
-                R.string.play_next,
-                shouldNotSwipeViewHolder = { viewHolder -> viewHolder is AlbumsViewHolder },
-                swipeCallback = { position ->
-                    presenter.onPlayNextCompositionClicked(position - 1)
-                })
+            requireContext(),
+            R.drawable.ic_play_next,
+            R.string.play_next,
+            shouldNotSwipeViewHolder = { viewHolder -> viewHolder is AlbumsViewHolder },
+            swipeCallback = { position ->
+                presenter.onPlayNextCompositionClicked(position - 1)
+            })
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
 
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
         slidrInterface = SlidrPanel.simpleSwipeBack(
-                viewBinding.listContainer,
-                this,
-                toolbar::onStackFragmentSlided
+            viewBinding.listContainer,
+            this,
+            toolbar::onStackFragmentSlided
         )
         val fm = childFragmentManager
+        editorErrorHandler = ErrorHandler(
+            fm,
+            presenter::onRetryFailedEditActionClicked,
+            this::showEditorRequestDeniedMessage
+        )
         deletingErrorHandler = DeleteErrorHandler(
-                fm,
-                presenter::onRetryFailedDeleteActionClicked,
-                this::showEditorRequestDeniedMessage
+            fm,
+            presenter::onRetryFailedDeleteActionClicked,
+            this::showEditorRequestDeniedMessage
         )
         choosePlayListDialogRunner = DialogFragmentRunner(
-                fm,
-                Tags.SELECT_PLAYLIST_TAG
+            fm,
+            Tags.SELECT_PLAYLIST_TAG
         ) { f -> f.setOnCompleteListener(presenter::onPlayListToAddingSelected) }
         compositionActionDialogRunner = DialogFragmentRunner(
-                fm,
-                Tags.COMPOSITION_ACTION_TAG
+            fm,
+            Tags.COMPOSITION_ACTION_TAG
         ) { f -> f.setOnTripleCompleteListener(this::onCompositionActionSelected) }
         editArtistNameDialogRunner = DialogFragmentRunner(
-                fm,
-                Tags.ARTIST_NAME_TAG
+            fm,
+            Tags.ARTIST_NAME_TAG
         ) { fragment -> fragment.setComplexCompleteListener { name, extra ->
             presenter.onNewArtistNameEntered(name, extra.getLong(Constants.Arguments.ID_ARG))
         } }
@@ -183,9 +191,9 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
     override fun showArtistInfo(artist: Artist) {
         toolbar.title = artist.name
         toolbar.subtitle = FormatUtils.formatArtistAdditionalInfo(
-                requireContext(),
-                artist,
-                R.drawable.ic_description_text_circle_inverse
+            requireContext(),
+            artist,
+            R.drawable.ic_description_text_circle_inverse
         )
     }
 
@@ -248,9 +256,9 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
         MessagesUtils.makeSnackbar(
-                viewBinding.listContainer,
-                getString(R.string.add_to_playlist_error_template, errorCommand.message),
-                Snackbar.LENGTH_SHORT
+            viewBinding.listContainer,
+            getString(R.string.add_to_playlist_error_template, errorCommand.message),
+            Snackbar.LENGTH_SHORT
         ).show()
     }
 
@@ -270,18 +278,18 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {
         DialogUtils.showConfirmDeleteDialog(
-                requireContext(),
-                compositionsToDelete,
-                presenter::onDeleteCompositionsDialogConfirmed
+            requireContext(),
+            compositionsToDelete,
+            presenter::onDeleteCompositionsDialogConfirmed
         )
     }
 
     override fun showDeleteCompositionError(errorCommand: ErrorCommand) {
         deletingErrorHandler.handleError(errorCommand) {
             MessagesUtils.makeSnackbar(
-                    viewBinding.listContainer,
-                    getString(R.string.delete_composition_error_template, errorCommand.message),
-                    Snackbar.LENGTH_SHORT
+                viewBinding.listContainer,
+                getString(R.string.delete_composition_error_template, errorCommand.message),
+                Snackbar.LENGTH_SHORT
             ).show()
         }
     }
@@ -308,15 +316,17 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
         extra.putInt(Constants.Arguments.POSITION_ARG, position)
         @AttrRes val statusBarColor = if (toolbar.isInActionMode) R.attr.actionModeStatusBarColor else android.R.attr.statusBarColor
         val fragment = CompositionActionDialogFragment.newInstance(
-                composition,
-                R.menu.composition_actions_menu,
-                statusBarColor,
-                extra)
+            composition,
+            R.menu.composition_actions_menu,
+            statusBarColor,
+            extra)
         compositionActionDialogRunner.show(fragment)
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, errorCommand.message, Snackbar.LENGTH_SHORT).show()
+        editorErrorHandler.handleError(errorCommand) {
+            MessagesUtils.makeSnackbar(viewBinding.listContainer, errorCommand.message, Snackbar.LENGTH_LONG).show()
+        }
     }
 
     override fun onCompositionsAddedToPlayNext(compositions: List<Composition>) {
@@ -337,13 +347,13 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
         val bundle = Bundle()
         bundle.putLong(Constants.Arguments.ID_ARG, artist.id)
         val fragment = InputTextDialogFragment.Builder(R.string.change_name,
-                R.string.change,
-                R.string.cancel,
-                R.string.name,
-                artist.name)
-                .canBeEmpty(false)
-                .extra(bundle)
-                .build()
+            R.string.change,
+            R.string.cancel,
+            R.string.name,
+            artist.name)
+            .canBeEmpty(false)
+            .extra(bundle)
+            .build()
         editArtistNameDialogRunner.show(fragment)
     }
 
@@ -369,7 +379,7 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     private fun onAlbumClicked(album: Album) {
         FragmentNavigation.from(parentFragmentManager())
-                .addNewFragment(AlbumItemsFragment.newInstance(album.id))
+            .addNewFragment(AlbumItemsFragment.newInstance(album.id))
     }
 
     private fun onOptionsItemClicked(item: MenuItem) {
