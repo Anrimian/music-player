@@ -24,13 +24,13 @@ import android.provider.MediaStore;
 import androidx.annotation.RequiresApi;
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -400,7 +400,7 @@ public class StorageMusicProvider {
         return contentResolver.openOutputStream(getCompositionUri(id));
     }
 
-    public Completable processStorageError(Throwable throwable, List<Composition> compositions) {
+    public Completable processStorageError(Throwable throwable, List<CompositionId> compositions) {
         return Completable.fromAction(() -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && throwable instanceof RecoverableSecurityException) {
                 List<Uri> uris = ListUtils.mapListNotNull(compositions, composition -> {

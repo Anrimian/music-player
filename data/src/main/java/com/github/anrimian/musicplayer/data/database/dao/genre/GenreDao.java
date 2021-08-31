@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntit
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
@@ -66,20 +67,11 @@ public interface GenreDao {
     }
 
     @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "title as title, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "fileName as fileName, " +
-            "duration as duration, " +
-            "size as size, " +
             "id as id, " +
-            "storageId as storageId, " +
-            "dateAdded as dateAdded, " +
-            "dateModified as dateModified, " +
-            "corruptionType as corruptionType " +
+            "storageId as storageId " +
             "FROM compositions " +
             "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
-    List<Composition> getCompositionsInGenre(long genreId);
+    List<CompositionId> getCompositionsInGenre(long genreId);
 
     @Query("SELECT " +
             "id as dbId, " +

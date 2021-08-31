@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrappe
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
@@ -278,7 +279,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .flatMap(compositions -> sourceEditor.setCompositionsAlbum(compositions, name))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumName(name, albumId);
-                    for (Composition composition: compositions) {
+                    for (CompositionId composition: compositions) {
                         runSystemRescan(composition);
                     }
                 })
@@ -292,7 +293,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .flatMap(compositions -> sourceEditor.setCompositionsAlbumArtist(compositions, newArtistName))
                 .doOnSuccess(compositions -> {
                     albumsDao.updateAlbumArtist(albumId, newArtistName);
-                    for (Composition composition: compositions) {
+                    for (CompositionId composition: compositions) {
                         runSystemRescan(composition);
                     }
                 })
@@ -302,7 +303,7 @@ public class EditorRepositoryImpl implements EditorRepository {
 
     @Override
     public Completable updateArtistName(String name, long artistId) {
-        Set<Composition> compositionsToScan = new LinkedHashSet<>();
+        Set<CompositionId> compositionsToScan = new LinkedHashSet<>();
         return checkArtistExists(name)
 
                 .andThen(Single.fromCallable(() -> artistsDao.getCompositionsByArtist(artistId)))
@@ -320,7 +321,7 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .doOnComplete(() -> {
                     artistsDao.updateArtistName(name, artistId);
 
-                    for (Composition composition: compositionsToScan) {
+                    for (CompositionId composition: compositionsToScan) {
                         runSystemRescan(composition);
                     }
                 })
@@ -487,7 +488,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         });
     }
 
-    private void runSystemRescan(Composition composition) {
+    private void runSystemRescan(CompositionId composition) {
         Long storageId = composition.getStorageId();
         if (storageId != null) {
             storageMusicProvider.scanMedia(storageId);

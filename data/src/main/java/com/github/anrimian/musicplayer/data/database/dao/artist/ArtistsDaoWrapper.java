@@ -4,6 +4,7 @@ import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.
 
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
@@ -38,7 +39,7 @@ public class ArtistsDaoWrapper {
         return artistsDao.getCompositionsByArtistObservable(sqlQuery);
     }
 
-    public List<Composition> getCompositionsByArtist(long artistId) {
+    public List<CompositionId> getCompositionsByArtist(long artistId) {
         return artistsDao.getCompositionsByArtist(artistId);
     }
 

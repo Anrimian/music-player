@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
@@ -31,20 +32,11 @@ public interface AlbumsDao {
     Observable<List<Composition>> getCompositionsInAlbumObservable(SimpleSQLiteQuery query);
 
     @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "title as title, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "fileName as fileName, " +
-            "duration as duration, " +
-            "size as size, " +
             "id as id, " +
-            "storageId as storageId, " +
-            "dateAdded as dateAdded, " +
-            "dateModified as dateModified, " +
-            "corruptionType as corruptionType " +
+            "storageId as storageId " +
             "FROM compositions " +
             "WHERE albumId = :albumId")
-    List<Composition> getCompositionsInAlbum(long albumId);
+    List<CompositionId> getCompositionsInAlbum(long albumId);
 
     @Query("SELECT id as id," +
             "name as name, " +

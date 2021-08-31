@@ -37,7 +37,7 @@ public class Composition {
     private final CorruptionType corruptionType;
 
     //remove filename from dao:
-    //***remake composition selection for editor
+    //***remake composition selection for editor(folders)
     //setting ui check subtitles on tablets
     //*** setting ui: add to order dialog?
     //adapt search filter
