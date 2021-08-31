@@ -15,6 +15,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.get
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
 import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
+import static com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivityKt.newCompositionEditorIntent;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
@@ -72,7 +73,6 @@ import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
-import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
@@ -648,7 +648,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     @Override
     public void startEditCompositionScreen(long id) {
-        startActivity(CompositionEditorActivity.newIntent(requireContext(), id));
+        startActivity(newCompositionEditorIntent(requireContext(), id));
     }
 
     @Override
@@ -863,7 +863,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
                             break;
                         }
                         case R.id.menu_edit: {
-                            startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                            startActivity(newCompositionEditorIntent(requireContext(), composition.getId()));
                             break;
                         }
                         case R.id.menu_share: {

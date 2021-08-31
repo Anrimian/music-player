@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.library.common.compositions;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
+import static com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivityKt.newCompositionEditorIntent;
+
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -8,10 +11,7 @@ import androidx.annotation.MenuRes;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
-import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
-
-import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
 
 public abstract class BaseLibraryCompositionsFragment extends LibraryFragment {
 
@@ -38,7 +38,7 @@ public abstract class BaseLibraryCompositionsFragment extends LibraryFragment {
                 break;
             }
             case R.id.menu_edit: {
-                startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                startActivity(newCompositionEditorIntent(requireContext(), composition.getId()));
                 break;
             }
             case R.id.menu_share: {
