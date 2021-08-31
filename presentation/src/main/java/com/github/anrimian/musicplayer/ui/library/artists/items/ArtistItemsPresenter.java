@@ -1,7 +1,11 @@
 package com.github.anrimian.musicplayer.ui.library.artists.items;
 
-import androidx.annotation.NonNull;
+import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
@@ -15,11 +19,10 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 
 import java.util.List;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
-
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
 
 
 public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<ArtistItemsView> {
@@ -30,6 +33,9 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
     private Disposable changeDisposable;
 
     private Artist artist;
+
+    @Nullable
+    private Completable lastEditAction;
 
     public ArtistItemsPresenter(long artistId,
                                 LibraryArtistsInteractor interactor,
@@ -66,7 +72,7 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
     }
 
     @Override
-    protected void saveListPosition(ListPosition listPosition) {
+    protected void saveListPosition(@NonNull ListPosition listPosition) {
         interactor.saveItemsListPosition(artistId, listPosition);
     }
 
@@ -85,11 +91,21 @@ public class ArtistItemsPresenter extends BaseLibraryCompositionsPresenter<Artis
 
     void onNewArtistNameEntered(String name, long artistId) {
         dispose(changeDisposable);
-        changeDisposable = interactor.updateArtistName(name, artistId)
+        lastEditAction = interactor.updateArtistName(name, artistId)
                 .observeOn(getUiScheduler())
                 .doOnSubscribe(d -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideRenameProgress())
-                .subscribe(() -> {}, this::onDefaultError);
+                .doFinally(() -> getViewState().hideRenameProgress());
+        changeDisposable = lastEditAction.subscribe(() -> {}, this::onDefaultError);
+    }
+
+    void onRetryFailedEditActionClicked() {
+        if (lastEditAction != null) {
+            RxUtils.dispose(changeDisposable, getPresenterDisposable());
+            changeDisposable = lastEditAction
+                    .doFinally(() -> lastEditAction = null)
+                    .subscribe(() -> {}, this::onDefaultError);
+            getPresenterDisposable().add(changeDisposable);
+        }
     }
 
     private void subscribeOnArtistInfo() {
