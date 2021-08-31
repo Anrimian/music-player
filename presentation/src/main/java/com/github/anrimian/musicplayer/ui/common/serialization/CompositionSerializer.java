@@ -6,14 +6,12 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 
 import java.util.Date;
-import java.util.Objects;
 
 public interface CompositionSerializer {
 
     String ARTIST = "artist";
     String TITLE = "title";
     String ALBUM = "album";
-    String FILE_NAME = "file_name";
     String DURATION = "duration";
     String SIZE = "size";
     String ID = "id";
@@ -27,7 +25,6 @@ public interface CompositionSerializer {
         bundle.putString(ARTIST, composition.getArtist());
         bundle.putString(TITLE, composition.getTitle());
         bundle.putString(ALBUM, composition.getAlbum());
-        bundle.putString(FILE_NAME, composition.getFileName());
         bundle.putLong(DURATION, composition.getDuration());
         bundle.putLong(SIZE, composition.getSize());
         bundle.putLong(ID, composition.getId());
@@ -44,7 +41,6 @@ public interface CompositionSerializer {
         return new Composition(
                 bundle.getString(ARTIST),
                 bundle.getString(TITLE),
-                Objects.requireNonNull(bundle.getString(FILE_NAME)),
                 bundle.getString(ALBUM),
                 bundle.getLong(DURATION),
                 bundle.getLong(SIZE),

@@ -13,11 +13,8 @@ public class Composition {
 
     @Nullable
     private final String artist;
-    @Nullable
-    private final String title;
     @Nonnull
-    @Deprecated
-    private final String fileName;
+    private final String title;
     @Nullable
     private final String album;
 
@@ -36,18 +33,14 @@ public class Composition {
     @Nullable
     private final CorruptionType corruptionType;
 
-    //remove filename from dao:
-    //***remake composition selection for editor(folders)
     //setting ui check subtitles on tablets
     //*** setting ui: add to order dialog?
     //adapt search filter
-    //remove from models
     //rename alphabetical order to by name order
     //add filename order
     @SuppressWarnings("NullableProblems")//annotations break room annotations processing
     public Composition(String artist,
                        String title,
-                       @Deprecated String fileName,
                        String album,
                        long duration,
                        long size,
@@ -58,7 +51,6 @@ public class Composition {
                        CorruptionType corruptionType) {
         this.artist = artist;
         this.title = title;
-        this.fileName = "|||||||||||||||||||||||";
         this.album = album;
         this.duration = duration;
         this.size = size;
@@ -79,15 +71,9 @@ public class Composition {
         return artist;
     }
 
-    @Nullable
+    @Nonnull
     public String getTitle() {
         return title;
-    }
-
-    @Deprecated
-    @Nonnull
-    public String getFileName() {
-        return fileName;
     }
 
     @Nullable
