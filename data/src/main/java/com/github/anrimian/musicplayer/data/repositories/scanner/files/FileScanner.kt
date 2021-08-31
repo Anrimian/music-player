@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
@@ -20,6 +21,7 @@ import java.util.*
 class FileScanner(
     private val compositionsDao: CompositionsDaoWrapper,
     private val compositionSourceEditor: CompositionSourceEditor,
+    private val stateRepository: StateRepository,
     private val analytics: Analytics,
     private val scheduler: Scheduler
 ) {
@@ -39,15 +41,21 @@ class FileScanner(
     private fun runFileScanner() {
         //compare scanner versions, if not equal - get last scan time and select all compositions with earlier last scan time
         //val lastScanTime = if (versions not equal) getLastScanTime else 0
-        compositionsDao.selectNextCompositionToScan()
+        compositionsDao.selectNextCompositionToScan(0)
             .doOnError(this::processError)
             .onErrorComplete()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
             .flatMap(this::scanCompositionFile)
             .doOnSuccess { runFileScanner() }
-            .doOnComplete { stateSubject.onNext(Idle) }//set last scan time, set scanner version
+            .doOnComplete(this::onScanCompleted)
             .subscribeOn(scheduler)
             .subscribe()
+    }
+
+    private fun onScanCompleted() {
+        stateRepository.lastFileScannerVersion = stateRepository.currentFileScannerVersion
+        stateRepository.lastCompleteScanTime = System.currentTimeMillis()
+        stateSubject.onNext(Idle)
     }
 
     private fun scanCompositionFile(composition: FullComposition): Maybe<*> {

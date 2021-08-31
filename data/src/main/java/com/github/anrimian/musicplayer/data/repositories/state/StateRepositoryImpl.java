@@ -48,7 +48,7 @@ public class StateRepositoryImpl implements StateRepository {
     }
 
     @Override
-    public void setLastFileScannerVersion() {
+    public void setLastFileScannerVersion(int version) {
 
     }
 
@@ -58,12 +58,12 @@ public class StateRepositoryImpl implements StateRepository {
     }
 
     @Override
-    public long getLastFullScanTime() {
+    public long getLastCompleteScanTime() {
         return 0;
     }
 
     @Override
-    public void setLastFullScanTime() {
+    public void setLastCompleteScanTime(long scanTime) {
 
     }
 }

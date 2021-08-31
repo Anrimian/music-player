@@ -10,11 +10,11 @@ public interface StateRepository {
 
     int getCurrentFileScannerVersion();
 
-    void setLastFileScannerVersion();
+    void setLastFileScannerVersion(int version);
 
     int getLastFileScannerVersion();
 
-    long getLastFullScanTime();
+    long getLastCompleteScanTime();
 
-    void setLastFullScanTime();
+    void setLastCompleteScanTime(long scanTime);
 }
