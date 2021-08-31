@@ -1,5 +1,14 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.LOADING;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_PREPARE_ERROR;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
+import static io.reactivex.rxjava3.subjects.BehaviorSubject.createDefault;
+
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
@@ -20,15 +29,6 @@ import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.LOADING;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_PREPARE_ERROR;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
-import static io.reactivex.rxjava3.subjects.BehaviorSubject.createDefault;
 
 public class PlayerInteractor {
 
@@ -217,7 +217,7 @@ public class PlayerInteractor {
     }
 
     private void onVolumeChanged(int volume) {
-        if (playerStateSubject.getValue() == PLAY && volume == 0) {
+        if (settingsRepository.isPauseOnZeroVolumeLevelEnabled() && playerStateSubject.getValue() == PLAY && volume == 0) {
             pause();
         }
     }

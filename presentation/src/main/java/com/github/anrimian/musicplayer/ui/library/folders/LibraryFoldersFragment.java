@@ -15,6 +15,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivityKt.newCompositionEditorIntent;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 import android.app.Activity;
@@ -30,6 +31,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -57,7 +59,6 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
-import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
@@ -595,7 +596,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 break;
             }
             case R.id.menu_edit: {
-                startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.getId()));
+                startActivity(newCompositionEditorIntent(requireContext(), composition.getId()));
                 break;
             }
             case R.id.menu_share: {
@@ -697,9 +698,11 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 break;
             }
             case R.id.menu_excluded_folders: {
-                //noinspection ConstantConditions
-                FragmentNavigation.from(getParentFragment().getParentFragmentManager())
-                        .addNewFragment(new ExcludedFoldersFragment());
+                Fragment parentFragment = getParentFragment();
+                if (parentFragment != null) {
+                    FragmentNavigation.from(parentFragment.getParentFragmentManager())
+                            .addNewFragment(new ExcludedFoldersFragment());
+                }
                 break;
             }
             case R.id.menu_sleep_timer: {

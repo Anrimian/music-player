@@ -12,6 +12,9 @@ interface PlayerSettingsView : MvpView {
     fun showPauseOnAudioFocusLossEnabled(checked: Boolean)
 
     @AddToEndSingle
+    fun showPauseOnZeroVolumeLevelEnabled(enabled: Boolean)
+
+    @AddToEndSingle
     fun showSelectedEqualizerType(type: Int)
 
 }
