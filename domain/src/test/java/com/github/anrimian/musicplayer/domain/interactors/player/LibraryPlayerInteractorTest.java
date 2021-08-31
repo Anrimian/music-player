@@ -1,5 +1,18 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDataProvider.currentItem;
+import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDataProvider.fakeCompositionSource;
+import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDataProvider.getFakeCompositions;
+import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.NOT_FOUND;
+import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.UNKNOWN;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
@@ -23,19 +36,6 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-
-import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDataProvider.currentItem;
-import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDataProvider.fakeCompositionSource;
-import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDataProvider.getFakeCompositions;
-import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.NOT_FOUND;
-import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.UNKNOWN;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class LibraryPlayerInteractorTest {
 
@@ -234,7 +234,7 @@ public class LibraryPlayerInteractorTest {
 
         currentCompositionSubject.onNext(new PlayQueueEvent(null));
 
-        verify(playerCoordinatorInteractor).stop(any());
+        verify(playerCoordinatorInteractor).reset(any());
     }
 
     @Test

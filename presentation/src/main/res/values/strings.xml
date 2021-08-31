@@ -231,6 +231,7 @@
 
     <string name="scan_storage_description">Usually all changes in media storage will appear automatically. But on some devices or system builds it won\'t work. This button runs scan media storage manually.</string>
     <string name="scanning_completed">Scanning completed</string>
+    <string name="pause_on_zero_volume_level">Stop playing when volume level has been reached zero</string>
     <string name="covers">Covers</string>
     <string name="display_composition_file_name">Display composition file name instead of title</string>
 

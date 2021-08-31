@@ -1,5 +1,20 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDataProvider.fakeCompositionSource;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.GAIN;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_SHORTLY;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
+import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.IGNORED;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
@@ -18,21 +33,6 @@ import org.mockito.Mockito;
 
 import io.reactivex.rxjava3.observers.TestObserver;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-
-import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDataProvider.fakeCompositionSource;
-import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.GAIN;
-import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS;
-import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_SHORTLY;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
-import static com.github.anrimian.musicplayer.domain.models.player.error.ErrorType.IGNORED;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class PlayerInteractorTest {
 
@@ -257,6 +257,8 @@ public class PlayerInteractorTest {
 
     @Test
     public void testVolumeSetToSilentWhilePlay() {
+        when(settingsRepository.isPauseOnZeroVolumeLevelEnabled()).thenReturn(true);
+
         CompositionSource composition = fakeCompositionSource(0);
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();

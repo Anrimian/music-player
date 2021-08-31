@@ -40,6 +40,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
         ViewUtils.onCheckChanged(viewBinding.cbDecreaseVolume, presenter::onDecreaseVolumeOnAudioFocusLossChecked)
         ViewUtils.onCheckChanged(viewBinding.cbPauseOnAudioFocusLoss, presenter::onPauseOnAudioFocusLossChecked)
+        ViewUtils.onCheckChanged(viewBinding.cbPauseOnZeroVolumeLevel, presenter::onPauseOnZeroVolumeLevelChecked)
 
         viewBinding.flEqualizerClickableArea.setOnClickListener { showEqualizerDialog() }
 
@@ -52,6 +53,10 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
     override fun showPauseOnAudioFocusLossEnabled(checked: Boolean) {
         ViewUtils.setChecked(viewBinding.cbPauseOnAudioFocusLoss, checked)
+    }
+
+    override fun showPauseOnZeroVolumeLevelEnabled(enabled: Boolean) {
+        ViewUtils.setChecked(viewBinding.cbPauseOnZeroVolumeLevel, enabled)
     }
 
     override fun showSelectedEqualizerType(type: Int) {

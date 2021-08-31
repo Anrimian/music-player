@@ -24,6 +24,14 @@ public class PlayerSettingsInteractor {
         return settingsRepository.isPauseOnAudioFocusLossEnabled();
     }
 
+    public void setPauseOnZeroVolumeLevelEnabled(boolean enabled) {
+        settingsRepository.setPauseOnZeroVolumeLevelEnabled(enabled);
+    }
+
+    public boolean isPauseOnZeroVolumeLevelEnabled() {
+        return settingsRepository.isPauseOnZeroVolumeLevelEnabled();
+    }
+
     public void setPauseOnAudioFocusLossEnabled(boolean enabled) {
         settingsRepository.setPauseOnAudioFocusLossEnabled(enabled);
     }
