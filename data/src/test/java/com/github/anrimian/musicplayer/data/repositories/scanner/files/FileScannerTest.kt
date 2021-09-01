@@ -41,8 +41,6 @@ class FileScannerTest {
             .thenReturn(Maybe.just(source))
     }
 
-    //apply retry
-
     @Test
     fun `run successful scan`() {
         val composition: FullComposition = mock()
@@ -94,7 +92,11 @@ class FileScannerTest {
                 .thenReturn(Maybe.empty())
 
         val exception = RuntimeException()
-        Mockito.doThrow(exception).doNothing().whenever(compositionsDao).applyDetailData()
+        Mockito.doThrow(exception)
+            .doThrow(exception)
+            .doThrow(exception)
+            .doNothing()
+            .whenever(compositionsDao).applyDetailData()
 
         fileScanner.scheduleFileScanner()
 

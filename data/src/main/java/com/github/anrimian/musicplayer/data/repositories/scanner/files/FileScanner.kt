@@ -17,6 +17,8 @@ import java.util.*
 //TODO apply album order
 //TODO apply genres data
 //TODO apply lyrics
+private const val RETRY_TIMES = 2L
+
 class FileScanner(
     private val compositionsDao: CompositionsDaoWrapper,
     private val compositionSourceEditor: CompositionSourceEditor,
@@ -43,6 +45,7 @@ class FileScanner(
         ) 0L else stateRepository.lastCompleteScanTime
         compositionsDao.selectNextCompositionToScan(lastCompleteScanTime)
             .doOnComplete(this::onScanCompleted)
+            .retry(RETRY_TIMES)
             .doOnError(this::processError)
             .onErrorComplete()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
@@ -61,6 +64,7 @@ class FileScanner(
     private fun scanCompositionFile(composition: FullComposition): Maybe<*> {
         return compositionSourceEditor.getFullTags(composition)
             .doOnSuccess { tags -> processCompositionScan(composition, tags) }
+            .retry(RETRY_TIMES)
             .doOnError(this::processError)
             .map { TRIGGER }
             .onErrorReturnItem(TRIGGER)
