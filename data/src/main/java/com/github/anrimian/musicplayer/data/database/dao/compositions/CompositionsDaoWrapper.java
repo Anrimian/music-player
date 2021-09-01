@@ -280,7 +280,7 @@ public class CompositionsDaoWrapper {
         return Maybe.empty();
     }
 
-    public void setCompositionLastFileScanTime(long id, Date time) {
+    public void setCompositionLastFileScanTime(FullComposition composition, Date time) {
 
     }
 

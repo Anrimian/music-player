@@ -17,7 +17,6 @@ import java.util.*
 //TODO apply album order
 //TODO apply genres data
 //TODO apply lyrics
-//TODO on error exclude composition from scan after several attempts
 class FileScanner(
     private val compositionsDao: CompositionsDaoWrapper,
     private val compositionSourceEditor: CompositionSourceEditor,
@@ -39,9 +38,10 @@ class FileScanner(
     fun getStateObservable(): Observable<FileScannerState> = stateSubject.distinctUntilChanged()
 
     private fun runFileScanner() {
-        //compare scanner versions, if not equal - get last scan time and select all compositions with earlier last scan time
-        //val lastScanTime = if (versions not equal) getLastScanTime else 0
-        compositionsDao.selectNextCompositionToScan(0)
+        val lastCompleteScanTime = if (
+            stateRepository.lastFileScannerVersion == stateRepository.currentFileScannerVersion
+        ) 0L else stateRepository.lastCompleteScanTime
+        compositionsDao.selectNextCompositionToScan(lastCompleteScanTime)
             .doOnComplete(this::onScanCompleted)
             .doOnError(this::processError)
             .onErrorComplete()
@@ -66,7 +66,7 @@ class FileScanner(
             .onErrorReturnItem(TRIGGER)
             //and set last modify time to prevent overwriting by scanner?
             //no, just add condition to media analyzer(hasActualChanges - also compare last file scan time and last modify time)
-            .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition.id, Date()) }
+            .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition, Date()) }
     }
 
     private fun processCompositionScan(fullComposition: FullComposition,
@@ -76,14 +76,6 @@ class FileScanner(
         compositionsDao.applyDetailData()
     }
 
-    //on error - rerun?
-    //+try several times and them skip?
-    //onErrorResumeNext?
-    //variant:
-    //--retry three times
-    //on error exclude from scan(how, just set file scan time?..no, it should rescan again, right),
-    // log if need, and consume event
-    //---on scanner version change rescan all files
     private fun processError(throwable: Throwable) {
         if (throwable is FileNotFoundException) {
             return

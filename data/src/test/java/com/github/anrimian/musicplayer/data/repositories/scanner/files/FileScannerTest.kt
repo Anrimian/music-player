@@ -35,9 +35,12 @@ class FileScannerTest {
     fun setUp() {
         whenever(stateRepository.currentFileScannerVersion).thenReturn(1)
         whenever(stateRepository.lastFileScannerVersion).thenReturn(1)
+
+        val source: CompositionSourceTags = mock()
+        whenever(compositionSourceEditor.getFullTags(any()))
+            .thenReturn(Maybe.just(source))
     }
 
-    //check scanner version update
     //apply retry
 
     @Test
@@ -47,10 +50,6 @@ class FileScannerTest {
         whenever(compositionsDao.selectNextCompositionToScan(eq(0)))
                 .thenReturn(Maybe.just(composition))
                 .thenReturn(Maybe.empty())
-
-        val source: CompositionSourceTags = mock()
-        whenever(compositionSourceEditor.getFullTags(any()))
-                .thenReturn(Maybe.just(source))
 
         fileScanner.scheduleFileScanner()
 
@@ -71,10 +70,6 @@ class FileScannerTest {
         whenever(compositionsDao.selectNextCompositionToScan(eq(0)))
                 .thenReturn(Maybe.error(exception))
                 .thenReturn(Maybe.just(mock<FullComposition>()))
-
-        val source: CompositionSourceTags = mock()
-        whenever(compositionSourceEditor.getFullTags(any()))
-                .thenReturn(Maybe.just(source))
 
         fileScanner.scheduleFileScanner()
 
@@ -98,10 +93,6 @@ class FileScannerTest {
                 .thenReturn(Maybe.just(composition2))
                 .thenReturn(Maybe.empty())
 
-        val source: CompositionSourceTags = mock()
-        whenever(compositionSourceEditor.getFullTags(any()))
-                .thenReturn(Maybe.just(source))
-
         val exception = RuntimeException()
         Mockito.doThrow(exception).doNothing().whenever(compositionsDao).applyDetailData()
 
@@ -120,4 +111,29 @@ class FileScannerTest {
         )
     }
 
+    @Test
+    fun `test file scanner version update`() {
+        whenever(stateRepository.currentFileScannerVersion).thenReturn(2)
+        val lastScanTime = 1000L
+        whenever(stateRepository.lastCompleteScanTime).thenReturn(lastScanTime)
+
+        val composition: FullComposition = mock()
+
+        whenever(compositionsDao.selectNextCompositionToScan(any()))
+            .thenReturn(Maybe.just(composition))
+            .thenReturn(Maybe.empty())
+
+        fileScanner.scheduleFileScanner()
+
+        verify(compositionsDao, times(2)).selectNextCompositionToScan(eq(lastScanTime))
+        verify(compositionsDao).setCompositionLastFileScanTime(eq(composition), any())
+        verify(stateRepository).lastFileScannerVersion = eq(2)
+        verify(stateRepository).lastCompleteScanTime = any()
+
+        testStateObserver.assertValues(
+            Idle,
+            Running(composition),
+            Idle
+        )
+    }
 }
