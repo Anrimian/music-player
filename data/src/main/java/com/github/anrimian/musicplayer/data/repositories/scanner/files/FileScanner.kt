@@ -42,12 +42,13 @@ class FileScanner(
         //compare scanner versions, if not equal - get last scan time and select all compositions with earlier last scan time
         //val lastScanTime = if (versions not equal) getLastScanTime else 0
         compositionsDao.selectNextCompositionToScan(0)
+            .doOnComplete(this::onScanCompleted)
             .doOnError(this::processError)
             .onErrorComplete()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
             .flatMap(this::scanCompositionFile)
             .doOnSuccess { runFileScanner() }
-            .doOnComplete(this::onScanCompleted)
+            .doOnComplete { stateSubject.onNext(Idle) }
             .subscribeOn(scheduler)
             .subscribe()
     }
@@ -55,7 +56,6 @@ class FileScanner(
     private fun onScanCompleted() {
         stateRepository.lastFileScannerVersion = stateRepository.currentFileScannerVersion
         stateRepository.lastCompleteScanTime = System.currentTimeMillis()
-        stateSubject.onNext(Idle)
     }
 
     private fun scanCompositionFile(composition: FullComposition): Maybe<*> {

@@ -37,7 +37,6 @@ class FileScannerTest {
         whenever(stateRepository.lastFileScannerVersion).thenReturn(1)
     }
 
-    //check scanner version set
     //check scanner version update
     //apply retry
 
@@ -80,7 +79,7 @@ class FileScannerTest {
         fileScanner.scheduleFileScanner()
 
         verify(compositionsDao, never()).setCompositionLastFileScanTime(any(), any())
-        verify(stateRepository, never()).lastFileScannerVersion = any()//shouldn't we?
+        verify(stateRepository, never()).lastFileScannerVersion = any()
         verify(stateRepository, never()).lastCompleteScanTime = any()
         verify(analytics).processNonFatalError(exception)
 
