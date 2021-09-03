@@ -19,13 +19,13 @@ public class ProgressBarCountDownTimer extends CountDownTimer {
 
     @Override
     public void onTick(long millisUntilFinished) {
-        int progress = (int) ((totalTimeMs - millisUntilFinished) * 100 / totalTimeMs);
+        int progress = (int) (millisUntilFinished * 100 / totalTimeMs);
         setProgress(progressBar, progress);
     }
 
     @Override
     public void onFinish() {
-        setProgress(progressBar, 100);
+        setProgress(progressBar, 0);
     }
 
     private void setProgress(ProgressBar pb, int progress) {
