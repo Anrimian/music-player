@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
@@ -22,6 +23,8 @@ class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
     private var artists: List<Artist> = ArrayList()
     
     private var searchText: String? = null
+
+    private var lastEditAction: Completable? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -52,15 +55,21 @@ class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
     }
 
     fun onNewArtistNameEntered(name: String?, artistId: Long) {
-        interactor.updateArtistName(name, artistId)
+        lastEditAction = interactor.updateArtistName(name, artistId)
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showRenameProgress() }
                 .doFinally { viewState.hideRenameProgress() }
-                .justSubscribe(this::onDefaultError)
+        lastEditAction!!.justSubscribe(this::onDefaultError)
+    }
+
+    fun onRetryFailedEditActionClicked() {
+        if (lastEditAction != null) {
+            lastEditAction!!.doFinally { lastEditAction = null }.justSubscribe(this::onDefaultError)
+        }
     }
 
     fun getSearchText() = searchText
-    
+
     private fun subscribeOnArtistsList() {
         if (artists.isEmpty()) {
             viewState.showLoading()

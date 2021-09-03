@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerIn
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
@@ -268,16 +269,21 @@ class MediaSessionHandler(private val context: Context,
         mediaSessionDisposable.add(Observable.combineLatest(
                 libraryPlayerInteractor.playQueueObservable.toObservable(),
                 playerInteractor.currentSourceObservable,
-                ::PlayQueueState
+                ::toSessionQueueItems
         ).subscribe(this::onPlayQueueReceived))
     }
 
-    private fun onPlayQueueReceived(queueState: PlayQueueState) {
-        val queue = when(queueState.currentSource.value) {
-            is UriCompositionSource -> emptyList()
-            else -> queueState.playQueue.map(this::toSessionQueueItem)
+    private fun onPlayQueueReceived(playQueue: List<MediaSessionCompat.QueueItem>) {
+        mediaSession?.setQueue(playQueue)
+    }
+
+    private fun toSessionQueueItems(playQueue: List<PlayQueueItem>,
+                                    currentSource: Optional<CompositionSource>
+    ): List<MediaSessionCompat.QueueItem> {
+        return when(currentSource.value) {
+            is LibraryCompositionSource -> playQueue.map(this::toSessionQueueItem)
+            else -> emptyList()
         }
-        getMediaSession().setQueue(queue)
     }
 
     private fun toSessionQueueItem(item: PlayQueueItem): MediaSessionCompat.QueueItem {
@@ -342,11 +348,6 @@ class MediaSessionHandler(private val context: Context,
             return this
         }
     }
-
-    private class PlayQueueState(
-            val playQueue: List<PlayQueueItem>,
-            val currentSource: Optional<CompositionSource>
-    )
 
     private inner class AppMediaSessionCallback : MediaSessionCompat.Callback() {
 

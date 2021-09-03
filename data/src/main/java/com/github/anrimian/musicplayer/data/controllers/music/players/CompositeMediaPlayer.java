@@ -27,7 +27,6 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     private AppMediaPlayer currentPlayer;
     private int currentPlayerIndex;
 
-    private CompositionSource currentComposition;
     private long currentTrackPosition;
 
     private float currentPlaySpeed = 1f;
@@ -48,7 +47,6 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     public void prepareToPlay(CompositionSource composition,
                               long startPosition,
                               @Nullable ErrorType previousErrorType) {
-        currentComposition = composition;
         currentTrackPosition = startPosition;
 
         if (currentPlayerIndex != startPlayerIndex) {
@@ -142,13 +140,14 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         return Observable.create(emitter -> {
             // if error event, switch to another player and consume event
             if (event instanceof ErrorEvent) {
-                ErrorType errorType = ((ErrorEvent) event).getErrorType();
+                ErrorEvent errorEvent = ((ErrorEvent) event);
+                ErrorType errorType = errorEvent.getErrorType();
                 if (errorType == ErrorType.UNSUPPORTED) {
                     int newPlayerIndex = currentPlayerIndex + 1;
                     //don't switch player when we reached end of available players
                     if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.length) {
                         setPlayer(newPlayerIndex);
-                        currentPlayer.prepareToPlay(currentComposition, currentTrackPosition, errorType);
+                        currentPlayer.prepareToPlay(errorEvent.getComposition(), currentTrackPosition, errorType);
                         return;
                     }
                 }
