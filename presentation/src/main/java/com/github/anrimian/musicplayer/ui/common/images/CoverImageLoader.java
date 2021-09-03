@@ -205,12 +205,14 @@ public class CoverImageLoader {
                     .build();
             onCompleted.call(uri);
         });
-        GlideApp.with(context)
-                .asFile()
-                .load(new CompositionImage(data.getId(), data.getDateModified()))
-                .override(getCoverSize())
-                .timeout(TIMEOUT_MILLIS)
-                .into(target);
+        CompositionImage imageData = new CompositionImage(data.getId(), data.getDateModified());
+        loadImage(imageData, bitmap -> {
+            GlideApp.with(context)
+                    .download(imageData)
+                    .onlyRetrieveFromCache(true)
+                    .timeout(TIMEOUT_MILLIS)
+                    .into(target);
+        });
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
