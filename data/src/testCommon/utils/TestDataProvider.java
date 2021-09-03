@@ -42,6 +42,7 @@ public class TestDataProvider {
                 null,
                 new Date(),
                 new Date(),
+                new Date(),
                 null);
     }
 
@@ -224,7 +225,8 @@ public class TestDataProvider {
                     storageId,
                     folderId,
                     dateAdded,
-                    dateModified);
+                    dateModified,
+                    new Date(0));
         }
     }
 

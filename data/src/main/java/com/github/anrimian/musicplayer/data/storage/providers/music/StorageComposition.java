@@ -38,6 +38,8 @@ public class StorageComposition {
     private final Date dateAdded;
     @Nonnull
     private final Date dateModified;
+    @Nonnull
+    private final Date lastScanDate;
 
     public StorageComposition(@Nullable String artist,
                               @Nullable String albumArtist,
@@ -51,7 +53,8 @@ public class StorageComposition {
                               long storageId,
                               @Nullable Long folderId,
                               @Nonnull Date dateAdded,
-                              @Nonnull Date dateModified) {
+                              @Nonnull Date dateModified,
+                              @Nonnull Date lastScanDate) {
         this.artist = artist;
         this.albumArtist = albumArtist;
         this.title = title;
@@ -65,6 +68,7 @@ public class StorageComposition {
         this.folderId = folderId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
+        this.lastScanDate = lastScanDate;
     }
 
     @Nullable
@@ -126,6 +130,11 @@ public class StorageComposition {
     @Nonnull
     public Date getDateModified() {
         return dateModified;
+    }
+
+    @Nonnull
+    public Date getLastScanDate() {
+        return lastScanDate;
     }
 
     @NonNull

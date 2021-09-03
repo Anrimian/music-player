@@ -174,7 +174,8 @@ public class StorageCompositionAnalyzer {
     }
 
     private boolean hasActualChanges(StorageComposition first, StorageFullComposition second) {
-        if (!DateUtils.isAfter(second.getDateModified(), first.getDateModified())) {
+        if (!DateUtils.isAfter(second.getDateModified(), first.getDateModified())
+                || !DateUtils.isAfter(second.getDateModified(), first.getLastScanDate())) {
             return false;
         }
 

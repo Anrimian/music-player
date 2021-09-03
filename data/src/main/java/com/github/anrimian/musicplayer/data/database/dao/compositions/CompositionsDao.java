@@ -64,7 +64,8 @@ public interface CompositionsDao {
             "compositions.storageId as storageId, " +
             "compositions.folderId as folderId, " +
             "compositions.dateAdded as dateAdded, " +
-            "compositions.dateModified as dateModified " +
+            "compositions.dateModified as dateModified, " +
+            "compositions.lastScanDate as lastScanDate " +
             "FROM compositions WHERE storageId NOTNULL")
     List<StorageComposition> selectAllAsStorageCompositions();
 

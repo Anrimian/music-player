@@ -184,6 +184,7 @@ public class StorageCompositionAnalyzerTest {
                 1L,
                 null,
                 new Date(1),
+                new Date(1),
                 new Date(1));
         map.put(1L, oldComposition);
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(map);

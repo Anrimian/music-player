@@ -3,6 +3,8 @@ package com.github.anrimian.musicplayer.data.database.mappers;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 
+import java.util.Date;
+
 import javax.annotation.Nullable;
 
 public class CompositionMapper {
@@ -23,6 +25,7 @@ public class CompositionMapper {
                 composition.getId(),
                 composition.getDateAdded(),
                 composition.getDateModified(),
+                new Date(0),
                 CompositionCorruptionDetector.getCorruptionType(composition));
     }
 }

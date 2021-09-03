@@ -70,6 +70,8 @@ public class CompositionEntity {
     private Date dateAdded;
     @Nonnull
     private Date dateModified;
+    @androidx.annotation.NonNull
+    private Date lastScanDate;
 
     @Nullable
     private CorruptionType corruptionType;
@@ -86,6 +88,7 @@ public class CompositionEntity {
                              @Nullable Long storageId,
                              @Nonnull Date dateAdded,
                              @Nonnull Date dateModified,
+                             @androidx.annotation.NonNull Date lastScanDate,
                              @Nullable CorruptionType corruptionType) {
         this.artistId = artistId;
         this.albumId = albumId;
@@ -99,6 +102,7 @@ public class CompositionEntity {
         this.size = size;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
+        this.lastScanDate = lastScanDate;
         this.corruptionType = corruptionType;
 
         Objects.requireNonNull(fileName);
@@ -163,6 +167,11 @@ public class CompositionEntity {
     @Nonnull
     public Date getDateModified() {
         return dateModified;
+    }
+
+    @androidx.annotation.NonNull
+    public Date getLastScanDate() {
+        return lastScanDate;
     }
 
     @Nullable

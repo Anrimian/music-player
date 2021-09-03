@@ -17,6 +17,8 @@ import java.util.*
 //TODO apply album order
 //TODO apply genres data
 //TODO apply lyrics
+
+//check: media analyzer scan date condition
 private const val RETRY_TIMES = 2L
 
 class FileScanner(
@@ -68,8 +70,6 @@ class FileScanner(
             .doOnError(this::processError)
             .map { TRIGGER }
             .onErrorReturnItem(TRIGGER)
-            //and set last modify time to prevent overwriting by scanner?
-            //no, just add condition to media analyzer(hasActualChanges - also compare last file scan time and last modify time)
             .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition, Date()) }
     }
 
