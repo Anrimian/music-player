@@ -216,7 +216,8 @@ public class FoldersDaoWrapper {
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
-            case NAME: {
+            case NAME:
+            case FILE_NAME: {
                 orderQuery.append("name");
                 break;
             }

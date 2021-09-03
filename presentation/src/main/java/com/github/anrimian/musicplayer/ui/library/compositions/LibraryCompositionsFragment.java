@@ -279,6 +279,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
                 OrderType.NAME,
+                OrderType.FILE_NAME,
                 OrderType.ADD_TIME,
                 OrderType.DURATION,
                 OrderType.SIZE);

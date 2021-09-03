@@ -34,8 +34,8 @@ public class Composition {
     private final CorruptionType corruptionType;
 
     //setting ui check subtitles on tablets
-    //*** setting ui: add to order dialog?
-    //add filename order
+    //*** setting ui: add to order dialog
+    //check empty title case: displaying, searching, ordering
     @SuppressWarnings("NullableProblems")//annotations break room annotations processing
     public Composition(String artist,
                        String title,

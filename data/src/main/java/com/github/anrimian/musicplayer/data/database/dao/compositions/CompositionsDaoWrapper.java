@@ -279,7 +279,11 @@ public class CompositionsDaoWrapper {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
             case NAME: {
-                orderQuery.append("title");
+                orderQuery.append("CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END");
+                break;
+            }
+            case FILE_NAME: {
+                orderQuery.append("fileName");
                 break;
             }
             case ADD_TIME: {
