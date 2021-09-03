@@ -5,7 +5,7 @@ import java.util.Map;
 
 
 public enum OrderType {
-    ALPHABETICAL(1),
+    NAME(1),
     ADD_TIME(3),
     COMPOSITION_COUNT(5),
     DURATION(7),

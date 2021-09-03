@@ -25,7 +25,6 @@
     <string name="unknown_author">Unknown author</string>
     <string name="delete">Delete</string>
     <string name="delete_folder">Delete folder</string>
-    <string name="alphabetical_order">Alphabetically</string>
     <string name="add_date_order">By date of addition</string>
     <string name="order">Sorting</string>
     <string name="folders">Folders</string>
@@ -234,6 +233,9 @@
     <string name="pause_on_zero_volume_level">Stop playing when volume level has been reached zero</string>
     <string name="covers">Covers</string>
     <string name="display_composition_file_name">Display composition file name instead of title</string>
+    <string name="name_order">By name</string>
+    <string name="file_name_order">By file name</string>
+
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

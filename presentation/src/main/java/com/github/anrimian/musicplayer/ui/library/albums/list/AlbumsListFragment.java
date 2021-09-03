@@ -159,7 +159,7 @@ public class AlbumsListFragment extends LibraryFragment implements
     @Override
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
-                OrderType.ALPHABETICAL,
+                OrderType.NAME,
                 OrderType.COMPOSITION_COUNT);
         selectOrderDialogRunner.show(fragment);
     }

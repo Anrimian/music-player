@@ -278,7 +278,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
-                OrderType.ALPHABETICAL,
+                OrderType.NAME,
                 OrderType.ADD_TIME,
                 OrderType.DURATION,
                 OrderType.SIZE);

@@ -194,7 +194,7 @@ public class FormatUtils {
 
     public static int getOrderTitle(OrderType orderType) {
         switch (orderType) {
-            case ALPHABETICAL: return R.string.alphabetical_order;
+            case NAME: return R.string.name_order;
             case ADD_TIME: return R.string.add_date_order;
             case COMPOSITION_COUNT: return R.string.by_composition_count;
             case DURATION: return R.string.by_duration;
@@ -205,7 +205,7 @@ public class FormatUtils {
 
     public static int getReversedOrderText(OrderType orderType) {
         switch (orderType) {
-            case ALPHABETICAL: return R.string.alphabetical_order_desc_title;
+            case NAME: return R.string.alphabetical_order_desc_title;
             case ADD_TIME: return R.string.add_date_order_desc_title;
             case COMPOSITION_COUNT: return R.string.more_first;
             case DURATION: return R.string.longest_first;

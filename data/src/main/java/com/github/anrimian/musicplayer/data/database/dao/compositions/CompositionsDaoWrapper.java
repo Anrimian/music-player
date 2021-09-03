@@ -278,7 +278,7 @@ public class CompositionsDaoWrapper {
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
-            case ALPHABETICAL: {
+            case NAME: {
                 orderQuery.append("title");
                 break;
             }

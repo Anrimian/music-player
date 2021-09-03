@@ -377,7 +377,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showSelectOrderScreen(Order folderOrder) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder,
-                OrderType.ALPHABETICAL,
+                OrderType.NAME,
                 OrderType.ADD_TIME,
                 OrderType.DURATION,
                 OrderType.SIZE);

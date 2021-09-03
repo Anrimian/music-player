@@ -64,7 +64,7 @@ public class ArtistsDaoWrapper {
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
-            case ALPHABETICAL: {
+            case NAME: {
                 orderQuery.append("name");
                 break;
             }

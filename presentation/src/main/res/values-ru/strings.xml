@@ -26,7 +26,6 @@
     <string name="unknown_author">Неизвестный исполнитель</string>
     <string name="delete">Удалить</string>
     <string name="delete_folder">Удалить папку</string>
-    <string name="alphabetical_order">По алфавиту</string>
     <string name="add_date_order">По дате добавления</string>
     <string name="order">Сортировка</string>
     <string name="folders">Папки</string>
