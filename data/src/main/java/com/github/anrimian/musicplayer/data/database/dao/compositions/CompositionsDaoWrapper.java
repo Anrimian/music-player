@@ -58,7 +58,7 @@ public class CompositionsDaoWrapper {
                                                           boolean useFileName,
                                                           @Nullable String searchText) {
         StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
-        query.append(getSearchQuery());
+        query.append(getSearchQuery(useFileName));
         query.append(getOrderQuery(order));
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 3));
         return updateSubject.switchMap(o -> compositionsDao.getAllObservable(sqlQuery));
@@ -73,8 +73,7 @@ public class CompositionsDaoWrapper {
                                                                            boolean useFileName,
                                                                            @Nullable String searchText) {
         StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
-        String searchQuery = getSearchQuery();
-        query.append(searchQuery);
+        query.append(getSearchQuery(useFileName));
         query.append(" AND ");
         query.append("folderId = ");
         query.append(folderId);
@@ -302,7 +301,10 @@ public class CompositionsDaoWrapper {
         return orderQuery.toString();
     }
 
-    private String getSearchQuery() {
-        return " WHERE (? IS NULL OR title LIKE ? OR (artist NOTNULL AND artist LIKE ?))";
+    private StringBuilder getSearchQuery(boolean useFileName) {
+        StringBuilder sb = new StringBuilder(" WHERE (? IS NULL OR ");
+        sb.append(useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END");
+        sb.append(" LIKE ? OR (artist NOTNULL AND artist LIKE ?))");
+        return sb;
     }
 }

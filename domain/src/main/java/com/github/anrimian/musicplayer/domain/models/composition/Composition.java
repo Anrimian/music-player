@@ -35,7 +35,6 @@ public class Composition {
 
     //setting ui check subtitles on tablets
     //*** setting ui: add to order dialog?
-    //adapt search filter
     //rename alphabetical order to by name order
     //add filename order
     @SuppressWarnings("NullableProblems")//annotations break room annotations processing
