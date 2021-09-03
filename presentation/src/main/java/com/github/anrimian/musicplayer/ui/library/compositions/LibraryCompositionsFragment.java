@@ -278,6 +278,7 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
+                true,
                 OrderType.NAME,
                 OrderType.FILE_NAME,
                 OrderType.ADD_TIME,

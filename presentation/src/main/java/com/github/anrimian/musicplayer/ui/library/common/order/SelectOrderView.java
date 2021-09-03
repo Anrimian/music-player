@@ -17,4 +17,7 @@ public interface SelectOrderView extends MvpView {
 
     @AddToEndSingle
     void showReverse(boolean selected);
+
+    @AddToEndSingle
+    void showFileNameEnabled(boolean checked);
 }

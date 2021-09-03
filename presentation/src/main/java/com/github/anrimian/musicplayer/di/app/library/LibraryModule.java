@@ -1,11 +1,14 @@
 package com.github.anrimian.musicplayer.di.app.library;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -20,8 +23,6 @@ import javax.inject.Named;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 29.10.2017.
@@ -53,8 +54,8 @@ public class LibraryModule {
 
     @Provides
     @Nonnull
-    SelectOrderPresenter selectOrderPresenter() {
-        return new SelectOrderPresenter();
+    SelectOrderPresenter selectOrderPresenter(DisplaySettingsInteractor displaySettingsInteractor) {
+        return new SelectOrderPresenter(displaySettingsInteractor);
     }
 
     @Provides

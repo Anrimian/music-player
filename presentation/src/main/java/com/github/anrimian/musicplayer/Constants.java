@@ -41,6 +41,7 @@ public interface Constants {
         String RANDOM_PLAY_ARG = "random_play_arg";
         String REPEAT_ARG = "repeat_arg";
         String COVERS_ENABLED_ARG = "covers_enabled_arg";
+        String FILE_NAME_SETTING_ARG = "file_name_setting_arg";
     }
 
     interface Tags {
