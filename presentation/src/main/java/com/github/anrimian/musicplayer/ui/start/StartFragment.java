@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.start;
 
-import android.Manifest;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +60,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
     @Override
     public void requestFilesPermissions() {
-        rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE)
+        rxPermissions.request(Permissions.getFilePermissionName())
                 .subscribe(presenter::onFilesPermissionResult);
     }
 
@@ -93,7 +92,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     }
 
     private void onTryAgainButtonClicked() {
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Permissions.getFilePermissionName())) {
             AndroidUtilsKtKt.startAppSettings(requireActivity());
             return;
         }

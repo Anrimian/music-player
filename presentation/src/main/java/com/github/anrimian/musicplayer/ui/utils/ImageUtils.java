@@ -53,6 +53,7 @@ public class ImageUtils {
         opt.outWidth = requestedSize;
         opt.outHeight = requestedSize;
         opt.inJustDecodeBounds = true;
+        opt.inPreferredConfig = Bitmap.Config.RGB_565;
         BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
         opt.inSampleSize = ImageUtils.calculateInSampleSize(opt, requestedSize, requestedSize);
         opt.inJustDecodeBounds = false;
