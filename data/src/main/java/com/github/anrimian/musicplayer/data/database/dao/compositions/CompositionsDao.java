@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 
 @Dao
@@ -147,6 +148,29 @@ public interface CompositionsDao {
     @Query("SELECT count() FROM compositions")
     long getCompositionsCount();
 
+    @Query("SELECT " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
+            "title as title, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "lyrics as lyrics, " +
+            "fileName as fileName, " +
+            "duration as duration, " +
+            "size as size, " +
+            "id as id, " +
+            "storageId as storageId, " +
+            "dateAdded as dateAdded, " +
+            "dateModified as dateModified, " +
+            "corruptionType as corruptionType " +
+            "FROM compositions " +
+            "WHERE lastScanDate < dateModified OR lastScanDate < :lastCompleteScanTime " +
+            "ORDER BY dateModified DESC " +
+            "LIMIT 1")
+    Maybe<FullComposition> selectNextCompositionToScan(long lastCompleteScanTime);
+
+    @Query("UPDATE compositions SET lastScanDate = :time WHERE id = :id")
+    void setCompositionLastFileScanTime(long id, Date time);
+
     static String getCompositionQuery() {
         return "SELECT " +
                 "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
@@ -162,5 +186,6 @@ public interface CompositionsDao {
                 "corruptionType as corruptionType  " +
                 "FROM compositions";
     }
+
 
 }
