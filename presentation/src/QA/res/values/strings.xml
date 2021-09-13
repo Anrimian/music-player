@@ -1,4 +1,4 @@
 <resources>
     <string name="file_provider_authorities" translatable="false">share_file_provider - QA</string>
-    <string name="app_name">Music Player(QA)</string>
+    <string name="app_name">(QA)Music Player</string>
 </resources>

@@ -22,8 +22,10 @@ import android.os.RemoteException;
 import android.provider.MediaStore;
 
 import androidx.annotation.RequiresApi;
+import androidx.annotation.RequiresPermission;
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.storage.exceptions.ContentResolverQueryException;
 import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
@@ -45,6 +47,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
@@ -150,7 +153,7 @@ public class StorageMusicProvider {
         String selection = Media.DURATION + " >= ? OR " + Media.DURATION + " IS NULL";
         String[] projection = new String[] { String.valueOf(minAudioDurationMillis) };
 
-        try(Cursor cursor = contentResolver.query(uri, query, selection, projection, null)) {
+        try(Cursor cursor = query(uri, query, selection, projection, null)) {
             if (cursor == null) {
                 return new LongSparseArray<>();
             }
@@ -208,7 +211,7 @@ public class StorageMusicProvider {
                 Media.DATA,
         };
 
-        try(Cursor cursor = contentResolver.query(
+        try(Cursor cursor = query(
                 getCompositionUri(storageId),
                 query,
                 null,
@@ -233,7 +236,7 @@ public class StorageMusicProvider {
                 Media.DISPLAY_NAME,
         };
 
-        try(Cursor cursor = contentResolver.query(
+        try(Cursor cursor = query(
                 getCompositionUri(storageId),
                 query,
                 null,
@@ -261,7 +264,7 @@ public class StorageMusicProvider {
                 Media.RELATIVE_PATH,
         };
 
-        try(Cursor cursor = contentResolver.query(
+        try(Cursor cursor = query(
                 getCompositionUri(storageId),
                 query,
                 null,
@@ -533,7 +536,6 @@ public class StorageMusicProvider {
         }
     }
 
-    @Nullable
     private Uri getStorageUri() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             checkIfMediaStoreAvailable(context);
@@ -548,6 +550,19 @@ public class StorageMusicProvider {
             contentResolver.applyBatch(MediaStore.AUTHORITY, operations);
         } catch (OperationApplicationException | RemoteException e) {
             throw new UpdateMediaStoreException(e);
+        }
+    }
+
+    @Nullable
+    private Cursor query(@RequiresPermission.Read @Nonnull Uri uri,
+                         @Nullable String[] projection,
+                         @Nullable String selection,
+                         @Nullable String[] selectionArgs,
+                         @Nullable String sortOrder) {
+        try {
+            return contentResolver.query(uri, projection, selection, selectionArgs, sortOrder, null);
+        } catch (Exception e) {
+            throw new ContentResolverQueryException(e);
         }
     }
 }
