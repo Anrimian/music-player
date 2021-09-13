@@ -44,7 +44,6 @@
     <string name="add_to_playlist_error_template">Can not add song to playlist: %1$s</string>
     <string name="delete_composition_error_template">Can not delete song: %1$s</string>
     <string name="add_to_playlist_success_template">Song \"%1$s\" added to playlist \"%2$s\"</string>
-    <string name="play_list_is_empty">Playlist is empty</string>
     <string name="save_as_play_list">Save as playlist</string>
     <string name="cancel">Cancel</string>
     <string name="deleting">Deleting</string>
@@ -235,6 +234,7 @@
     <string name="display_composition_file_name">Display composition file name instead of title</string>
     <string name="name_order">By name</string>
     <string name="file_name_order">By file name</string>
+    <string name="play_list_is_empty">Playlist is empty. Compositions can be added to playlists on library screens.</string>
 
 
     <plurals name="compositions_count">
