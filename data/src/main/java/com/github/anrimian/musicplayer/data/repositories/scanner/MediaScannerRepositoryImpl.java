@@ -6,6 +6,7 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.storage.exceptions.ContentResolverQueryException;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
@@ -14,6 +15,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -40,6 +42,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final StorageCompositionAnalyzer compositionAnalyzer;
     private final StoragePlaylistAnalyzer playlistAnalyzer;
     private final LoggerRepository loggerRepository;
+    private final Analytics analytics;
     private final Scheduler scheduler;
 
     private final CompositeDisposable mediaStoreDisposable = new CompositeDisposable();
@@ -53,6 +56,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                                       StorageCompositionAnalyzer compositionAnalyzer,
                                       StoragePlaylistAnalyzer playlistAnalyzer,
                                       LoggerRepository loggerRepository,
+                                      Analytics analytics,
                                       Scheduler scheduler) {
         this.musicProvider = musicProvider;
         this.playListsProvider = playListsProvider;
@@ -62,6 +66,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         this.compositionAnalyzer = compositionAnalyzer;
         this.playlistAnalyzer = playlistAnalyzer;
         this.loggerRepository = loggerRepository;
+        this.analytics = analytics;
         this.scheduler = scheduler;
     }
 
@@ -136,13 +141,21 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 
     private Completable processError(Throwable throwable) {
         if (isStandardError(throwable)) {
+            if (isStandardUnwantedError(throwable)) {
+                analytics.processNonFatalError(throwable);
+            }
             return Completable.complete();
         }
         return Completable.error(throwable);
     }
 
     private boolean isStandardError(Throwable throwable) {
-        return throwable instanceof SQLiteDiskIOException;
+        return throwable instanceof SQLiteDiskIOException
+                || isStandardUnwantedError(throwable);
+    }
+
+    private boolean isStandardUnwantedError(Throwable throwable) {
+        return throwable instanceof ContentResolverQueryException;
     }
 
     private void onStorageGenresReceived(Map<String, StorageGenre> newGenres) {

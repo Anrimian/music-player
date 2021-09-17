@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.di.app;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
+
 import android.content.Context;
 import android.os.Build;
 
@@ -28,6 +31,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
 import com.github.anrimian.musicplayer.data.storage.source.FileSourceProvider;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
@@ -43,9 +47,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
 
 @Module
 public class StorageModule {
@@ -142,6 +143,7 @@ public class StorageModule {
                                                   StorageCompositionAnalyzer compositionAnalyzer,
                                                   StoragePlaylistAnalyzer storagePlaylistAnalyzer,
                                                   LoggerRepository loggerRepository,
+                                                  Analytics analytics,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
@@ -151,6 +153,7 @@ public class StorageModule {
                 compositionAnalyzer,
                 storagePlaylistAnalyzer,
                 loggerRepository,
+                analytics,
                 scheduler);
     }
 
