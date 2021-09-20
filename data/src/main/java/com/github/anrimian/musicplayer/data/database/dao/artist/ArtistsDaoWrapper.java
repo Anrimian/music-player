@@ -1,7 +1,10 @@
 package com.github.anrimian.musicplayer.data.database.dao.artist;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
@@ -9,8 +12,6 @@ import com.github.anrimian.musicplayer.domain.models.order.Order;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
-
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 
 public class ArtistsDaoWrapper {
 
@@ -32,11 +33,13 @@ public class ArtistsDaoWrapper {
         return artistsDao.getAllObservable(sqlQuery);
     }
 
-    public Observable<List<Composition>> getCompositionsByArtistObservable(long artistId) {
-        return artistsDao.getCompositionsByArtistObservable(artistId);
+    public Observable<List<Composition>> getCompositionsByArtistObservable(long artistId, boolean useFileName) {
+        String query = ArtistsDao.getCompositionsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {artistId} );
+        return artistsDao.getCompositionsByArtistObservable(sqlQuery);
     }
 
-    public List<Composition> getCompositionsByArtist(long artistId) {
+    public List<CompositionId> getCompositionsByArtist(long artistId) {
         return artistsDao.getCompositionsByArtist(artistId);
     }
 
@@ -61,7 +64,7 @@ public class ArtistsDaoWrapper {
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
-            case ALPHABETICAL: {
+            case NAME: {
                 orderQuery.append("name");
                 break;
             }

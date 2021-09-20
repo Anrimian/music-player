@@ -2,6 +2,9 @@ package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 import androidx.collection.LongSparseArray;
@@ -59,11 +62,12 @@ public class CompositionsDaoWrapper {
     }
 
     public Observable<List<Composition>> getAllObservable(Order order,
+                                                          boolean useFileName,
                                                           @Nullable String searchText) {
-        String query = CompositionsDao.getCompositionQuery();
-        query += getSearchQuery();
-        query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 3));
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(getSearchQuery(useFileName));
+        query.append(getOrderQuery(order));
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 3));
         return updateSubject.switchMap(o -> compositionsDao.getAllObservable(sqlQuery));
     }
 
@@ -73,10 +77,10 @@ public class CompositionsDaoWrapper {
 
     public Observable<List<Composition>> getCompositionsInFolderObservable(Long folderId,
                                                                            Order order,
+                                                                           boolean useFileName,
                                                                            @Nullable String searchText) {
-        StringBuilder query = new StringBuilder(CompositionsDao.getCompositionQuery());
-        String searchQuery = getSearchQuery();
-        query.append(searchQuery);
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(getSearchQuery(useFileName));
         query.append(" AND ");
         query.append("folderId = ");
         query.append(folderId);
@@ -88,9 +92,9 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getAllInFolderObservable(sqlQuery);
     }
 
-    public List<Composition> getAllCompositionsInFolder(Long parentFolderId) {
+    public List<Composition> getAllCompositionsInFolder(Long parentFolderId, boolean useFileName) {
         String query = FoldersDao.getRecursiveFolderQuery(parentFolderId);
-        query += CompositionsDao.getCompositionQuery();
+        query += CompositionsDao.getCompositionQuery(useFileName);
         query += " WHERE folderId IN (SELECT childFolderId FROM allChildFolders) ";
         query += "OR folderId = ";
         query += parentFolderId;
@@ -98,15 +102,15 @@ public class CompositionsDaoWrapper {
         return compositionsDao.executeQuery(sqlQuery);
     }
 
-    public List<Composition> getCompositionsInFolder(Long parentFolderId, Order order) {
-        String query = CompositionsDao.getCompositionQuery();
-        query += " WHERE folderId = ";
-        query += parentFolderId;
-        query += " OR (folderId IS NULL AND ";
-        query += parentFolderId;
-        query += " IS NULL)";
-        query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+    public List<Composition> getCompositionsInFolder(Long parentFolderId, Order order, boolean useFileName) {
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(" WHERE folderId = ");
+        query.append(parentFolderId);
+        query.append(" OR (folderId IS NULL AND ");
+        query.append(parentFolderId);
+        query.append(" IS NULL)");
+        query.append(getOrderQuery(order));
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString());
         return compositionsDao.executeQuery(sqlQuery);
     }
 
@@ -321,8 +325,12 @@ public class CompositionsDaoWrapper {
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
-            case ALPHABETICAL: {
-                orderQuery.append("title");
+            case NAME: {
+                orderQuery.append("CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END");
+                break;
+            }
+            case FILE_NAME: {
+                orderQuery.append("fileName");
                 break;
             }
             case ADD_TIME: {
@@ -344,8 +352,11 @@ public class CompositionsDaoWrapper {
         return orderQuery.toString();
     }
 
-    private String getSearchQuery() {
-        return " WHERE (? IS NULL OR title LIKE ? OR (artist NOTNULL AND artist LIKE ?))";
+    private StringBuilder getSearchQuery(boolean useFileName) {
+        StringBuilder sb = new StringBuilder(" WHERE (? IS NULL OR ");
+        sb.append(useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END");
+        sb.append(" LIKE ? OR (artist NOTNULL AND artist LIKE ?))");
+        return sb;
     }
 
 }

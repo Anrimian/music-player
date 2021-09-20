@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
+import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
+
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
@@ -19,9 +22,6 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
-
-import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
-import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
@@ -46,7 +46,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         this.scheduler = scheduler;
 
         playQueueObservable = settingsPreferences.getRandomPlayingObservable()
-                .switchMap(playQueueDao::getPlayQueueObservable)
+                .switchMap(isRandom -> settingsPreferences.getDisplayFileNameObservable()
+                        .switchMap(useFileName -> playQueueDao.getPlayQueueObservable(isRandom, useFileName))
+                )
                 .toFlowable(BackpressureStrategy.LATEST)
                 .replay(1)
                 .refCount();
@@ -236,7 +238,8 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
             return Observable.just(new PlayQueueEvent(null));
         }
 
-        return playQueueDao.getItemObservable(id)
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> playQueueDao.getItemObservable(id, useFileName))
                 .flatMap(this::checkForExisting)
                 .map(this::mapToQueueEvent);
     }

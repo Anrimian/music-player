@@ -127,4 +127,14 @@ public interface SettingsRepository {
     void setAudioFileMinDurationMillis(long millis);
 
     long getAudioFileMinDurationMillis();
+
+    void setPauseOnZeroVolumeLevelEnabled(boolean enabled);
+
+    boolean isPauseOnZeroVolumeLevelEnabled();
+
+    Observable<Boolean> getDisplayFileNameObservable();
+
+    void setDisplayFileName(boolean displayFileName);
+
+    boolean isDisplayFileNameEnabled();
 }

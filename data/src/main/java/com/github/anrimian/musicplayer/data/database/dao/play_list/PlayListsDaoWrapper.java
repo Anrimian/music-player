@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.database.dao.play_list;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 import androidx.core.util.Pair;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
@@ -141,8 +142,11 @@ public class PlayListsDaoWrapper {
                 .map(items -> items.get(0));
     }
 
-    public Observable<List<PlayListItem>> getPlayListItemsObservable(long playListId) {
-        return playListDao.getPlayListItemsObservable(playListId)
+    public Observable<List<PlayListItem>> getPlayListItemsObservable(long playListId,
+                                                                     boolean useFileName) {
+        String query = PlayListDao.getPlaylistItemsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {playListId} );
+        return playListDao.getPlayListItemsObservable(sqlQuery)
                 .map(entities -> mapList(entities, this::toItem));
     }
 

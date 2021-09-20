@@ -101,6 +101,7 @@ public class StorageModule {
                                                  StorageMusicProvider storageMusicProvider,
                                                  StorageGenresProvider storageGenresProvider,
                                                  StateRepository stateRepository,
+                                                 SettingsRepository settingsRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new EditorRepositoryImpl(
                 sourceEditor,
@@ -113,6 +114,7 @@ public class StorageModule {
                 storageMusicProvider,
                 storageGenresProvider,
                 stateRepository,
+                settingsRepository,
                 scheduler);
     }
 

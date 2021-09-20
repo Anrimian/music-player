@@ -4,11 +4,14 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RawQuery;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
@@ -25,38 +28,15 @@ public interface AlbumsDao {
     @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
     Observable<List<Album>> getAllObservable(SupportSQLiteQuery query);
 
-    @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "title as title, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "fileName as fileName, " +
-            "duration as duration, " +
-            "size as size, " +
-            "id as id, " +
-            "storageId as storageId, " +
-            "dateAdded as dateAdded, " +
-            "dateModified as dateModified, " +
-            "corruptionType as corruptionType " +
-            "FROM compositions " +
-            "WHERE albumId = :albumId " +
-            "ORDER BY fileName")
-    Observable<List<Composition>> getCompositionsInAlbumObservable(long albumId);
+    @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
+    Observable<List<Composition>> getCompositionsInAlbumObservable(SimpleSQLiteQuery query);
 
     @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "title as title, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "fileName as fileName, " +
-            "duration as duration, " +
-            "size as size, " +
             "id as id, " +
-            "storageId as storageId, " +
-            "dateAdded as dateAdded, " +
-            "dateModified as dateModified, " +
-            "corruptionType as corruptionType " +
+            "storageId as storageId " +
             "FROM compositions " +
             "WHERE albumId = :albumId")
-    List<Composition> getCompositionsInAlbum(long albumId);
+    List<CompositionId> getCompositionsInAlbum(long albumId);
 
     @Query("SELECT id as id," +
             "name as name, " +
@@ -120,4 +100,13 @@ public interface AlbumsDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM albums WHERE name = :name)")
     boolean isAlbumExists(String name);
+
+    static String getCompositionsQuery(boolean useFileName) {
+        return "SELECT " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM compositions " +
+                "WHERE albumId = ? " +
+                "ORDER BY fileName";
+    }
+
 }

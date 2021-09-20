@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,7 @@ import io.reactivex.rxjava3.core.Single;
 //TODO consider write playlists in audio file tags
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
+    private final SettingsRepository settingsRepository;
     private final StoragePlayListsProvider storagePlayListsProvider;
     private final PlayListsDaoWrapper playListsDao;
     private final Scheduler dbScheduler;
@@ -33,10 +35,12 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     private long deletedItemPlayListId;
     private int deletedItemPosition;
 
-    public PlayListsRepositoryImpl(StoragePlayListsProvider storagePlayListsProvider,
+    public PlayListsRepositoryImpl(SettingsRepository settingsRepository,
+                                   StoragePlayListsProvider storagePlayListsProvider,
                                    PlayListsDaoWrapper playListsDao,
                                    Scheduler dbScheduler,
                                    Scheduler slowBgScheduler) {
+        this.settingsRepository = settingsRepository;
         this.storagePlayListsProvider = storagePlayListsProvider;
         this.playListsDao = playListsDao;
         this.dbScheduler = dbScheduler;
@@ -55,7 +59,8 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     @Override
     public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId) {
-        return playListsDao.getPlayListItemsObservable(playlistId);
+        return settingsRepository.getDisplayFileNameObservable()
+                .switchMap(useFileName -> playListsDao.getPlayListItemsObservable(playlistId, useFileName));
     }
 
     @Override

@@ -25,7 +25,6 @@
     <string name="unknown_author">Autor desconocido</string>
     <string name="delete">Eliminar</string>
     <string name="delete_folder">Eliminar carpeta</string>
-    <string name="alphabetical_order">Alfabeticamente</string>
     <string name="add_date_order">Por fecha de agregada</string>
     <string name="order">Ordenar</string>
     <string name="folders">Carpetas</string>

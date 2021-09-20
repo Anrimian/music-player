@@ -1,5 +1,14 @@
 package com.github.anrimian.musicplayer.ui.library.compositions;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils.safeShow;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -52,15 +61,6 @@ import java.util.List;
 
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils.safeShow;
 
 public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment implements
         LibraryCompositionsView, BackButtonListener, FragmentLayerListener {
@@ -278,7 +278,9 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
     @Override
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
-                OrderType.ALPHABETICAL,
+                true,
+                OrderType.NAME,
+                OrderType.FILE_NAME,
                 OrderType.ADD_TIME,
                 OrderType.DURATION,
                 OrderType.SIZE);
@@ -372,10 +374,6 @@ public class LibraryCompositionsFragment extends BaseLibraryCompositionsFragment
             }
             case R.id.menu_equalizer: {
                 new EqualizerDialogFragment().show(getChildFragmentManager(), null);
-                break;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
                 break;
             }
         }

@@ -1,5 +1,12 @@
 package com.github.anrimian.musicplayer.ui.common.format;
 
+import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.text.format.Formatter;
@@ -24,13 +31,6 @@ import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionS
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
 
 import java.util.Locale;
-
-import static android.text.TextUtils.isEmpty;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.run;
-import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * Created on 15.11.2017.
@@ -194,7 +194,8 @@ public class FormatUtils {
 
     public static int getOrderTitle(OrderType orderType) {
         switch (orderType) {
-            case ALPHABETICAL: return R.string.alphabetical_order;
+            case NAME: return R.string.name_order;
+            case FILE_NAME: return R.string.file_name_order;
             case ADD_TIME: return R.string.add_date_order;
             case COMPOSITION_COUNT: return R.string.by_composition_count;
             case DURATION: return R.string.by_duration;
@@ -205,7 +206,8 @@ public class FormatUtils {
 
     public static int getReversedOrderText(OrderType orderType) {
         switch (orderType) {
-            case ALPHABETICAL: return R.string.alphabetical_order_desc_title;
+            case NAME:
+            case FILE_NAME: return R.string.alphabetical_order_desc_title;
             case ADD_TIME: return R.string.add_date_order_desc_title;
             case COMPOSITION_COUNT: return R.string.more_first;
             case DURATION: return R.string.longest_first;

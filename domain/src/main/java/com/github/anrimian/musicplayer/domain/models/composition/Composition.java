@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.domain.models.composition;
 
-import com.github.anrimian.musicplayer.domain.utils.Objects;
-
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -15,10 +13,8 @@ public class Composition {
 
     @Nullable
     private final String artist;
-    @Nullable
-    private final String title;
     @Nonnull
-    private final String fileName;
+    private final String title;
     @Nullable
     private final String album;
 
@@ -40,7 +36,6 @@ public class Composition {
     @SuppressWarnings("NullableProblems")//annotations break room annotations processing
     public Composition(String artist,
                        String title,
-                       String fileName,
                        String album,
                        long duration,
                        long size,
@@ -51,7 +46,6 @@ public class Composition {
                        CorruptionType corruptionType) {
         this.artist = artist;
         this.title = title;
-        this.fileName = fileName;
         this.album = album;
         this.duration = duration;
         this.size = size;
@@ -72,14 +66,9 @@ public class Composition {
         return artist;
     }
 
-    @Nullable
+    @Nonnull
     public String getTitle() {
         return title;
-    }
-
-    @Nonnull
-    public String getFileName() {
-        return fileName;
     }
 
     @Nullable
@@ -118,7 +107,6 @@ public class Composition {
     public String toString() {
         return "Composition{" +
                 "title='" + title + '\'' +
-                ", fileName='" + fileName + '\'' +
                 ", id=" + id +
                 '}';
     }

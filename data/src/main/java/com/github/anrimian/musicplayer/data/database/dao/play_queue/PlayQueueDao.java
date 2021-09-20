@@ -3,8 +3,14 @@ package com.github.anrimian.musicplayer.data.database.dao.play_queue;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.RawQuery;
 import androidx.room.Update;
+import androidx.sqlite.db.SupportSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
 
@@ -18,39 +24,8 @@ public interface PlayQueueDao {
     @Query("SELECT * FROM play_queue ORDER BY position")
     List<PlayQueueEntity> getPlayQueue();
 
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "compositions.title AS title, " +
-            "compositions.fileName AS fileName, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
-            "ORDER BY position")
-    Observable<List<PlayQueueItemDto>> getPlayQueueInNormalOrderObservable();
-
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "compositions.id AS id, " +
-            "compositions.storageId AS storageId, " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "compositions.title AS title, " +
-            "compositions.fileName AS fileName, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
-            "ORDER BY shuffledPosition")
-    Observable<List<PlayQueueItemDto>> getPlayQueueInShuffledOrderObservable();
+    @RawQuery(observedEntities = { PlayQueueEntity.class, ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
+    Observable<List<PlayQueueItemDto>> getPlayQueueObservable(SupportSQLiteQuery query);
 
     @Query("SELECT id " +
             "FROM play_queue " +
@@ -64,23 +39,8 @@ public interface PlayQueueDao {
             "LIMIT 1")
     Long getItemIdAtShuffledPosition(int position);
 
-    @Query("SELECT " +
-            "play_queue.id AS itemId," +
-            "compositions.id AS id, " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.title AS title, " +
-            "compositions.fileName AS fileName, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id " +
-            "WHERE itemId = :id " +
-            "LIMIT 1")
-    Observable<PlayQueueItemDto[]> getItemObservable(long id);
+    @RawQuery(observedEntities = { PlayQueueEntity.class, ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
+    Observable<PlayQueueItemDto[]> getItemObservable(SupportSQLiteQuery query);
 
     @Insert
     long[] insertItems(List<PlayQueueEntity> playQueueEntityList);
@@ -217,4 +177,11 @@ public interface PlayQueueDao {
 
     @Query("SELECT count() FROM play_queue")
     Observable<Integer> getPlayQueueSizeObservable();
+
+    static String getCompositionQuery(boolean useFileName) {
+        return "SELECT " +
+                "play_queue.id AS itemId," +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id ";
+    }
 }

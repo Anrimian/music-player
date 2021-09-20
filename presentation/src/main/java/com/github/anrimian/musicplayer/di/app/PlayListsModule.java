@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.playlists.StorageP
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
@@ -64,11 +65,13 @@ public class PlayListsModule {
     @Provides
     @Nonnull
     @Singleton
-    PlayListsRepository storagePlayListDataSource(StoragePlayListsProvider playListsProvider,
+    PlayListsRepository storagePlayListDataSource(SettingsRepository settingsRepository,
+                                                  StoragePlayListsProvider playListsProvider,
                                                   PlayListsDaoWrapper playListsDaoWrapper,
                                                   @Named(DB_SCHEDULER) Scheduler dbScheduler,
                                                   @Named(SLOW_BG_SCHEDULER) Scheduler slowBgScheduler) {
-        return new PlayListsRepositoryImpl(playListsProvider,
+        return new PlayListsRepositoryImpl(settingsRepository,
+                playListsProvider,
                 playListsDaoWrapper,
                 dbScheduler,
                 slowBgScheduler);

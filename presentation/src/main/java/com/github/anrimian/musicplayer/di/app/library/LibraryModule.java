@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFolders
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -55,8 +56,8 @@ public class LibraryModule {
 
     @Provides
     @Nonnull
-    SelectOrderPresenter selectOrderPresenter() {
-        return new SelectOrderPresenter();
+    SelectOrderPresenter selectOrderPresenter(DisplaySettingsInteractor displaySettingsInteractor) {
+        return new SelectOrderPresenter(displaySettingsInteractor);
     }
 
     @Provides

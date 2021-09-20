@@ -18,6 +18,9 @@ class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
         viewState.showPauseOnAudioFocusLossEnabled(
             interactor.isPauseOnAudioFocusLossEnabled
         )
+        viewState.showPauseOnZeroVolumeLevelEnabled(
+            interactor.isPauseOnZeroVolumeLevelEnabled
+        )
         subscribeOnSelectedEqualizer()
     }
 
@@ -29,6 +32,11 @@ class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
     fun onPauseOnAudioFocusLossChecked(checked: Boolean) {
         viewState.showPauseOnAudioFocusLossEnabled(checked)
         interactor.isPauseOnAudioFocusLossEnabled = checked
+    }
+
+    fun onPauseOnZeroVolumeLevelChecked(checked: Boolean) {
+        viewState.showPauseOnZeroVolumeLevelEnabled(checked)
+        interactor.isPauseOnZeroVolumeLevelEnabled = checked
     }
 
     private fun subscribeOnSelectedEqualizer() {
