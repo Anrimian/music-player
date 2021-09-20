@@ -171,6 +171,9 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET lastScanDate = :time WHERE id = :id")
     void setCompositionLastFileScanTime(long id, Date time);
 
+    @Query("UPDATE compositions SET lastScanDate = 0")
+    void cleanLastFileScanTime();
+
     static StringBuilder getCompositionQuery(boolean useFileName) {
         return new StringBuilder("SELECT " +
                 CompositionsDao.getCompositionSelectionQuery(useFileName) +

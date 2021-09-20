@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDiskIOException;
 
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.repositories.scanner.files.FileScanner;
@@ -40,6 +41,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final StorageMusicProvider musicProvider;
     private final StoragePlayListsProvider playListsProvider;
     private final StorageGenresProvider genresProvider;
+    private final CompositionsDaoWrapper compositionsDao;
     private final GenresDaoWrapper genresDao;
     private final SettingsRepository settingsRepository;
     private final StorageCompositionAnalyzer compositionAnalyzer;
@@ -55,6 +57,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     public MediaScannerRepositoryImpl(StorageMusicProvider musicProvider,
                                       StoragePlayListsProvider playListsProvider,
                                       StorageGenresProvider genresProvider,
+                                      CompositionsDaoWrapper compositionsDao,
                                       GenresDaoWrapper genresDao,
                                       SettingsRepository settingsRepository,
                                       StorageCompositionAnalyzer compositionAnalyzer,
@@ -66,6 +69,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         this.musicProvider = musicProvider;
         this.playListsProvider = playListsProvider;
         this.genresProvider = genresProvider;
+        this.compositionsDao = compositionsDao;
         this.genresDao = genresDao;
         this.settingsRepository = settingsRepository;
         this.compositionAnalyzer = compositionAnalyzer;
@@ -94,6 +98,12 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     }
 
     @Override
+    public Completable runStorageAndFileScanner() {
+        return Completable.fromAction(compositionsDao::cleanLastFileScanTime)
+                .andThen(runRescanStorage());
+    }
+
+    @Override
     public Observable<FileScannerState> getFileScannerStateObservable() {
         return fileScanner.getStateObservable();
     }
@@ -104,6 +114,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 .subscribeOn(scheduler)
                 .observeOn(scheduler)
                 .doOnNext(compositionAnalyzer::applyCompositionsData)//then run file scanner
+                .doOnNext(o -> fileScanner.scheduleFileScanner())
                 .retry(RETRY_COUNT, this::isStandardError)
                 .onErrorComplete(this::isStandardError)
                 .subscribe(o -> {}));
@@ -136,6 +147,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 return;
             }
             playlistAnalyzer.applyPlayListData(playlists);
+            fileScanner.scheduleFileScanner();
 
             //<return genres after deep scan implementation>
 //            applyGenresData(genresProvider.getGenres());

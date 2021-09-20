@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
@@ -11,7 +10,6 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 
 public interface EditorRepository {
@@ -55,8 +53,6 @@ public interface EditorRepository {
     Completable updateArtistName(String name, long artistId);
 
     Completable updateGenreName(String name, long genreId);
-
-    Maybe<CompositionSourceTags> getCompositionFileTags(FullComposition composition);
 
     Single<String[]> getCompositionFileGenres(FullComposition composition);
 

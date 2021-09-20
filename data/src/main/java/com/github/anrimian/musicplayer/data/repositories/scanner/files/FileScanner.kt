@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.files
 
+import android.util.Log
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
@@ -9,21 +10,27 @@ import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.domain.models.scanner.Idle
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository
-import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.FileNotFoundException
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 //apply album order
 //apply genres data
 //apply lyrics
 
-//on manual rescan clean last complete scan time
+//cleanLastFileScanTime not working
+//scan state display design
+//scan state: display non-scanned file count? ("Scanning file tags: %s \n %d left")
+//clean logs
 
+//check: on manual rescan clean last complete scan time
 //check: media analyzer scan date condition
 private const val RETRY_TIMES = 2L
+private const val READ_FILE_TIMEOUT_SECONDS = 2L
 
 class FileScanner(
     private val compositionsDao: CompositionsDaoWrapper,
@@ -55,9 +62,12 @@ class FileScanner(
             .doOnError(this::processError)
             .onErrorComplete()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
-            .flatMap(this::scanCompositionFile)
+            .flatMapSingle(this::scanCompositionFile)
             .doOnSuccess { runFileScanner() }
-            .doOnComplete { stateSubject.onNext(Idle) }
+            .doOnComplete {
+                Log.d("KEK", "completed")
+                stateSubject.onNext(Idle)
+            }
             .subscribeOn(scheduler)
             .subscribe()
     }
@@ -67,9 +77,13 @@ class FileScanner(
         stateRepository.lastCompleteScanTime = System.currentTimeMillis()
     }
 
-    private fun scanCompositionFile(composition: FullComposition): Maybe<*> {
+    private fun scanCompositionFile(composition: FullComposition): Single<*> {
+        Log.d("KEK", "scanCompositionFile: " + composition.fileName)
         return compositionSourceEditor.getFullTags(composition)
-            .doOnSuccess { tags -> compositionsDao.updateCompositionBySourceTags(composition, tags) }
+            .doOnSuccess { tags ->
+                Log.d("KEK", "updateCompositionBySourceTags: " + composition.fileName)
+                compositionsDao.updateCompositionBySourceTags(composition, tags) }
+            .timeout(READ_FILE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .retry(RETRY_TIMES)
             .doOnError(this::processError)
             .map { TRIGGER }

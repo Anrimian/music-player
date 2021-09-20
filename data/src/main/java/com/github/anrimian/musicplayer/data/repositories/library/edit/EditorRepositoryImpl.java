@@ -1,9 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.library.edit;
 
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
-
-import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 import androidx.core.util.Pair;
 
@@ -49,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
@@ -342,12 +338,6 @@ public class EditorRepositoryImpl implements EditorRepository {
                             storageGenresProvider.updateGenreName(oldName, name);
                         })
                 )
-                .subscribeOn(scheduler);
-    }
-
-    @Override
-    public Maybe<CompositionSourceTags> getCompositionFileTags(FullComposition composition) {
-        return sourceEditor.getFullTags(composition)
                 .subscribeOn(scheduler);
     }
 

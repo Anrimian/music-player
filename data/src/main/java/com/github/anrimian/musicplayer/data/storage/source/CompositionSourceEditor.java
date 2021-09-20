@@ -147,9 +147,9 @@ public class CompositionSourceEditor {
                 .flatMap(path -> removeCompositionAlbumArt(path, composition.getStorageId()));
     }
 
-    public Maybe<CompositionSourceTags> getFullTags(FullComposition composition) {
+    public Single<CompositionSourceTags> getFullTags(FullComposition composition) {
         return getPath(composition)
-                .flatMapMaybe(this::getFullTags);
+                .flatMap(this::getFullTags);
     }
 
     public Maybe<byte[]> getCompositionArtworkBinaryData(long storageId) {
@@ -283,12 +283,9 @@ public class CompositionSourceEditor {
         });
     }
 
-    private Maybe<CompositionSourceTags> getFullTags(String filePath) {
-        return Maybe.fromCallable(() -> {
+    private Single<CompositionSourceTags> getFullTags(String filePath) {
+        return Single.fromCallable(() -> {
             Tag tag = getFileTag(filePath);
-            if (tag == null) {
-                return null;
-            }
             return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
                     tag.getFirst(FieldKey.ARTIST),
                     tag.getFirst(FieldKey.ALBUM),
@@ -334,7 +331,7 @@ public class CompositionSourceEditor {
 
     private Tag getFileTag(String filePath) throws Exception {
         AudioFile file = readFile(new File(filePath));
-        return file.getTag();
+        return file.getTagOrCreateDefault();
     }
 
     private Single<Long> changeCompositionAlbumArt(String filePath, Long id, ImageSource imageSource) {
@@ -387,11 +384,7 @@ public class CompositionSourceEditor {
 
     private void runFileAction(File file, ThrowsCallback<Tag> callback) throws Exception {
         AudioFile audioFile = readFile(file);
-        Tag tag = audioFile.getTag();
-        if (tag == null) {
-            tag = new ID3v24Tag();
-            audioFile.setTag(tag);
-        }
+        Tag tag = audioFile.getTagOrCreateAndSetDefault();
         callback.call(tag);
         AudioFileIO.write(audioFile);
     }

@@ -2,9 +2,6 @@ package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
-
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
-import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 import androidx.collection.LongSparseArray;
@@ -289,6 +286,10 @@ public class CompositionsDaoWrapper {
 
     public void setCompositionLastFileScanTime(FullComposition composition, Date time) {
         compositionsDao.setCompositionLastFileScanTime(composition.getId(), time);
+    }
+
+    public void cleanLastFileScanTime() {
+        compositionsDao.cleanLastFileScanTime();
     }
 
     public void updateCompositionBySourceTags(FullComposition composition, CompositionSourceTags tags) {

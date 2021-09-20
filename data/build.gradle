@@ -70,5 +70,6 @@ dependencies {
     androidTestImplementation deps.rxJavaExt
     androidTestImplementation deps.roomTest
     androidTestImplementation deps.mockito
+    androidTestImplementation deps.mockitoKt
 
 }

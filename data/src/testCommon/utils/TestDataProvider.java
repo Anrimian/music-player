@@ -83,7 +83,6 @@ public class TestDataProvider {
 
     public static Composition fakeComposition(long id) {
         return new Composition(null,
-                null,
                 "fileName",
                 null,
                 0,

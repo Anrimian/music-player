@@ -12,5 +12,7 @@ public interface MediaScannerRepository {
 
     Completable runStorageScanner();
 
+    Completable runStorageAndFileScanner();
+
     Observable<FileScannerState> getFileScannerStateObservable();
 }

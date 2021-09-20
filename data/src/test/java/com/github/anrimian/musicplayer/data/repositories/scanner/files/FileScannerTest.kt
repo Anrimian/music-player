@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.scanner.Idle
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository
 import io.reactivex.rxjava3.core.Maybe
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +41,7 @@ class FileScannerTest {
 
         val source: CompositionSourceTags = mock()
         whenever(compositionSourceEditor.getFullTags(any()))
-            .thenReturn(Maybe.just(source))
+            .thenReturn(Single.just(source))
     }
 
     @Test
@@ -98,7 +99,7 @@ class FileScannerTest {
             .doThrow(exception)
             .doThrow(exception)
             .doNothing()
-            .whenever(compositionsDao).applyDetailData()
+            .whenever(compositionsDao).updateCompositionBySourceTags(any(), any())
 
         fileScanner.scheduleFileScanner()
 
