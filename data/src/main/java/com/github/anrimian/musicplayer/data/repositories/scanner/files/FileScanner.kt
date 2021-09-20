@@ -5,7 +5,9 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEdit
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags
+import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
+import com.github.anrimian.musicplayer.domain.models.scanner.Idle
+import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
@@ -14,9 +16,11 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.FileNotFoundException
 import java.util.*
 
-//TODO apply album order
-//TODO apply genres data
-//TODO apply lyrics
+//apply album order
+//apply genres data
+//apply lyrics
+
+//on manual rescan clean last complete scan time
 
 //check: media analyzer scan date condition
 private const val RETRY_TIMES = 2L
@@ -65,19 +69,12 @@ class FileScanner(
 
     private fun scanCompositionFile(composition: FullComposition): Maybe<*> {
         return compositionSourceEditor.getFullTags(composition)
-            .doOnSuccess { tags -> processCompositionScan(composition, tags) }
+            .doOnSuccess { tags -> compositionsDao.updateCompositionBySourceTags(composition, tags) }
             .retry(RETRY_TIMES)
             .doOnError(this::processError)
             .map { TRIGGER }
             .onErrorReturnItem(TRIGGER)
             .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition, Date()) }
-    }
-
-    private fun processCompositionScan(fullComposition: FullComposition,
-                                       fileTags: CompositionSourceTags) {
-        //compare
-        //apply data to database(in one transaction)
-        compositionsDao.applyDetailData()
     }
 
     private fun processError(throwable: Throwable) {

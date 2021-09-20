@@ -22,13 +22,13 @@ import java.util.*
  * Created on 02.11.2017.
  */
 class PlayerPresenter(
-        private val playerInteractor: LibraryPlayerInteractor,
-        private val playListsInteractor: PlayListsInteractor,
-        private val playerScreenInteractor: PlayerScreenInteractor,
-        errorParser: ErrorParser,
-        uiScheduler: Scheduler
+    private val playerInteractor: LibraryPlayerInteractor,
+    private val playListsInteractor: PlayListsInteractor,
+    private val playerScreenInteractor: PlayerScreenInteractor,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler
 ) : AppPresenter<PlayerView>(uiScheduler, errorParser) {
-    
+
     private val batterySafeDisposable = CompositeDisposable()
 
     private val listDragFilter = ListDragFilter()
@@ -36,14 +36,14 @@ class PlayerPresenter(
     private var playQueue: List<PlayQueueItem> = ArrayList()
     private var currentItem: PlayQueueItem? = null
     private var currentPosition = -1
-    
+
     private var isDragging = false
     private var isCoversEnabled = false
-    
+
     private val compositionsForPlayList = LinkedList<Composition>()
 
     private var lastDeleteAction: Completable? = null
-    
+
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.setButtonPanelState(playerScreenInteractor.isPlayerPanelOpen)
@@ -61,6 +61,7 @@ class PlayerPresenter(
         subscribeOnCurrentPosition()
         subscribeOnTrackPositionChanging()
         subscribeOnSleepTimerTime()
+        subscribeOnFileScannerState()
     }
 
     fun onStop() {
@@ -69,7 +70,7 @@ class PlayerPresenter(
 
     fun onCurrentScreenRequested() {
         viewState.showDrawerScreen(playerScreenInteractor.selectedDrawerScreen,
-                playerScreenInteractor.selectedPlayListScreenId)
+            playerScreenInteractor.selectedPlayListScreenId)
     }
 
     fun onOpenPlayQueueClicked() {
@@ -174,10 +175,10 @@ class PlayerPresenter(
     fun onPlayListForAddingCreated(playList: PlayList?) {
         val compositionsToAdd = playQueue.map(PlayQueueItem::getComposition)
         playListsInteractor.addCompositionsToPlayList(compositionsToAdd, playList)
-                .subscribeOnUi(
-                        { viewState.showAddingToPlayListComplete(playList, compositionsToAdd) },
-                        this::onAddingToPlayListError
-                )
+            .subscribeOnUi(
+                { viewState.showAddingToPlayListComplete(playList, compositionsToAdd) },
+                this::onAddingToPlayListError
+            )
     }
 
     fun onDeleteCompositionsDialogConfirmed(compositionsToDelete: List<Composition>) {
@@ -243,8 +244,8 @@ class PlayerPresenter(
     fun onRetryFailedDeleteActionClicked() {
         if (lastDeleteAction != null) {
             lastDeleteAction!!
-                    .doFinally { lastDeleteAction = null }
-                    .subscribe({}, this::onDeleteCompositionError)
+                .doFinally { lastDeleteAction = null }
+                .subscribe({}, this::onDeleteCompositionError)
         }
     }
 
@@ -272,19 +273,19 @@ class PlayerPresenter(
 
     private fun subscribeOnRepeatMode() {
         batterySafeDisposable.add(playerInteractor.repeatModeObservable
-                .observeOn(uiScheduler)
-                .subscribe(viewState::showRepeatMode))
+            .observeOn(uiScheduler)
+            .subscribe(viewState::showRepeatMode))
     }
 
     private fun addPreparedCompositionsToPlayList(playList: PlayList) {
         playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
-                .subscribeOnUi({ onAddingToPlayListCompleted(playList) }, this::onAddingToPlayListError)
+            .subscribeOnUi({ onAddingToPlayListCompleted(playList) }, this::onAddingToPlayListError)
     }
 
     private fun deletePreparedCompositions(compositionsToDelete: List<Composition>) {
         lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
-                .observeOn(uiScheduler)
-                .doOnComplete { onDeleteCompositionsSuccess(compositionsToDelete) }
+            .observeOn(uiScheduler)
+            .doOnComplete { onDeleteCompositionsSuccess(compositionsToDelete) }
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionError)
     }
 
@@ -309,14 +310,14 @@ class PlayerPresenter(
 
     private fun subscribeOnCurrentCompositionChanging() {
         batterySafeDisposable.add(playerInteractor.currentQueueItemObservable
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayQueueEventReceived))
+            .observeOn(uiScheduler)
+            .subscribe(this::onPlayQueueEventReceived))
     }
 
     private fun subscribeOnCurrentPosition() {
         batterySafeDisposable.add(playerInteractor.currentItemPositionObservable
-                .observeOn(uiScheduler)
-                .subscribe(this::onItemPositionReceived))
+            .observeOn(uiScheduler)
+            .subscribe(this::onItemPositionReceived))
     }
 
     private fun onItemPositionReceived(position: Int) {
@@ -329,7 +330,7 @@ class PlayerPresenter(
     private fun onPlayQueueEventReceived(playQueueEvent: PlayQueueEvent) {
         val newItem = playQueueEvent.playQueueItem
         if (currentItem == null || currentItem != newItem
-                || !CompositionHelper.areSourcesTheSame(newItem!!.composition, currentItem!!.composition)) {
+            || !CompositionHelper.areSourcesTheSame(newItem!!.composition, currentItem!!.composition)) {
             onCurrentCompositionChanged(newItem, playQueueEvent.trackPosition)
         }
     }
@@ -337,7 +338,7 @@ class PlayerPresenter(
     private fun onCurrentCompositionChanged(newItem: PlayQueueItem?, trackPosition: Long) {
         viewState.showCurrentQueueItem(newItem, isCoversEnabled)
         if (newItem != null
-                && (newItem != currentItem || newItem.composition.duration != currentItem!!.composition.duration)) {
+            && (newItem != currentItem || newItem.composition.duration != currentItem!!.composition.duration)) {
             viewState.showTrackState(trackPosition, newItem.composition.duration)
         }
         currentItem = newItem
@@ -345,8 +346,8 @@ class PlayerPresenter(
 
     private fun subscribeOnPlayerStateChanges() {
         batterySafeDisposable.add(playerInteractor.playerStateObservable
-                .observeOn(uiScheduler)
-                .subscribe(this::onPlayerStateChanged))
+            .observeOn(uiScheduler)
+            .subscribe(this::onPlayerStateChanged))
     }
 
     private fun onPlayerStateChanged(playerState: PlayerState) {
@@ -355,9 +356,9 @@ class PlayerPresenter(
 
     private fun subscribeOnPlayQueue() {
         batterySafeDisposable.add(playerInteractor.playQueueObservable
-                .observeOn(uiScheduler)
-                .filter(listDragFilter::filterListEmitting)
-                .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError))
+            .observeOn(uiScheduler)
+            .filter(listDragFilter::filterListEmitting)
+            .subscribe(this::onPlayQueueChanged, this::onPlayQueueReceivingError))
     }
 
     private fun onPlayQueueChanged(list: List<PlayQueueItem>) {
@@ -374,8 +375,8 @@ class PlayerPresenter(
 
     private fun subscribeOnTrackPositionChanging() {
         batterySafeDisposable.add(playerInteractor.trackPositionObservable
-                .observeOn(uiScheduler)
-                .subscribe(this::onTrackPositionChanged))
+            .observeOn(uiScheduler)
+            .subscribe(this::onTrackPositionChanged))
     }
 
     private fun onTrackPositionChanged(currentPosition: Long) {
@@ -387,7 +388,7 @@ class PlayerPresenter(
 
     private fun subscribeOnUiSettings() {
         playerScreenInteractor.coversEnabledObservable
-                .subscribeOnUi(this::onUiSettingsReceived, errorParser::logError)
+            .subscribeOnUi(this::onUiSettingsReceived, errorParser::logError)
     }
 
     private fun onUiSettingsReceived(isCoversEnabled: Boolean) {
@@ -405,22 +406,28 @@ class PlayerPresenter(
 
     private fun subscribeOnRandomMode() {
         playerInteractor.randomPlayingObservable
-                .unsafeSubscribeOnUi(viewState::showRandomPlayingButton)
+            .unsafeSubscribeOnUi(viewState::showRandomPlayingButton)
     }
 
     private fun subscribeOnSpeedAvailableState() {
         playerInteractor.speedChangeAvailableObservable
-                .unsafeSubscribeOnUi(viewState::showSpeedChangeFeatureVisible)
+            .unsafeSubscribeOnUi(viewState::showSpeedChangeFeatureVisible)
     }
 
     private fun subscribeOnSpeedState() {
         playerInteractor.playbackSpeedObservable
-                .unsafeSubscribeOnUi(viewState::displayPlaybackSpeed)
+            .unsafeSubscribeOnUi(viewState::displayPlaybackSpeed)
     }
 
     private fun subscribeOnSleepTimerTime() {
         batterySafeDisposable.add(playerScreenInteractor.sleepTimerCountDownObservable
-                .observeOn(uiScheduler)
-                .subscribe(viewState::showSleepTimerRemainingTime))
+            .observeOn(uiScheduler)
+            .subscribe(viewState::showSleepTimerRemainingTime))
+    }
+
+    private fun subscribeOnFileScannerState() {
+        batterySafeDisposable.add(playerScreenInteractor.fileScannerStateObservable
+            .observeOn(uiScheduler)
+            .subscribe(viewState::showFileScannerState))
     }
 }

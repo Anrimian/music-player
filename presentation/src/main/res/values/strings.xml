@@ -229,6 +229,8 @@
     <string name="equalizer_initialization_error" tools:ignore="MissingTranslation">Unable to initialize in-app equalizer. Try to restart it.</string>
     <string name="restart" tools:ignore="MissingTranslation">Restart</string>
 
+    <string name="file_scanner_state">Scanning file tags: %s</string>
+
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
         <item quantity="other">%1$s songs</item>

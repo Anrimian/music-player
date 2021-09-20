@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
@@ -19,7 +20,9 @@ import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionU
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.Date;
 import java.util.List;
@@ -284,8 +287,35 @@ public class CompositionsDaoWrapper {
         compositionsDao.setCompositionLastFileScanTime(composition.getId(), time);
     }
 
-    public void applyDetailData() {
+    public void updateCompositionBySourceTags(FullComposition composition, CompositionSourceTags tags) {
+        appDatabase.runInTransaction(() -> {
+            long id = composition.getId();
 
+            String tagTitle = tags.getTitle();
+            if (!isEmpty(tagTitle) && !Objects.equals(composition.getTitle(), tagTitle)) {
+                updateTitle(id, tagTitle);
+            }
+
+            String tagArtist = tags.getArtist();
+            if (!isEmpty(tagArtist) && !Objects.equals(composition.getArtist(), tagArtist)) {
+                updateArtist(id, tagArtist);
+            }
+
+            String tagAlbum = tags.getAlbum();
+            if (!isEmpty(tagAlbum) && !Objects.equals(composition.getAlbum(), tagAlbum)) {
+                updateAlbum(id, tagAlbum);
+            }
+
+            String tagAlbumArtist = tags.getAlbumArtist();
+            if (!isEmpty(tagAlbumArtist) && !Objects.equals(composition.getAlbumArtist(), tagAlbumArtist)) {
+                updateAlbumArtist(id, tagAlbumArtist);
+            }
+
+            String tagLyrics = tags.getLyrics();
+            if (!isEmpty(tagLyrics) && !Objects.equals(composition.getLyrics(), tagLyrics)) {
+                updateLyrics(id, tagLyrics);
+            }
+        });
     }
 
     private String getOrderQuery(Order order) {

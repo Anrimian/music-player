@@ -5,6 +5,8 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEdit
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags
+import com.github.anrimian.musicplayer.domain.models.scanner.Idle
+import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers

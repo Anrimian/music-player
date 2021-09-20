@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepo
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StoragePlaylistAnalyzer;
+import com.github.anrimian.musicplayer.data.repositories.scanner.files.FileScanner;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceApi30;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceImpl;
@@ -135,6 +136,17 @@ public class StorageModule {
     @Provides
     @Nonnull
     @Singleton
+    FileScanner fileScanner(CompositionsDaoWrapper compositionsDao,
+                            CompositionSourceEditor compositionSourceEditor,
+                            StateRepository stateRepository,
+                            Analytics analytics,
+                            @Named(IO_SCHEDULER) Scheduler scheduler) {
+        return new FileScanner(compositionsDao, compositionSourceEditor, stateRepository, analytics, scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
     MediaScannerRepository mediaScannerRepository(StorageMusicProvider musicProvider,
                                                   StoragePlayListsProvider playListsProvider,
                                                   StorageGenresProvider genresProvider,
@@ -142,6 +154,7 @@ public class StorageModule {
                                                   SettingsRepository settingsRepository,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
                                                   StoragePlaylistAnalyzer storagePlaylistAnalyzer,
+                                                  FileScanner fileScanner,
                                                   LoggerRepository loggerRepository,
                                                   Analytics analytics,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
@@ -152,6 +165,7 @@ public class StorageModule {
                 settingsRepository,
                 compositionAnalyzer,
                 storagePlaylistAnalyzer,
+                fileScanner,
                 loggerRepository,
                 analytics,
                 scheduler);

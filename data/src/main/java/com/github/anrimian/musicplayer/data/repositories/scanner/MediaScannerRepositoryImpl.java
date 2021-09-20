@@ -6,6 +6,7 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.repositories.scanner.files.FileScanner;
 import com.github.anrimian.musicplayer.data.storage.exceptions.ContentResolverQueryException;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
@@ -16,6 +17,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.playlists.StorageP
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -41,6 +44,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final SettingsRepository settingsRepository;
     private final StorageCompositionAnalyzer compositionAnalyzer;
     private final StoragePlaylistAnalyzer playlistAnalyzer;
+    private final FileScanner fileScanner;
     private final LoggerRepository loggerRepository;
     private final Analytics analytics;
     private final Scheduler scheduler;
@@ -55,6 +59,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                                       SettingsRepository settingsRepository,
                                       StorageCompositionAnalyzer compositionAnalyzer,
                                       StoragePlaylistAnalyzer playlistAnalyzer,
+                                      FileScanner fileScanner,
                                       LoggerRepository loggerRepository,
                                       Analytics analytics,
                                       Scheduler scheduler) {
@@ -65,6 +70,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
         this.settingsRepository = settingsRepository;
         this.compositionAnalyzer = compositionAnalyzer;
         this.playlistAnalyzer = playlistAnalyzer;
+        this.fileScanner = fileScanner;
         this.loggerRepository = loggerRepository;
         this.analytics = analytics;
         this.scheduler = scheduler;
@@ -85,6 +91,11 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     @Override
     public Completable runStorageScanner() {
         return runRescanStorage();
+    }
+
+    @Override
+    public Observable<FileScannerState> getFileScannerStateObservable() {
+        return fileScanner.getStateObservable();
     }
 
     private void subscribeOnMediaStoreChanges() {
