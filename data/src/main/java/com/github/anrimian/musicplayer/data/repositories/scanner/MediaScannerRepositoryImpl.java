@@ -100,6 +100,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     @Override
     public Completable runStorageAndFileScanner() {
         return Completable.fromAction(compositionsDao::cleanLastFileScanTime)
+                .subscribeOn(scheduler)
                 .andThen(runRescanStorage());
     }
 
@@ -113,7 +114,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 .switchMap(musicProvider::getCompositionsObservable)
                 .subscribeOn(scheduler)
                 .observeOn(scheduler)
-                .doOnNext(compositionAnalyzer::applyCompositionsData)//then run file scanner
+                .doOnNext(compositionAnalyzer::applyCompositionsData)
                 .doOnNext(o -> fileScanner.scheduleFileScanner())
                 .retry(RETRY_COUNT, this::isStandardError)
                 .onErrorComplete(this::isStandardError)

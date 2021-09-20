@@ -75,7 +75,7 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
         //noinspection ResultOfMethodCallIgnored
         Components.getAppComponent()
                 .mediaScannerRepository()
-                .runStorageScanner()
+                .runStorageAndFileScanner()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() ->
                         Toast.makeText(requireContext(), R.string.scanning_completed, Toast.LENGTH_SHORT)

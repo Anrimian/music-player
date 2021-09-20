@@ -22,13 +22,12 @@ import java.util.concurrent.TimeUnit
 //apply genres data
 //apply lyrics
 
-//cleanLastFileScanTime not working
 //scan state display design
-//scan state: display non-scanned file count? ("Scanning file tags: %s \n %d left")
+//scan state: display non-scanned file count? ("Scanning file tags: %s \n %d left") -- hmm, it's overhead, no
 //clean logs
 
-//check: on manual rescan clean last complete scan time
 //check: media analyzer scan date condition
+//check: media scanner version update
 private const val RETRY_TIMES = 2L
 private const val READ_FILE_TIMEOUT_SECONDS = 2L
 
