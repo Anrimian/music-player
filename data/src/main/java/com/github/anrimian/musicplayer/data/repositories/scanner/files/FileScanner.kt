@@ -22,8 +22,6 @@ import java.util.concurrent.TimeUnit
 //apply genres data
 //apply lyrics
 
-//scan state display design
-//scan state: display non-scanned file count? ("Scanning file tags: %s \n %d left") -- hmm, it's overhead, no
 //clean logs
 
 //check: media analyzer scan date condition

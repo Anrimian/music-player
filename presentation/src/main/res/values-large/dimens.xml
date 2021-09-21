@@ -14,6 +14,7 @@
     <dimen name="content_horizontal_margin">24dp</dimen>
     <dimen name="content_vertical_margin">24dp</dimen>
 
+    <dimen name="drawer_content_margin">16dp</dimen>
     <!--list margins-->
     <dimen name="list_vertical_margin">16dp</dimen>
     <!--content_vertical_margin*2(48) + fab size(56) -->
