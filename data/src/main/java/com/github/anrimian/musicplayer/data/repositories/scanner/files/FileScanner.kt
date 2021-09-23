@@ -22,9 +22,11 @@ import java.util.concurrent.TimeUnit
 //apply genres data
 //apply lyrics
 
+//handle tag analyzer errors?
 //clean logs
 
-//check: media analyzer scan date condition
+//check: media analyzer scan date condition: runs normally
+//check: interaction with tag editor: on second attempt always freeze
 //check: media scanner version update
 private const val RETRY_TIMES = 2L
 private const val READ_FILE_TIMEOUT_SECONDS = 2L
@@ -60,7 +62,10 @@ class FileScanner(
             .onErrorComplete()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
             .flatMapSingle(this::scanCompositionFile)
-            .doOnSuccess { runFileScanner() }
+            .doOnSuccess {
+                Log.d("KEK", "run next")
+                runFileScanner()
+            }
             .doOnComplete {
                 Log.d("KEK", "completed")
                 stateSubject.onNext(Idle)
@@ -75,12 +80,14 @@ class FileScanner(
     }
 
     private fun scanCompositionFile(composition: FullComposition): Single<*> {
-        Log.d("KEK", "scanCompositionFile: " + composition.fileName)
-        return compositionSourceEditor.getFullTags(composition)
+        return Single.just(composition)
+            .doOnSuccess { Log.d("KEK", "scanCompositionFile: " + composition.fileName) }
+            .flatMap(compositionSourceEditor::getFullTags)//compositionSourceEditor.getFullTags(composition)
             .doOnSuccess { tags ->
                 Log.d("KEK", "updateCompositionBySourceTags: " + composition.fileName)
                 compositionsDao.updateCompositionBySourceTags(composition, tags) }
-            .timeout(READ_FILE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .timeout(READ_FILE_TIMEOUT_SECONDS, TimeUnit.SECONDS, scheduler)
+            .doOnError { Log.d("KEK", "scanCompositionFile error: ${it.message}") }
             .retry(RETRY_TIMES)
             .doOnError(this::processError)
             .map { TRIGGER }
@@ -89,6 +96,7 @@ class FileScanner(
     }
 
     private fun processError(throwable: Throwable) {
+        Log.d("KEK", "processError: " + throwable.message)
         if (throwable is FileNotFoundException) {
             return
         }

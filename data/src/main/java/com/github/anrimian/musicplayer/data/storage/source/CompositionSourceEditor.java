@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.storage.source;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
 
 import android.os.Build;
+import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
@@ -285,7 +286,9 @@ public class CompositionSourceEditor {
 
     private Single<CompositionSourceTags> getFullTags(String filePath) {
         return Single.fromCallable(() -> {
+            Log.d("KEK", "getFileTag: " + filePath);
             Tag tag = getFileTag(filePath);
+            Log.d("KEK", "getFullTags");
             return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
                     tag.getFirst(FieldKey.ARTIST),
                     tag.getFirst(FieldKey.ALBUM),
