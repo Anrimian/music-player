@@ -11,10 +11,12 @@ import com.github.anrimian.musicplayer.domain.repositories.StateRepository
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.schedulers.TestScheduler
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.*
+import java.util.concurrent.TimeUnit
 
 class FileScannerTest {
 
@@ -140,5 +142,44 @@ class FileScannerTest {
             Running(composition),
             Idle
         )
+    }
+
+    @Test
+    fun `test file read timeout`() {
+        val testScheduler = TestScheduler()
+        val fileScanner = FileScanner(
+            compositionsDao,
+            compositionSourceEditor,
+            stateRepository,
+            analytics,
+            testScheduler
+        )
+        val testStateObserver = fileScanner.getStateObservable().test()
+
+        val composition: FullComposition = mock()
+        val source: CompositionSourceTags = mock()
+
+        whenever(compositionsDao.selectNextCompositionToScan(eq(0)))
+            .thenReturn(Maybe.just(composition))
+            .thenReturn(Maybe.empty())
+        whenever(compositionSourceEditor.getFullTags(any()))
+            .thenReturn(Single.just(source).delay(3, TimeUnit.SECONDS, testScheduler))
+            .thenReturn(Single.just(source).delay(3, TimeUnit.SECONDS, testScheduler))
+            .thenReturn(Single.just(source))
+
+        fileScanner.scheduleFileScanner()
+        testScheduler.advanceTimeBy(4, TimeUnit.SECONDS)
+
+        verify(compositionsDao).setCompositionLastFileScanTime(eq(composition), any())
+        verify(compositionsDao).updateCompositionBySourceTags(eq(composition), eq(source))
+        verify(stateRepository).lastFileScannerVersion = eq(1)
+        verify(stateRepository).lastCompleteScanTime = any()
+
+        testStateObserver.assertValues(
+            Idle,
+            Running(composition),
+            Idle
+        )
+
     }
 }

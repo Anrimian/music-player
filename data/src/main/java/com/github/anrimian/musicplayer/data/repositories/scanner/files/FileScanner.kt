@@ -1,11 +1,13 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.files
 
+//import android.util.Log
 import android.util.Log
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.domain.models.scanner.Idle
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
@@ -26,7 +28,8 @@ import java.util.concurrent.TimeUnit
 //clean logs
 
 //check: media analyzer scan date condition: runs normally
-//check: interaction with tag editor: on second attempt always freeze
+//check: interaction with tag editor: on second attempt always freeze - fixed
+//prevent on editor action cover double blink
 //check: media scanner version update
 private const val RETRY_TIMES = 2L
 private const val READ_FILE_TIMEOUT_SECONDS = 2L
@@ -82,7 +85,7 @@ class FileScanner(
     private fun scanCompositionFile(composition: FullComposition): Single<*> {
         return Single.just(composition)
             .doOnSuccess { Log.d("KEK", "scanCompositionFile: " + composition.fileName) }
-            .flatMap(compositionSourceEditor::getFullTags)//compositionSourceEditor.getFullTags(composition)
+            .flatMap(this::getFullTags)
             .doOnSuccess { tags ->
                 Log.d("KEK", "updateCompositionBySourceTags: " + composition.fileName)
                 compositionsDao.updateCompositionBySourceTags(composition, tags) }
@@ -93,6 +96,11 @@ class FileScanner(
             .map { TRIGGER }
             .onErrorReturnItem(TRIGGER)
             .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition, Date()) }
+    }
+
+    private fun getFullTags(composition: FullComposition): Single<CompositionSourceTags> {
+        //scheduler is required to prevent timeout and handle it correctly
+        return compositionSourceEditor.getFullTags(composition).subscribeOn(scheduler)
     }
 
     private fun processError(throwable: Throwable) {
