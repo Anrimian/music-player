@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.files
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
+import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
@@ -20,9 +21,6 @@ import java.util.concurrent.TimeUnit
 
 //apply album order
 //apply genres data
-
-//handle tag analyzer errors?
-//get tag errors - wrap in exception with file name. Ignore this exception in analytics here.
 
 private const val RETRY_TIMES = 2L
 private const val READ_FILE_TIMEOUT_SECONDS = 2L
@@ -87,7 +85,7 @@ class FileScanner(
     }
 
     private fun processError(throwable: Throwable) {
-        if (throwable is FileNotFoundException) {
+        if (throwable is FileNotFoundException || throwable is TagReaderException) {
             return
         }
         analytics.processNonFatalError(throwable)

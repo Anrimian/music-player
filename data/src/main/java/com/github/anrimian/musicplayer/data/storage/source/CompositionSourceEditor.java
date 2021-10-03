@@ -5,6 +5,7 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName
 import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
+import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -285,12 +286,16 @@ public class CompositionSourceEditor {
 
     private Single<CompositionSourceTags> getFullTags(String filePath) {
         return Single.fromCallable(() -> {
-            Tag tag = getFileTag(filePath);
-            return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
-                    tag.getFirst(FieldKey.ARTIST),
-                    tag.getFirst(FieldKey.ALBUM),
-                    tag.getFirst(FieldKey.ALBUM_ARTIST),
-                    tag.getFirst(FieldKey.LYRICS));
+            try {
+                Tag tag = getFileTag(filePath);
+                return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
+                        tag.getFirst(FieldKey.ARTIST),
+                        tag.getFirst(FieldKey.ALBUM),
+                        tag.getFirst(FieldKey.ALBUM_ARTIST),
+                        tag.getFirst(FieldKey.LYRICS));
+            } catch (Exception e) {
+                throw new TagReaderException("Unable to read: " + filePath, e);
+            }
         });
     }
 
