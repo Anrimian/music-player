@@ -280,7 +280,6 @@ public class CompositionsDaoWrapper {
     }
 
     public Maybe<FullComposition> selectNextCompositionToScan(long lastCompleteScanTime) {
-        //select composition where last scan time is less than modify time(or less than lastCompleteScanTime) order by modify time(latest - first)
         return compositionsDao.selectNextCompositionToScan(lastCompleteScanTime);
     }
 

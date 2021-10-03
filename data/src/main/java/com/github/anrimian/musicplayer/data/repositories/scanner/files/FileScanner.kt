@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.files
 
-//import android.util.Log
-import android.util.Log
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
@@ -22,14 +20,10 @@ import java.util.concurrent.TimeUnit
 
 //apply album order
 //apply genres data
-//apply lyrics
 
 //handle tag analyzer errors?
-//clean logs
+//get tag errors - wrap in exception with file name. Ignore this exception in analytics here.
 
-//check: media analyzer scan date condition: runs normally
-//check: interaction with tag editor: on second attempt always freeze - fixed
-//check: media scanner version update
 private const val RETRY_TIMES = 2L
 private const val READ_FILE_TIMEOUT_SECONDS = 2L
 
@@ -64,14 +58,8 @@ class FileScanner(
             .onErrorComplete()
             .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
             .flatMapSingle(this::scanCompositionFile)
-            .doOnSuccess {
-                Log.d("KEK", "run next")
-                runFileScanner()
-            }
-            .doOnComplete {
-                Log.d("KEK", "completed")
-                stateSubject.onNext(Idle)
-            }
+            .doOnSuccess { runFileScanner() }
+            .doOnComplete { stateSubject.onNext(Idle) }
             .subscribeOn(scheduler)
             .subscribe()
     }
@@ -83,13 +71,9 @@ class FileScanner(
 
     private fun scanCompositionFile(composition: FullComposition): Single<*> {
         return Single.just(composition)
-            .doOnSuccess { Log.d("KEK", "scanCompositionFile: " + composition.fileName) }
             .flatMap(this::getFullTags)
-            .doOnSuccess { tags ->
-                Log.d("KEK", "updateCompositionBySourceTags: " + composition.fileName)
-                compositionsDao.updateCompositionBySourceTags(composition, tags) }
             .timeout(READ_FILE_TIMEOUT_SECONDS, TimeUnit.SECONDS, scheduler)
-            .doOnError { Log.d("KEK", "scanCompositionFile error: ${it.message}") }
+            .doOnSuccess { tags -> compositionsDao.updateCompositionBySourceTags(composition, tags) }
             .retry(RETRY_TIMES)
             .doOnError(this::processError)
             .map { TRIGGER }
@@ -103,7 +87,6 @@ class FileScanner(
     }
 
     private fun processError(throwable: Throwable) {
-        Log.d("KEK", "processError: " + throwable.message)
         if (throwable is FileNotFoundException) {
             return
         }
