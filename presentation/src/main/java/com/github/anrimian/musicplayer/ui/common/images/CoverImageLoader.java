@@ -74,7 +74,7 @@ public class CoverImageLoader {
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
                 .timeout(TIMEOUT_MILLIS)
-                .listener(new RequestListener<Bitmap>() {
+                .listener(new RequestListener<>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e,
                                                 Object model,
@@ -206,13 +206,13 @@ public class CoverImageLoader {
             onCompleted.call(uri);
         });
         CompositionImage imageData = new CompositionImage(data.getId(), data.getDateModified());
-        loadImage(imageData, bitmap -> {
-            GlideApp.with(context)
-                    .download(imageData)
-                    .onlyRetrieveFromCache(true)
-                    .timeout(TIMEOUT_MILLIS)
-                    .into(target);
-        });
+        loadImage(imageData, bitmap ->
+                GlideApp.with(context)
+                        .download(imageData)
+                        .onlyRetrieveFromCache(true)
+                        .timeout(TIMEOUT_MILLIS)
+                        .into(target)
+        );
     }
 
     public void displayImage(@NonNull RemoteViews widgetView,
@@ -255,7 +255,7 @@ public class CoverImageLoader {
                         .load(oldData)
                         .override(getCoverSize())
                         .timeout(TIMEOUT_MILLIS))
-                .listener(new RequestListener<Bitmap>() {
+                .listener(new RequestListener<>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e,
                                                 Object model,
@@ -330,7 +330,7 @@ public class CoverImageLoader {
     }
 
     private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {
-        return new CustomTarget<T>() {
+        return new CustomTarget<>() {
             @Override
             public void onResourceReady(@NonNull T resource, @Nullable Transition<? super T> transition) {
                 callback.call(resource);

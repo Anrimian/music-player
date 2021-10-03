@@ -236,7 +236,9 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         viewBinding.tvLyrics.text = composition.lyrics
         viewBinding.tvAuthor.text = FormatUtils.formatAuthor(composition.artist, this)
         viewBinding.tvFilename.text = FileUtils.formatFileName(composition.fileName, true)
+    }
 
+    override fun showCompositionCover(composition: FullComposition) {
         Components.getAppComponent()
             .imageLoader()
             .displayImageInReusableTarget(

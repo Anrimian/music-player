@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit
 
 //check: media analyzer scan date condition: runs normally
 //check: interaction with tag editor: on second attempt always freeze - fixed
-//prevent on editor action cover double blink
 //check: media scanner version update
 private const val RETRY_TIMES = 2L
 private const val READ_FILE_TIMEOUT_SECONDS = 2L
