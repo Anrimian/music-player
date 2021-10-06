@@ -1,5 +1,16 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -48,17 +59,6 @@ import java.util.List;
 import moxy.MvpAppCompatFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Arguments.POSITION_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.COMPOSITION_ACTION_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeletePlayListItemCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class PlayListFragment extends MvpAppCompatFragment
         implements PlayListView, FragmentLayerListener {
@@ -262,7 +262,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     public void showDeleteItemCompleted(PlayList playList, List<PlayListItem> items) {
         String text = getDeletePlayListItemCompleteMessage(requireActivity(), playList, items);
         MessagesUtils.makeSnackbar(clListContainer, text, Snackbar.LENGTH_LONG)
-                .setAction(R.string.cancel, presenter::onRestoreRemovedItemClicked)
+                .setAction(R.string.cancel, () -> presenter.onRestoreRemovedItemClicked(playList))
                 .show();
     }
 
@@ -270,7 +270,7 @@ public class PlayListFragment extends MvpAppCompatFragment
     public void showConfirmDeletePlayListDialog(PlayList playList) {
         DialogUtils.showConfirmDeleteDialog(requireContext(),
                 playList,
-                presenter::onDeletePlayListDialogConfirmed);
+                () -> presenter.onDeletePlayListDialogConfirmed(playList));
     }
 
     @Override
