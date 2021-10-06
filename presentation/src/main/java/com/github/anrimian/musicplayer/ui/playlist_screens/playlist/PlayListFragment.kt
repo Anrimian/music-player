@@ -234,7 +234,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, FragmentLayerList
         DialogUtils.showConfirmDeleteDialog(
             requireContext(),
             playList
-        ) { presenter.onDeletePlayListDialogConfirmed() }
+        ) { presenter.onDeletePlayListDialogConfirmed(playList) }
     }
 
     override fun showPlayListDeleteSuccess(playList: PlayList) {

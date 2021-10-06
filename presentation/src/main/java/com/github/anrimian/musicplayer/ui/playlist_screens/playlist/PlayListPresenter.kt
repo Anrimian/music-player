@@ -212,10 +212,8 @@ class PlayListPresenter(private val playListId: Long,
         viewState.showPlayListDeleteSuccess(playList)
     }
 
-    private fun onDeleteItemCompleted(item: PlayListItem, position: Int) {
-        playList.call { playList ->
-            viewState.showDeleteItemCompleted(playList, listOf(item))
-        }
+    private fun onDeleteItemCompleted(item: PlayListItem) {
+        playList.call { playList -> viewState.showDeleteItemCompleted(playList, listOf(item)) }
     }
 
     private fun onDeleteItemError(throwable: Throwable) {
