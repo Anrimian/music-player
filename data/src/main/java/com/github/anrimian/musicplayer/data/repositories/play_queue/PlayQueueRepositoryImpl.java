@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
+import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
+
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
@@ -19,9 +22,6 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
-
-import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
-import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
@@ -57,7 +57,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .replay(1)
                 .refCount();
 
-        subscribeOnPositionChange();
+//        subscribeOnPositionChange();
     }
 
     @Override
@@ -212,6 +212,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     /**
      * Position saving for moving to next item after current item deleted
+     * Let it stay for a while, see how replacing will work
      */
     private void subscribeOnPositionChange() {
         Observable.combineLatest(uiStatePreferences.getCurrentItemIdObservable(),
@@ -219,7 +220,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 playQueueDao::getPositionObservable)
                 .switchMap(observable -> observable)
                 .doOnNext(uiStatePreferences::setCurrentItemLastPosition)
-                .subscribe();
+                .subscribe();//scheduler?
     }
 
     private void insertNewQueue(List<Composition> compositions, int startPosition) {
@@ -242,7 +243,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private Observable<PlayQueueItem> checkForExisting(Optional<PlayQueueItem> itemOpt) {
-        return Observable.create(emitter -> {
+        return Observable.<PlayQueueItem>create(emitter -> {
             PlayQueueItem item = itemOpt.getValue();
             if (item == null) {
                 if (consumeDeletedItemEvent) {
@@ -259,7 +260,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 return;
             }
             emitter.onNext(item);
-        });
+        }).flatMap(item -> settingsPreferences.getRandomPlayingObservable()
+                .switchMap(random -> playQueueDao.getPositionObservable(item.getId(), random))
+                .doOnNext(uiStatePreferences::setCurrentItemLastPosition)
+                .map(o -> item));
     }
 
     private PlayQueueEvent mapToQueueEvent(PlayQueueItem item) {
