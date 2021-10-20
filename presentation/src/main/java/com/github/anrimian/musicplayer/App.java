@@ -25,7 +25,6 @@ In v0.9.4:
 -glide memory optimization
 -glide save on disc full resolution images
 -fix eq state crash
--fix seekbar position
 -crash here (StorageCompositionsInserter.java:180)
 -cleanup MusicService
 */
