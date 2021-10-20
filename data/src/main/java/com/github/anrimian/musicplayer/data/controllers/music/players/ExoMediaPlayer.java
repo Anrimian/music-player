@@ -85,6 +85,7 @@ public class ExoMediaPlayer implements AppMediaPlayer {
                               @Nullable ErrorType previousErrorType) {
         isPreparing = true;
         this.currentComposition = composition;
+        trackPositionSubject.onNext(startPosition);
         //cancel previous preparation?
         Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)

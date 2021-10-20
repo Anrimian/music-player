@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
+import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
+import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
+import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.hasSourceChanges;
+
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
@@ -29,11 +34,6 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-
-import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
-import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
-import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.areSourcesTheSame;
-import static com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper.hasSourceChanges;
 
 public class LibraryPlayerInteractor {
 
@@ -207,7 +207,8 @@ public class LibraryPlayerInteractor {
 
     public Observable<Long> getTrackPositionObservable() {
         return playerCoordinatorInteractor.getTrackPositionObservable(LIBRARY)
-                .mergeWith(trackPositionSubject);
+                .mergeWith(trackPositionSubject)
+                .startWith(getActualTrackPosition());
     }
 
     public Observable<PlayerState> getPlayerStateObservable() {
