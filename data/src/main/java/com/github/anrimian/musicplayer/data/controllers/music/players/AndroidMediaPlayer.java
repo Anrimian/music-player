@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
+import static android.media.MediaPlayer.MEDIA_ERROR_MALFORMED;
+import static android.media.MediaPlayer.MEDIA_ERROR_UNSUPPORTED;
+
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -31,9 +34,6 @@ import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-
-import static android.media.MediaPlayer.MEDIA_ERROR_MALFORMED;
-import static android.media.MediaPlayer.MEDIA_ERROR_UNSUPPORTED;
 
 public class AndroidMediaPlayer implements AppMediaPlayer {
 
@@ -105,6 +105,7 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
                               @Nullable ErrorType previousErrorType) {
         this.currentComposition = composition;
         this.previousErrorType = previousErrorType;
+        trackPositionSubject.onNext(startPosition);
         RxUtils.dispose(preparationDisposable);
         preparationDisposable = Single.fromCallable(() -> composition)
                 .flatMapCompletable(this::prepareMediaSource)

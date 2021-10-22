@@ -36,8 +36,8 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
         intent.putExtra(MusicService.REQUEST_CODE, Constants.Actions.PLAY);
         intent.putExtra(MusicService.PLAY_DELAY_MILLIS, playDelay);
-//        checkPermissionsAndStartServiceFromBg(context, intent);
-        ContextCompat.startForegroundService(context, intent);
+        checkPermissionsAndStartServiceFromBg(context, intent);
+//        ContextCompat.startForegroundService(context, intent);
     }
 
     public SystemServiceControllerImpl(Context context) {
@@ -63,17 +63,17 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         }
         startServiceExp(context, intent);
     }
-//
-//    private static void checkPermissionsAndStartServiceFromBg(Context context, Intent intent) {
-//        if (!Permissions.hasFilePermission(context)) {
-//            Components.getAppComponent()
-//                    .notificationDisplayer()
-//                    .showErrorNotification(R.string.no_file_permission);
-//            return;
-//        }
-//        startServiceFromBg(context, intent);
-//    }
-//
+
+    private static void checkPermissionsAndStartServiceFromBg(Context context, Intent intent) {
+        if (!Permissions.hasFilePermission(context)) {
+            Components.getAppComponent()
+                    .notificationDisplayer()
+                    .showErrorNotification(R.string.no_file_permission);
+            return;
+        }
+        startServiceFromBg(context, intent);
+    }
+
     private static void startServiceExp(Context context, Intent intent) {
         handler.post(() -> {
             try {
@@ -85,13 +85,13 @@ public class SystemServiceControllerImpl implements SystemServiceController {
             }
         });
     }
-//
+
     private static void startServiceFromBg(Context context, Intent intent) {
         Intent bgIntent = new Intent(intent);
         intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
         ContextCompat.startForegroundService(context, bgIntent);
     }
-//
+
     private static class ForegroundServiceStarterConnection implements ServiceConnection {
 
         private final Context context;

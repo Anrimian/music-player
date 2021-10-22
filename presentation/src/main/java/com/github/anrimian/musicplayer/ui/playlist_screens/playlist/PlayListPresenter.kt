@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilter
+import com.github.anrimian.musicplayer.ui.utils.wrappers.DeferredObject2
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -34,7 +35,7 @@ class PlayListPresenter(private val playListId: Long,
 
     private var currentItemDisposable: Disposable? = null
     private var items: List<PlayListItem> = ArrayList()
-    private var playList: PlayList? = null
+    private var playList = DeferredObject2<PlayList>()
 
     private val compositionsForPlayList: MutableList<Composition> = LinkedList()
     private val compositionsToDelete: MutableList<Composition> = LinkedList()
@@ -112,12 +113,12 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     fun onDeletePlayListButtonClicked() {
-        viewState.showConfirmDeletePlayListDialog(playList!!)
+        playList.call(viewState::showConfirmDeletePlayListDialog)
     }
 
-    fun onDeletePlayListDialogConfirmed() {
-        playListsInteractor.deletePlayList(playList!!.id)
-            .subscribeOnUi(this::onPlayListDeleted, this::onPlayListDeletingError)
+    fun onDeletePlayListDialogConfirmed(playList: PlayList) {
+        playListsInteractor.deletePlayList(playList.id)
+            .subscribeOnUi({ onPlayListDeleted(playList) }, this::onPlayListDeletingError)
     }
 
     fun onFragmentMovedToTop() {
@@ -148,9 +149,11 @@ class PlayListPresenter(private val playListId: Long,
         if (!ListUtils.isIndexInRange(items, startDragPosition) || !ListUtils.isIndexInRange(items, position)) {
             return
         }
-        listDragFilter.increaseEventsToSkip()
-        playListsInteractor.moveItemInPlayList(playList, startDragPosition, position)
-            .justSubscribe(this::onDefaultError)
+        playList.call { playList ->
+            listDragFilter.increaseEventsToSkip()
+            playListsInteractor.moveItemInPlayList(playList, startDragPosition, position)
+                .justSubscribe(this::onDefaultError)
+        }
     }
 
     fun onPlayActionSelected(position: Int) {
@@ -162,9 +165,7 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     fun onChangePlayListNameButtonClicked() {
-        if (playList != null) {
-            viewState.showEditPlayListNameDialog(playList!!)
-        }
+        playList.call(viewState::showEditPlayListNameDialog)
     }
 
     fun onRetryFailedDeleteActionClicked() {
@@ -207,14 +208,12 @@ class PlayListPresenter(private val playListId: Long,
         viewState.showDeletePlayListError(errorCommand)
     }
 
-    private fun onPlayListDeleted() {
-        viewState.showPlayListDeleteSuccess(playList!!)
+    private fun onPlayListDeleted(playList: PlayList) {
+        viewState.showPlayListDeleteSuccess(playList)
     }
 
     private fun onDeleteItemCompleted(item: PlayListItem) {
-        if (playList != null) {
-            viewState.showDeleteItemCompleted(playList!!, listOf(item))
-        }
+        playList.call { playList -> viewState.showDeleteItemCompleted(playList, listOf(item)) }
     }
 
     private fun onDeleteItemError(throwable: Throwable) {
@@ -276,7 +275,7 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun onPlayListInfoReceived(playList: PlayList) {
-        this.playList = playList
+        this.playList.setObject(playList)
         viewState.showPlayListInfo(playList)
     }
 

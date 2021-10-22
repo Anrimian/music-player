@@ -15,7 +15,6 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
 import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivityKt.newCompositionEditorIntent;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 import android.app.Activity;
@@ -59,6 +58,7 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivityKt;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter;
@@ -598,7 +598,7 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
                 break;
             }
             case R.id.menu_edit: {
-                startActivity(newCompositionEditorIntent(requireContext(), composition.getId()));
+                startActivity(CompositionEditorActivityKt.newCompositionEditorIntent(requireContext(), composition.getId()));
                 break;
             }
             case R.id.menu_share: {

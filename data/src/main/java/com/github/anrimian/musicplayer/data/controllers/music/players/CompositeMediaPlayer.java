@@ -20,7 +20,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     private final int startPlayerIndex = 0;
 
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
-    private final PublishSubject<Long> trackPositionSubject = PublishSubject.create();
+    private final BehaviorSubject<Long> trackPositionSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> speedChangeAvailableSubject = BehaviorSubject.create();
     private final CompositeDisposable playerDisposable = new CompositeDisposable();
 

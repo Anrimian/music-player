@@ -59,7 +59,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 .replay(1)
                 .refCount();
 
-        subscribeOnPositionChange();
+//        subscribeOnPositionChange();
     }
 
     @Override
@@ -214,6 +214,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     /**
      * Position saving for moving to next item after current item deleted
+     * Let it stay for a while, see how replacing will work
      */
     private void subscribeOnPositionChange() {
         Observable.combineLatest(uiStatePreferences.getCurrentItemIdObservable(),
@@ -221,7 +222,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 playQueueDao::getPositionObservable)
                 .switchMap(observable -> observable)
                 .doOnNext(uiStatePreferences::setCurrentItemLastPosition)
-                .subscribe();
+                .subscribe();//scheduler?
     }
 
     private void insertNewQueue(List<Composition> compositions, int startPosition) {
@@ -245,7 +246,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private Observable<PlayQueueItem> checkForExisting(Optional<PlayQueueItem> itemOpt) {
-        return Observable.create(emitter -> {
+        return Observable.<PlayQueueItem>create(emitter -> {
             PlayQueueItem item = itemOpt.getValue();
             if (item == null) {
                 if (consumeDeletedItemEvent) {
@@ -262,7 +263,10 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                 return;
             }
             emitter.onNext(item);
-        });
+        }).flatMap(item -> settingsPreferences.getRandomPlayingObservable()
+                .switchMap(random -> playQueueDao.getPositionObservable(item.getId(), random))
+                .doOnNext(uiStatePreferences::setCurrentItemLastPosition)
+                .map(o -> item));
     }
 
     private PlayQueueEvent mapToQueueEvent(PlayQueueItem item) {

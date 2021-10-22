@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.source.UnrecognizedInputFormatException;
 import com.google.android.exoplayer2.upstream.ContentDataSource;
+import com.google.android.exoplayer2.upstream.FileDataSource;
 
 import java.io.FileNotFoundException;
 
@@ -18,19 +19,17 @@ public class PlayerErrorParserImpl implements PlayerErrorParser {
 
     @Override
     public ErrorType getErrorType(Throwable throwable) {
-        if (throwable instanceof ContentDataSource.ContentDataSourceException) {
-            throwable = throwable.getCause();
-            if (throwable instanceof FileNotFoundException) {
-                return ErrorType.NOT_FOUND;
-            }
-        }
         if (throwable instanceof FileNotFoundException) {
             return ErrorType.NOT_FOUND;
         }
         if (throwable instanceof PlaybackException) {
             Throwable cause = throwable.getCause();
-            if (cause instanceof FileNotFoundException) {
-                return ErrorType.NOT_FOUND;
+            if (cause instanceof ContentDataSource.ContentDataSourceException
+                || cause instanceof FileDataSource.FileDataSourceException) {
+                Throwable causeOfCause = cause.getCause();
+                if (causeOfCause instanceof FileNotFoundException) {
+                    return ErrorType.NOT_FOUND;
+                }
             }
             if (cause instanceof UnrecognizedInputFormatException) {
                 return ErrorType.UNSUPPORTED;

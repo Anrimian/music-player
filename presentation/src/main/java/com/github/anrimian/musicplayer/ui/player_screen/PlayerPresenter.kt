@@ -132,7 +132,7 @@ class PlayerPresenter(
         currentPosition = position
         currentItem = item
         playerInteractor.skipToItem(item.id)
-        onCurrentCompositionChanged(item, 0)
+        viewState.showCurrentQueueItem(currentItem, isCoversEnabled)
     }
 
     fun onQueueItemIconClicked(position: Int, playQueueItem: PlayQueueItem) {
@@ -329,19 +329,12 @@ class PlayerPresenter(
 
     private fun onPlayQueueEventReceived(playQueueEvent: PlayQueueEvent) {
         val newItem = playQueueEvent.playQueueItem
-        if (currentItem == null || currentItem != newItem
+        if (currentItem == null
+            || currentItem != newItem
             || !CompositionHelper.areSourcesTheSame(newItem!!.composition, currentItem!!.composition)) {
-            onCurrentCompositionChanged(newItem, playQueueEvent.trackPosition)
+            currentItem = newItem
+            viewState.showCurrentQueueItem(newItem, isCoversEnabled)
         }
-    }
-
-    private fun onCurrentCompositionChanged(newItem: PlayQueueItem?, trackPosition: Long) {
-        viewState.showCurrentQueueItem(newItem, isCoversEnabled)
-        if (newItem != null
-            && (newItem != currentItem || newItem.composition.duration != currentItem!!.composition.duration)) {
-            viewState.showTrackState(trackPosition, newItem.composition.duration)
-        }
-        currentItem = newItem
     }
 
     private fun subscribeOnPlayerStateChanges() {
