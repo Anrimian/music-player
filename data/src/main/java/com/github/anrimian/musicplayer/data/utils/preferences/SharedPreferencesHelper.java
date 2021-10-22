@@ -156,6 +156,32 @@ public class SharedPreferencesHelper {
         }
     }
 
+    public void putIntArray(String key, int[] value) {
+        JSONArray jsonArray = new JSONArray();
+        for (int item: value) {
+            jsonArray.put(item);
+        }
+        putString(key, jsonArray.toString());
+    }
+
+    public int[] getIntArray(String key, int[] defaultValue) {
+        try {
+            String rawData = getString(key);
+            if (rawData == null) {
+                return defaultValue;
+            }
+            JSONArray jsonArray = new JSONArray(rawData);
+            int length = jsonArray.length();
+            int[] result = new int[length];
+            for (int i = 0; i < jsonArray.length(); i++) {
+                result[i] = jsonArray.getInt(i);
+            }
+            return result;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public Set<String> getStringSet(String key, Set<String> defaultValue) {
         return preferences.getStringSet(key, defaultValue);

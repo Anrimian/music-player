@@ -1,23 +1,26 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
+
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.observers.TestObserver;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import utils.TestDataProvider;
-
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class CompositeMediaPlayerTest {
 
@@ -45,7 +48,10 @@ public class CompositeMediaPlayerTest {
         when(player2.getEventsObservable()).thenReturn(player2EventSubject);
         when(player2.getSpeedChangeAvailableObservable()).thenReturn(Observable.just(true));
 
-        compositeMediaPlayer = new CompositeMediaPlayer(() -> player1, () -> player2);
+        ArrayList<Function<AppMediaPlayer>> players = new ArrayList<>();
+        players.add(() -> player1);
+        players.add(() -> player2);
+        compositeMediaPlayer = new CompositeMediaPlayer(players);
     }
 
     @Test

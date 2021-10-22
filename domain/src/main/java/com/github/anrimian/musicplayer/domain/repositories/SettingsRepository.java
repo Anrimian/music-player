@@ -127,4 +127,8 @@ public interface SettingsRepository {
     void setAudioFileMinDurationMillis(long millis);
 
     long getAudioFileMinDurationMillis();
+
+    int[] getAvailableMediaPlayers();
+
+    void setAvailableMediaPlayers(int[] mediaPlayersIds);
 }

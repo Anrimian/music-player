@@ -14,9 +14,13 @@ import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
+
+import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
@@ -39,6 +43,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     private final BehaviorSubject<Float> currentSpeedSubject = BehaviorSubject.createDefault(1f);
 
     public MusicPlayerControllerImpl(UiStateRepository uiStateRepository,
+                                     SettingsRepository settingsRepository,
                                      Context context,
                                      CompositionSourceProvider sourceRepository,
                                      Scheduler uiScheduler,
@@ -47,9 +52,23 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                                      Analytics analytics,
                                      EqualizerController equalizerController) {
         this.uiStateRepository = uiStateRepository;
-        Function<AppMediaPlayer> exoMediaPlayer = () -> new ExoMediaPlayer(context, sourceRepository, uiScheduler, ioScheduler, playerErrorParser, equalizerController);
-        Function<AppMediaPlayer> androidMediaPlayer = () -> new AndroidMediaPlayer(context, uiScheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
-        mediaPlayer = new CompositeMediaPlayer(exoMediaPlayer, androidMediaPlayer);
+
+        int[] mediaPlayers = settingsRepository.getAvailableMediaPlayers();
+        ArrayList<Function<AppMediaPlayer>> mediaPlayerImpls = new ArrayList<>(mediaPlayers.length);
+        for (int playerId : mediaPlayers) {
+            switch (playerId) {
+                case MediaPlayers.EXO_MEDIA_PLAYER: {
+                    mediaPlayerImpls.add(() -> new ExoMediaPlayer(context, sourceRepository, uiScheduler, ioScheduler, playerErrorParser, equalizerController));
+                    break;
+                }
+                case MediaPlayers.ANDROID_MEDIA_PLAYER: {
+                    mediaPlayerImpls.add(() -> new AndroidMediaPlayer(context, uiScheduler, sourceRepository, playerErrorParser, analytics, equalizerController));
+                    break;
+                }
+            }
+
+        }
+        mediaPlayer = new CompositeMediaPlayer(mediaPlayerImpls);
 
 //        mediaPlayer = new AndroidMediaPlayer(context, uiScheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
 //        mediaPlayer = new ExoMediaPlayer(context, sourceRepository, uiScheduler, playerErrorParser, equalizerController);

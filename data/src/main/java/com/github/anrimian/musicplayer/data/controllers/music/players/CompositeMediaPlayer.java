@@ -6,6 +6,8 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
+import java.util.ArrayList;
+
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -16,7 +18,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public class CompositeMediaPlayer implements AppMediaPlayer {
 
-    private final Function<AppMediaPlayer>[] mediaPlayers;
+    private final ArrayList<Function<AppMediaPlayer>> mediaPlayers;
     private final int startPlayerIndex = 0;
 
     private final PublishSubject<PlayerEvent> playerEventSubject = PublishSubject.create();
@@ -31,8 +33,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
 
     private float currentPlaySpeed = 1f;
 
-    @SafeVarargs
-    public CompositeMediaPlayer(Function<AppMediaPlayer>... mediaPlayers) {
+    public CompositeMediaPlayer(ArrayList<Function<AppMediaPlayer>> mediaPlayers) {
         this.mediaPlayers = mediaPlayers;
 
         setPlayer(startPlayerIndex);
@@ -117,7 +118,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         //compare with current - if not equal - re prepare with first
         //current player observable
 
-        //do not update?
+        //do not update? "Changes will take effect after application restart"
     }
 
     private void setPlayer(int index) {
@@ -125,7 +126,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         if (currentPlayer != null) {
             currentPlayer.release();
         }
-        currentPlayer = mediaPlayers[index].call();
+        currentPlayer = mediaPlayers.get(index).call();
         currentPlayer.setPlaySpeed(currentPlaySpeed);
 
         playerDisposable.clear();
@@ -154,7 +155,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
                 if (errorType == ErrorType.UNSUPPORTED) {
                     int newPlayerIndex = currentPlayerIndex + 1;
                     //don't switch player when we reached end of available players
-                    if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.length) {
+                    if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.size()) {
                         setPlayer(newPlayerIndex);
                         currentPlayer.prepareToPlay(errorEvent.getComposition(), currentTrackPosition, errorType);
                         return;
