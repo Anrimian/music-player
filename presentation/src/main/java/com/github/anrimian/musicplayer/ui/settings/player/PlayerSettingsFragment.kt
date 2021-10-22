@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
@@ -43,6 +44,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         ViewUtils.onCheckChanged(viewBinding.cbPauseOnZeroVolumeLevel, presenter::onPauseOnZeroVolumeLevelChecked)
 
         viewBinding.flEqualizerClickableArea.setOnClickListener { showEqualizerDialog() }
+        viewBinding.flMediaPlayersClickableArea.setOnClickListener { showMediaPlayersSettingScreen() }
 
         SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided)
     }
@@ -63,6 +65,23 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         viewBinding.tvEqualizerState.setText(getEqualizerTypeDescription(type))
     }
 
+    override fun showEnabledMediaPlayers(players: IntArray) {
+        val sb = StringBuilder()
+        players.forEachIndexed { index, id ->
+            sb.append(getString(getMediaPlayerName(id)))
+            if (index < players.size - 1) {
+                sb.append(", ")
+            }
+        }
+        viewBinding.tvMediaPlayersState.text = sb.toString()
+    }
+
+    @StringRes
+    private fun getMediaPlayerName(mediaPlayerId: Int) = when(mediaPlayerId) {
+        MediaPlayers.EXO_MEDIA_PLAYER -> R.string.exo_media_player
+        else -> R.string.android_media_player
+    }
+
     @StringRes
     private fun getEqualizerTypeDescription(type: Int): Int {
         return when (type) {
@@ -74,5 +93,11 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
     private fun showEqualizerDialog() {
         EqualizerDialogFragment().show(childFragmentManager, null)
+    }
+
+    private fun showMediaPlayersSettingScreen() {
+        //description: "App uses several media players for music playing.
+    // Here they can be disabled or change priority.
+    // All changes will take effect only after application restart"
     }
 }

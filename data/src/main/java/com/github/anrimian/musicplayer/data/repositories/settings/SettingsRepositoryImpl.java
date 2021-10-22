@@ -55,7 +55,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String SLEEP_TIMER_TIME = "sleep_timer_time";
     private static final String SLEEP_TIMER_PLAY_LAST = "sleep_timer_play_last";
 
-    private static final String AVAILABLE_MEDIA_PLAYERS = "available_media_players";
+    private static final String ENABLED_MEDIA_PLAYERS = "enabled_media_players";
 
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
@@ -443,16 +443,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public int[] getAvailableMediaPlayers() {
+    public int[] getEnabledMediaPlayers() {
         return preferences.getIntArray(
-                AVAILABLE_MEDIA_PLAYERS,
+                ENABLED_MEDIA_PLAYERS,
                 new int[] { MediaPlayers.EXO_MEDIA_PLAYER, MediaPlayers.ANDROID_MEDIA_PLAYER }
         );
     }
 
     @Override
-    public void setAvailableMediaPlayers(int[] mediaPlayersIds) {
-        preferences.putIntArray(AVAILABLE_MEDIA_PLAYERS, mediaPlayersIds);
+    public void setEnabledMediaPlayers(int[] mediaPlayersIds) {
+        preferences.putIntArray(ENABLED_MEDIA_PLAYERS, mediaPlayersIds);
     }
 
     private Order orderFromInt(int order) {

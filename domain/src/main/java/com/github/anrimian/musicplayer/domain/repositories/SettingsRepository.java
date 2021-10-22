@@ -138,7 +138,7 @@ public interface SettingsRepository {
 
     boolean isDisplayFileNameEnabled();
 
-    int[] getAvailableMediaPlayers();
+    int[] getEnabledMediaPlayers();
 
-    void setAvailableMediaPlayers(int[] mediaPlayersIds);
+    void setEnabledMediaPlayers(int[] mediaPlayersIds);
 }

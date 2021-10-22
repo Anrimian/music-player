@@ -236,6 +236,10 @@
     <string name="file_name_order">By file name</string>
     <string name="play_list_is_empty">Playlist is empty. Compositions can be added to playlists on library screens.</string>
     <string name="file_scanner_state">Scanning file tags: %s</string>
+    <string name="active_media_players">Active media players</string>
+    <string name="advanced">Advanced</string>
+    <string name="android_media_player">Android media player</string>
+    <string name="exo_media_player">Google exo player</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

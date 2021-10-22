@@ -53,7 +53,7 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
                                      EqualizerController equalizerController) {
         this.uiStateRepository = uiStateRepository;
 
-        int[] mediaPlayers = settingsRepository.getAvailableMediaPlayers();
+        int[] mediaPlayers = settingsRepository.getEnabledMediaPlayers();
         ArrayList<Function<AppMediaPlayer>> mediaPlayerImpls = new ArrayList<>(mediaPlayers.length);
         for (int playerId : mediaPlayers) {
             switch (playerId) {

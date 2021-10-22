@@ -112,15 +112,6 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         return speedChangeAvailableSubject;
     }
 
-    public void updateMediaPlayers(Function<AppMediaPlayer>[] mediaPlayers) {
-        //if size is equal, if not?
-        //compare players, if not equal - ??
-        //compare with current - if not equal - re prepare with first
-        //current player observable
-
-        //do not update? "Changes will take effect after application restart"
-    }
-
     private void setPlayer(int index) {
         currentPlayerIndex = index;
         if (currentPlayer != null) {
