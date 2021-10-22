@@ -67,6 +67,7 @@ public interface Constants {
         String MESSAGE_RES_ARG = "message_res_arg";
         String PROGRESS_DIALOG_TAG = "progress_dialog_arg";
         String EDIT_COVER_TAG = "edit_cover_tag";
+        String ENABLED_MEDIA_PLAYERS = "enabled_media_players";
     }
 
     interface RequestCodes {

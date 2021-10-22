@@ -118,7 +118,7 @@
                 android:paddingStart="@dimen/toolbar_content_start"
                 android:paddingEnd="@dimen/content_horizontal_margin"
                 android:paddingTop="@dimen/content_vertical_margin"
-                android:text="@string/active_media_players"
+                android:text="@string/enabled_media_players"
                 app:layout_constraintTop_toBottomOf="@id/tvAdvanced"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>

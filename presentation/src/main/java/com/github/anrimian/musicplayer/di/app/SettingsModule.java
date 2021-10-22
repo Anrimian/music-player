@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -17,6 +19,7 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsPresenter;
+import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -25,8 +28,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 21.04.2018.
@@ -95,5 +96,11 @@ public class SettingsModule {
     @NonNull
     LibrarySettingsInteractor librarySettingsInteractor(SettingsRepository settingsRepository) {
         return new LibrarySettingsInteractor(settingsRepository);
+    }
+
+    @Provides
+    @Nonnull
+    EnabledMediaPlayersPresenter enabledMediaPlayersPresenter(PlayerSettingsInteractor playerSettingsInteractor) {
+        return new EnabledMediaPlayersPresenter(playerSettingsInteractor);
     }
 }

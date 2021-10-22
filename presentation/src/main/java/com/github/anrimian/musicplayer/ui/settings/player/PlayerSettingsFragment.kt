@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import com.github.anrimian.musicplayer.Constants.Tags.ENABLED_MEDIA_PLAYERS
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding
@@ -12,7 +13,9 @@ import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
+import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
@@ -22,6 +25,8 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
     private val presenter by moxyPresenter { Components.getSettingsComponent().playerSettingsPresenter() }
     
     private lateinit var viewBinding: FragmentSettingsPlayerBinding
+
+    private lateinit var enabledMediaPlayersDialogFragmentRunner: DialogFragmentRunner<EnabledMediaPlayersDialogFragment>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +52,11 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         viewBinding.flMediaPlayersClickableArea.setOnClickListener { showMediaPlayersSettingScreen() }
 
         SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided)
+
+        enabledMediaPlayersDialogFragmentRunner = DialogFragmentRunner(
+            childFragmentManager,
+            ENABLED_MEDIA_PLAYERS
+        ) { fragment -> fragment.onCompleteListener = presenter::onEnabledMediaPlayersSelected }
     }
 
     override fun showDecreaseVolumeOnAudioFocusLossEnabled(checked: Boolean) {
@@ -96,6 +106,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
     }
 
     private fun showMediaPlayersSettingScreen() {
+        enabledMediaPlayersDialogFragmentRunner.show(EnabledMediaPlayersDialogFragment())
         //description: "App uses several media players for music playing.
     // Here they can be disabled or change priority.
     // All changes will take effect only after application restart"
