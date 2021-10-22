@@ -198,7 +198,7 @@ public class ArtistsListFragment extends LibraryFragment implements
     @Override
     public void showSelectOrderScreen(Order order) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
-                OrderType.ALPHABETICAL,
+                OrderType.NAME,
                 OrderType.COMPOSITION_COUNT);
         selectOrderDialogRunner.show(fragment);
     }
@@ -257,10 +257,6 @@ public class ArtistsListFragment extends LibraryFragment implements
             }
             case R.id.menu_equalizer: {
                 new EqualizerDialogFragment().show(getChildFragmentManager(), null);
-                break;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
                 break;
             }
         }

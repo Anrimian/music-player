@@ -53,6 +53,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
+import com.github.anrimian.musicplayer.databinding.PartialDrawerHeaderBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractorKt;
 import com.github.anrimian.musicplayer.domain.models.Screens;
@@ -61,6 +62,8 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState;
+import com.github.anrimian.musicplayer.domain.models.scanner.Running;
 import com.github.anrimian.musicplayer.ui.ScreensMap;
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
@@ -125,6 +128,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
     private FragmentDrawerBinding viewBinding;
     private PartialDetailedMusicBinding panelBinding;
+    private PartialDrawerHeaderBinding drawerHeaderBinding;
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private RecyclerView rvPlayList;
@@ -273,7 +277,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
 
 
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
-        navigationView.inflateHeaderView(R.layout.partial_drawer_header);
+        View headerView = navigationView.inflateHeaderView(R.layout.partial_drawer_header);
+        drawerHeaderBinding = PartialDrawerHeaderBinding.bind(headerView);
 
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(requireActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
         DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
@@ -749,6 +754,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         }
 
         panelBinding.tvSleepTime.setText(FormatUtils.formatMilliseconds(remainingMillis));
+    }
+
+    @Override
+    public void showFileScannerState(FileScannerState state) {
+        if (state instanceof Running) {
+            String fileName = ((Running) state).getComposition().getFileName();
+            drawerHeaderBinding.tvFileScannerState.setText(getString(R.string.file_scanner_state, fileName));
+            drawerHeaderBinding.tvFileScannerState.setVisibility(VISIBLE);
+        } else {
+            drawerHeaderBinding.tvFileScannerState.setVisibility(View.GONE);
+        }
     }
 
     public void openPlayQueue() {

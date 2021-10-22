@@ -5,12 +5,17 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.RawQuery;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
@@ -51,37 +56,22 @@ public interface GenreDao {
     })
     Observable<List<Genre>> getAllObservable(SupportSQLiteQuery query);
 
-    @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "title as title, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "fileName as fileName, " +
-            "duration as duration, " +
-            "size as size, " +
-            "id as id, " +
-            "storageId as storageId, " +
-            "dateAdded as dateAdded, " +
-            "dateModified as dateModified, " +
-            "corruptionType as corruptionType " +
-            "FROM compositions " +
-            "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
-    Observable<List<Composition>> getCompositionsInGenreObservable(long genreId);
+    @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class, GenreEntryEntity.class })
+    Observable<List<Composition>> getCompositionsInGenreObservable(SimpleSQLiteQuery query);
+
+    static String getCompositionsQuery(boolean useFileName) {
+        return "SELECT " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM compositions " +
+                "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)";
+    }
 
     @Query("SELECT " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "title as title, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "fileName as fileName, " +
-            "duration as duration, " +
-            "size as size, " +
             "id as id, " +
-            "storageId as storageId, " +
-            "dateAdded as dateAdded, " +
-            "dateModified as dateModified, " +
-            "corruptionType as corruptionType " +
+            "storageId as storageId " +
             "FROM compositions " +
             "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
-    List<Composition> getCompositionsInGenre(long genreId);
+    List<CompositionId> getCompositionsInGenre(long genreId);
 
     @Query("SELECT " +
             "id as dbId, " +

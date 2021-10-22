@@ -377,7 +377,9 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
     @Override
     public void showSelectOrderScreen(Order folderOrder) {
         SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(folderOrder,
-                OrderType.ALPHABETICAL,
+                true,
+                OrderType.NAME,
+                OrderType.FILE_NAME,
                 OrderType.ADD_TIME,
                 OrderType.DURATION,
                 OrderType.SIZE);
@@ -715,10 +717,6 @@ public class LibraryFoldersFragment extends MvpAppCompatFragment
             }
             case R.id.menu_search: {
                 presenter.onSearchButtonClicked();
-                break;
-            }
-            case R.id.menu_rescan_storage: {
-                Components.getAppComponent().mediaScannerRepository().rescanStorage();
                 break;
             }
         }

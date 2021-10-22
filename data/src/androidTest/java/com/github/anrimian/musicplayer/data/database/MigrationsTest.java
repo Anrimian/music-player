@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.data.database;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static org.junit.Assert.assertEquals;
+
 import android.app.Instrumentation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,10 +21,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static org.junit.Assert.assertEquals;
-
 public class MigrationsTest {
 
     private static final String TEST_DB_NAME = "music_player_database";
@@ -37,6 +37,15 @@ public class MigrationsTest {
                     instrumentation,
                     AppDatabase.class.getCanonicalName(),
                     new FrameworkSQLiteOpenHelperFactory());
+
+    @Test
+    public void testMigrationFrom7To8() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 7);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                8,
+                false,
+                Migrations.MIGRATION_7_8);
+    }
 
     @Test
     public void testMigrationFrom6To7() throws Exception {

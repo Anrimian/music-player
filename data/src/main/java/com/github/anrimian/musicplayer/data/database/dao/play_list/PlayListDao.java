@@ -4,8 +4,14 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RawQuery;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
@@ -82,24 +88,8 @@ public interface PlayListDao {
             "WHERE play_lists.id = :id ")
     Observable<List<PlayList>> getPlayListObservable(long id);
 
-    @Query("SELECT " +
-            "play_lists_entries.itemId AS itemId," +
-            "compositions.id AS id, " +
-            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
-            "(SELECT name FROM albums WHERE id = albumId) as album, " +
-            "compositions.storageId AS storageId, " +
-            "compositions.title AS title, " +
-            "compositions.fileName AS fileName, " +
-            "compositions.duration AS duration, " +
-            "compositions.size AS size, " +
-            "compositions.dateAdded AS dateAdded, " +
-            "compositions.dateModified AS dateModified, " +
-            "compositions.corruptionType AS corruptionType " +
-            "FROM play_lists_entries " +
-            "INNER JOIN compositions ON play_lists_entries.audioId = compositions.id " +
-            "WHERE play_lists_entries.playListId = :playListId " +
-            "ORDER BY orderPosition")
-    Observable<List<PlayListEntryDto>> getPlayListItemsObservable(long playListId);
+    @RawQuery(observedEntities = { PlayListEntity.class, ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
+    Observable<List<PlayListEntryDto>> getPlayListItemsObservable(SimpleSQLiteQuery query);
 
     @Query("SELECT " +
             "play_lists_entries.storageItemId as itemId, " +
@@ -160,4 +150,14 @@ public interface PlayListDao {
 
     @Query("SELECT exists(SELECT 1 FROM play_lists WHERE storageId = :storageId LIMIT 1)")
     boolean isPlayListExistsByStorageId(long storageId);
+
+    static String getPlaylistItemsQuery(boolean useFileName) {
+        return "SELECT " +
+                "play_lists_entries.itemId AS itemId," +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM play_lists_entries " +
+                "INNER JOIN compositions ON play_lists_entries.audioId = compositions.id " +
+                "WHERE play_lists_entries.playListId = ? " +
+                "ORDER BY orderPosition";
+    }
 }

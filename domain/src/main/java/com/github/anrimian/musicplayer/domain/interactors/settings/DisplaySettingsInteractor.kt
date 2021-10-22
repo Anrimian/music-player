@@ -5,6 +5,12 @@ import io.reactivex.rxjava3.core.Observable
 
 class DisplaySettingsInteractor(private val settingsRepository: SettingsRepository) {
 
+    fun isDisplayFileNameEnabled() = settingsRepository.isDisplayFileNameEnabled
+
+    fun setDisplayFileName(useFileName: Boolean) {
+        settingsRepository.setDisplayFileName(useFileName)
+    }
+
     fun getCoversEnabledObservable(): Observable<Boolean> = settingsRepository.coversEnabledObservable
 
     fun getCoversInNotificationEnabledObservable(): Observable<Boolean> = settingsRepository.coversInNotificationEnabledObservable

@@ -42,6 +42,7 @@ public class TestDataProvider {
                 null,
                 new Date(),
                 new Date(),
+                new Date(),
                 null);
     }
 
@@ -82,7 +83,6 @@ public class TestDataProvider {
 
     public static Composition fakeComposition(long id) {
         return new Composition(null,
-                null,
                 "fileName",
                 null,
                 0,
@@ -224,7 +224,8 @@ public class TestDataProvider {
                     storageId,
                     folderId,
                     dateAdded,
-                    dateModified);
+                    dateModified,
+                    new Date(0));
         }
     }
 

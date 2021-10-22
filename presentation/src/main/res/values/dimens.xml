@@ -38,6 +38,7 @@
     <dimen name="content_vertical_margin">16dp</dimen>
     <dimen name="content_margin">16dp</dimen>
 
+    <dimen name="drawer_content_margin">14dp</dimen>
     <!--list margins-->
     <dimen name="list_vertical_margin">14dp</dimen>
     <dimen name="content_vertical_spacing_margin">4dp</dimen>

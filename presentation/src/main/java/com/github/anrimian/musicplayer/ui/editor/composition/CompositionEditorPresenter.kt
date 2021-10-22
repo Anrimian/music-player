@@ -327,8 +327,12 @@ class CompositionEditorPresenter(
     }
 
     private fun onCompositionReceived(composition: FullComposition) {
-        if (!this::composition.isInitialized) {
+        val firstReceive = !this::composition.isInitialized
+        if (firstReceive) {
             checkCompositionTagsInSource(composition)
+        }
+        if (firstReceive || this.composition.dateModified != composition.dateModified) {
+            viewState.showCompositionCover(composition)
         }
         this.composition = composition
         viewState.showComposition(composition)

@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepo
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StoragePlaylistAnalyzer;
+import com.github.anrimian.musicplayer.data.repositories.scanner.files.FileScanner;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceApi30;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceImpl;
@@ -100,6 +101,7 @@ public class StorageModule {
                                                  StorageMusicProvider storageMusicProvider,
                                                  StorageGenresProvider storageGenresProvider,
                                                  StateRepository stateRepository,
+                                                 SettingsRepository settingsRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new EditorRepositoryImpl(
                 sourceEditor,
@@ -112,6 +114,7 @@ public class StorageModule {
                 storageMusicProvider,
                 storageGenresProvider,
                 stateRepository,
+                settingsRepository,
                 scheduler);
     }
 
@@ -135,23 +138,38 @@ public class StorageModule {
     @Provides
     @Nonnull
     @Singleton
+    FileScanner fileScanner(CompositionsDaoWrapper compositionsDao,
+                            CompositionSourceEditor compositionSourceEditor,
+                            StateRepository stateRepository,
+                            Analytics analytics,
+                            @Named(IO_SCHEDULER) Scheduler scheduler) {
+        return new FileScanner(compositionsDao, compositionSourceEditor, stateRepository, analytics, scheduler);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
     MediaScannerRepository mediaScannerRepository(StorageMusicProvider musicProvider,
                                                   StoragePlayListsProvider playListsProvider,
                                                   StorageGenresProvider genresProvider,
+                                                  CompositionsDaoWrapper compositionsDao,
                                                   GenresDaoWrapper genresDao,
                                                   SettingsRepository settingsRepository,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
                                                   StoragePlaylistAnalyzer storagePlaylistAnalyzer,
+                                                  FileScanner fileScanner,
                                                   LoggerRepository loggerRepository,
                                                   Analytics analytics,
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
                 genresProvider,
+                compositionsDao,
                 genresDao,
                 settingsRepository,
                 compositionAnalyzer,
                 storagePlaylistAnalyzer,
+                fileScanner,
                 loggerRepository,
                 analytics,
                 scheduler);

@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+import static java.util.Collections.emptyList;
+import static utils.TestDataProvider.composition;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -9,10 +13,10 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,10 +24,6 @@ import org.junit.Test;
 
 import java.util.Date;
 import java.util.List;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
-import static java.util.Collections.emptyList;
-import static utils.TestDataProvider.composition;
 
 public class PlayListsDaoWrapperTest {
 
@@ -81,13 +81,13 @@ public class PlayListsDaoWrapperTest {
             )));
         }
 
-        List<PlayListEntryDto> items = playListDao.getPlayListItemsObservable(playlistId)
+        List<PlayListItem> items = daoWrapper.getPlayListItemsObservable(playlistId, false)
                 .blockingFirst();
         displayItems("testMoveItems, items: ", items);
 
         daoWrapper.moveItems(playlistId, 0, 7);
 
-        items = playListDao.getPlayListItemsObservable(playlistId)
+        items = daoWrapper.getPlayListItemsObservable(playlistId, false)
                 .blockingFirst();
         displayItems("testMoveItems, moved items: ", items);
 
@@ -125,9 +125,9 @@ public class PlayListsDaoWrapperTest {
         System.out.println("KEKAS" + daoWrapper.getPlayListsObservable().blockingFirst());
     }
 
-    private void displayItems(String message, List<PlayListEntryDto> items) {
+    private void displayItems(String message, List<PlayListItem> items) {
         StringBuilder sb = new StringBuilder();
-        for (PlayListEntryDto item : items) {
+        for (PlayListItem item : items) {
             sb.append("\n");
             sb.append("itemId = ");
             sb.append(item.getItemId());

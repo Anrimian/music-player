@@ -49,4 +49,10 @@
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
+
+    <style name="ToolbarTextStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">13sp</item>
+    </style>
 </resources>

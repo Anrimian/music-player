@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 
 import java.util.List;
@@ -101,4 +102,7 @@ public interface PlayerView extends MvpView {
 
     @AddToEndSingle
     void showSleepTimerRemainingTime(long remainingMillis);
+
+    @AddToEndSingle
+    void showFileScannerState(FileScannerState state);
 }

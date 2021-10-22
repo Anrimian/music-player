@@ -13,6 +13,7 @@ class DisplaySettingsPresenter(private val interactor: DisplaySettingsInteractor
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        viewState.showFileNameEnabled(interactor.isDisplayFileNameEnabled())
         viewState.showCoversChecked(interactor.isCoversEnabled())
         viewState.showCoversInNotificationChecked(interactor.isCoversInNotificationEnabled())
         viewState.showColoredNotificationChecked(interactor.isColoredNotificationEnabled())
@@ -25,6 +26,11 @@ class DisplaySettingsPresenter(private val interactor: DisplaySettingsInteractor
     fun onCoversChecked(checked: Boolean) {
         viewState.showCoversChecked(checked)
         interactor.setCoversEnabled(checked)
+    }
+
+    fun onFileNameChecked(checked: Boolean) {
+        viewState.showFileNameEnabled(checked)
+        interactor.setDisplayFileName(checked)
     }
 
     fun onCoversInNotificationChecked(checked: Boolean) {

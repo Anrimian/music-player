@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 
 @Dao
@@ -64,7 +65,8 @@ public interface CompositionsDao {
             "compositions.storageId as storageId, " +
             "compositions.folderId as folderId, " +
             "compositions.dateAdded as dateAdded, " +
-            "compositions.dateModified as dateModified " +
+            "compositions.dateModified as dateModified, " +
+            "compositions.lastScanDate as lastScanDate " +
             "FROM compositions WHERE storageId NOTNULL")
     List<StorageComposition> selectAllAsStorageCompositions();
 
@@ -146,20 +148,50 @@ public interface CompositionsDao {
     @Query("SELECT count() FROM compositions")
     long getCompositionsCount();
 
-    static String getCompositionQuery() {
-        return "SELECT " +
-                "(SELECT name FROM artists WHERE id = artistId) as artist,  " +
-                "(SELECT name FROM albums WHERE id = albumId) as album,  " +
-                "title as title,  " +
-                "fileName as fileName, " +
-                "duration as duration,  " +
-                "size as size,  " +
-                "id as id,  " +
-                "storageId as storageId,  " +
-                "dateAdded as dateAdded,  " +
-                "dateModified as dateModified,  " +
-                "corruptionType as corruptionType  " +
-                "FROM compositions";
+    @Query("SELECT " +
+            "(SELECT name FROM artists WHERE id = artistId) as artist, " +
+            "title as title, " +
+            "(SELECT name FROM albums WHERE id = albumId) as album, " +
+            "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "lyrics as lyrics, " +
+            "fileName as fileName, " +
+            "duration as duration, " +
+            "size as size, " +
+            "id as id, " +
+            "storageId as storageId, " +
+            "dateAdded as dateAdded, " +
+            "dateModified as dateModified, " +
+            "corruptionType as corruptionType " +
+            "FROM compositions " +
+            "WHERE lastScanDate < dateModified OR lastScanDate < :lastCompleteScanTime " +
+            "ORDER BY dateModified DESC " +
+            "LIMIT 1")
+    Maybe<FullComposition> selectNextCompositionToScan(long lastCompleteScanTime);
+
+    @Query("UPDATE compositions SET lastScanDate = :time WHERE id = :id")
+    void setCompositionLastFileScanTime(long id, Date time);
+
+    @Query("UPDATE compositions SET lastScanDate = 0")
+    void cleanLastFileScanTime();
+
+    static StringBuilder getCompositionQuery(boolean useFileName) {
+        return new StringBuilder("SELECT " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM compositions");
     }
+
+    static String getCompositionSelectionQuery(boolean useFileName) {
+        return "compositions.id AS id, " +
+                "compositions.storageId AS storageId, " +
+                "(SELECT name FROM artists WHERE id = artistId) as artist, " +
+                "(SELECT name FROM albums WHERE id = albumId) as album, " +
+                "(" + (useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END") + ") as title, " +
+                "compositions.duration AS duration, " +
+                "compositions.size AS size, " +
+                "compositions.dateAdded AS dateAdded, " +
+                "compositions.dateModified AS dateModified, " +
+                "compositions.corruptionType AS corruptionType ";
+    }
+
 
 }

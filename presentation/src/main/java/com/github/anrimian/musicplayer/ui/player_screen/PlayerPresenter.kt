@@ -61,6 +61,7 @@ class PlayerPresenter(
         subscribeOnCurrentPosition()
         subscribeOnTrackPositionChanging()
         subscribeOnSleepTimerTime()
+        subscribeOnFileScannerState()
     }
 
     fun onStop() {
@@ -415,5 +416,11 @@ class PlayerPresenter(
         batterySafeDisposable.add(playerScreenInteractor.sleepTimerCountDownObservable
             .observeOn(uiScheduler)
             .subscribe(viewState::showSleepTimerRemainingTime))
+    }
+
+    private fun subscribeOnFileScannerState() {
+        batterySafeDisposable.add(playerScreenInteractor.fileScannerStateObservable
+            .observeOn(uiScheduler)
+            .subscribe(viewState::showFileScannerState))
     }
 }

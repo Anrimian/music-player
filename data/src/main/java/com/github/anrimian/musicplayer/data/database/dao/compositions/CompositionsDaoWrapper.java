@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
+
 import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
@@ -16,18 +20,18 @@ import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionU
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
+import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
-
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
-import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
 public class CompositionsDaoWrapper {
 
@@ -55,11 +59,12 @@ public class CompositionsDaoWrapper {
     }
 
     public Observable<List<Composition>> getAllObservable(Order order,
+                                                          boolean useFileName,
                                                           @Nullable String searchText) {
-        String query = CompositionsDao.getCompositionQuery();
-        query += getSearchQuery();
-        query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 3));
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(getSearchQuery(useFileName));
+        query.append(getOrderQuery(order));
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 3));
         return updateSubject.switchMap(o -> compositionsDao.getAllObservable(sqlQuery));
     }
 
@@ -69,10 +74,10 @@ public class CompositionsDaoWrapper {
 
     public Observable<List<Composition>> getCompositionsInFolderObservable(Long folderId,
                                                                            Order order,
+                                                                           boolean useFileName,
                                                                            @Nullable String searchText) {
-        StringBuilder query = new StringBuilder(CompositionsDao.getCompositionQuery());
-        String searchQuery = getSearchQuery();
-        query.append(searchQuery);
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(getSearchQuery(useFileName));
         query.append(" AND ");
         query.append("folderId = ");
         query.append(folderId);
@@ -84,9 +89,9 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getAllInFolderObservable(sqlQuery);
     }
 
-    public List<Composition> getAllCompositionsInFolder(Long parentFolderId) {
+    public List<Composition> getAllCompositionsInFolder(Long parentFolderId, boolean useFileName) {
         String query = FoldersDao.getRecursiveFolderQuery(parentFolderId);
-        query += CompositionsDao.getCompositionQuery();
+        query += CompositionsDao.getCompositionQuery(useFileName);
         query += " WHERE folderId IN (SELECT childFolderId FROM allChildFolders) ";
         query += "OR folderId = ";
         query += parentFolderId;
@@ -94,15 +99,15 @@ public class CompositionsDaoWrapper {
         return compositionsDao.executeQuery(sqlQuery);
     }
 
-    public List<Composition> getCompositionsInFolder(Long parentFolderId, Order order) {
-        String query = CompositionsDao.getCompositionQuery();
-        query += " WHERE folderId = ";
-        query += parentFolderId;
-        query += " OR (folderId IS NULL AND ";
-        query += parentFolderId;
-        query += " IS NULL)";
-        query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query);
+    public List<Composition> getCompositionsInFolder(Long parentFolderId, Order order, boolean useFileName) {
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(" WHERE folderId = ");
+        query.append(parentFolderId);
+        query.append(" OR (folderId IS NULL AND ");
+        query.append(parentFolderId);
+        query.append(" IS NULL)");
+        query.append(getOrderQuery(order));
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString());
         return compositionsDao.executeQuery(sqlQuery);
     }
 
@@ -274,11 +279,58 @@ public class CompositionsDaoWrapper {
         compositionsDao.setCorruptionType(corruptionType, id);
     }
 
+    public Maybe<FullComposition> selectNextCompositionToScan(long lastCompleteScanTime) {
+        return compositionsDao.selectNextCompositionToScan(lastCompleteScanTime);
+    }
+
+    public void setCompositionLastFileScanTime(FullComposition composition, Date time) {
+        compositionsDao.setCompositionLastFileScanTime(composition.getId(), time);
+    }
+
+    public void cleanLastFileScanTime() {
+        compositionsDao.cleanLastFileScanTime();
+    }
+
+    public void updateCompositionBySourceTags(FullComposition composition, CompositionSourceTags tags) {
+        appDatabase.runInTransaction(() -> {
+            long id = composition.getId();
+
+            String tagTitle = tags.getTitle();
+            if (!isEmpty(tagTitle) && !Objects.equals(composition.getTitle(), tagTitle)) {
+                updateTitle(id, tagTitle);
+            }
+
+            String tagArtist = tags.getArtist();
+            if (!isEmpty(tagArtist) && !Objects.equals(composition.getArtist(), tagArtist)) {
+                updateArtist(id, tagArtist);
+            }
+
+            String tagAlbum = tags.getAlbum();
+            if (!isEmpty(tagAlbum) && !Objects.equals(composition.getAlbum(), tagAlbum)) {
+                updateAlbum(id, tagAlbum);
+            }
+
+            String tagAlbumArtist = tags.getAlbumArtist();
+            if (!isEmpty(tagAlbumArtist) && !Objects.equals(composition.getAlbumArtist(), tagAlbumArtist)) {
+                updateAlbumArtist(id, tagAlbumArtist);
+            }
+
+            String tagLyrics = tags.getLyrics();
+            if (!isEmpty(tagLyrics) && !Objects.equals(composition.getLyrics(), tagLyrics)) {
+                updateLyrics(id, tagLyrics);
+            }
+        });
+    }
+
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
-            case ALPHABETICAL: {
-                orderQuery.append("title");
+            case NAME: {
+                orderQuery.append("CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END");
+                break;
+            }
+            case FILE_NAME: {
+                orderQuery.append("fileName");
                 break;
             }
             case ADD_TIME: {
@@ -300,7 +352,11 @@ public class CompositionsDaoWrapper {
         return orderQuery.toString();
     }
 
-    private String getSearchQuery() {
-        return " WHERE (? IS NULL OR title LIKE ? OR (artist NOTNULL AND artist LIKE ?))";
+    private StringBuilder getSearchQuery(boolean useFileName) {
+        StringBuilder sb = new StringBuilder(" WHERE (? IS NULL OR ");
+        sb.append(useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END");
+        sb.append(" LIKE ? OR (artist NOTNULL AND artist LIKE ?))");
+        return sb;
     }
+
 }

@@ -1,5 +1,11 @@
 package com.github.anrimian.musicplayer.infrastructure.service.music;
 
+import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
+import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
+import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
+import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
+import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -27,12 +33,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
-
 /**
  * Created on 03.11.2017.
  */
@@ -46,10 +46,7 @@ public class MusicService extends Service {
     //optimization
     private final ServiceState serviceState = new ServiceState();
 
-//    private final MediaSessionCallback mediaSessionCallback = new MediaSessionCallback();
     private final CompositeDisposable serviceDisposable = new CompositeDisposable();
-
-//    private MediaSessionCompat mediaSession;
 
     private PlayerState playerState = PlayerState.IDLE;
     @Nullable
@@ -62,35 +59,6 @@ public class MusicService extends Service {
     public void onCreate() {
         super.onCreate();
         Components.getAppComponent().mediaSessionHandler().dispatchServiceCreated();
-
-//        if (!Permissions.hasFilePermission(this)) {
-//            notificationsDisplayer().startForegroundErrorNotification(this, R.string.no_file_permission);
-//            stopForeground(true);
-//            stopSelf();
-//            //noinspection UnnecessaryReturnStatement
-//            return;
-//        }
-
-        //reduce chance to show first notification without info
-//        currentSource = playerInteractor().getCurrentSource();
-//        notificationSetting = musicServiceInteractor().getNotificationSettings();
-
-        //we must start foreground in onCreate, strange ANR otherwise
-//        notificationsDisplayer().startForegroundNotification(this,
-//                playerState == PlayerState.PLAY,
-//                currentSource,
-//                mediaSession(),
-//                repeatMode,
-//                notificationSetting,
-//                true);
-//        //update state that depends on current item and settings to keep it actual
-//        if (currentSource != null) {
-//            updateMediaSessionState();
-//            updateMediaSessionMetadata();
-//            updateMediaSessionAlbumArt();
-//        }
-
-//        subscribeOnServiceState();
     }
 
     @Override
@@ -117,19 +85,13 @@ public class MusicService extends Service {
         int requestCode = intent.getIntExtra(REQUEST_CODE, -1);
         if (requestCode != -1) {
             handleNotificationAction(requestCode, intent);
-        } /*else {
-            KeyEvent keyEvent = MediaButtonReceiver.handleIntent(mediaSession(), intent);
-            if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_UP) {
-                handleMediaButtonAction(keyEvent);
-            }
-        }*/
+        }
         return START_NOT_STICKY;
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-//        return null;
         return new LocalBinder();
     }
 
@@ -137,8 +99,6 @@ public class MusicService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Components.getAppComponent().mediaSessionHandler().dispatchServiceDestroyed();
-//        mediaSession().setActive(false);
-//        mediaSession().release();
         serviceDisposable.dispose();
     }
 
@@ -160,25 +120,6 @@ public class MusicService extends Service {
 
         subscribeOnServiceState();
     }
-
-//    private void handleMediaButtonAction(@Nonnull KeyEvent keyEvent) {
-//        /* player interactor not null check because case:
-//         * 1) start-stop play
-//         * 2) enable bluetooth connection receiver
-//         * 3) hide activity
-//         * 4) revoke permission
-//         * 5) connect bluetooth device
-//         * 6) use play button from device
-//         * 7) resume activity from task manager
-//         *
-//         * not actual, but leave, it's interesting memory
-//         */
-//        Log.d("KEK", "handleMediaButtonAction");
-//        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY) {
-//            Log.d("KEK", "play from media button");
-//            playerInteractor().play();
-//        }
-//    }
 
     private void handleNotificationAction(int requestCode, Intent intent) {
         switch (requestCode) {
@@ -298,20 +239,6 @@ public class MusicService extends Service {
 
     private MediaSessionCompat mediaSession() {
         return Components.getAppComponent().mediaSessionHandler().getMediaSession();
-
-//        if (mediaSession == null) {
-//            mediaSession = new MediaSessionCompat(this, getClass().getSimpleName());
-//            mediaSession.setCallback(mediaSessionCallback);
-//
-//            Intent activityIntent = new Intent(this, MainActivity.class);
-//            PendingIntent pActivityIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
-//            mediaSession.setSessionActivity(pActivityIntent);
-//
-//            Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON, null, this, AppMediaButtonReceiver.class);
-//            PendingIntent pMediaButtonIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
-//            mediaSession.setMediaButtonReceiver(pMediaButtonIntent);
-//        }
-//        return mediaSession;
     }
 
     private PlayerInteractor playerInteractor() {
@@ -346,173 +273,6 @@ public class MusicService extends Service {
             return this;
         }
     }
-
-    /*private class MediaSessionCallback extends MediaSessionCompat.Callback {
-
-        @Override
-        public void onPlay() {
-            playerInteractor().play();
-        }
-
-        @Override
-        public void onPause() {
-            playerInteractor().pause();
-        }
-
-        @Override
-        public void onStop() {
-            playerInteractor().stop();
-        }
-
-        @Override
-        public void onSkipToNext() {
-            musicServiceInteractor().skipToNext();
-        }
-
-        @Override
-        public void onSkipToPrevious() {
-            musicServiceInteractor().skipToPrevious();
-        }
-
-        @Override
-        public void onSeekTo(long pos) {
-            playerInteractor().onSeekFinished(pos);
-        }
-
-        //next - test it
-
-        @Override
-        public void onSetRepeatMode(int repeatMode) {
-            int appRepeatMode;
-            switch (repeatMode) {
-                case REPEAT_MODE_INVALID:
-                case REPEAT_MODE_NONE: {
-                    appRepeatMode = RepeatMode.NONE;
-                    break;
-                }
-                case REPEAT_MODE_GROUP:
-                case REPEAT_MODE_ALL: {
-                    appRepeatMode = RepeatMode.REPEAT_PLAY_LIST;
-                    break;
-                }
-                case REPEAT_MODE_ONE: {
-                    appRepeatMode = RepeatMode.REPEAT_COMPOSITION;
-                    break;
-                }
-                default: {
-                    appRepeatMode = RepeatMode.NONE;
-                }
-            }
-            musicServiceInteractor().setRepeatMode(appRepeatMode);
-        }
-
-        @Override
-        public void onSetShuffleMode(int shuffleMode) {
-            musicServiceInteractor().setRandomPlayingEnabled(shuffleMode != SHUFFLE_MODE_NONE);
-        }
-
-        @Override
-        public void onFastForward() {
-            playerInteractor().fastSeekForward();
-        }
-
-        @Override
-        public void onRewind() {
-            playerInteractor().fastSeekBackward();
-        }
-
-        @Override
-        public void onSetPlaybackSpeed(float speed) {
-            musicServiceInteractor().setPlaybackSpeed(speed);
-        }
-
-        //next - not implemented
-
-        @Override
-        public void onCommand(String command, Bundle extras, ResultReceiver cb) {
-            super.onCommand(command, extras, cb);
-        }
-
-        @Override
-        public void onPrepare() {
-            super.onPrepare();
-        }
-
-        @Override
-        public void onPrepareFromMediaId(String mediaId, Bundle extras) {
-            super.onPrepareFromMediaId(mediaId, extras);
-        }
-
-        @Override
-        public void onPrepareFromSearch(String query, Bundle extras) {
-            super.onPrepareFromSearch(query, extras);
-        }
-
-        @Override
-        public void onPrepareFromUri(Uri uri, Bundle extras) {
-            super.onPrepareFromUri(uri, extras);
-        }
-
-        @Override
-        public void onPlayFromMediaId(String mediaId, Bundle extras) {
-            super.onPlayFromMediaId(mediaId, extras);
-        }
-
-        @Override
-        public void onPlayFromSearch(String query, Bundle extras) {
-            super.onPlayFromSearch(query, extras);
-        }
-
-        @Override
-        public void onPlayFromUri(Uri uri, Bundle extras) {
-            super.onPlayFromUri(uri, extras);
-        }
-
-        @Override
-        public void onSkipToQueueItem(long id) {
-            super.onSkipToQueueItem(id);
-        }
-
-        @Override
-        public void onSetRating(RatingCompat rating) {
-            super.onSetRating(rating);
-        }
-
-        @Override
-        public void onSetRating(RatingCompat rating, Bundle extras) {
-            super.onSetRating(rating, extras);
-        }
-
-        @Override
-        public void onSetCaptioningEnabled(boolean enabled) {
-            super.onSetCaptioningEnabled(enabled);
-        }
-
-        @Override
-        public void onCustomAction(String action, Bundle extras) {
-            super.onCustomAction(action, extras);
-        }
-
-        @Override
-        public void onAddQueueItem(MediaDescriptionCompat description) {
-            super.onAddQueueItem(description);
-        }
-
-        @Override
-        public void onAddQueueItem(MediaDescriptionCompat description, int index) {
-            super.onAddQueueItem(description, index);
-        }
-
-        @Override
-        public void onRemoveQueueItem(MediaDescriptionCompat description) {
-            super.onRemoveQueueItem(description);
-        }
-
-        @Override
-        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-            return super.onMediaButtonEvent(mediaButtonEvent);
-        }
-    }*/
 
     public class LocalBinder extends Binder {
 

@@ -39,12 +39,14 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String COLORED_NOTIFICATION = "colored_notification";
     private static final String SHOW_NOTIFICATION_COVER_STUB = "show_notification_cover_stub";
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
+    private static final String SHOW_FILE_NAME = "show_file_name";
 
     private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
     private static final String AUDIO_FILE_MIN_DURATION = "audio_file_min_duration";
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
     private static final String PAUSE_ON_AUDIO_FOCUS_LOSS = "pause_on_audio_focus_loss";
+    private static final String PAUSE_ON_ZERO_VOLUME_LEVEL = "pause_on_zero_volume_level";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
 
     private static final String EXTERNAL_PLAYER_REPEAT_MODE = "external_player_repeat_mode";
@@ -66,6 +68,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showNotificationCoverStubSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> showFileNameSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
     private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
     private final BehaviorSubject<Long> audioFileMinDurationSubject = BehaviorSubject.create();
@@ -409,6 +412,34 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public boolean isNotificationCoverStubEnabled() {
         return preferences.getBoolean(SHOW_NOTIFICATION_COVER_STUB, true);
+    }
+
+    @Override
+    public void setPauseOnZeroVolumeLevelEnabled(boolean enabled) {
+        preferences.putBoolean(PAUSE_ON_ZERO_VOLUME_LEVEL, enabled);
+    }
+
+    @Override
+    public boolean isPauseOnZeroVolumeLevelEnabled() {
+        return preferences.getBoolean(PAUSE_ON_ZERO_VOLUME_LEVEL, true);
+    }
+
+    @Override
+    public Observable<Boolean> getDisplayFileNameObservable() {
+        return withDefaultValue(showFileNameSubject, this::isDisplayFileNameEnabled);
+    }
+
+    @Override
+    public void setDisplayFileName(boolean displayFileName) {
+        if (displayFileName != isDisplayFileNameEnabled()) {
+            preferences.putBoolean(SHOW_FILE_NAME, displayFileName);
+            showFileNameSubject.onNext(displayFileName);
+        }
+    }
+
+    @Override
+    public boolean isDisplayFileNameEnabled() {
+        return preferences.getBoolean(SHOW_FILE_NAME, false);
     }
 
     @Override

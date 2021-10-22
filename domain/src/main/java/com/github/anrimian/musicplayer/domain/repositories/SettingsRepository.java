@@ -128,6 +128,16 @@ public interface SettingsRepository {
 
     long getAudioFileMinDurationMillis();
 
+    void setPauseOnZeroVolumeLevelEnabled(boolean enabled);
+
+    boolean isPauseOnZeroVolumeLevelEnabled();
+
+    Observable<Boolean> getDisplayFileNameObservable();
+
+    void setDisplayFileName(boolean displayFileName);
+
+    boolean isDisplayFileNameEnabled();
+
     int[] getAvailableMediaPlayers();
 
     void setAvailableMediaPlayers(int[] mediaPlayersIds);

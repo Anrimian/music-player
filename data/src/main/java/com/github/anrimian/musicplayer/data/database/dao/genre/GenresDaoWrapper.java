@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.data.database.dao.genre;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
+
 import androidx.collection.LongSparseArray;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
@@ -8,6 +12,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
@@ -21,10 +26,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.reactivex.rxjava3.core.Observable;
-
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 
 public class GenresDaoWrapper {
 
@@ -76,11 +77,13 @@ public class GenresDaoWrapper {
                 .map(list -> list.get(0));
     }
 
-    public Observable<List<Composition>> getCompositionsInGenreObservable(long genreId) {
-        return genreDao.getCompositionsInGenreObservable(genreId);
+    public Observable<List<Composition>> getCompositionsInGenreObservable(long genreId, boolean useFileName) {
+        String query = GenreDao.getCompositionsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {genreId} );
+        return genreDao.getCompositionsInGenreObservable(sqlQuery);
     }
 
-    public List<Composition> getCompositionsInGenre(long genreId) {
+    public List<CompositionId> getCompositionsInGenre(long genreId) {
         return genreDao.getCompositionsInGenre(genreId);
     }
 
@@ -185,7 +188,7 @@ public class GenresDaoWrapper {
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
-            case ALPHABETICAL: {
+            case NAME: {
                 orderQuery.append("name");
                 break;
             }

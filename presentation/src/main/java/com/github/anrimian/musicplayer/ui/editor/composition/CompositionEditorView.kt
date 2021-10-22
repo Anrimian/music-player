@@ -30,6 +30,9 @@ interface CompositionEditorView : MvpView {
     @StateStrategyType(value = SingleStateByTagStrategy::class, tag = CHANGE_FILE_STATE)
     fun hideChangeFileProgress()
 
+    @AddToEndSingle
+    fun showCompositionCover(composition: FullComposition)
+
     @OneExecution
     fun showErrorMessage(errorCommand: ErrorCommand)
 

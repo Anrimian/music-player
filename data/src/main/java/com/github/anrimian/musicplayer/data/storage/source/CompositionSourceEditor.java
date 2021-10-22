@@ -1,10 +1,13 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
+
 import android.os.Build;
 
+import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
+import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
@@ -36,8 +39,6 @@ import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
-import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
-
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';
@@ -62,7 +63,7 @@ public class CompositionSourceEditor {
                 .flatMapCompletable(path -> setCompositionAuthor(path, composition.getStorageId(), author));
     }
 
-    public Completable setCompositionAuthor(Composition composition, String author) {
+    public Completable setCompositionAuthor(CompositionId composition, String author) {
         return getPath(composition)
                 .flatMapCompletable(path -> setCompositionAuthor(path, composition.getStorageId(), author));
     }
@@ -72,12 +73,12 @@ public class CompositionSourceEditor {
                 .flatMapCompletable(path -> setCompositionAlbum(path, composition.getStorageId(), author));
     }
 
-    public Completable setCompositionAlbum(Composition composition, String author) {
+    public Completable setCompositionAlbum(CompositionId composition, String author) {
         return getPath(composition)
                 .flatMapCompletable(path -> setCompositionAlbum(path, composition.getStorageId(), author));
     }
 
-    public Single<List<Composition>> setCompositionsAlbum(List<Composition> compositions, String album) {
+    public Single<List<CompositionId>> setCompositionsAlbum(List<CompositionId> compositions, String album) {
         return Observable.fromIterable(compositions)
                 .flatMapCompletable(composition -> setCompositionAlbum(composition, album))
                 .onErrorResumeNext(throwable -> storageMusicProvider.processStorageError(throwable, compositions))
@@ -89,14 +90,14 @@ public class CompositionSourceEditor {
                 .flatMapCompletable(path -> setCompositionAlbumArtist(path, composition.getStorageId(), artist));
     }
 
-    public Single<List<Composition>> setCompositionsAlbumArtist(List<Composition> compositions, String artist) {
+    public Single<List<CompositionId>> setCompositionsAlbumArtist(List<CompositionId> compositions, String artist) {
         return Observable.fromIterable(compositions)
                 .flatMapCompletable(composition -> setCompositionAlbumArtist(composition, artist))
                 .onErrorResumeNext(throwable -> storageMusicProvider.processStorageError(throwable, compositions))
                 .toSingleDefault(compositions);
     }
 
-    public Completable setCompositionAlbumArtist(Composition composition, String artist) {
+    public Completable setCompositionAlbumArtist(CompositionId composition, String artist) {
         return getPath(composition)
                 .flatMapCompletable(path -> setCompositionAlbumArtist(path, composition.getStorageId(), artist));
     }
@@ -113,7 +114,7 @@ public class CompositionSourceEditor {
                 .flatMapCompletable(path -> changeCompositionGenre(path, composition.getStorageId(), oldGenre, newGenre));
     }
 
-    public Completable changeCompositionGenre(Composition composition,
+    public Completable changeCompositionGenre(CompositionId composition,
                                               String oldGenre,
                                               String newGenre) {
         return getPath(composition)
@@ -147,9 +148,9 @@ public class CompositionSourceEditor {
                 .flatMap(path -> removeCompositionAlbumArt(path, composition.getStorageId()));
     }
 
-    public Maybe<CompositionSourceTags> getFullTags(FullComposition composition) {
+    public Single<CompositionSourceTags> getFullTags(FullComposition composition) {
         return getPath(composition)
-                .flatMapMaybe(this::getFullTags);
+                .flatMap(this::getFullTags);
     }
 
     public Maybe<byte[]> getCompositionArtworkBinaryData(long storageId) {
@@ -283,17 +284,18 @@ public class CompositionSourceEditor {
         });
     }
 
-    private Maybe<CompositionSourceTags> getFullTags(String filePath) {
-        return Maybe.fromCallable(() -> {
-            Tag tag = getFileTag(filePath);
-            if (tag == null) {
-                return null;
+    private Single<CompositionSourceTags> getFullTags(String filePath) {
+        return Single.fromCallable(() -> {
+            try {
+                Tag tag = getFileTag(filePath);
+                return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
+                        tag.getFirst(FieldKey.ARTIST),
+                        tag.getFirst(FieldKey.ALBUM),
+                        tag.getFirst(FieldKey.ALBUM_ARTIST),
+                        tag.getFirst(FieldKey.LYRICS));
+            } catch (Exception e) {
+                throw new TagReaderException("Unable to read: " + filePath, e);
             }
-            return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
-                    tag.getFirst(FieldKey.ARTIST),
-                    tag.getFirst(FieldKey.ALBUM),
-                    tag.getFirst(FieldKey.ALBUM_ARTIST),
-                    tag.getFirst(FieldKey.LYRICS));
         });
     }
 
@@ -311,7 +313,7 @@ public class CompositionSourceEditor {
         });
     }
 
-    private Single<String> getPath(Composition composition) {
+    private Single<String> getPath(CompositionId composition) {
         return getPath(composition.getStorageId());
     }
 
@@ -334,7 +336,7 @@ public class CompositionSourceEditor {
 
     private Tag getFileTag(String filePath) throws Exception {
         AudioFile file = readFile(new File(filePath));
-        return file.getTag();
+        return file.getTagOrCreateDefault();
     }
 
     private Single<Long> changeCompositionAlbumArt(String filePath, Long id, ImageSource imageSource) {
@@ -387,11 +389,7 @@ public class CompositionSourceEditor {
 
     private void runFileAction(File file, ThrowsCallback<Tag> callback) throws Exception {
         AudioFile audioFile = readFile(file);
-        Tag tag = audioFile.getTag();
-        if (tag == null) {
-            tag = new ID3v24Tag();
-            audioFile.setTag(tag);
-        }
+        Tag tag = audioFile.getTagOrCreateAndSetDefault();
         callback.call(tag);
         AudioFileIO.write(audioFile);
     }

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.library;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
@@ -28,8 +30,6 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 /**
  * Created on 24.10.2017.
@@ -66,7 +66,12 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText) {
-        return compositionsDao.getAllObservable(settingsPreferences.getCompositionsOrder(), searchText);
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> compositionsDao.getAllObservable(
+                        settingsPreferences.getCompositionsOrder(),
+                        useFileName,
+                        searchText)
+                );
     }
 
     @Override
@@ -99,12 +104,14 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Observable<List<Composition>> getGenreItemsObservable(long genreId) {
-        return genresDao.getCompositionsInGenreObservable(genreId);
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> genresDao.getCompositionsInGenreObservable(genreId, useFileName));
     }
 
     @Override
     public Observable<List<Composition>> getAlbumItemsObservable(long albumId) {
-        return albumsDao.getCompositionsInAlbumObservable(albumId);
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> albumsDao.getCompositionsInAlbumObservable(albumId, useFileName));
     }
 
     @Override
@@ -114,7 +121,8 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Observable<List<Composition>> getCompositionsByArtist(long artistId) {
-        return artistsDao.getCompositionsByArtistObservable(artistId);
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> artistsDao.getCompositionsByArtistObservable(artistId, useFileName));
     }
 
     @Override
@@ -147,9 +155,16 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
-                                                            @Nullable String searchQuery) {
+                                                           @Nullable String searchQuery) {
         return settingsPreferences.getFolderOrderObservable()
-                .switchMap(order -> foldersDao.getFilesObservable(folderId, order, searchQuery));
+                .switchMap(order -> settingsPreferences.getDisplayFileNameObservable()
+                        .switchMap(useFileName -> foldersDao.getFilesObservable(
+                                folderId,
+                                order,
+                                useFileName,
+                                searchQuery)
+                        )
+                );
     }
 
     @Override
@@ -165,7 +180,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources) {
-        return foldersDao.extractAllCompositionsFromFiles(fileSources, settingsPreferences.getFolderOrder())
+        return foldersDao.extractAllCompositionsFromFiles(fileSources, settingsPreferences.getFolderOrder(), settingsPreferences.isDisplayFileNameEnabled())
                 .subscribeOn(scheduler);
     }
 
@@ -222,15 +237,17 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
-        return Single.fromCallable(() -> compositionsDao.getAllCompositionsInFolder(folder.getId()))
-                .map(compositions -> storageFilesDataSource.deleteCompositionFiles(compositions, folder))
+        return Single.fromCallable(() -> compositionsDao.getAllCompositionsInFolder(
+                folder.getId(),
+                settingsPreferences.isDisplayFileNameEnabled()
+        )).map(compositions -> storageFilesDataSource.deleteCompositionFiles(compositions, folder))
                 .doOnSuccess(compositions -> foldersDao.deleteFolder(folder.getId(), compositions))
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Single<List<Composition>> deleteFolders(List<FileSource> folders) {
-        return foldersDao.extractAllCompositionsFromFiles(folders)
+        return foldersDao.extractAllCompositionsFromFiles(folders, settingsPreferences.isDisplayFileNameEnabled())
                 .map(compositions -> storageFilesDataSource.deleteCompositionFiles(compositions, folders))
                 .doOnSuccess(compositions -> foldersDao.deleteFolders(extractFolderIds(folders), compositions))
                 .subscribeOn(scheduler);
@@ -255,6 +272,8 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     private List<Composition> selectAllCompositionsInFolder(Long folderId) {
         return foldersDao.getAllCompositionsInFolder(
                 folderId,
-                settingsPreferences.getFolderOrder());
+                settingsPreferences.getFolderOrder(),
+                settingsPreferences.isDisplayFileNameEnabled()
+        );
     }
 }

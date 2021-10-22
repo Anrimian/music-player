@@ -44,11 +44,16 @@ class DisplaySettingsFragment : MvpAppCompatFragment(), DisplaySettingsView {
         viewBinding.cbColoredNotification.visibility =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) VISIBLE else GONE
         
+        onCheckChanged(viewBinding.cbUseFileName, presenter::onFileNameChecked)
         onCheckChanged(viewBinding.cbCovers, presenter::onCoversChecked)
         onCheckChanged(viewBinding.cbCoversInNotification, presenter::onCoversInNotificationChecked)
         onCheckChanged(viewBinding.cbColoredNotification, presenter::onColoredNotificationChecked)
         onCheckChanged(viewBinding.cbShowCoverStubInNotification, presenter::onNotificationCoverStubChecked)
         onCheckChanged(viewBinding.cbNotificationOnLockScreen, presenter::onCoversOnLockScreenChecked)
+    }
+
+    override fun showFileNameEnabled(enabled: Boolean) {
+        setChecked(viewBinding.cbUseFileName, enabled)
     }
 
     override fun showCoversChecked(checked: Boolean) {

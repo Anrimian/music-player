@@ -1,5 +1,16 @@
 package com.github.anrimian.musicplayer.domain.models.utils;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.ALBUM;
+import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
+import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DATE_ADDED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
+import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
+import static com.github.anrimian.musicplayer.domain.Payloads.SIZE;
+import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
+import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
+import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
+
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
@@ -7,18 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.ALBUM;
-import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
-import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
-import static com.github.anrimian.musicplayer.domain.Payloads.DATE_ADDED;
-import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
-import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
-import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
-import static com.github.anrimian.musicplayer.domain.Payloads.SIZE;
-import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
-import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class CompositionHelper {
 
@@ -28,7 +27,6 @@ public class CompositionHelper {
                 && Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && Objects.equals(first.getDateModified(), second.getDateModified())
                 && first.getDuration() == second.getDuration()
-                && Objects.equals(first.getFileName(), second.getFileName())
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
                 && first.getCorruptionType() == second.getCorruptionType();
@@ -55,9 +53,6 @@ public class CompositionHelper {
         if (first.getDuration() != second.getDuration()) {
             payloads.add(DURATION);
         }
-        if (!Objects.equals(first.getFileName(), second.getFileName())) {
-            payloads.add(FILE_NAME);
-        }
         if (first.getSize() != second.getSize()) {
             payloads.add(SIZE);
         }
@@ -71,7 +66,7 @@ public class CompositionHelper {
     }
 
     public static String formatCompositionName(Composition composition) {
-        return formatCompositionName(composition.getTitle(), composition.getFileName());
+        return composition.getTitle();
     }
 
     public static String formatCompositionName(String title, String fileName) {
