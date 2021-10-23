@@ -34,7 +34,7 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
 
     }
 
-    override fun showEnabledMediaPlayers(mediaPlayers: IntArray) {
+    override fun showEnabledMediaPlayers(mediaPlayers: Set<Int>) {
 
     }
 
