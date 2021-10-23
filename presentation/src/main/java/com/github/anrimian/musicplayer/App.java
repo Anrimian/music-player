@@ -27,6 +27,7 @@ In v0.9.4:
 -fix eq state crash
 -crash here (StorageCompositionsInserter.java:180)
 -cleanup MusicService
+-slidr gesture can't be performed while file scanner is running: constant ui update
 */
 public class App extends Application {
 
