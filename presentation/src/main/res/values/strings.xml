@@ -236,6 +236,7 @@
     <string name="file_name_order">By file name</string>
     <string name="play_list_is_empty">Playlist is empty. Compositions can be added to playlists on library screens.</string>
     <string name="file_scanner_state">Scanning file tags: %s</string>
+    <string name="show_all_audio_files">Show all audio files</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

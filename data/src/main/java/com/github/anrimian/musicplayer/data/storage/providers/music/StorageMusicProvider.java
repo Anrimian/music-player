@@ -25,8 +25,8 @@ import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.collection.LongSparseArray;
 
-import com.github.anrimian.musicplayer.data.storage.exceptions.ContentResolverQueryException;
 import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
+import com.github.anrimian.musicplayer.data.storage.exceptions.ContentResolverQueryException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
@@ -92,7 +92,8 @@ public class StorageMusicProvider {
     }
 
     public Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable(
-            long minAudioDurationMillis
+            long minAudioDurationMillis,
+            boolean showAllAudioFiles
     ) {
         Observable<Object> storageChangeObservable = RxContentObserver.getObservable(contentResolver, unsafeGetStorageUri());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -108,11 +109,14 @@ public class StorageMusicProvider {
             storageChangeObservable = Observable.merge(storageChangeObservable, playListChangeObservable);
         }
         return storageChangeObservable
-                .flatMapSingle(o -> getCompositionsSingle(minAudioDurationMillis));
+                .flatMapSingle(o -> getCompositionsSingle(minAudioDurationMillis, showAllAudioFiles));
     }
 
     @Nullable
-    public LongSparseArray<StorageFullComposition> getCompositions(long minAudioDurationMillis) {
+    public LongSparseArray<StorageFullComposition> getCompositions(
+            long minAudioDurationMillis,
+            boolean showAllAudioFiles
+    ) {
         String[] query;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             query = new String[] {
@@ -149,9 +153,22 @@ public class StorageMusicProvider {
             return null;
         }
 
+        StringBuilder selectionBuilder = new StringBuilder();
         //also display unsupported or corrupted compositions
-        String selection = Media.DURATION + " >= ? OR " + Media.DURATION + " IS NULL";
-        String[] projection = new String[] { String.valueOf(minAudioDurationMillis) };
+        selectionBuilder.append(Media.DURATION + " >= ? OR " + Media.DURATION + " IS NULL");
+        if (showAllAudioFiles) {
+            selectionBuilder.append(" AND ");
+            selectionBuilder.append(Media.IS_MUSIC);
+            selectionBuilder.append(" = ?");
+        }
+
+        String selection = selectionBuilder.toString();
+        String[] projection;
+        if (showAllAudioFiles) {
+            projection = new String[] { String.valueOf(minAudioDurationMillis), String.valueOf(1) };
+        } else {
+            projection = new String[] { String.valueOf(minAudioDurationMillis) };
+        }
 
         try(Cursor cursor = query(uri, query, selection, projection, null)) {
             if (cursor == null) {
@@ -421,9 +438,14 @@ public class StorageMusicProvider {
     }
 
     private Single<LongSparseArray<StorageFullComposition>> getCompositionsSingle(
-            long minAudioDurationMillis) {
+            long minAudioDurationMillis,
+            boolean showAllAudioFiles
+    ) {
         return Single.create(emitter -> {
-            LongSparseArray<StorageFullComposition> compositions = getCompositions(minAudioDurationMillis);
+            LongSparseArray<StorageFullComposition> compositions = getCompositions(
+                    minAudioDurationMillis,
+                    showAllAudioFiles
+            );
             if (compositions != null) {
                 emitter.onSuccess(compositions);
             }

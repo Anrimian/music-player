@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner;
 import android.database.sqlite.SQLiteDiskIOException;
 
 import androidx.collection.LongSparseArray;
+import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
@@ -110,8 +111,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     }
 
     private void subscribeOnMediaStoreChanges() {
-        mediaStoreDisposable.add(settingsRepository.geAudioFileMinDurationMillisObservable()
-                .switchMap(musicProvider::getCompositionsObservable)
+        mediaStoreDisposable.add(getCompositionsObservable()
                 .subscribeOn(scheduler)
                 .observeOn(scheduler)
                 .doOnNext(compositionAnalyzer::applyCompositionsData)
@@ -134,10 +134,23 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 //        subscribeOnGenresData();
     }
 
+    //update on change settings not working
+    private Observable<LongSparseArray<StorageFullComposition>> getCompositionsObservable() {
+        return Observable.combineLatest(
+                settingsRepository.getAudioFileMinDurationMillisObservable(),
+                settingsRepository.getShowAllAudioFilesEnabledObservable(),
+                Pair::new
+        ).switchMap(settings -> musicProvider.getCompositionsObservable(
+                settings.first,
+                settings.second
+        ));
+    }
+
     private Completable runRescanStorage() {
         return Completable.fromAction(() -> {
             LongSparseArray<StorageFullComposition> compositions = musicProvider.getCompositions(
-                    settingsRepository.getAudioFileMinDurationMillis()
+                    settingsRepository.getAudioFileMinDurationMillis(),
+                    settingsRepository.isShowAllAudioFilesEnabled()
             );
             if (compositions == null) {
                 return;
