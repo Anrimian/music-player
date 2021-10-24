@@ -155,8 +155,8 @@ public class StorageMusicProvider {
 
         StringBuilder selectionBuilder = new StringBuilder();
         //also display unsupported or corrupted compositions
-        selectionBuilder.append(Media.DURATION + " >= ? OR " + Media.DURATION + " IS NULL");
-        if (showAllAudioFiles) {
+        selectionBuilder.append("(" + Media.DURATION + " >= ? OR " + Media.DURATION + " IS NULL)");
+        if (!showAllAudioFiles) {
             selectionBuilder.append(" AND ");
             selectionBuilder.append(Media.IS_MUSIC);
             selectionBuilder.append(" = ?");
@@ -165,9 +165,9 @@ public class StorageMusicProvider {
         String selection = selectionBuilder.toString();
         String[] projection;
         if (showAllAudioFiles) {
-            projection = new String[] { String.valueOf(minAudioDurationMillis), String.valueOf(1) };
-        } else {
             projection = new String[] { String.valueOf(minAudioDurationMillis) };
+        } else {
+            projection = new String[] { String.valueOf(minAudioDurationMillis), String.valueOf(1) };
         }
 
         try(Cursor cursor = query(uri, query, selection, projection, null)) {
