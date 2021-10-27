@@ -17,10 +17,10 @@ class EnabledMediaPlayersPresenter(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         val enabledMediaPlayers = playerSettingsInteractor.getEnabledMediaPlayers()
-        mediaPlayers.sortedBy(enabledMediaPlayers::indexOf)
+        enabledMediaPlayers.forEach(this.enabledMediaPlayers::add)
+
         viewState.showMediaPlayers(mediaPlayers)
 
-        enabledMediaPlayers.forEach(this.enabledMediaPlayers::add)
         viewState.showEnabledMediaPlayers(this.enabledMediaPlayers)
     }
 
@@ -29,7 +29,11 @@ class EnabledMediaPlayersPresenter(
     }
 
     fun onItemEnableStatusChanged(id: Int, enabled: Boolean) {
-
+        if (enabled) {
+            enabledMediaPlayers.add(id)
+        } else {
+            enabledMediaPlayers.remove(id)
+        }
     }
 
     fun onCompleteButtonClicked() {
