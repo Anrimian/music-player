@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -10,6 +12,7 @@ import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepository
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -25,8 +28,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 /**
  * Created on 21.04.2018.
@@ -93,7 +94,8 @@ public class SettingsModule {
 
     @Provides
     @NonNull
-    LibrarySettingsInteractor librarySettingsInteractor(SettingsRepository settingsRepository) {
-        return new LibrarySettingsInteractor(settingsRepository);
+    LibrarySettingsInteractor librarySettingsInteractor(SettingsRepository settingsRepository,
+                                                        MediaScannerRepository mediaScannerRepository) {
+        return new LibrarySettingsInteractor(settingsRepository, mediaScannerRepository);
     }
 }
