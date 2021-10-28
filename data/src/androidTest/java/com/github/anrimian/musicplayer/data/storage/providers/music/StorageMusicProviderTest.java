@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+
 import android.Manifest;
 import android.content.Context;
 import android.util.Log;
@@ -17,8 +19,6 @@ import org.junit.Test;
 import hu.akarnokd.rxjava3.math.MathObservable;
 import io.reactivex.rxjava3.core.Observable;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-
 public class StorageMusicProviderTest {
 
     @Rule
@@ -35,7 +35,7 @@ public class StorageMusicProviderTest {
 
     @Test
     public void testRepositoryReturnValues() {
-        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions(0);
+        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions(0, false);
         if (map == null) {
             map = new LongSparseArray<>();
         }
@@ -58,7 +58,7 @@ public class StorageMusicProviderTest {
 
     private long load() {
         long startTime = System.currentTimeMillis();
-        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions( 0);
+        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions( 0, false);
         if (map == null) {
             Log.d("KEK", "load failed");
         }

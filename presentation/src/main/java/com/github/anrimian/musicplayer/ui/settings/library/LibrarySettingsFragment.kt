@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
@@ -52,9 +53,8 @@ class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, L
             viewBinding.cbDoNotShowDeleteDialog.visibility = View.GONE
         }
 
-        ViewUtils.onCheckChanged(viewBinding.cbDoNotShowDeleteDialog) { isChecked ->
-            presenter.doNotAppConfirmDialogChecked(isChecked)
-        }
+        onCheckChanged(viewBinding.cbDoNotShowDeleteDialog, presenter::doNotAppConfirmDialogChecked)
+        onCheckChanged(viewBinding.cbShowAllAudioFiles, presenter::onShowAllAudioFilesChecked)
 
         viewBinding.flAudioMinDurationClickableArea.setOnClickListener {
             presenter.onSelectMinDurationClicked()
@@ -72,6 +72,10 @@ class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, L
 
     override fun showAppConfirmDeleteDialogEnabled(enabled: Boolean) {
         ViewUtils.setChecked(viewBinding.cbDoNotShowDeleteDialog, !enabled)
+    }
+
+    override fun showAllAudioFilesEnabled(enabled: Boolean) {
+        ViewUtils.setChecked(viewBinding.cbShowAllAudioFiles, enabled)
     }
 
     override fun showAudioFileMinDurationMillis(millis: Long) {

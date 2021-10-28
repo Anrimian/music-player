@@ -42,6 +42,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
     private static final String AUDIO_FILE_MIN_DURATION = "audio_file_min_duration";
+    private static final String SHOW_ALL_AUDIO_FILES = "show_all_audio_files";
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
     private static final String PAUSE_ON_AUDIO_FOCUS_LOSS = "pause_on_audio_focus_loss";
@@ -67,6 +68,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showFileNameSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> showAllAudioFilesSubject = BehaviorSubject.create();
     private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
     private final BehaviorSubject<Long> audioFileMinDurationSubject = BehaviorSubject.create();
 
@@ -376,7 +378,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public Observable<Long> geAudioFileMinDurationMillisObservable() {
+    public Observable<Long> getAudioFileMinDurationMillisObservable() {
         return withDefaultValue(audioFileMinDurationSubject, this::getAudioFileMinDurationMillis);
     }
 
@@ -390,7 +392,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public long getAudioFileMinDurationMillis() {
-        return preferences.getLong(AUDIO_FILE_MIN_DURATION, 30000L);
+        return preferences.getLong(AUDIO_FILE_MIN_DURATION, 15000L);
     }
 
     @Override
@@ -437,6 +439,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public boolean isDisplayFileNameEnabled() {
         return preferences.getBoolean(SHOW_FILE_NAME, false);
+    }
+
+    @Override
+    public void setShowAllAudioFilesEnabled(boolean enabled) {
+        if (enabled != isShowAllAudioFilesEnabled()) {
+            preferences.putBoolean(SHOW_ALL_AUDIO_FILES, enabled);
+            showAllAudioFilesSubject.onNext(enabled);
+        }
+    }
+
+    @Override
+    public boolean isShowAllAudioFilesEnabled() {
+        return preferences.getBoolean(SHOW_ALL_AUDIO_FILES, false);
+    }
+
+    @Override
+    public Observable<Boolean> getShowAllAudioFilesEnabledObservable() {
+        return withDefaultValue(showAllAudioFilesSubject, this::isShowAllAudioFilesEnabled);
     }
 
     private Order orderFromInt(int order) {

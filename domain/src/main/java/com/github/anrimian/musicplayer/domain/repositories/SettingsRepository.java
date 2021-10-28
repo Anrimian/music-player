@@ -122,7 +122,7 @@ public interface SettingsRepository {
 
     boolean isSleepTimerPlayLastSong();
 
-    Observable<Long> geAudioFileMinDurationMillisObservable();
+    Observable<Long> getAudioFileMinDurationMillisObservable();
 
     void setAudioFileMinDurationMillis(long millis);
 
@@ -137,4 +137,11 @@ public interface SettingsRepository {
     void setDisplayFileName(boolean displayFileName);
 
     boolean isDisplayFileNameEnabled();
+
+    void setShowAllAudioFilesEnabled(boolean enabled);
+
+    boolean isShowAllAudioFilesEnabled();
+
+    Observable<Boolean> getShowAllAudioFilesEnabledObservable();
+
 }
