@@ -18,13 +18,13 @@
 
     <style name="SeekBarStyle" parent="@style/Widget.AppCompat.SeekBar"/>
 
-    <style name="DiscreteSliderStyle">
+    <style name="SliderStyle">
         <item name="colorOnBackground">#fff</item>
         <item name="colorSurface">#fff</item>
         <item name="colorPrimary">?attr/colorAccent</item>
 
         <item name="labelBehavior">gone</item>
-        <item name="labelStyle">@style/DiscreteSliderStyle</item>
+        <item name="labelStyle">@style/SliderStyle</item>
         <item name="trackHeight">2dp</item>
         <item name="thumbRadius">6dp</item>
         <item name="haloRadius">15dp</item>
