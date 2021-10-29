@@ -240,6 +240,9 @@
     <string name="advanced">Advanced</string>
     <string name="android_media_player">Android media player</string>
     <string name="exo_media_player">Google exo player</string>
+    <string name="exo_media_player_description">Exo media player by google</string>
+    <string name="android_media_player_description">Default android media player. Can support wider variations of audio files but can be unstable</string>
+    <string name="media_players_setting_description">App uses several media players for music playing. Here they can be disabled or changed use priority. All changes will take effect only after application restart.</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

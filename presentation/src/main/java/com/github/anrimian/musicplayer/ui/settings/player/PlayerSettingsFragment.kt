@@ -10,7 +10,7 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding
 import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
+import com.github.anrimian.musicplayer.ui.common.format.getMediaPlayerName
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersDialogFragment
@@ -87,12 +87,6 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
     }
 
     @StringRes
-    private fun getMediaPlayerName(mediaPlayerId: Int) = when(mediaPlayerId) {
-        MediaPlayers.EXO_MEDIA_PLAYER -> R.string.exo_media_player
-        else -> R.string.android_media_player
-    }
-
-    @StringRes
     private fun getEqualizerTypeDescription(type: Int): Int {
         return when (type) {
             EqualizerType.EXTERNAL -> R.string.system_equalizer
@@ -107,8 +101,5 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
     private fun showMediaPlayersSettingScreen() {
         enabledMediaPlayersDialogFragmentRunner.show(EnabledMediaPlayersDialogFragment())
-        //description: "App uses several media players for music playing.
-    // Here they can be disabled or change priority.
-    // All changes will take effect only after application restart"
     }
 }
