@@ -104,7 +104,15 @@ public class InternalEqualizer implements AppEqualizer {
     public void setBandLevel(short bandNumber, short level) {
         Equalizer equalizer = equalizerHolder.getEqualizer();
         if (equalizer != null) {
-            equalizer.setBandLevel(bandNumber, level);
+            try {
+                equalizer.setBandLevel(bandNumber, level);
+            } catch (RuntimeException e) {
+                EqualizerState equalizerState = currentStateSubject.getValue();
+                if (equalizerState != null) {
+                    currentStateSubject.onNext(equalizerState);
+                }
+                throw e;
+            }
         }
 
         EqualizerState equalizerState = currentStateSubject.getValue();
