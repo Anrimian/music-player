@@ -16,15 +16,14 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
  */
 
 /*
-In v0.9.4:
+In v0.9.3:
 -option to choose player implementation priority
--option to select only music files(enabled by default)
 -finish Czech localization
 -finish arabic localization(+slidr, swipe, icons, motion layout)
 -select compositions from all volumes
 -glide memory optimization
 -glide save on disc full resolution images
--fix eq state crash
+-fix eq state crash(on attach). And return eq attach logic back?
 -crash here (StorageCompositionsInserter.java:180)
 -cleanup MusicService
 */

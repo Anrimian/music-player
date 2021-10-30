@@ -1,5 +1,19 @@
 package com.github.anrimian.musicplayer.ui.notifications;
 
+import static androidx.core.content.ContextCompat.getColor;
+import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
+import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
+import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
+import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
+import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
+import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -27,22 +41,9 @@ import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 
 import javax.annotation.Nonnull;
-
-import static androidx.core.content.ContextCompat.getColor;
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
-import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
 
 
 /**
@@ -112,7 +113,7 @@ public class NotificationsDisplayer {
         PendingIntent pIntent = PendingIntent.getActivity(context,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
 
         return new NotificationCompat.Builder(context, ERROR_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.playing_error))
@@ -251,7 +252,7 @@ public class NotificationsDisplayer {
                                                                    @Nullable MusicNotificationSetting notificationSetting) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(OPEN_PLAY_QUEUE_ARG, true);
-        PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
 
         boolean coloredNotification = false;
         boolean showNotificationCoverStub = true;
@@ -301,7 +302,7 @@ public class NotificationsDisplayer {
         PendingIntent pIntentPlayPause = PendingIntent.getService(context,
                 requestCode,
                 intentPlayPause,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
 
         NotificationCompat.Action playPauseAction = new NotificationCompat.Action(
                 play? R.drawable.ic_pause: R.drawable.ic_play,
@@ -317,14 +318,14 @@ public class NotificationsDisplayer {
             PendingIntent pIntentSkipToPrevious = PendingIntent.getService(context,
                     SKIP_TO_PREVIOUS,
                     intentSkipToPrevious,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
 
             Intent intentSkipToNext = new Intent(context, MusicService.class);
             intentSkipToNext.putExtra(REQUEST_CODE, SKIP_TO_NEXT);
             PendingIntent pIntentSkipToNext = PendingIntent.getService(context,
                     SKIP_TO_NEXT,
                     intentSkipToNext,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
 
             style.setShowActionsInCompactView(0, 1, 2);
 
@@ -339,7 +340,7 @@ public class NotificationsDisplayer {
             PendingIntent pIntentChangeRepeatMode = PendingIntent.getService(context,
                     CHANGE_REPEAT_MODE,
                     intentChangeRepeatMode,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
 
             NotificationCompat.Action changeRepeatModeAction = new NotificationCompat.Action(
                     getRepeatModeIcon(repeatMode),
