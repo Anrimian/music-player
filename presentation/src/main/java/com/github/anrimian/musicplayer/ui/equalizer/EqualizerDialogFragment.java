@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -32,7 +33,6 @@ import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
-import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
@@ -131,7 +131,7 @@ public class EqualizerDialogFragment extends MvpBottomSheetDialogFragment
 
     @Override
     public void showErrorMessage(ErrorCommand errorCommand) {
-        AppSnackbar.make(viewBinding.getRoot(), errorCommand.getMessage()).show();
+        Toast.makeText(requireContext(), errorCommand.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     @Override

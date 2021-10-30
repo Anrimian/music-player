@@ -8,6 +8,8 @@ import android.graphics.Path;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import javax.annotation.Nullable;
+
 public class ImageUtils {
 
     public static Bitmap toCircleBitmap(Bitmap bitmap) {
@@ -60,7 +62,11 @@ public class ImageUtils {
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, opt);
     }
 
-    public static byte[] downscaleImageBytes(byte[] imageBytes, int requestedSize) throws IOException {
+    @Nullable
+    public static byte[] downscaleImageBytes(@Nullable byte[] imageBytes, int requestedSize) throws IOException {
+        if (imageBytes == null) {
+            return null;
+        }
         Bitmap bitmap = decodeBitmap(imageBytes, requestedSize);
 
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {

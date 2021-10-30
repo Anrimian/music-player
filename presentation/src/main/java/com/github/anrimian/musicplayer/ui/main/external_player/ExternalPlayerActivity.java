@@ -238,15 +238,12 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
             title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
             album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
             String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-
-            int coverSize = getResources().getInteger(R.integer.icon_image_size);
-            imageBytes = ImageUtils.downscaleImageBytes(mmr.getEmbeddedPicture(), coverSize);
-
             try {
                 duration = Long.parseLong(durationStr);
             } catch (NumberFormatException ignored) {}
 
-
+            int coverSize = getResources().getInteger(R.integer.icon_image_size);
+            imageBytes = ImageUtils.downscaleImageBytes(mmr.getEmbeddedPicture(), coverSize);
         } catch (Exception ignored) {
 
         } finally {
