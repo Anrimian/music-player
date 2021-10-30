@@ -43,7 +43,11 @@ class EqualizerPresenter(
     }
 
     fun onBandLevelChanged(band: Band, value: Short) {
-        interactor.setBandLevel(band.bandNumber, value)
+        try {
+            interactor.setBandLevel(band.bandNumber, value)
+        } catch (e: Exception) {
+            viewState.showErrorMessage(errorParser.parseError(e))
+        }
     }
 
     fun onBandLevelDragStopped() {
