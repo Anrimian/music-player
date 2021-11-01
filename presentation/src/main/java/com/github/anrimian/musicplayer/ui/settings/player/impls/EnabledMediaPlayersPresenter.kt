@@ -22,6 +22,7 @@ class EnabledMediaPlayersPresenter(
         viewState.showMediaPlayers(mediaPlayers)
 
         viewState.showEnabledMediaPlayers(this.enabledMediaPlayers)
+        showAllowedItemDisabling()
     }
 
     fun onItemMoved() {
@@ -34,9 +35,14 @@ class EnabledMediaPlayersPresenter(
         } else {
             enabledMediaPlayers.remove(id)
         }
+        showAllowedItemDisabling()
     }
 
     fun onCompleteButtonClicked() {
         viewState.close(mediaPlayers)
+    }
+
+    private fun showAllowedItemDisabling() {
+        viewState.setDisableAllowed(enabledMediaPlayers.size > 1)
     }
 }

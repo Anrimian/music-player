@@ -12,6 +12,9 @@ interface EnabledMediaPlayersView: MvpView {
     @AddToEndSingle
     fun showEnabledMediaPlayers(mediaPlayers: Set<Int>)
 
+    @AddToEndSingle
+    fun setDisableAllowed(allowed: Boolean)
+
     @Skip
     fun close(result: IntArray)
 

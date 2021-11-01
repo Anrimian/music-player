@@ -11,11 +11,11 @@
         android:id="@+id/tvMediaPlayerName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginStart="@dimen/content_internal_margin"
         android:layout_marginTop="@dimen/content_internal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ivDrag"
         app:layout_constraintEnd_toStartOf="@id/swMediaPlayer"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constrainedWidth="true"
@@ -34,6 +34,16 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constrainedWidth="true"
         tools:text="Description"/>
+
+    <ImageView
+        style="@style/ButtonStyle"
+        android:id="@+id/ivDrag"
+        android:src="@drawable/is_drag_handle"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:contentDescription="@string/change_player_priority"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvMediaPlayerName"
+        app:layout_constraintBottom_toBottomOf="@id/tvMediaPlayerDescription"/>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/swMediaPlayer"

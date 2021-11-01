@@ -395,7 +395,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public long getAudioFileMinDurationMillis() {
-        return preferences.getLong(AUDIO_FILE_MIN_DURATION, 15000L);
+        return preferences.getLong(AUDIO_FILE_MIN_DURATION, 10000L);
     }
 
     @Override

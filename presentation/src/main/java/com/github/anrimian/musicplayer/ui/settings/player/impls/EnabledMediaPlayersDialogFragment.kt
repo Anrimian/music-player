@@ -38,12 +38,16 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
     }
 
     override fun showMediaPlayers(mediaPlayers: IntArray) {
-        adapter = MediaPlayersAdapter(mediaPlayers)
+        adapter = MediaPlayersAdapter(mediaPlayers, presenter::onItemEnableStatusChanged)
         viewBinding.rvMediaPlayers.adapter = adapter
     }
 
     override fun showEnabledMediaPlayers(mediaPlayers: Set<Int>) {
+        adapter.setEnabledItems(mediaPlayers)
+    }
 
+    override fun setDisableAllowed(allowed: Boolean) {
+        adapter.setDisableAllowed(allowed)
     }
 
     override fun close(result: IntArray) {

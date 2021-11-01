@@ -4,14 +4,40 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class MediaPlayersAdapter(
-    private val mediaPlayers: IntArray
+    private val mediaPlayers: IntArray,
+    private val onPlayerEnabled: (Int, Boolean) -> Unit
 ): RecyclerView.Adapter<MediaPlayerViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = MediaPlayerViewHolder(parent)
+    private val viewHolders = HashSet<MediaPlayerViewHolder>()
+
+    private var enabledItems: Set<Int> = HashSet()
+    private var isDisableAllowed: Boolean = false
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        MediaPlayerViewHolder(parent, onPlayerEnabled)
 
     override fun onBindViewHolder(holder: MediaPlayerViewHolder, position: Int) {
-        holder.bind(mediaPlayers[position])
+        viewHolders.add(holder)
+
+        val item = mediaPlayers[position]
+        holder.bind(item)
+        holder.setEnabled(enabledItems)
     }
 
     override fun getItemCount() = mediaPlayers.size
+
+    override fun onViewRecycled(holder: MediaPlayerViewHolder) {
+        super.onViewRecycled(holder)
+        viewHolders.remove(holder)
+    }
+
+    fun setEnabledItems(enabledItems: Set<Int>) {
+        this.enabledItems = enabledItems
+        viewHolders.forEach { holder -> holder.setEnabled(enabledItems) }
+    }
+
+    fun setDisableAllowed(allowed: Boolean) {
+        isDisableAllowed = allowed
+        viewHolders.forEach { holder -> holder.setDisableAllowed(allowed) }
+    }
 }
