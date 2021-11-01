@@ -34,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
+import com.github.anrimian.musicplayer.ui.utils.pIntentFlag
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -67,11 +68,11 @@ class MediaSessionHandler(private val context: Context,
                 setCallback(AppMediaSessionCallback())
 
                 val activityIntent = Intent(context, MainActivity::class.java)
-                val pActivityIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
+                val pActivityIntent = PendingIntent.getActivity(context, 0, activityIntent, pIntentFlag())
                 setSessionActivity(pActivityIntent)
 
                 val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON, null, context, AppMediaButtonReceiver::class.java)
-                val pMediaButtonIntent = PendingIntent.getBroadcast(context, 0, mediaButtonIntent, 0)
+                val pMediaButtonIntent = PendingIntent.getBroadcast(context, 0, mediaButtonIntent, pIntentFlag())
                 setMediaButtonReceiver(pMediaButtonIntent)
             }
             subscribeOnPlayQueue()

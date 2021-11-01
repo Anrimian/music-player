@@ -1,21 +1,5 @@
 package com.github.anrimian.musicplayer.ui.widgets.providers;
 
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.widget.RemoteViews;
-
-import androidx.annotation.LayoutRes;
-
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
-import com.github.anrimian.musicplayer.ui.main.MainActivity;
-import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
-import com.github.anrimian.musicplayer.ui.widgets.WidgetDataHolder;
-
 import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
 import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
@@ -33,6 +17,23 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.RANDOM_PLAY_AR
 import static com.github.anrimian.musicplayer.Constants.Arguments.REPEAT_ARG;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
 import static com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater.UPDATE_FROM_INTENT;
+
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.widget.RemoteViews;
+
+import androidx.annotation.LayoutRes;
+
+import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
+import com.github.anrimian.musicplayer.ui.main.MainActivity;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
+import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
+import com.github.anrimian.musicplayer.ui.widgets.WidgetDataHolder;
 
 
 public abstract class BaseWidgetProvider extends AppWidgetProvider {
@@ -129,7 +130,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         PendingIntent pIntentPlayPause = PendingIntent.getBroadcast(context,
                 requestCode,
                 intentPlayPause,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
         widgetView.setOnClickPendingIntent(R.id.iv_play_pause, pIntentPlayPause);
 
         Intent intentSkipToPrevious = new Intent(context, WidgetActionsReceiver.class);
@@ -137,7 +138,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         PendingIntent pIntentSkipToPrevious = PendingIntent.getBroadcast(context,
                 SKIP_TO_PREVIOUS,
                 intentSkipToPrevious,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
         widgetView.setOnClickPendingIntent(R.id.iv_skip_to_previous, pIntentSkipToPrevious);
 
         Intent intentSkipToNext = new Intent(context, WidgetActionsReceiver.class);
@@ -145,7 +146,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         PendingIntent pIntentSkipToNext = PendingIntent.getBroadcast(context,
                 SKIP_TO_NEXT,
                 intentSkipToNext,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
         widgetView.setOnClickPendingIntent(R.id.iv_skip_to_next, pIntentSkipToNext);
 
         Intent intent = new Intent(context, MainActivity.class);
@@ -153,7 +154,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         PendingIntent pIntent = PendingIntent.getActivity(context,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
         widgetView.setOnClickPendingIntent(R.id.widget_view, pIntent);
     }
 

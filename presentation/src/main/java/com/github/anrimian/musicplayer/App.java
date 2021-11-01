@@ -23,7 +23,7 @@ In v0.9.3:
 -select compositions from all volumes
 -glide memory optimization
 -glide save on disc full resolution images
--fix eq state crash
+-fix eq state crash(on attach). And return eq attach logic back?
 -crash here (StorageCompositionsInserter.java:180)
 -cleanup MusicService
 -slidr gesture can't be performed while file scanner is running: constant ui update

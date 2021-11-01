@@ -44,7 +44,8 @@
         <activity android:name=".ui.main.MainActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/AppTheme.VersionSpecific">
+            android:theme="@style/AppTheme.VersionSpecific"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -59,7 +60,8 @@
         <activity android:name=".ui.main.external_player.ExternalPlayerActivity"
             android:launchMode="singleInstance"
             android:theme="@style/DialogActivityTheme"
-            android:excludeFromRecents="true">
+            android:excludeFromRecents="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -96,7 +98,8 @@
             android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc" />
 
-        <receiver android:name=".infrastructure.receivers.AppMediaButtonReceiver">
+        <receiver android:name=".infrastructure.receivers.AppMediaButtonReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
@@ -125,7 +128,8 @@
         <receiver
             android:name=".ui.widgets.providers.WidgetProviderSmall"
             android:icon="@mipmap/ic_launcher_round"
-            android:label="@string/widget_small_name">
+            android:label="@string/widget_small_name"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -138,7 +142,8 @@
         <receiver
             android:name=".ui.widgets.providers.WidgetProviderSmallExt"
             android:icon="@mipmap/ic_launcher_round"
-            android:label="@string/widget_small_ext_name">
+            android:label="@string/widget_small_ext_name"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -151,7 +156,8 @@
         <receiver
             android:name=".ui.widgets.providers.WidgetProviderMedium"
             android:icon="@mipmap/ic_launcher_round"
-            android:label="@string/widget_medium_name">
+            android:label="@string/widget_medium_name"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -162,7 +168,8 @@
         </receiver>
 
         <receiver android:name=".infrastructure.receivers.BluetoothConnectionReceiver"
-            android:enabled="false">
+            android:enabled="false"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
             </intent-filter>

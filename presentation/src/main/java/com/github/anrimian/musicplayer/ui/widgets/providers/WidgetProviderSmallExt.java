@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.ui.widgets.providers;
 
+import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
+import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_SHUFFLE_NODE;
+import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
+
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -10,12 +15,8 @@ import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
-
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_SHUFFLE_NODE;
-import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 
 
 public class WidgetProviderSmallExt extends BaseWidgetProvider {
@@ -65,7 +66,7 @@ public class WidgetProviderSmallExt extends BaseWidgetProvider {
         PendingIntent pIntentChangeShuffleMode = PendingIntent.getBroadcast(context,
                 CHANGE_SHUFFLE_NODE,
                 intentChangeShuffleMode,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
         widgetView.setOnClickPendingIntent(R.id.iv_shuffle_mode, pIntentChangeShuffleMode);
 
         Intent intentChangeRepeatMode = new Intent(context, WidgetActionsReceiver.class);
@@ -73,7 +74,7 @@ public class WidgetProviderSmallExt extends BaseWidgetProvider {
         PendingIntent pIntentChangeRepeatMode = PendingIntent.getBroadcast(context,
                 CHANGE_REPEAT_MODE,
                 intentChangeRepeatMode,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
         widgetView.setOnClickPendingIntent(R.id.iv_repeat_mode, pIntentChangeRepeatMode);
     }
 
