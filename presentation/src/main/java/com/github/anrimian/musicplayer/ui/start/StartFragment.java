@@ -14,7 +14,7 @@ import com.github.anrimian.musicplayer.databinding.FragmentStartBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKtKt;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 import com.github.anrimian.musicplayer.utils.Permissions;
 import com.tbruyelle.rxpermissions3.RxPermissions;
 
@@ -93,7 +93,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
 
     private void onTryAgainButtonClicked() {
         if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Permissions.getFilePermissionName())) {
-            AndroidUtilsKtKt.startAppSettings(requireActivity());
+            AndroidUtilsKt.startAppSettings(requireActivity());
             return;
         }
         presenter.onTryAgainButtonClicked();

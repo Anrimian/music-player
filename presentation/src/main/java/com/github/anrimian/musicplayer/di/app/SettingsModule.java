@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepository
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -94,8 +95,9 @@ public class SettingsModule {
 
     @Provides
     @NonNull
-    LibrarySettingsInteractor librarySettingsInteractor(SettingsRepository settingsRepository) {
-        return new LibrarySettingsInteractor(settingsRepository);
+    LibrarySettingsInteractor librarySettingsInteractor(SettingsRepository settingsRepository,
+                                                        MediaScannerRepository mediaScannerRepository) {
+        return new LibrarySettingsInteractor(settingsRepository, mediaScannerRepository);
     }
 
     @Provides
