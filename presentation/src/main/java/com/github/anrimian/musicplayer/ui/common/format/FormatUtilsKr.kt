@@ -9,9 +9,3 @@ fun getMediaPlayerName(mediaPlayerId: Int) = when(mediaPlayerId) {
     MediaPlayers.EXO_MEDIA_PLAYER -> R.string.exo_media_player
     else -> R.string.android_media_player
 }
-
-@StringRes
-fun getMediaPlayerDescription(mediaPlayerId: Int) = when(mediaPlayerId) {
-    MediaPlayers.EXO_MEDIA_PLAYER -> R.string.exo_media_player_description
-    else -> R.string.android_media_player_description
-}

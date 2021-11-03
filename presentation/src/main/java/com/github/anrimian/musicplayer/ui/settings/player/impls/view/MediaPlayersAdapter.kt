@@ -5,7 +5,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class MediaPlayersAdapter(
     private val mediaPlayers: IntArray,
-    private val onPlayerEnabled: (Int, Boolean) -> Unit
+    private val onPlayerEnabled: (Int, Boolean) -> Unit,
+    private val onDragButtonClick: (RecyclerView.ViewHolder) -> Unit
 ): RecyclerView.Adapter<MediaPlayerViewHolder>() {
 
     private val viewHolders = HashSet<MediaPlayerViewHolder>()
@@ -14,7 +15,7 @@ class MediaPlayersAdapter(
     private var isDisableAllowed: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        MediaPlayerViewHolder(parent, onPlayerEnabled)
+        MediaPlayerViewHolder(parent, onPlayerEnabled, onDragButtonClick)
 
     override fun onBindViewHolder(holder: MediaPlayerViewHolder, position: Int) {
         viewHolders.add(holder)

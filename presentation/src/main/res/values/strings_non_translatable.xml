@@ -21,6 +21,9 @@
     <string name="widget_medium_name" translatable="false">4x2: Medium</string>
     <string name="playback_speed_template" translatable="false">%.2fX</string>
 
+    <string name="android_media_player" translatable="false">Android media player</string>
+    <string name="exo_media_player" translatable="false">Google exo player</string>
+
     <string name="about_app_text" translatable="false"><![CDATA[
         <big><b>What is this app?</b></big>
         <br/>This is a music player that I wrote for myself, in accordance with my vision of how a music player should look like.

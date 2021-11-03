@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="@dimen/content_internal_margin"
+    android:background="?attr/dialogBackground"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -12,46 +13,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/content_internal_margin"
-        android:layout_marginTop="@dimen/content_internal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
-        app:layout_constraintTop_toTopOf="parent"
+        android:maxLines="2"
+        app:layout_constraintTop_toTopOf="@id/ivDrag"
+        app:layout_constraintBottom_toBottomOf="@id/ivDrag"
         app:layout_constraintStart_toEndOf="@id/ivDrag"
         app:layout_constraintEnd_toStartOf="@id/swMediaPlayer"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constrainedWidth="true"
         tools:text="Android media player"/>
 
-    <TextView
-        style="@style/TextStyle.Subtitle"
-        android:id="@+id/tvMediaPlayerDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/content_spacing_vertical_margin"
-        android:layout_marginEnd="@dimen/content_horizontal_margin"
-        app:layout_constraintTop_toBottomOf="@id/tvMediaPlayerName"
-        app:layout_constraintStart_toStartOf="@id/tvMediaPlayerName"
-        app:layout_constraintEnd_toStartOf="@id/swMediaPlayer"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constrainedWidth="true"
-        tools:text="Description"/>
-
     <ImageView
         style="@style/ButtonStyle"
         android:id="@+id/ivDrag"
-        android:src="@drawable/is_drag_handle"
+        android:src="@drawable/ic_drag_handle"
         android:layout_marginStart="@dimen/content_horizontal_margin"
-        android:contentDescription="@string/change_player_priority"
+        android:contentDescription="@null"
+        android:layout_marginTop="@dimen/content_internal_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tvMediaPlayerName"
-        app:layout_constraintBottom_toBottomOf="@id/tvMediaPlayerDescription"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/swMediaPlayer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
-        app:layout_constraintTop_toTopOf="@id/tvMediaPlayerName"
-        app:layout_constraintBottom_toBottomOf="@id/tvMediaPlayerDescription"
+        app:layout_constraintTop_toTopOf="@id/ivDrag"
+        app:layout_constraintBottom_toBottomOf="@id/ivDrag"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

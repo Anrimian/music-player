@@ -96,7 +96,7 @@
     <string name="show_covers_in_notification">Show covers in notification</string>
     <string name="colored_notification">Color notification in cover colors</string>
     <string name="display">Display</string>
-    <string name="decrease_volume_on_notification">Decrease volume when notification received</string>
+    <string name="decrease_volume_on_notification">Decrease volume when notification is received</string>
     <string name="playing">Player</string>
     <string name="error_channel_description">Playing error notifications</string>
     <string name="playing_error">Play error</string>
@@ -238,12 +238,7 @@
     <string name="show_all_audio_files">Show all audio files</string>
     <string name="enabled_media_players">Enabled media players</string>
     <string name="advanced">Advanced</string>
-    <string name="android_media_player">Android media player</string>
-    <string name="exo_media_player">Google exo player</string>
-    <string name="exo_media_player_description">Exo media player by google</string>
-    <string name="android_media_player_description">Default android media player. Can support wider variations of audio files but can be unstable</string>
     <string name="media_players_setting_description">App uses several media players for music playing. Here they can be disabled or changed use priority. All changes will take effect only after application restart.</string>
-    <string name="change_player_priority">Change player priority</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

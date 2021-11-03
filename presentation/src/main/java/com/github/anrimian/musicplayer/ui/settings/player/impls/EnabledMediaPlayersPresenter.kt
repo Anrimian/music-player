@@ -25,7 +25,7 @@ class EnabledMediaPlayersPresenter(
         showAllowedItemDisabling()
     }
 
-    fun onItemMoved() {
+    fun onItemMoved(from: Int, to: Int) {
 
     }
 
@@ -39,7 +39,14 @@ class EnabledMediaPlayersPresenter(
     }
 
     fun onCompleteButtonClicked() {
-        viewState.close(mediaPlayers)
+        val result = IntArray(enabledMediaPlayers.size)
+        var index = 0
+        mediaPlayers.forEach { id ->
+            if (enabledMediaPlayers.contains(id)) {
+                result[index++] = id
+            }
+        }
+        viewState.close(result)
     }
 
     private fun showAllowedItemDisabling() {
