@@ -20,13 +20,13 @@ In v0.9.3:
 -option to choose player implementation priority
 -finish Czech localization
 -finish arabic localization(+slidr, swipe, icons, motion layout)
--select compositions from all volumes
 -glide memory optimization
 -glide save on disc full resolution images
--fix eq state crash(on attach). And return eq attach logic back?
+-return eq attach logic back?
 -crash here (StorageCompositionsInserter.java:180)
+-exo player sound gap on skip
 -cleanup MusicService
--slidr gesture can't be performed while file scanner is running: constant ui update
+-slidr and scroll gesture can't be performed while file scanner is running: constant ui update
 */
 public class App extends Application {
 
