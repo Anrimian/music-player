@@ -146,12 +146,18 @@ public class StorageMusicProvider {
             };
         }
 
-        Uri uri;
-        try {
-            uri = getStorageUri();//TODO select all uri's from all available volumes
-        } catch (UnavailableMediaStoreException e) {
+        //check how it works
+        List<Uri> uris = getStorageUris();
+        if (uris.isEmpty()) {
             return null;
         }
+
+//        Uri uri;
+//        try {
+//            uri = getStorageUri();//try to select all uri's from all available volumes
+//        } catch (UnavailableMediaStoreException e) {
+//            return null;
+//        }
 
         StringBuilder selectionBuilder = new StringBuilder();
         //also display unsupported or corrupted compositions
@@ -170,55 +176,59 @@ public class StorageMusicProvider {
             projection = new String[] { String.valueOf(minAudioDurationMillis), String.valueOf(1) };
         }
 
-        try(Cursor cursor = query(uri, query, selection, projection, null)) {
-            if (cursor == null) {
-                return new LongSparseArray<>();
-            }
-
-            LongSparseArray<StorageAlbum> albums = albumsProvider.getAlbums();
-
-            CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-            LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>(cursor.getCount());
-
-            int artistIndex = getColumnIndex(cursor, Media.ARTIST);
-            int titleIndex = getColumnIndex(cursor, Media.TITLE);
-            int relativePathIndex = -1;
-            int filePathIndex = -1;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                relativePathIndex = getColumnIndex(cursor, Media.RELATIVE_PATH);
-            } else {
-                filePathIndex = getColumnIndex(cursor, Media.DATA);
-            }
-            int displayNameIndex = getColumnIndex(cursor, Media.DISPLAY_NAME);
-            int durationIndex = getColumnIndex(cursor, Media.DURATION);
-            int sizeIndex = getColumnIndex(cursor, Media.SIZE);
-            int idIndex = getColumnIndex(cursor, Media._ID);
-            int albumIdIndex = getColumnIndex(cursor, Media.ALBUM_ID);
-            int dateAddedIndex = getColumnIndex(cursor, Media.DATE_ADDED);
-            int dateModifiedIndex = getColumnIndex(cursor, Media.DATE_MODIFIED);
-
-            while (cursor.moveToNext()) {
-                StorageFullComposition composition = buildStorageComposition(
-                        artistIndex,
-                        titleIndex,
-                        relativePathIndex,
-                        filePathIndex,
-                        displayNameIndex,
-                        durationIndex,
-                        sizeIndex,
-                        idIndex,
-                        albumIdIndex,
-                        dateAddedIndex,
-                        dateModifiedIndex,
-                        cursorWrapper,
-                        albums
-                );
-                if (composition != null) {
-                    compositions.put(composition.getId(), composition);
+        LongSparseArray<StorageFullComposition> compositions = new LongSparseArray<>();
+        for (Uri uri: uris) {
+            try (Cursor cursor = query(uri, query, selection, projection, null)) {
+                if (cursor == null) {
+                    return new LongSparseArray<>();
                 }
+
+                LongSparseArray<StorageAlbum> albums = albumsProvider.getAlbums();
+
+                CursorWrapper cursorWrapper = new CursorWrapper(cursor);
+                LongSparseArray<StorageFullComposition> volumeCompositions = new LongSparseArray<>(cursor.getCount());
+
+                int artistIndex = getColumnIndex(cursor, Media.ARTIST);
+                int titleIndex = getColumnIndex(cursor, Media.TITLE);
+                int relativePathIndex = -1;
+                int filePathIndex = -1;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    relativePathIndex = getColumnIndex(cursor, Media.RELATIVE_PATH);
+                } else {
+                    filePathIndex = getColumnIndex(cursor, Media.DATA);
+                }
+                int displayNameIndex = getColumnIndex(cursor, Media.DISPLAY_NAME);
+                int durationIndex = getColumnIndex(cursor, Media.DURATION);
+                int sizeIndex = getColumnIndex(cursor, Media.SIZE);
+                int idIndex = getColumnIndex(cursor, Media._ID);
+                int albumIdIndex = getColumnIndex(cursor, Media.ALBUM_ID);
+                int dateAddedIndex = getColumnIndex(cursor, Media.DATE_ADDED);
+                int dateModifiedIndex = getColumnIndex(cursor, Media.DATE_MODIFIED);
+
+                while (cursor.moveToNext()) {
+                    StorageFullComposition composition = buildStorageComposition(
+                            artistIndex,
+                            titleIndex,
+                            relativePathIndex,
+                            filePathIndex,
+                            displayNameIndex,
+                            durationIndex,
+                            sizeIndex,
+                            idIndex,
+                            albumIdIndex,
+                            dateAddedIndex,
+                            dateModifiedIndex,
+                            cursorWrapper,
+                            albums
+                    );
+                    if (composition != null) {
+                        volumeCompositions.put(composition.getId(), composition);
+                    }
+                }
+                compositions.putAll(volumeCompositions);
             }
-            return compositions;
         }
+        return compositions;
     }
 
     @Nullable
@@ -564,6 +574,17 @@ public class StorageMusicProvider {
             return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         } else {
             return Media.EXTERNAL_CONTENT_URI;
+        }
+    }
+
+    private List<Uri> getStorageUris() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Set<String> volumes = MediaStore.getExternalVolumeNames(context);
+            List<Uri> uris = new ArrayList<>();
+            volumes.forEach(volume -> uris.add(MediaStore.Audio.Media.getContentUri(volume)));
+            return uris;
+        } else {
+            return asList(Media.EXTERNAL_CONTENT_URI);
         }
     }
 
