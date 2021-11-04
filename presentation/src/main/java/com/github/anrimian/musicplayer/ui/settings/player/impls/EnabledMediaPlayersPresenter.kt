@@ -2,13 +2,16 @@ package com.github.anrimian.musicplayer.ui.settings.player.impls
 
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
+import com.github.anrimian.musicplayer.domain.utils.indexOfOr
 import moxy.MvpPresenter
+import java.util.*
+import kotlin.collections.HashSet
 
 class EnabledMediaPlayersPresenter(
     private val playerSettingsInteractor: PlayerSettingsInteractor
 ): MvpPresenter<EnabledMediaPlayersView>() {
 
-    private val mediaPlayers = intArrayOf(
+    private var mediaPlayers = listOf(
         MediaPlayers.EXO_MEDIA_PLAYER,
         MediaPlayers.ANDROID_MEDIA_PLAYER
     )
@@ -19,6 +22,7 @@ class EnabledMediaPlayersPresenter(
         val enabledMediaPlayers = playerSettingsInteractor.getEnabledMediaPlayers()
         enabledMediaPlayers.forEach(this.enabledMediaPlayers::add)
 
+        mediaPlayers = mediaPlayers.sortedBy { id -> enabledMediaPlayers.indexOfOr(id, mediaPlayers.size) }
         viewState.showMediaPlayers(mediaPlayers)
 
         viewState.showEnabledMediaPlayers(this.enabledMediaPlayers)
@@ -26,7 +30,15 @@ class EnabledMediaPlayersPresenter(
     }
 
     fun onItemMoved(from: Int, to: Int) {
-
+        if (from < to) {
+            for (i in from until to) {
+                swapItems(i, i + 1)
+            }
+        } else {
+            for (i in from downTo to + 1) {
+                swapItems(i, i - 1)
+            }
+        }
     }
 
     fun onItemEnableStatusChanged(id: Int, enabled: Boolean) {
@@ -47,6 +59,11 @@ class EnabledMediaPlayersPresenter(
             }
         }
         viewState.close(result)
+    }
+
+    private fun swapItems(from: Int, to: Int) {
+        Collections.swap(mediaPlayers, from, to)
+        viewState.notifyItemMoved(from, to)
     }
 
     private fun showAllowedItemDisabling() {

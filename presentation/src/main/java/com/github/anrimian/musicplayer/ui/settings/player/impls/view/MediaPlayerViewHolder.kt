@@ -26,13 +26,15 @@ class MediaPlayerViewHolder(
     }
 
     fun setEnabled(enabledItems: Set<Int>) {
-        viewBinding.swMediaPlayer.isChecked = enabledItems.contains(item)
+        val isEnabled = enabledItems.contains(item)
+        viewBinding.swMediaPlayer.isChecked = isEnabled
     }
 
     fun setDisableAllowed(allowed: Boolean) {
+        viewBinding.ivDrag.isEnabled = allowed
+
         val enabled = !viewBinding.swMediaPlayer.isChecked || allowed
         viewBinding.swMediaPlayer.isEnabled = enabled
-        viewBinding.ivDrag.isEnabled = enabled
     }
 
 }

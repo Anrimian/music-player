@@ -7,7 +7,7 @@ import moxy.viewstate.strategy.alias.Skip
 interface EnabledMediaPlayersView: MvpView {
 
     @AddToEndSingle
-    fun showMediaPlayers(mediaPlayers: IntArray)
+    fun showMediaPlayers(mediaPlayers: List<Int>)
 
     @AddToEndSingle
     fun showEnabledMediaPlayers(mediaPlayers: Set<Int>)
@@ -17,5 +17,8 @@ interface EnabledMediaPlayersView: MvpView {
 
     @Skip
     fun close(result: IntArray)
+
+    @Skip
+    fun notifyItemMoved(from: Int, to: Int)
 
 }

@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class MediaPlayersAdapter(
-    private val mediaPlayers: IntArray,
+    private val mediaPlayers: List<Int>,
     private val onPlayerEnabled: (Int, Boolean) -> Unit,
     private val onDragButtonClick: (RecyclerView.ViewHolder) -> Unit
 ): RecyclerView.Adapter<MediaPlayerViewHolder>() {
@@ -23,6 +23,7 @@ class MediaPlayersAdapter(
         val item = mediaPlayers[position]
         holder.bind(item)
         holder.setEnabled(enabledItems)
+        holder.setDisableAllowed(isDisableAllowed)
     }
 
     override fun getItemCount() = mediaPlayers.size

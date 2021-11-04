@@ -15,8 +15,6 @@ import moxy.MvpAppCompatDialogFragment
 import moxy.ktx.moxyPresenter
 
 //add reset button?
-//drag logic
-//do not drag out of recycler view borders
 //check files with unsupported seeking
 class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMediaPlayersView {
 
@@ -35,7 +33,7 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
         val dialog = AlertDialog.Builder(activity)
             .setTitle(R.string.enabled_media_players)
             .setView(viewBinding.root)
-            .setPositiveButton(android.R.string.ok) { _, _ -> presenter.onCompleteButtonClicked() }
+            .setPositiveButton(R.string.apply) { _, _ -> presenter.onCompleteButtonClicked() }
             .setNegativeButton(R.string.close) { _, _ -> }
             .create()
         dialog.show()
@@ -50,7 +48,7 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
         return dialog
     }
 
-    override fun showMediaPlayers(mediaPlayers: IntArray) {
+    override fun showMediaPlayers(mediaPlayers: List<Int>) {
         adapter = MediaPlayersAdapter(
             mediaPlayers,
             presenter::onItemEnableStatusChanged,
@@ -65,6 +63,10 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
 
     override fun setDisableAllowed(allowed: Boolean) {
         adapter.setDisableAllowed(allowed)
+    }
+
+    override fun notifyItemMoved(from: Int, to: Int) {
+        adapter.notifyItemMoved(from, to)
     }
 
     override fun close(result: IntArray) {
