@@ -19,11 +19,11 @@
 
     <TextView
         android:id="@+id/tvCurrentSpeed"
-        style="@style/TextStyleContentSubtitle.Small"
+        style="@style/TextStyleContentSubtitle.Medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:translationY="10dp"
-        app:layout_constraintTop_toTopOf="@id/tvSpeedMin"
+        app:layout_constraintBottom_toBottomOf="@id/tvSpeedMin"
         app:layout_constraintStart_toStartOf="@id/tvSpeedMin"
         app:layout_constraintEnd_toEndOf="@id/tvSpeedMax"
         tools:text="1.00"/>
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_margin"
         android:translationY="10dp"
-        app:layout_constraintTop_toTopOf="@id/tvSpeedMin"
+        app:layout_constraintBottom_toBottomOf="@id/tvSpeedMin"
         app:layout_constraintEnd_toEndOf="@id/rangeSlider"
         tools:text="2.00"/>
 

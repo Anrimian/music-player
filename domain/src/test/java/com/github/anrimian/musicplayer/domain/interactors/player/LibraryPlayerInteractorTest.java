@@ -234,7 +234,7 @@ public class LibraryPlayerInteractorTest {
 
         currentCompositionSubject.onNext(new PlayQueueEvent(null));
 
-        verify(playerCoordinatorInteractor).reset(any());
+        verify(playerCoordinatorInteractor).reset(eq(PlayerType.LIBRARY));
     }
 
     @Test
