@@ -23,7 +23,6 @@ In v0.9.3:
 -glide save on disc full resolution images
 -return eq attach logic back?
 -crash here (StorageCompositionsInserter.java:180)
--exo player sound gap on skip
 -cleanup MusicService
 -slidr and scroll gesture can't be performed while file scanner is running: constant ui update
 */

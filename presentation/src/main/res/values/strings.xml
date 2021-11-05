@@ -226,7 +226,7 @@
 
     <string name="equalizer_initialization_error">Unable to initialize in-app equalizer. Try to restart it.</string>
     <string name="restart">Restart</string>
-    <string name="scan_storage_description">Usually all changes in media storage will appear automatically. But on some devices or system builds it won\'t work. This button runs scan media storage manually.</string>
+    <string name="scan_storage_description">Usually all changes with files on the device will appear automatically. But on some devices or system builds it won\'t work. This button runs file scan manually.</string>
     <string name="scanning_completed">Scanning completed</string>
     <string name="pause_on_zero_volume_level">Stop playing when volume level has been reached zero</string>
     <string name="covers">Covers</string>
@@ -237,7 +237,7 @@
     <string name="file_scanner_state">Scanning file tags: %s</string>
     <string name="show_all_audio_files">Show all audio files</string>
     <string name="enabled_media_players">Enabled media players</string>
-    <string name="advanced">Advanced</string>
+    <string name="advanced_settings">Advanced</string>
     <string name="media_players_setting_description">App uses several media players for music playing. Here they can be disabled or changed use priority. All changes will take effect only after application restart.</string>
 
     <plurals name="compositions_count">
