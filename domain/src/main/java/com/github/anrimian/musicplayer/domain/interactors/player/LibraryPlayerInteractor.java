@@ -392,8 +392,8 @@ public class LibraryPlayerInteractor {
     }
 
     private void onCompositionPlayFinished() {
-        onSeekFinished(0);
         if (settingsRepository.getRepeatMode() == RepeatMode.REPEAT_COMPOSITION) {
+            onSeekFinished(0);
             return;
         }
         playQueueRepository.skipToNext()
