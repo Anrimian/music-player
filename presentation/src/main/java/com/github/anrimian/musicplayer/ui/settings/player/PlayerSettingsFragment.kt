@@ -5,13 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import com.github.anrimian.musicplayer.Constants.Tags.ENABLED_MEDIA_PLAYERS
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.ui.common.format.getMediaPlayerName
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
+import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
@@ -21,6 +25,8 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
     private val presenter by moxyPresenter { Components.getSettingsComponent().playerSettingsPresenter() }
     
     private lateinit var viewBinding: FragmentSettingsPlayerBinding
+
+    private lateinit var enabledMediaPlayersDialogFragmentRunner: DialogFragmentRunner<EnabledMediaPlayersDialogFragment>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,8 +49,14 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         ViewUtils.onCheckChanged(viewBinding.cbPauseOnZeroVolumeLevel, presenter::onPauseOnZeroVolumeLevelChecked)
 
         viewBinding.flEqualizerClickableArea.setOnClickListener { showEqualizerDialog() }
+        viewBinding.flMediaPlayersClickableArea.setOnClickListener { showMediaPlayersSettingScreen() }
 
         SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided)
+
+        enabledMediaPlayersDialogFragmentRunner = DialogFragmentRunner(
+            childFragmentManager,
+            ENABLED_MEDIA_PLAYERS
+        ) { fragment -> fragment.onCompleteListener = presenter::onEnabledMediaPlayersSelected }
     }
 
     override fun showDecreaseVolumeOnAudioFocusLossEnabled(checked: Boolean) {
@@ -63,6 +75,17 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         viewBinding.tvEqualizerState.setText(getEqualizerTypeDescription(type))
     }
 
+    override fun showEnabledMediaPlayers(players: IntArray) {
+        val sb = StringBuilder()
+        players.forEachIndexed { index, id ->
+            sb.append(getString(getMediaPlayerName(id)))
+            if (index < players.size - 1) {
+                sb.append(", ")
+            }
+        }
+        viewBinding.tvMediaPlayersState.text = sb.toString()
+    }
+
     @StringRes
     private fun getEqualizerTypeDescription(type: Int): Int {
         return when (type) {
@@ -74,5 +97,9 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
     private fun showEqualizerDialog() {
         EqualizerDialogFragment().show(childFragmentManager, null)
+    }
+
+    private fun showMediaPlayersSettingScreen() {
+        enabledMediaPlayersDialogFragmentRunner.show(EnabledMediaPlayersDialogFragment())
     }
 }

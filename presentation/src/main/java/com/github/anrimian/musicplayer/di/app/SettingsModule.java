@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsPresenter;
+import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersPresenter;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -97,5 +98,11 @@ public class SettingsModule {
     LibrarySettingsInteractor librarySettingsInteractor(SettingsRepository settingsRepository,
                                                         MediaScannerRepository mediaScannerRepository) {
         return new LibrarySettingsInteractor(settingsRepository, mediaScannerRepository);
+    }
+
+    @Provides
+    @Nonnull
+    EnabledMediaPlayersPresenter enabledMediaPlayersPresenter(PlayerSettingsInteractor playerSettingsInteractor) {
+        return new EnabledMediaPlayersPresenter(playerSettingsInteractor);
     }
 }

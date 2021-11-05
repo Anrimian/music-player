@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
@@ -7,6 +8,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.view.MotionEvent
+import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
 
@@ -31,4 +34,14 @@ fun pIntentFlag(flags: Int = 0): Int = if (Build.VERSION.SDK_INT >= Build.VERSIO
     PendingIntent.FLAG_IMMUTABLE or flags
 } else {
     flags
+}
+
+@SuppressLint("ClickableViewAccessibility")
+fun View.onMotionDown(callback: () -> Unit) {
+    setOnTouchListener { _, event ->
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            callback()
+        }
+        return@setOnTouchListener false
+    }
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/content_internal_margin"
+    android:background="?attr/dialogBackground"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        style="@style/TextStyle.Medium"
+        android:id="@+id/tvMediaPlayerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/content_internal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:maxLines="2"
+        app:layout_constraintTop_toTopOf="@id/ivDrag"
+        app:layout_constraintBottom_toBottomOf="@id/ivDrag"
+        app:layout_constraintStart_toEndOf="@id/ivDrag"
+        app:layout_constraintEnd_toStartOf="@id/swMediaPlayer"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constrainedWidth="true"
+        tools:text="Android media player"/>
+
+    <ImageView
+        style="@style/ButtonStyle"
+        android:id="@+id/ivDrag"
+        android:src="@drawable/ic_drag_handle"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:contentDescription="@null"
+        android:layout_marginTop="@dimen/content_internal_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/swMediaPlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        app:layout_constraintTop_toTopOf="@id/ivDrag"
+        app:layout_constraintBottom_toBottomOf="@id/ivDrag"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

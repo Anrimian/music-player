@@ -71,6 +71,6 @@ class DisplaySettingsPresenter(private val interactor: DisplaySettingsInteractor
 
     private fun onCoversEnabled(enabled: Boolean) {
         viewState.showCoversInNotificationEnabled(enabled)
-        viewState.showShowCoversOnLockScreenEnabled(enabled)
+        viewState.showCoversOnLockScreenEnabled(enabled)
     }
 }

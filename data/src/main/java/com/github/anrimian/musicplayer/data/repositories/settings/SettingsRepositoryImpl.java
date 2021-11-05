@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.data.controllers.music.equalizer.Equalize
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
+import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -54,6 +55,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     private static final String SLEEP_TIMER_TIME = "sleep_timer_time";
     private static final String SLEEP_TIMER_PLAY_LAST = "sleep_timer_play_last";
+
+    private static final String ENABLED_MEDIA_PLAYERS = "enabled_media_players";
 
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
@@ -392,7 +395,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public long getAudioFileMinDurationMillis() {
-        return preferences.getLong(AUDIO_FILE_MIN_DURATION, 15000L);
+        return preferences.getLong(AUDIO_FILE_MIN_DURATION, 10000L);
     }
 
     @Override
@@ -457,6 +460,19 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public Observable<Boolean> getShowAllAudioFilesEnabledObservable() {
         return withDefaultValue(showAllAudioFilesSubject, this::isShowAllAudioFilesEnabled);
+    }
+
+    @Override
+    public int[] getEnabledMediaPlayers() {
+        return preferences.getIntArray(
+                ENABLED_MEDIA_PLAYERS,
+                new int[] { MediaPlayers.EXO_MEDIA_PLAYER, MediaPlayers.ANDROID_MEDIA_PLAYER }
+        );
+    }
+
+    @Override
+    public void setEnabledMediaPlayers(int[] mediaPlayersIds) {
+        preferences.putIntArray(ENABLED_MEDIA_PLAYERS, mediaPlayersIds);
     }
 
     private Order orderFromInt(int order) {

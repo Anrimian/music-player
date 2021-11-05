@@ -144,4 +144,7 @@ public interface SettingsRepository {
 
     Observable<Boolean> getShowAllAudioFilesEnabledObservable();
 
+    int[] getEnabledMediaPlayers();
+
+    void setEnabledMediaPlayers(int[] mediaPlayersIds);
 }

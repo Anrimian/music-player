@@ -80,7 +80,7 @@ class DisplaySettingsFragment : MvpAppCompatFragment(), DisplaySettingsView {
         viewBinding.cbColoredNotification.isEnabled = enabled
     }
 
-    override fun showShowCoversOnLockScreenEnabled(enabled: Boolean) {
+    override fun showCoversOnLockScreenEnabled(enabled: Boolean) {
         viewBinding.cbNotificationOnLockScreen.isEnabled = enabled
     }
 

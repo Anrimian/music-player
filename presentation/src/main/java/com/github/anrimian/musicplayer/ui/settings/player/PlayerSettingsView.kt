@@ -17,4 +17,7 @@ interface PlayerSettingsView : MvpView {
     @AddToEndSingle
     fun showSelectedEqualizerType(type: Int)
 
+    @AddToEndSingle
+    fun showEnabledMediaPlayers(players: IntArray)
+
 }

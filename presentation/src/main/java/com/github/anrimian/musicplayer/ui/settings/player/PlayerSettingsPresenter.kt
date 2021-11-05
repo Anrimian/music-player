@@ -13,34 +13,36 @@ class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.showDecreaseVolumeOnAudioFocusLossEnabled(
-                interactor.isDecreaseVolumeOnAudioFocusLossEnabled
+            interactor.isDecreaseVolumeOnAudioFocusLossEnabled()
         )
-        viewState.showPauseOnAudioFocusLossEnabled(
-            interactor.isPauseOnAudioFocusLossEnabled
-        )
-        viewState.showPauseOnZeroVolumeLevelEnabled(
-            interactor.isPauseOnZeroVolumeLevelEnabled
-        )
+        viewState.showPauseOnAudioFocusLossEnabled(interactor.isPauseOnAudioFocusLossEnabled())
+        viewState.showPauseOnZeroVolumeLevelEnabled(interactor.isPauseOnZeroVolumeLevelEnabled())
+        viewState.showEnabledMediaPlayers(interactor.getEnabledMediaPlayers())
         subscribeOnSelectedEqualizer()
     }
 
     fun onDecreaseVolumeOnAudioFocusLossChecked(checked: Boolean) {
         viewState.showDecreaseVolumeOnAudioFocusLossEnabled(checked)
-        interactor.isDecreaseVolumeOnAudioFocusLossEnabled = checked
+        interactor.setDecreaseVolumeOnAudioFocusLossEnabled(checked)
     }
 
     fun onPauseOnAudioFocusLossChecked(checked: Boolean) {
         viewState.showPauseOnAudioFocusLossEnabled(checked)
-        interactor.isPauseOnAudioFocusLossEnabled = checked
+        interactor.setPauseOnAudioFocusLossEnabled(checked)
     }
 
     fun onPauseOnZeroVolumeLevelChecked(checked: Boolean) {
         viewState.showPauseOnZeroVolumeLevelEnabled(checked)
-        interactor.isPauseOnZeroVolumeLevelEnabled = checked
+        interactor.setPauseOnAudioFocusLossEnabled(checked)
+    }
+
+    fun onEnabledMediaPlayersSelected(mediaPlayers: IntArray) {
+        viewState.showEnabledMediaPlayers(mediaPlayers)
+        interactor.setEnabledMediaPlayers(mediaPlayers)
     }
 
     private fun subscribeOnSelectedEqualizer() {
-        interactor.selectedEqualizerTypeObservable
-                .unsafeSubscribeOnUi(viewState::showSelectedEqualizerType)
+        interactor.getSelectedEqualizerTypeObservable()
+            .unsafeSubscribeOnUi(viewState::showSelectedEqualizerType)
     }
 }

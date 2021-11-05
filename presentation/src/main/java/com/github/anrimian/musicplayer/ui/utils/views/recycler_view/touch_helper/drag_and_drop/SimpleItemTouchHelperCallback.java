@@ -13,17 +13,19 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     private static final float TOP_Z = 8f;
 
     private final boolean horizontalDrag;
+    private final boolean isLongPressDragEnabled;
 
     private OnMovedListener onMovedListener;
     private OnStartDragListener onStartDragListener;
     private OnEndDragListener onEndDragListener;
 
-    public SimpleItemTouchHelperCallback() {
-        this(false);
+    public SimpleItemTouchHelperCallback(boolean isLongPressDragEnabled) {
+        this(false, isLongPressDragEnabled);
     }
 
-    public SimpleItemTouchHelperCallback(boolean horizontalDrag) {
+    public SimpleItemTouchHelperCallback(boolean horizontalDrag, boolean isLongPressDragEnabled) {
         this.horizontalDrag = horizontalDrag;
+        this.isLongPressDragEnabled = isLongPressDragEnabled;
     }
 
     @Override
@@ -73,7 +75,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
     @Override
     public boolean isLongPressDragEnabled() {
-        return true;
+        return isLongPressDragEnabled;
     }
 
     public void setOnMovedListener(OnMovedListener onMovedListener) {

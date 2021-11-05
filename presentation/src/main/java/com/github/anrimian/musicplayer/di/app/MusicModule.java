@@ -142,6 +142,7 @@ class MusicModule {
     @NonNull
     @Singleton
     MusicPlayerController provideMusicPlayerController(UiStateRepository uiStateRepository,
+                                                       SettingsRepository settingsRepository,
                                                        Context context,
                                                        CompositionSourceProvider sourceRepository,
                                                        @Named(UI_SCHEDULER) Scheduler uiScheduler,
@@ -150,6 +151,7 @@ class MusicModule {
                                                        Analytics analytics,
                                                        EqualizerController equalizerController) {
         return new MusicPlayerControllerImpl(uiStateRepository,
+                settingsRepository,
                 context,
                 sourceRepository,
                 uiScheduler,

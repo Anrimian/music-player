@@ -33,6 +33,6 @@ interface DisplaySettingsView : MvpView {
     fun showNotificationCoverStubEnabled(enabled: Boolean)
 
     @AddToEndSingle
-    fun showShowCoversOnLockScreenEnabled(enabled: Boolean)
+    fun showCoversOnLockScreenEnabled(enabled: Boolean)
 
 }
