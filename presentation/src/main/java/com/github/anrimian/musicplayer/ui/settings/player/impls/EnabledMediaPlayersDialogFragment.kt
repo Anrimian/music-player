@@ -14,8 +14,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper
 import moxy.MvpAppCompatDialogFragment
 import moxy.ktx.moxyPresenter
 
-//add reset button?
-//check files with unsupported seeking
 class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMediaPlayersView {
 
     private val presenter by moxyPresenter { Components.getSettingsComponent().enabledMediaPlayersPresenter() }
@@ -33,8 +31,6 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
         val dialog = AlertDialog.Builder(activity)
             .setTitle(R.string.enabled_media_players)
             .setView(viewBinding.root)
-            .setPositiveButton(R.string.apply) { _, _ -> presenter.onCompleteButtonClicked() }
-            .setNegativeButton(R.string.close) { _, _ -> }
             .create()
         dialog.show()
 
@@ -44,6 +40,10 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
         callback.setOnMovedListener(presenter::onItemMoved)
         itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(viewBinding.rvMediaPlayers)
+
+        viewBinding.btnApply.setOnClickListener { presenter.onCompleteButtonClicked() }
+        viewBinding.btnClose.setOnClickListener { dismissAllowingStateLoss() }
+        viewBinding.btnReset.setOnClickListener { presenter.onResetButtonClicked() }
 
         return dialog
     }

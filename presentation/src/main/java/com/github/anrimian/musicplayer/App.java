@@ -17,7 +17,6 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
 /*
 In v0.9.3:
--option to choose player implementation priority
 -finish Czech localization
 -finish arabic localization(+slidr, swipe, icons, motion layout)
 -glide memory optimization

@@ -11,10 +11,13 @@ class EnabledMediaPlayersPresenter(
     private val playerSettingsInteractor: PlayerSettingsInteractor
 ): MvpPresenter<EnabledMediaPlayersView>() {
 
-    private var mediaPlayers = listOf(
+    private val defaultMediaPlayers = intArrayOf(
         MediaPlayers.EXO_MEDIA_PLAYER,
         MediaPlayers.ANDROID_MEDIA_PLAYER
     )
+
+    private lateinit var mediaPlayers: List<Int>
+
     private val enabledMediaPlayers = HashSet<Int>()
 
     override fun onFirstViewAttach() {
@@ -22,7 +25,7 @@ class EnabledMediaPlayersPresenter(
         val enabledMediaPlayers = playerSettingsInteractor.getEnabledMediaPlayers()
         enabledMediaPlayers.forEach(this.enabledMediaPlayers::add)
 
-        mediaPlayers = mediaPlayers.sortedBy { id -> enabledMediaPlayers.indexOfOr(id, mediaPlayers.size) }
+        mediaPlayers = defaultMediaPlayers.sortedBy { id -> enabledMediaPlayers.indexOfOr(id, defaultMediaPlayers.size) }
         viewState.showMediaPlayers(mediaPlayers)
 
         viewState.showEnabledMediaPlayers(this.enabledMediaPlayers)
@@ -61,6 +64,10 @@ class EnabledMediaPlayersPresenter(
         viewState.close(result)
     }
 
+    fun onResetButtonClicked() {
+        viewState.close(defaultMediaPlayers)
+    }
+
     private fun swapItems(from: Int, to: Int) {
         Collections.swap(mediaPlayers, from, to)
         viewState.notifyItemMoved(from, to)
@@ -69,4 +76,6 @@ class EnabledMediaPlayersPresenter(
     private fun showAllowedItemDisabling() {
         viewState.setDisableAllowed(enabledMediaPlayers.size > 1)
     }
+
+
 }
