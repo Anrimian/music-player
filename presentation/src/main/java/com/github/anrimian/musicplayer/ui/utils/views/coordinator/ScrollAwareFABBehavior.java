@@ -42,7 +42,15 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
                                        @NonNull View target,
                                        int axes,
                                        int type) {
-        return axes == ViewCompat.SCROLL_AXIS_VERTICAL;
+        boolean verticalAxes = axes == ViewCompat.SCROLL_AXIS_VERTICAL;
+        //handle android 12 overscroll animation, if we always return true - it wouldn't work
+        if (verticalAxes && directTargetChild instanceof RecyclerView) {
+            RecyclerView recyclerView = (RecyclerView) directTargetChild;
+            if (!recyclerView.canScrollVertically(1) || !recyclerView.canScrollVertically(-1)) {
+                return false;
+            }
+        }
+        return verticalAxes;
     }
 
     @Override
@@ -77,7 +85,6 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
                                @NonNull int[] consumed) {
         super.onNestedScroll(coordinatorLayout, fab, target, dxConsumed, dyConsumed, dxUnconsumed,
                 dyUnconsumed, type, consumed);
-        if (type == ViewCompat.TYPE_TOUCH) {
             if (dyConsumed > 0 && hideAnimator == null) {
                 if (showAnimator != null ) {
                     showAnimator.cancel();
@@ -125,6 +132,5 @@ public class ScrollAwareFABBehavior extends FloatingActionButton.Behavior {
                 });
                 showAnimator.start();
             }
-        }
     }
 }
