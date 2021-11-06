@@ -254,7 +254,7 @@
     <string name="show_covers_on_lock_screen">Показывать обложку на экране блокировки и в android auto</string>
     <string name="equalizer_initialization_error">Не удалось запустить эквалайзер. Попробуйте снова.</string>
     <string name="restart">Перезапустить</string>
-    <string name="scan_storage_description">Обычно все изменения файлами на устройстве показываются автоматически. Но на некоторых устройствах или версиях системы это не работает. Эта кнопка запускает сканирование файлов вручную.</string>
+    <string name="scan_storage_description">Обычно все изменения c файлами на устройстве отображаются автоматически. Но на некоторых устройствах или версиях системы это не работает. Эта кнопка запускает сканирование файлов вручную.</string>
     <string name="scanning_completed">Сканирование завершено</string>
     <string name="pause_on_zero_volume_level">Останавливать воспроизведение если уровень громкости опускается до нуля</string>
     <string name="covers">Обложки</string>
