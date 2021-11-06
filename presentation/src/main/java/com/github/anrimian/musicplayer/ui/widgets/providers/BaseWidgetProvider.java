@@ -24,8 +24,10 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.widget.RemoteViews;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.LayoutRes;
 
 import com.github.anrimian.musicplayer.R;
@@ -189,6 +191,15 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 repeatMode);
 
         appWidgetManager.updateAppWidget(widgetId, widgetView);
+    }
+
+    @ColorRes
+    protected int getWidgetAccentColorRes() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return android.R.color.system_accent1_500;
+        } else {
+            return R.color.colorAccent;
+        }
     }
 
     @LayoutRes

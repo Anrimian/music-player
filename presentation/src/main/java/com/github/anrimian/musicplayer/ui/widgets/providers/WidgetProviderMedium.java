@@ -54,7 +54,7 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
 
         if (enabled) {
             int color = ContextCompat.getColor(context,
-                    randomPlayModeEnabled? R.color.colorAccent: R.color.primary_button_color);
+                    randomPlayModeEnabled? getWidgetAccentColorRes(): R.color.primary_button_color);
             widgetView.setInt(R.id.iv_shuffle_mode, "setColorFilter", color);
         }
 
