@@ -45,7 +45,6 @@
     <string name="add_to_playlist_error_template">Не вдалось додати композицію в плейлист: %1$s</string>
     <string name="delete_composition_error_template">Не вдалось видалити композицію: %1$s</string>
     <string name="add_to_playlist_success_template">Композиція \"%1$s\" додана до плейлиста \"%2$s\"</string>
-    <string name="play_list_is_empty">Плейлист пустий</string>
     <string name="save_as_play_list">Зберегти як плейлист</string>
     <string name="cancel">Скасування</string>
     <string name="deleting">Видалення</string>
@@ -221,6 +220,22 @@
     <string name="rewind">Перемотка назад</string>
     <string name="fast_forward">Перемотка вперед</string>
     <string name="show_covers_on_lock_screen">Показувати обкладинку на екрані блокування і в Android Auto</string>
+    <string name="equalizer_initialization_error">Не вдалося запустити еквалайзер. Спробуйте знову.</string>
+    <string name="restart">Перезапустити</string>
+    <string name="scan_storage_description">Зазвичай всі зміни з файлами на пристрої відображаються автоматично. Але на деяких пристроях чи версіях системи це не працює. Ця кнопка запускає сканування файлів вручну.</string>
+    <string name="scanning_completed">Сканування завершене</string>
+    <string name="pause_on_zero_volume_level">Зупиняти відтворення якщо рівень гучності опускається до нуля</string>
+    <string name="covers">Обкладинки</string>
+    <string name="display_composition_file_name">Показувати ім\'я файлу замість назви композиції</string>
+    <string name="name_order">За іменем</string>
+    <string name="file_name_order">За іменем файла</string>
+    <string name="play_list_is_empty">Плейлист пустий. Композиції можуть бути додані в плейлист на екранах бібліотеки</string>
+    <string name="file_scanner_state">Сканування тегів файла: %s</string>
+    <string name="show_all_audio_files">Показувати всі аудіо файли</string>
+    <string name="enabled_media_players">Активні медіа плеєри</string>
+    <string name="advanced_settings">Розширені налаштування</string>
+    <string name="media_players_setting_description">Додаток використовує для програвання музики декілька музичних програвачів. Тут їх можна відключити чи змінити пріоритети використання. Всі зміни набудуть чинності лише після перезапуску додатка.</string>
+
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиція</item>
