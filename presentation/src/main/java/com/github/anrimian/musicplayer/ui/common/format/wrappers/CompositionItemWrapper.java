@@ -33,7 +33,6 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
@@ -76,10 +75,6 @@ public class CompositionItemWrapper {
             iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
         }
         clickableItem.setOnClickListener(v -> onClickListener.call(composition));
-
-        if (btnActionsMenu != null) {
-            CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
-        }
     }
 
     public void bind(Composition composition, boolean showCovers) {

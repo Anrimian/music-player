@@ -5,7 +5,7 @@
         <item name="android:layout_height">@dimen/button_expand_size</item>
         <item name="android:scaleType">centerInside</item>
         <item name="android:background">?actionBarItemBackground</item>
-        <item name="android:tint">@color/color_button</item>
+        <item name="tint">@color/color_button</item>
     </style>
 
     <style name="ButtonStyle.Main">
@@ -17,7 +17,7 @@
     <style name="ButtonStyle.Menu">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="android:tint">@color/color_button_secondary</item>
+        <item name="tint">@color/color_button_secondary</item>
     </style>
 
     <style name="BrightButtonStyle">

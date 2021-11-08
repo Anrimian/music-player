@@ -1,5 +1,13 @@
 package com.github.anrimian.musicplayer.ui.editor.album;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.ALBUM_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.NAME_TAG;
+import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
+import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +20,6 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.ActivityAlbumEditBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
@@ -26,14 +33,6 @@ import com.google.android.material.snackbar.Snackbar;
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static com.github.anrimian.musicplayer.Constants.Arguments.ALBUM_ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.AUTHOR_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEditorView {
 
@@ -75,9 +74,6 @@ public class AlbumEditorActivity extends MvpAppCompatActivity implements AlbumEd
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(R.string.edit_album_tags);
         }
-
-        CompatUtils.setMainButtonStyle(viewBinding.ivNameEdit);
-        CompatUtils.setMainButtonStyle(viewBinding.ivAuthorEdit);
 
         viewBinding.changeAuthorClickableArea.setOnClickListener(v -> presenter.onChangeAuthorClicked());
         viewBinding.changeNameClickableArea.setOnClickListener(v -> presenter.onChangeNameClicked());

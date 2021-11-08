@@ -17,7 +17,6 @@ import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.utils.FileUtils
-import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
@@ -120,15 +119,6 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
             R.attr.playerPanelBackground,
             android.R.attr.colorBackground
         )
-
-        CompatUtils.setMainButtonStyle(viewBinding.ivCoverEdit)
-        CompatUtils.setMainButtonStyle(viewBinding.ivFilenameEdit)
-        CompatUtils.setMainButtonStyle(viewBinding.ivTitleEdit)
-        CompatUtils.setMainButtonStyle(viewBinding.ivAuthorEdit)
-        CompatUtils.setMainButtonStyle(viewBinding.ivAlbumEdit)
-        CompatUtils.setMainButtonStyle(viewBinding.ivAlbumArtist)
-        CompatUtils.setMainButtonStyle(viewBinding.ivLyrics)
-        CompatUtils.setMainButtonStyle(viewBinding.ivGenreEdit)
 
         val fm = supportFragmentManager
         errorHandler = ErrorHandler(

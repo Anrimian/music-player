@@ -334,12 +334,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
         seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart);
         seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
 
-        CompatUtils.setMainButtonStyle(ivPlayPause);
-        CompatUtils.setMainButtonStyle(ivSkipToNext);
-        CompatUtils.setMainButtonStyle(ivSkipToPrevious);
-        CompatUtils.setMainButtonStyle(btnRandomPlay);
-        CompatUtils.setMainButtonStyle(btnRepeatMode);
-        CompatUtils.setSecondaryButtonStyle(btnActionsMenu);
         CompatUtils.setOutlineTextButtonStyle(panelBinding.tvPlaybackSpeed);
         CompatUtils.setOutlineTextButtonStyle(panelBinding.tvSleepTime);
 

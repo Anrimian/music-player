@@ -69,8 +69,6 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         viewBinding = ActivityExternalPlayerBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
 
-        CompatUtils.setMainButtonStyle(viewBinding.ivPlayPause);
-        CompatUtils.setMainButtonStyle(viewBinding.ivRepeatMode);
         CompatUtils.setOutlineTextButtonStyle(viewBinding.tvPlaybackSpeed);
 
         seekBarViewWrapper = new SeekBarViewWrapper(viewBinding.sbTrackState);

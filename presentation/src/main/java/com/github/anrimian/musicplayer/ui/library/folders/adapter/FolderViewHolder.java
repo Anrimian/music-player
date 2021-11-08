@@ -1,20 +1,5 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 
-import android.graphics.Color;
-import android.view.ViewGroup;
-
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.databinding.ItemStorageFolderBinding;
-import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
-import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
-import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
-
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
 import static com.github.anrimian.musicplayer.domain.Payloads.FILES_COUNT;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
@@ -22,6 +7,20 @@ import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
+
+import android.graphics.Color;
+import android.view.ViewGroup;
+
+import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.databinding.ItemStorageFolderBinding;
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+
+import java.util.List;
+
+import javax.annotation.Nonnull;
 
 
 /**
@@ -59,7 +58,6 @@ class FolderViewHolder extends FileViewHolder {
             });
         }
         viewBinding.btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));
-        CompatUtils.setSecondaryButtonStyle(viewBinding.btnActionsMenu);
     }
 
     @Override
