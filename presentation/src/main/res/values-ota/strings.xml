@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="open_drawer">Çekmeceyi Aç</string>
+    <string name="close_drawer">Çekmeceyi kapat</string>
+    <string name="try_again">Tekrar deneyin</string>
+    <string name="can_not_work_without_file_permission">Uygulama, dosya izni olmadan çalışamaz</string>
+    <string name="close">Kapat</string>
+    <string name="library">Kütüphane</string>
+    <string name="settings">Ayarlar</string>
+    <string name="internal_app_error">Dahili uygulama hatası</string>
+    <string name="unexpected_error">Hata: %s</string>
+    <string name="file_not_found">Dosya bulunamadı</string>
+    <string name="compositions_on_device_not_found">Cihazda şarkı bulunamadı</string>
+    <string name="compositions_and_folders_for_search_not_found">Arama sonuçlarıyla eşleşen kompozisyonlar ve klasörler bulunamadı</string>
+    <string name="compositions_for_search_not_found">Eşleşen arama sonucu bulunamadı</string>
+    <string name="foreground_channel_description">Ön plan oyuncu bildirimi</string>
+    <string name="previous_track">Önceki parça</string>
+    <string name="next_track">Sonraki parça</string>
+    <string name="folder">Klasör</string>
+    <string name="content_description_menu">Geçerli kompozisyon menüsünü aç</string>
+    <string name="content_description_menu_template">Kompozisyon menüsünü aç: %s</string>
+    <string name="share">Gönder</string>
+    <string name="content_description_repeat_mode">Tekrar modu menüsü</string>
+    <string name="content_description_shuffle">Karıştırma modu</string>
+    <string name="unknown_author">Bilinmeyen yazar</string>
+    <string name="delete">Sil</string>
+    <string name="delete_folder">Klasörü sil</string>
+    <string name="add_date_order">Eklenme tarihine göre</string>
+    <string name="order">Sıralama</string>
+    <string name="folders">Klasörler</string>
+    <string name="compositions">Şarkılar</string>
+    <string name="play_lists">Oynatma Listeleri</string>
+    <string name="play_lists_on_device_not_found">Cihazda oynatma listesi bulunamadı</string>
+    <string name="name">Ad</string>
+    <string name="create">Oluştur</string>
+    <string name="create_playlist">Çalma listesi oluştur</string>
+    <string name="create_playlist_error_template">Oynatma listesi oluşturulamıyor: %1$s</string>
+    <string name="change_playlist_name_error_template">Oynatma listesi adı değiştirilemiyor: %1$s</string>
+    <string name="name_can_not_be_empty">ad boş olamaz</string>
+    <string name="create_progress">Oluşturuluyor…</string>
+    <string name="play_list_with_this_name_already_exists">bu ada sahip oynatma listesi zaten var</string>
+    <string name="add_to_playlist">Oynatma listesine ekle</string>
+    <string name="select_play_list">Çalma listesi seçin</string>
+    <string name="add_to_playlist_error_template">Şarkı oynatma listesine eklenemiyor: %1$s</string>
+    <string name="delete_composition_error_template">Şarkı silinemiyor: %1$s</string>
+    <string name="add_to_playlist_success_template">Şarkı \"%1$s\" \"%2$s\" oynatma listesine eklendi</string>
+    <string name="save_as_play_list">Oynatma listesi olarak kaydet</string>
+    <string name="cancel">İptal</string>
+    <string name="deleting">Siliniyor</string>
+    <string name="delete_composition_template">Şarkı \"%1$s\" silinsin mi?  Bu işlem geri alınamaz.</string>
+    <string name="delete_empty_folder">\"%s\" klasörü silinsin mi?  Bu işlem geri alınamaz.</string>
+    <string name="delete_folder_template">%2$s \"%1$s\" klasöründen silinsin mi?  Bu işlem geri alınamaz.</string>
+    <string name="delete_template">\"%1$s\" silinsin mi?  Bu işlem geri alınamaz.</string>
+    <string name="delete_composition_success">Şarkı \"%1$s\" silindi</string>
+    <string name="search">Ara</string>
+    <string name="play_queue">Oynatma sırası</string>
+    <string name="pause">Duraklat</string>
+    <string name="play">Oynat</string>
+    <string name="play_all">Tümünü oynat</string>
+    <string name="repeat_playlist">Oynatma sırasını tekrarla</string>
+    <string name="repeat_composition">Şarkıyı tekrarla</string>
+    <string name="do_not_repeat">Tekrar etmeyin</string>
+    <string name="delete_from_queue">Oynatma sırasından sil</string>
+    <string name="delete_from_play_list">Oynatma listesinden sil</string>
+    <string name="add_item_to_playlist_error_template">Şarkı oynatma listesine eklenemiyor: %1$s</string>
+    <string name="delete_from_playlist_success_template">Şarkı \"%1$s\" \"%2$s\" oynatma listesinden silindi</string>
+    <string name="delete_playlist_template">Oynatma listesi \"%1$s\" silinsin mi?</string>
+    <string name="play_list_delete_error">Oynatma listesi silinemiyor: %1$s </string>
+    <string name="play_not_exists">Oynatma listesi yok</string>
+    <string name="play_list_deleted">Oynatma listesi \"%1$s\" silindi</string>
+    <string name="can_not_receive_file_for_send">Gönderilecek dosyalar alınamıyor: %1$s</string>
+    <string name="position_template">Mevcut oynatma süresi: %1$s</string>
+    <string name="now_playing_template">Şu anda oynatılıyor: %1$s.  Oynatma sırasını açın.</string>
+    <string name="play_all_in_folder">Tümünü klasörde oynat</string>
+    <string name="delete_playlist">Oynatma listesini sil</string>
+    <string name="storage_timeout_error_message">
+         Cihaz medya depolama alanı yanıt vermiyor.
+         Bu gerçekten garip ve nadir bir sorundur.
+         Cihazı yeniden başlatmayı deneyin, belki bu sorunu çözecektir.
+    </string>
+    <string name="select_all">Tümünü seç</string>
+    <string name="file_uri_extract_error">
+         Gönderilecek \"%s\" kompozisyonunun sistem yolu alınamıyor.
+         Muhtemelen özel sistem klasöründedir.
+     </string>
+    <string name="loading_progress">Yükleniyor…</string>
+    <string name="alphabetical_order_desc_title">Z - A</string>
+    <string name="add_date_order_desc_title">Önce daha sonra</string>
+    <string name="play_action">Oynat</string>
+    <string name="play_next">Sonrakini oynat</string>
+    <string name="add_to_play_queue">Sıraya ekle</string>
+    <string name="edit_name">Yeniden adlandır</string>
+    <string name="change">Değiştir</string>
+    <string name="no_current_composition">Geçerli bir kompozisyon yok</string>
+    <string name="show_covers">Kapakları göster</string>
+    <string name="show_covers_in_notification">Kapakları bildirimde göster</string>
+    <string name="colored_notification">Kapak renklerinde renk bildirimi</string>
+    <string name="display">Ekran</string>
+    <string name="decrease_volume_on_notification">Bildirim alındığında sesi azalt</string>
+    <string name="playing">Oyuncu</string>
+    <string name="error_channel_description">Hata bildirimlerini oynatma</string>
+    <string name="playing_error">Oynatma hatası</string>
+    <string name="no_file_permission">Dosya izni yok</string>
+    <string name="about_app">Hakkında</string>
+    <string name="version_template">Sürüm %1$s(Derleme %2$d)</string>
+    <string name="theme">Tema</string>
+    <string name="dark_theme">Koyu</string>
+    <string name="edit">Düzenle</string>
+    <string name="edit_tags">Etiketleri düzenle</string>
+    <string name="change_author_name">Sanatçıyı değiştir</string>
+    <string name="change_title">Başlığı değiştir</string>
+    <string name="title">Başlık</string>
+    <string name="filename">Dosya adı</string>
+    <string name="artist">Sanatçı</string>
+    <string name="change_file_name">Dosya adını değiştir</string>
+    <string name="copied_message">Metin kopyalandı</string>
+    <string name="folder_name">Klasör adı</string>
+    <string name="rename_folder">Klasörü yeniden adlandır</string>
+    <string name="cut">Kes</string>
+    <string name="copy">Kopyala</string>
+    <string name="paste">Yapıştır</string>
+    <string name="paste_in_new_folder">Yeni klasöre yapıştırın</string>
+    <string name="move_in_the_same_folder_error">Hedef ve kaynak klasör eşleşiyor</string>
+    <string name="file_already_exists">Bu ada sahip dosya zaten var</string>
+    <string name="new_folder">Yeni klasör</string>
+    <string name="play_on_connect_bluetooth_device">Bluetooth cihazı bağlandığında çalmaya başlayın</string>
+    <string name="headset">Kulaklık</string>
+    <string name="scan_storage">Medya deposunu yeniden tara</string>
+    <string name="auto_night_mode">Otomatik gece modu</string>
+    <string name="unsupported_format_hint">Desteklenmeyen biçim</string>
+    <string name="artists">Sanatçılar</string>
+    <string name="no_artists_in_library">Kitaplıkta sanatçı yok</string>
+    <string name="albums">Albümler</string>
+    <string name="no_albums_in_library">Kitaplıkta albüm yok</string>
+    <string name="genres">Türler</string>
+    <string name="no_genres_in_library">Kitaplıkta tür yok</string>
+    <string name="no_items_in_genre">Seçili türde beste yok</string>
+    <string name="no_compositions">Kompozisyon yok</string>
+    <string name="change_album_name">Albümü değiştir</string>
+    <string name="album">Albüm</string>
+    <string name="genre">Tür</string>
+    <string name="change_composition_genre">Kompozisyon türünü değiştir</string>
+    <string name="change_name">Adı değiştir</string>
+    <string name="rename_progress">Yeniden adlandırılıyor…</string>
+    <string name="album_artist">Albüm sanatçısı</string>
+    <string name="change_album_artist">Albüm sanatçısını değiştir</string>
+    <string name="edit_album_tags">Albüm etiketlerini düzenle</string>
+    <string name="by_composition_count">Kompozisyon sayısına göre</string>
+    <string name="by_duration">Süreye göre</string>
+    <string name="longest_first">Önce en uzunu</string>
+    <string name="more_first">Önce daha fazlası</string>
+    <string name="artist_already_exists">Bu ada sahip sanatçı zaten var</string>
+    <string name="album_already_exists">Bu ada sahip albüm zaten var</string>
+    <string name="genre_already_exists">Bu ada sahip tür zaten var</string>
+    <string name="remove_genre">Türü kaldır</string>
+    <string name="add_composition_genre">Tür ekle</string>
+    <string name="add">Ekle</string>
+    <string name="edit_genre">Türü düzenle</string>
+    <string name="genre_removed_message">Tür \"%s\" kaldırıldı</string>
+    <string name="exclude_from_scanning">Gizle</string>
+    <string name="ignored_folder_added">Klasör \'%s\' hariç tutulan klasör listesine eklendi</string>
+    <string name="excluded_folders">Hariç tutulan klasörler</string>
+    <string name="remove_excluded_folder">Dışlanan klasörü kaldır</string>
+    <string name="ignored_folder_removed">Hariç tutulan klasör kaldırıldı</string>
+    <string name="moving_and_destination_folders_matches">Taşıma ve hedef klasörler eşleşiyor</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Bu ada sahip klasör hedef klasörde zaten var</string>
+    <string name="move_progress">Taşınıyor…</string>
+    <string name="delete_progress">Siliniyor…</string>
+    <string name="play_next_message_single">Ardından Beste \"%s\" çalınacak</string>
+    <string name="added_to_queue_message_single">Composition \"%s\" oyun sırasının sonuna eklendi</string>
+    <string name="queue_item_removed">Sıra öğesi kaldırıldı</string>
+    <string name="by_size">Boyuta göre</string>
+    <string name="largest_first">Önce en büyüğü</string>
+    <string name="log_info_text">Önemli olmayan bazı hatalar oluştu ve bunlarla ilgili bilgiler günlük dosyasına kaydedildi.  Uygulama, günlükleri otomatik olarak göndermez, ancak bunları manuel olarak gönderebilirsiniz.  Bu, uygulama kalitesini artırmaya yardımcı olacaktır.  Geçerli günlük dosyası boyutu: %d KB</string>
+    <string name="view_file">Dosyayı görüntüle</string>
+    <string name="send_file">Dosya gönder</string>
+    <string name="delete_file">Dosyayı sil</string>
+    <string name="log_file_deleted">Günlük dosyası silindi</string>
+    <string name="pick_email_app_to_send">Göndermek için bir e-posta uygulaması seçin</string>
+    <string name="clear_play_queue">Oynatma sırasını temizle</string>
+    <string name="no_excluded_folders">Taramanın dışında bırakılan klasörler burada görünecek</string>
+    <string name="keep_playing_after_window_close">Pencere kapandıktan sonra oynamaya devam et</string>
+    <string name="unknown_play_error">Bilinmeyen oynatma hatası</string>
+    <string name="equalizer">Ekolayzır</string>
+    <string name="system_equalizer">Sistem ekolayzır</string>
+    <string name="no_equalizer">Hiçbiri</string>
+    <string name="external_equalizer_description">Sistem ekolayzır çalışması harici ekolayzır uygulamasına bağlıdır ve bazı uygulamalarla çalışmayabilir</string>
+    <string name="external_equalizer_not_found">Harici ekolayzır uygulaması bulunamadı</string>
+    <string name="open">Aç</string>
+    <string name="cover">Kapak</string>
+    <string name="change_cover">Kapağı değiştir</string>
+    <string name="pick_from_gallery">Galeriden seç</string>
+    <string name="remove_cover">Kapağı kaldır</string>
+    <string name="editor_timeout_error">Etiket düzenleyici zaman aşımına uğradı.  Dosya biçimi desteklenmiyor olabilir</string>
+    <string name="change_lyrics">Şarkı sözlerini değiştir</string>
+    <string name="lyrics">Şarkı Sözleri</string>
+    <string name="check_tags_error">Kompozisyon etiketleri kontrol edilemedi: %s</string>
+    <string name="changing_file_progress">Dosya değiştiriliyor…</string>
+    <string name="android_r_edit_file_permission_denied">
+         Android 11\'den dosyaları düzenlemek ve silmek, açık sistem izni gerektirir
+     </string>
+    <string name="error_report">Hata raporu</string>
+    <string name="critical_error_report_message">Önemli bir hata oluştu ve bu uygulama nedeniyle başlatılamıyor.  Bu hataların ortaya çıkması son derece istenmeyen bir durumdur.  Uygulama herhangi bir bilgiyi otomatik olarak göndermez, ancak hata günlüğü olan dosyayı e-posta ile manuel olarak gönderebilirsiniz.  Bu, bu hatayı düzeltmeye yardımcı olacaktır.</string>
+    <string name="error_report_message">Önemli bir hata oluştu.  Uygulama herhangi bir bilgiyi otomatik olarak göndermez, ancak hata günlüğü olan dosyayı e-posta ile manuel olarak gönderebilirsiniz.  Bu, bu hatayı düzeltmeye yardımcı olacaktır.</string>
+    <string name="show_error_report_dialog_on_start">Uygulama kilitlendikten sonra uygulama başlatıldığında hata raporu iletişim kutusunu göster</string>
+    <string name="do_not_show_confirm_delete_dialog">Uygulamayı silmek için iletişim kutusunu göster</string>
+    <string name="app_equalizer">Uygulama ekolayzırı</string>
+    <string name="presets">Ön ayarlar</string>
+    <string name="playback_speed">Oynatma hızı</string>
+    <string name="reset">Sıfırla</string>
+    <string name="apply">Uygula</string>
+    <string name="sleep_timer">Uyku zamanlayıcısı</string>
+    <string name="start">Başlat</string>
+    <string name="resume">Devam et</string>
+    <string name="sleep_timer_message">Çalma şurada durdurulacak:</string>
+    <string name="stop">Durdur</string>
+    <string name="exclude_compositions_with_duration_less_than">Besteleri taramanın dışında tut</string>
+    <string name="with_duration_less_than">Süresi %s\'den az olan</string>
+    <string name="pause_on_audiofocus_loss">Arama, müzik/video oynatma vb. sırasında oynatmayı durdurun.</string>
+    <string name="show_cover_stub_in_notification">Kapak bulunamadığında bildirimde kapak saplamasını göster</string>
+    <string name="write_to_this_is_not_allowed">Bu dosyayı değiştirme izni yok.  Dosya yöneticisini deneyin.</string>
+    <string name="shuffle_all_and_play">Tümünü karıştır ve oynat</string>
+    <string name="rewind">Geri Sar</string>
+    <string name="fast_forward">Hızlı ileri sarma</string>
+    <string name="show_covers_on_lock_screen">Kilit ekranında ve android auto\'da kapakları göster</string>
+    <string name="equalizer_initialization_error">Uygulama içi ekolayzer başlatılamıyor.  Yeniden başlatmayı deneyin.</string>
+    <string name="restart">Yeniden başlat</string>
+    <string name="scan_storage_description">Genellikle, cihazdaki dosyalarda yapılan tüm değişiklikler otomatik olarak görünür.  Ancak bazı cihazlarda veya sistem yapılarında çalışmayacaktır.  Bu düğme, dosya taramasını manuel olarak çalıştırır.</string>
+    <string name="scanning_completed">Tarama tamamlandı</string>
+    <string name="pause_on_zero_volume_level">Ses düzeyi sıfıra ulaştığında çalmayı bırakın</string>
+    <string name="covers">Kapaklar</string>
+    <string name="display_composition_file_name">Başlık yerine kompozisyon dosyası adını görüntüle</string>
+    <string name="name_order">Ada göre</string>
+    <string name="file_name_order">Dosya adına göre</string>
+    <string name="play_list_is_empty">Oynatma listesi boş.  Kitaplık ekranlarındaki çalma listelerine besteler eklenebilir.</string>
+    <string name="file_scanner_state">Dosya etiketleri taranıyor: %s</string>
+    <string name="show_all_audio_files">Tüm ses dosyalarını göster</string>
+    <string name="enabled_media_players">Etkin medya oynatıcılar</string>
+    <string name="advanced_settings">Gelişmiş</string>
+    <string name="media_players_setting_description">Uygulama, müzik çalmak için birkaç medya oynatıcı kullanır.  Burada devre dışı bırakılabilir veya kullanım önceliği değiştirilebilir.  Tüm değişiklikler yalnızca uygulama yeniden başlatıldıktan sonra yürürlüğe girecek.</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s şarkı</item>
+        <item quantity="other">Şarkılar %1$s</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s şarkı</item>
+        <item quantity="other">Şarkılar %1$s</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s dosya</item>
+        <item quantity="other">%1$s dosya</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s albüm</item>
+        <item quantity="other">%1$s albüm</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">sonraki %s şarkı çalınacak</item>
+        <item quantity="other">%s şarkı daha sonra çalınacak</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s şarkı oynatma sırasının sonuna eklendi</item>
+        <item quantity="other">%s şarkı çalma sırasının sonuna eklendi</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d şarkı çalma listesine eklendi\"%2$s\"</item>
+        <item quantity="other">çalma listesine eklenen şarkılar %1$d \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d şarkı çalma listesinden silindi \"%2$s\"</item>
+        <item quantity="other">çalma listesinden silinen şarkılar %1$d \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d şarkı silindi</item>
+        <item quantity="other">%1$d şarkı silindi</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d saniye</item>
+        <item quantity="other">%1$d saniye</item>
+    </plurals>
+
+</resources>
