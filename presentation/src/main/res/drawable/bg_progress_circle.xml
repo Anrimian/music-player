@@ -11,7 +11,8 @@
                 android:shape="ring"
                 android:angle="0"
                 android:type="sweep"
-                android:thicknessRatio="12">
+                android:thicknessRatio="12"
+                android:useLevel="true"><!-- this line fixes the issue for lollipop api 21 -->
                 <solid android:color="?attr/colorAccent"/>
             </shape>
         </rotate>
