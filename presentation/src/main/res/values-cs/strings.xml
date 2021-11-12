@@ -247,43 +247,43 @@
     </plurals>
 
     <plurals name="compositions_count_dativ">
-        <item quantity="one">%1$s písni</item>
-        <item quantity="few">%1$s písněm</item>
+        <item quantity="one">%1$s píseň</item>
+        <item quantity="few">%1$s písně</item>
         <item quantity="other">%1$s písním</item>
     </plurals>
 
     <plurals name="files_count">
         <item quantity="one">%1$s soubor</item>
-        <item quantity="few">%1$s souborů</item>
-        <item quantity="other">%1$s soubory</item>
+        <item quantity="few">%1$s soubory</item>
+        <item quantity="other">%1$s souborů</item>
     </plurals>
 
     <plurals name="albums_count">
         <item quantity="one">%1$s album</item>
         <item quantity="few">%1$s alba</item>
-        <item quantity="other">%1$s alby</item>
+        <item quantity="other">%1$s alb</item>
     </plurals>
 
     <plurals name="play_next_message">
         <item quantity="one">%s píseň bude přehrána jako další</item>
-        <item quantity="few">%s písně bude přehráno jako dalších</item>
+        <item quantity="few">%s písně budou přehrány jako dalších</item>
         <item quantity="other">%s písní bude přehráno jako dalších</item>
     </plurals>
 
     <plurals name="added_to_queue_message">
-        <item quantity="one">%s píseň přídána na konec fronty přehrávání</item>
-        <item quantity="few">%s písně přídány na konec fronty přehrávání</item>
-        <item quantity="other">%s písní přídáno na konec fronty přehrávání</item>
+        <item quantity="one">%s píseň přidána na konec fronty přehrávání</item>
+        <item quantity="few">%s písně přidány na konec fronty přehrávání</item>
+        <item quantity="other">%s písní přidáno na konec fronty přehrávání</item>
     </plurals>
 
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d píseň přidána do seznamu skladeb \"%2$s\"</item>
-        <item quantity="few">%1$d písně přídány do seznamu skladeb \"%2$s\"</item>
-        <item quantity="other">%1$d písní přídáno do seznamu skladeb \"%2$s\"</item>
+        <item quantity="few">%1$d písně přidány do seznamu skladeb \"%2$s\"</item>
+        <item quantity="other">%1$d písní přidáno do seznamu skladeb \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_from_playlist_count_success_template">
-        <item quantity="one">%1$d písní smazáno ze seznamu skladeb \"%2$s\"</item>
+        <item quantity="one">%1$d píseň smazána ze seznamu skladeb \"%2$s\"</item>
         <item quantity="few">%1$d písně smazány ze seznamu skladeb \"%2$s\"</item>
         <item quantity="other">%1$d písní smazáno ze seznamu skladeb \"%2$s\"</item>
     </plurals>
