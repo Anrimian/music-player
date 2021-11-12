@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="open_drawer">Otevřít dok aplikací</string>
+    <string name="close_drawer">Zavřít dok aplikací</string>
+    <string name="try_again">Zkusit znovu</string>
+    <string name="can_not_work_without_file_permission">Aplikace nemůže pracovat bez oprávnění přístupu k úložišti</string>
+    <string name="close">Zavřít</string>
+    <string name="library">Knihovna</string>
+    <string name="settings">Nastavení</string>
+    <string name="internal_app_error">Interní chyba aplikace</string>
+    <string name="unexpected_error">Chyba: %s</string>
+    <string name="file_not_found">Soubor nenalezen</string>
+    <string name="compositions_on_device_not_found">Na zařízení nebyla nalezena žádná skladba</string>
+    <string name="compositions_and_folders_for_search_not_found">Skladby a složky odpovídající výsledkům hledání nebyly nalezeny</string>
+    <string name="compositions_for_search_not_found">Nebyly nalezeny žádné odpovídající výsledky vyhledávání</string>
+    <string name="foreground_channel_description">Oznámení přehrávače při běhu na popředí</string>
+    <string name="previous_track">Předchozí skladba</string>
+    <string name="next_track">Další skladba</string>
+    <string name="folder">Složka</string>
+    <string name="content_description_menu">Otevřít aktuální nabdku skladby</string>
+    <string name="content_description_menu_template">Otevřít nabidku skladby: %s</string>
+    <string name="share">Odeslat</string>
+    <string name="content_description_repeat_mode">Nabídka režimu opakování</string>
+    <string name="content_description_shuffle">Režim náhodného přehrávání</string>
+    <string name="unknown_author">Neznámý autor</string>
+    <string name="delete">Smazat</string>
+    <string name="delete_folder">Smazat složku</string>
+    <string name="add_date_order">Podle data přídání</string>
+    <string name="order">Třídění</string>
+    <string name="folders">Složky</string>
+    <string name="compositions">Skladby</string>
+    <string name="play_lists">Seznamy skladeb</string>
+    <string name="play_lists_on_device_not_found">Nebyly nalezeny žádné seznamy skladeb na zařízení</string>
+    <string name="name">Název</string>
+    <string name="create">Vytvořit</string>
+    <string name="create_playlist">Vytvořit seznam skladeb</string>
+    <string name="create_playlist_error_template">Nelze vytvořit seznam skladeb: %1$s</string>
+    <string name="change_playlist_name_error_template">Nelze změnit název seznamu skladeb: %1$s</string>
+    <string name="name_can_not_be_empty">Název nemůže být prázdný</string>
+    <string name="create_progress">Vytvářím…</string>
+    <string name="play_list_with_this_name_already_exists">Seznam skladeb s tímto názvem již existuje</string>
+    <string name="add_to_playlist">Přidat do seznamu skladeb</string>
+    <string name="select_play_list">Vybrat seznam skladeb</string>
+    <string name="add_to_playlist_error_template">Nelze přidat píseň do seznamu skladeb: %1$s</string>
+    <string name="delete_composition_error_template">Nelze smazat skladbu: %1$s</string>
+    <string name="add_to_playlist_success_template">Skladba \"%1$s\" byla přidána do seznamu skladeb \"%2$s\"</string>
+    <string name="save_as_play_list">Uložit jako seznam skladeb</string>
+    <string name="cancel">Zrušit</string>
+    <string name="deleting">Mažu</string>
+    <string name="delete_composition_template">Smazat skladbu \"%1$s\"? Tuto akci nelze vrátit.</string>
+    <string name="delete_empty_folder">Smazat složku \"%s\"? Tuto akci nelze vrátit.</string>
+    <string name="delete_folder_template">Smazat %2$s ze složky \"%1$s\"? Tuto akci nelze vrátit.</string>
+    <string name="delete_template">Smazat \"%1$s\"? Tuto akci nelze vrátit.</string>
+    <string name="delete_composition_success">Skladba \"%1$s\" byla smazána</string>
+    <string name="search">Hledat</string>
+    <string name="play_queue">Fronta přehrávání</string>
+    <string name="pause">Pozastavit</string>
+    <string name="play">Přehrát</string>
+    <string name="play_all">Přehrát vše</string>
+    <string name="repeat_playlist">Přehrát znovu frontu přehrávání</string>
+    <string name="repeat_composition">Opakovat píseň</string>
+    <string name="do_not_repeat">Neopakovat</string>
+    <string name="delete_from_queue">Smazat z fronty přehrávání</string>
+    <string name="delete_from_play_list">Smazat ze seznamu skladeb</string>
+    <string name="add_item_to_playlist_error_template">Nelze přidat píseň do seznamu skladeb: %1$s</string>
+    <string name="delete_from_playlist_success_template">Skladba \"%1$s\"smazána ze seznamu skladeb \"%2$s\"</string>
+    <string name="delete_playlist_template">Smazat seznam skladeb \"%1$s\"?</string>
+    <string name="play_list_delete_error">Nelze smazat seznam skladeb: %1$s </string>
+    <string name="play_not_exists">Seznam skladeb neexistuje</string>
+    <string name="play_list_deleted">Seznam skladeb \"%1$s\" byl smazán</string>
+    <string name="can_not_receive_file_for_send">Nelze připravit skladbu k odeslání: %1$s</string>
+    <string name="position_template">Aktuální hrací doba: %1$s</string>
+    <string name="now_playing_template">Nyní se přehrává: %1$s. Otevřít frontu přehrávání</string>
+    <string name="play_all_in_folder">Přehrát vše ve složce</string>
+    <string name="delete_playlist">Smazat seznam skladeb</string>
+    <string name="storage_timeout_error_message">
+        Úložistě zařízení neodpovídá.
+        To je velmi zvláštní a neobvyklé.
+        Zkuste restartovat zařízení, možná to pomůže.
+    </string>
+    <string name="select_all">Vybrat vše</string>
+    <string name="file_uri_extract_error">
+        Nelze získat systémovou cestu pro skladbu \"%s\" k odeslání.
+        Možná je ve vyhrazené systémové složce.
+    </string>
+    <string name="loading_progress">Nahrávám…</string>
+    <string name="alphabetical_order_desc_title">Z - A</string>
+    <string name="add_date_order_desc_title">Později přidané první</string>
+    <string name="play_action">Přehrát</string>
+    <string name="play_next">Přehrát další</string>
+    <string name="add_to_play_queue">Přidat do fronty přehrávání</string>
+    <string name="edit_name">Přejmenovat</string>
+    <string name="change">Změnit</string>
+    <string name="no_current_composition">Žádná současná skladba</string>
+    <string name="show_covers">Zobrazit přebaly</string>
+    <string name="show_covers_in_notification">Zobrazit přebaly v oznámení</string>
+    <string name="colored_notification">Zbarvit oznámení podle barvy přebalu</string>
+    <string name="display">Zobrazení</string>
+    <string name="decrease_volume_on_notification">Zeslabit při příjmu oznámení</string>
+    <string name="playing">Přehrávač</string>
+    <string name="error_channel_description">Zobrazit oznámení při chybě přehrávání</string>
+    <string name="playing_error">Chyba přehrávání</string>
+    <string name="no_file_permission">Žádné souborové oprávnění</string>
+    <string name="about_app">O aplikaci</string>
+    <string name="version_template">Verze %1$s(Build %2$d)</string>
+    <string name="theme">Barevné téma</string>
+    <string name="dark_theme">Tmavé</string>
+    <string name="edit">Upravit</string>
+    <string name="edit_tags">Upravit značky</string>
+    <string name="change_author_name">Změnit umělce</string>
+    <string name="change_title">Změnit název</string>
+    <string name="title">Název</string>
+    <string name="filename">Název souboru</string>
+    <string name="artist">Umělec</string>
+    <string name="change_file_name">Změnit název souboru</string>
+    <string name="copied_message">Text zkopírován</string>
+    <string name="folder_name">Název složky</string>
+    <string name="rename_folder">Přejmenovat složku</string>
+    <string name="cut">Vyjmout</string>
+    <string name="copy">Kopírovat</string>
+    <string name="paste">Vložit</string>
+    <string name="paste_in_new_folder">Vložit do nového adresáře</string>
+    <string name="move_in_the_same_folder_error">Zdrojová a cílová složka je stejná</string>
+    <string name="file_already_exists">Soubor s tímto názvem již existuje</string>
+    <string name="new_folder">Nová složka</string>
+    <string name="play_on_connect_bluetooth_device">Začít přehrávat po připojení zařízení Bluetooth</string>
+    <string name="headset">Sluchátka</string>
+    <string name="scan_storage">Znovu prohledat úložiště médií</string>
+    <string name="auto_night_mode">Automatický noční režim</string>
+    <string name="unsupported_format_hint">Nepodporovaný formát</string>
+    <string name="artists">Umělci</string>
+    <string name="no_artists_in_library">V knihovně nejsou žádní umělci</string>
+    <string name="albums">Alba</string>
+    <string name="no_albums_in_library">V knihovně nejsou žádná alba</string>
+    <string name="genres">Žánry</string>
+    <string name="no_genres_in_library">V knihovně nejsou žádné žánry</string>
+    <string name="no_items_in_genre">Vybraný žánr neobsahuje žádné skladby</string>
+    <string name="no_compositions">Žádné skladby</string>
+    <string name="change_album_name">Změnit album</string>
+    <string name="album">Album</string>
+    <string name="genre">Žánr</string>
+    <string name="change_composition_genre">Změnit žánr skladby</string>
+    <string name="change_name">Změnit název</string>
+    <string name="rename_progress">Přejmenovávám…</string>
+    <string name="album_artist">Umělec alba</string>
+    <string name="change_album_artist">Změnit umělce alba</string>
+    <string name="edit_album_tags">Změnit štítky alba</string>
+    <string name="by_composition_count">Podle počtu skladeb</string>
+    <string name="by_duration">Podle doby trvání</string>
+    <string name="longest_first">Nejdelší první</string>
+    <string name="more_first">Více obsahu první</string>
+    <string name="artist_already_exists">Umělci s tímto názvem již existují</string>
+    <string name="album_already_exists">Alba s tímto názvem již existují</string>
+    <string name="genre_already_exists">Žánry s tímto názvem již existují</string>
+    <string name="remove_genre">Odstranit žánr</string>
+    <string name="add_composition_genre">Přidat žánr</string>
+    <string name="add">Přidat</string>
+    <string name="edit_genre">Změnit žánr</string>
+    <string name="genre_removed_message">Žánr \"%s\" byl odstraněn</string>
+    <string name="exclude_from_scanning">Skrýt</string>
+    <string name="ignored_folder_added">Složka \'%s\' byla přidána do seznamu vyloučených složek</string>
+    <string name="excluded_folders">Vyloučené složky</string>
+    <string name="remove_excluded_folder">Odstranit vyloučenou složku</string>
+    <string name="ignored_folder_removed">Vyloučená složka byla odstraněna</string>
+    <string name="moving_and_destination_folders_matches">Zdrojová a cílová složka je stejná</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder"> Složka s tímto názvem již existuje v cílové složce</string>
+    <string name="move_progress">Přesouvám…</string>
+    <string name="delete_progress">Mažu…</string>
+    <string name="play_next_message_single">Skladba \"%s\" se přehraje jako další</string>
+    <string name="added_to_queue_message_single">Skladba \"%s\" přidána na konec fronty přehrávání</string>
+    <string name="queue_item_removed">Položka byla odebrána z fronty přehrávání</string>
+    <string name="by_size">Podle velikosti souboru</string>
+    <string name="largest_first">Největší první</string>
+    <string name="log_info_text">Vyskytly se nějaké nezávažné chyby a informace byly nahrány do protokolu. Aplikace neodesílá záznamy automaticky, ale můžete je odeslat ručně. Takto pmůžete zlepšit kvalitu aplikace. Aktuální velikost souboru: %d KB</string>
+    <string name="view_file">Zobrazit soubor</string>
+    <string name="send_file">Odeslat soubor</string>
+    <string name="delete_file">Smazat soubor</string>
+    <string name="log_file_deleted">Soubor protokolu byl smazán</string>
+    <string name="pick_email_app_to_send">Vyberte která aplikace odešle email</string>
+    <string name="clear_play_queue">Vyčistit frontu přehrávání</string>
+    <string name="no_excluded_folders">Soubory vyloučené z prohledávání se zobrazí zde</string>
+    <string name="keep_playing_after_window_close">Pokračovat v přehrávání i po zavření okna</string>
+    <string name="unknown_play_error">Neznámá chyba v přehrávání</string>
+    <string name="equalizer">Ekvalizér</string>
+    <string name="system_equalizer">Systémový ekvalizér</string>
+    <string name="no_equalizer">Žádný</string>
+    <string name="external_equalizer_description">Funkce systémového ekvalizéru závisí na externí aplikaci a nemusí správně fungovat s některými aplikacemi</string>
+    <string name="external_equalizer_not_found">Aplikace externího ekvalizéru nebyla nalezena</string>
+    <string name="open">Otevřít</string>
+    <string name="cover">Přebal</string>
+    <string name="change_cover">Změnit přebal</string>
+    <string name="pick_from_gallery">Vybrat z galerie</string>
+    <string name="remove_cover">Odstranit přebal</string>
+    <string name="editor_timeout_error">Editor štítků nefunguje. Možná je formát souboru nepodporovaný</string>
+    <string name="change_lyrics">Změnit text písně</string>
+    <string name="lyrics">Text písně</string>
+    <string name="check_tags_error">Nešlo zkontrolovat štítky skladby: %s</string>
+    <string name="changing_file_progress">Měním soubor…</string>
+    <string name="android_r_edit_file_permission_denied">
+        Od verze Android 11 vyžaduje úprava a mazání souborů výslovné povolení povolení
+    </string>
+    <string name="error_report">Nahlásit chybu</string>
+    <string name="critical_error_report_message">Nastala kritická chyba a aplikaci nelze spustit. Tato chyba je velmi nežádoucí. Aplikace automaticky neodesílá žádná data, ale můžete manuálně odeslat emailem soubor protokolu. Takto pomůžete k odstranění této chyby.</string>
+    <string name="error_report_message">Nastala kritická chyba. Aplikace automaticky neodesílá žádná data, ale můžete manuálně odeslat emailem soubor protokolu. Takto pomůžete k odstranění této chyby.</string>
+    <string name="show_error_report_dialog_on_start">Zobrazit chybové hlášení při startu aplikace po pádu aplikace.</string>
+    <string name="do_not_show_confirm_delete_dialog">Nezobrazovat okno aplikace pro potvrzení mazání</string>
+    <string name="app_equalizer">Aplikace ekvalizéru</string>
+    <string name="presets">Předvolby</string>
+    <string name="playback_speed">Rychlost přehrávání</string>
+    <string name="reset">Resetovat</string>
+    <string name="apply">Použít</string>
+    <string name="sleep_timer">Časovač vypnutí</string>
+    <string name="start">Start</string>
+    <string name="resume">Obnovit</string>
+    <string name="sleep_timer_message">Přehrávání skončí za:</string>
+    <string name="stop">Zastavit</string>
+    <string name="exclude_compositions_with_duration_less_than">Vyloučit skladby z vyhledávání</string>
+    <string name="with_duration_less_than">S dobou přehrávání menší než %s</string>
+    <string name="pause_on_audiofocus_loss">Zastavit přehrávání během hovoru, přehrávání videa nebo hudby a podobně</string>
+    <string name="show_cover_stub_in_notification">Zobrazit náhradní přebal v oznámení pokud přebal není nalezen</string>
+    <string name="write_to_this_is_not_allowed">Bez oprávnění nelze změnit tento soubor. Zkuste správce souborů.</string>
+    <string name="shuffle_all_and_play">Zamíchat vše a přehrát</string>
+    <string name="rewind">Vrátit</string>
+    <string name="fast_forward">Přetočit dopředu</string>
+    <string name="show_covers_on_lock_screen">Zobrazit přebal na zamykací obrazovce a v Android Auto</string>
+    <string name="equalizer_initialization_error">Nepodařilo se spustit zabudovany ekvalizér. Zkuste ho restartovat.</string>
+    <string name="restart">Restartovat</string>
+    <string name="scan_storage_description">Obvykle se změny souborů na zařízení zobrazí automaticky. Na některých zařízeních se to nemusí stát. Toto tlačítko spustí ručně skenování souborů.</string>
+    <string name="scanning_completed">Skenování dokončeno</string>
+    <string name="pause_on_zero_volume_level">Zastavit přehrávání při úplném ztlumení hlasitosti</string>
+    <string name="covers">Přebaly</string>
+    <string name="display_composition_file_name">Zobrazit jméno souboru skladby místo titulu</string>
+    <string name="name_order">Podle jména</string>
+    <string name="file_name_order">Podle jména souboru</string>
+    <string name="play_list_is_empty">Fronta přehrávání je prázdná. Skladby můžete přidat do front na obrazovce Knihovny.</string>
+    <string name="file_scanner_state">Skenuji štítky souboru: %s</string>
+    <string name="show_all_audio_files">Zobrazit všechny zvukové soubory</string>
+    <string name="enabled_media_players">Povolené přehrávače médií</string>
+    <string name="advanced_settings">Pokročilé</string>
+    <string name="media_players_setting_description">Aplikace používá mnoho přehrávačů médií pro přehrávání. Zde je můžete zakázat nebo jim změnit prioritu. Změny se projeví po restartování aplikace.</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s píseň</item>
+        <item quantity="few">%1$s písně</item>
+        <item quantity="other">%1$s písní</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s písni</item>
+        <item quantity="few">%1$s písněm</item>
+        <item quantity="other">%1$s písním</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s soubor</item>
+        <item quantity="few">%1$s souborů</item>
+        <item quantity="other">%1$s soubory</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s album</item>
+        <item quantity="few">%1$s alba</item>
+        <item quantity="other">%1$s alby</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s píseň bude přehrána jako další</item>
+        <item quantity="few">%s písně bude přehráno jako dalších</item>
+        <item quantity="other">%s písní bude přehráno jako dalších</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s píseň přídána na konec fronty přehrávání</item>
+        <item quantity="few">%s písně přídány na konec fronty přehrávání</item>
+        <item quantity="other">%s písní přídáno na konec fronty přehrávání</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d píseň přidána do seznamu skladeb \"%2$s\"</item>
+        <item quantity="few">%1$d písně přídány do seznamu skladeb \"%2$s\"</item>
+        <item quantity="other">%1$d písní přídáno do seznamu skladeb \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d písní smazáno ze seznamu skladeb \"%2$s\"</item>
+        <item quantity="few">%1$d písně smazány ze seznamu skladeb \"%2$s\"</item>
+        <item quantity="other">%1$d písní smazáno ze seznamu skladeb \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d píseň vymazána</item>
+        <item quantity="few">%1$d písně smazány</item>
+        <item quantity="other">%1$d písní smazáno</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d sekunda</item>
+        <item quantity="few">%1$d sekundy</item>
+        <item quantity="other">%1$d sekund</item>
+    </plurals>
+
+</resources>
