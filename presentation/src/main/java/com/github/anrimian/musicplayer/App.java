@@ -22,7 +22,6 @@ In v0.9.3:
 -return eq attach logic back? - check sound
 -crash here (StorageCompositionsInserter.java:180)
 -cleanup MusicService
--slidr and scroll gesture can't be performed while file scanner is running: constant ui update
 */
 //-rtl support(+slidr, swipe, icons, motion layout)
 public class App extends Application {

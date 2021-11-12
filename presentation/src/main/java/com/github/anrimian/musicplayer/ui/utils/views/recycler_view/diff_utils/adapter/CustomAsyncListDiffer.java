@@ -1,21 +1,25 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter;
 
+
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.AdapterListUpdateCallback;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.ListUpdateCallback;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 
 /**
@@ -58,7 +62,7 @@ import java.util.concurrent.Executor;
  *     {@literal @}Override
  *     public void onCreate(Bundle savedState) {
  *         super.onCreate(savedState);
- *         MyViewModel viewModel = ViewModelProviders.of(this).get(MyViewModel.class);
+ *         MyViewModel viewModel = new ViewModelProvider(this).get(MyViewModel.class);
  *         RecyclerView recyclerView = findViewById(R.id.user_list);
  *         UserAdapter adapter = new UserAdapter();
  *         viewModel.usersList.observe(this, list -> adapter.submitList(list));
@@ -109,8 +113,7 @@ public class CustomAsyncListDiffer<T> {
     private final ListUpdateCallback mUpdateCallback;
     @SuppressWarnings("WeakerAccess") /* synthetic access */
     final AsyncDifferConfig<T> mConfig;
-    @SuppressWarnings("WeakerAccess") /* synthetic access */
-    final Executor mMainThreadExecutor;
+    Executor mMainThreadExecutor;
 
     private static class MainThreadExecutor implements Executor {
         final Handler mHandler = new Handler(Looper.getMainLooper());
@@ -121,7 +124,25 @@ public class CustomAsyncListDiffer<T> {
         }
     }
 
+    // TODO: use MainThreadExecutor from supportlib once one exists
     private static final Executor sMainThreadExecutor = new CustomAsyncListDiffer.MainThreadExecutor();
+
+    /**
+     * Listener for when the current List is updated.
+     *
+     * @param <T> Type of items in List
+     */
+    public interface ListListener<T> {
+        /**
+         * Called after the current List has been updated.
+         *
+         * @param previousList The previous list.
+         * @param currentList The new current list.
+         */
+        void onCurrentListChanged(@NonNull List<T> previousList, @NonNull List<T> currentList);
+    }
+
+    private final List<androidx.recyclerview.widget.AsyncListDiffer.ListListener<T>> mListeners = new CopyOnWriteArrayList<>();
 
     /**
      * Convenience for
@@ -131,7 +152,6 @@ public class CustomAsyncListDiffer<T> {
      * @param adapter Adapter to dispatch position updates to.
      * @param diffCallback ItemCallback that compares items to dispatch appropriate animations when
      *
-     * @param recyclerView
      * @see DiffUtil.DiffResult#dispatchUpdatesTo(RecyclerView.Adapter)
      */
     public CustomAsyncListDiffer(RecyclerView recyclerView,
@@ -145,8 +165,6 @@ public class CustomAsyncListDiffer<T> {
      * Create a AsyncListDiffer with the provided config, and ListUpdateCallback to dispatch
      * updates to.
      *
-     *
-     * @param recyclerView
      * @param listUpdateCallback Callback to dispatch updates to.
      * @param config Config to define background work Executor, and DiffUtil.ItemCallback for
      *               computing List diffs.
@@ -211,13 +229,40 @@ public class CustomAsyncListDiffer<T> {
      */
     @SuppressWarnings("WeakerAccess")
     public void submitList(@Nullable final List<T> newList) {
+        submitList(newList, null);
+    }
+
+    /**
+     * Pass a new List to the AdapterHelper. Adapter updates will be computed on a background
+     * thread.
+     * <p>
+     * If a List is already present, a diff will be computed asynchronously on a background thread.
+     * When the diff is computed, it will be applied (dispatched to the {@link ListUpdateCallback}),
+     * and the new List will be swapped in.
+     * <p>
+     * The commit callback can be used to know when the List is committed, but note that it
+     * may not be executed. If List B is submitted immediately after List A, and is
+     * committed directly, the callback associated with List A will not be run.
+     *
+     * @param newList The new List.
+     * @param commitCallback Optional runnable that is executed when the List is committed, if
+     *                       it is committed.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public void submitList(@Nullable final List<T> newList,
+                           @Nullable final Runnable commitCallback) {
         // incrementing generation means any currently-running diffs are discarded when they finish
         final int runGeneration = ++mMaxScheduledGeneration;
 
         if (newList == mList) {
             // nothing to do (Note - still had to inc generation, since may have ongoing work)
+            if (commitCallback != null) {
+                commitCallback.run();
+            }
             return;
         }
+
+        final List<T> previousList = mReadOnlyList;
 
         // fast simple remove all
         if (newList == null) {
@@ -227,6 +272,7 @@ public class CustomAsyncListDiffer<T> {
             mReadOnlyList = Collections.emptyList();
             // notify last, after list is updated
             mUpdateCallback.onRemoved(0, countRemoved);
+            onCurrentListChanged(previousList, commitCallback);
             return;
         }
 
@@ -236,6 +282,7 @@ public class CustomAsyncListDiffer<T> {
             mReadOnlyList = Collections.unmodifiableList(newList);
             // notify last, after list is updated
             mUpdateCallback.onInserted(0, newList.size());
+            onCurrentListChanged(previousList, commitCallback);
             return;
         }
 
@@ -302,7 +349,7 @@ public class CustomAsyncListDiffer<T> {
                     @Override
                     public void run() {
                         if (mMaxScheduledGeneration == runGeneration) {
-                            latchList(newList, result);
+                            latchList(newList, result, commitCallback);
                         }
                     }
                 });
@@ -311,25 +358,66 @@ public class CustomAsyncListDiffer<T> {
     }
 
     @SuppressWarnings("WeakerAccess") /* synthetic access */
-    void latchList(@NonNull List<T> newList, @NonNull DiffUtil.DiffResult diffResult) {
+    void latchList(
+            @NonNull List<T> newList,
+            @NonNull DiffUtil.DiffResult diffResult,
+            @Nullable Runnable commitCallback) {
+        final List<T> previousList = mReadOnlyList;
         mList = newList;
         // notify last, after list is updated
         mReadOnlyList = Collections.unmodifiableList(newList);
 
+        //if we are on 0 position and list size had changed, scroll bar after update
         RecyclerView.LayoutManager lm = recyclerView.getLayoutManager();
-        Parcelable recyclerViewState = getRecyclerViewState(lm);
+        LinearLayoutManager llm = null;
+        int position = -1;
+        if (lm instanceof LinearLayoutManager) {
+            llm = (LinearLayoutManager) lm;
+            position = llm.findFirstVisibleItemPosition();
+        }
+
         diffResult.dispatchUpdatesTo(mUpdateCallback);
-        if (lm != null && recyclerViewState != null) {
-            recyclerView.post(() -> lm.onRestoreInstanceState(recyclerViewState));
+        onCurrentListChanged(previousList, commitCallback);
+
+        if (llm != null && position == 0 && diffResult.convertOldPositionToNew(0) != 0) {
+            RecyclerViewUtils.scrollToPosition(recyclerView,
+                    llm,
+                    0,
+                    true);
         }
     }
 
-    @Nullable
-    private Parcelable getRecyclerViewState(RecyclerView.LayoutManager lm) {
-        Parcelable recyclerViewState = null;
-        if (lm != null) {
-            recyclerViewState = lm.onSaveInstanceState();
+    private void onCurrentListChanged(@NonNull List<T> previousList,
+                                      @Nullable Runnable commitCallback) {
+        // current list is always mReadOnlyList
+        for (androidx.recyclerview.widget.AsyncListDiffer.ListListener<T> listener : mListeners) {
+            listener.onCurrentListChanged(previousList, mReadOnlyList);
         }
-        return recyclerViewState;
+        if (commitCallback != null) {
+            commitCallback.run();
+        }
+    }
+
+    /**
+     * Add a ListListener to receive updates when the current List changes.
+     *
+     * @param listener Listener to receive updates.
+     *
+     * @see #getCurrentList()
+     * @see #removeListListener(androidx.recyclerview.widget.AsyncListDiffer.ListListener)
+     */
+    public void addListListener(@NonNull androidx.recyclerview.widget.AsyncListDiffer.ListListener<T> listener) {
+        mListeners.add(listener);
+    }
+
+    /**
+     * Remove a previously registered ListListener.
+     *
+     * @param listener Previously registered listener.
+     * @see #getCurrentList()
+     * @see #addListListener(androidx.recyclerview.widget.AsyncListDiffer.ListListener)
+     */
+    public void removeListListener(@NonNull androidx.recyclerview.widget.AsyncListDiffer.ListListener<T> listener) {
+        mListeners.remove(listener);
     }
 }
