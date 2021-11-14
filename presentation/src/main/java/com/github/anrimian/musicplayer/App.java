@@ -18,7 +18,6 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 /*
 In v0.9.3:
 -glide memory optimization
--glide save on disc full resolution images
 -return eq attach logic back? - check sound
 -crash here (StorageCompositionsInserter.java:180)
 -cleanup MusicService

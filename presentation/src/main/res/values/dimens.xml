@@ -123,6 +123,7 @@
 
     <!--covers-->
     <integer name="icon_image_size">130</integer>
+    <integer name="icon_image_full_size">1000</integer>
 
     <!--snackbar-->
     <integer name="snackbar_max_lines">5</integer>

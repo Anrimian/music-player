@@ -47,7 +47,7 @@ public class CompositionModelLoader extends AppModelLoader<CompositionImage, Bit
 
             Bitmap bitmap = null;
             if (imageBytes != null) {
-                int coverSize = context.getResources().getInteger(R.integer.icon_image_size);
+                int coverSize = context.getResources().getInteger(R.integer.icon_image_full_size);
                 bitmap = ImageUtils.decodeBitmap(imageBytes, coverSize);
             }
             callback.onDataReady(bitmap);

@@ -42,7 +42,7 @@ import io.reactivex.rxjava3.core.Single;
 public class CompositionSourceEditor {
 
     private static final char GENRE_DIVIDER = '\u0000';
-    private static final int MAX_COVER_SIZE = 1024;
+    private static final int MAX_COVER_SIZE = 1000;
 
     private final StorageMusicProvider storageMusicProvider;
     private final FileSourceProvider fileSourceProvider;

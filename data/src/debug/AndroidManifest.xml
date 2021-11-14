@@ -3,7 +3,9 @@
     package="com.github.anrimian.musicplayer.data">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"/>
 
     <application android:allowBackup="false"
         android:requestLegacyExternalStorage="true"
