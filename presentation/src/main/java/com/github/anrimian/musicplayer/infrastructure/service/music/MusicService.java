@@ -74,8 +74,7 @@ public class MusicService extends Service {
             stopSelf();
             return START_NOT_STICKY;
         }
-        int startForegroundSignal = intent.getIntExtra(START_FOREGROUND_SIGNAL, -1);
-        if (startForegroundSignal != -1) {
+        if (intent.getBooleanExtra(START_FOREGROUND_SIGNAL, false)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerState == PlayerState.IDLE) {
                 //should reduce chance of RemoteServiceException
                 notificationsDisplayer().startStubForegroundNotification(this, mediaSession());

@@ -33,7 +33,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     public static void startPlayForegroundService(Context context, int playDelay) {
         Intent intent = new Intent(context, MusicService.class);
-        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
+        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, true);
         intent.putExtra(MusicService.REQUEST_CODE, Constants.Actions.PLAY);
         intent.putExtra(MusicService.PLAY_DELAY_MILLIS, playDelay);
         checkPermissionsAndStartServiceFromBg(context, intent);
@@ -88,7 +88,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     private static void startServiceFromBg(Context context, Intent intent) {
         Intent bgIntent = new Intent(intent);
-        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
+        intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, true);
         ContextCompat.startForegroundService(context, bgIntent);
     }
 
