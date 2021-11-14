@@ -13,9 +13,9 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
-import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
@@ -42,7 +42,8 @@ public class PlayListsDaoWrapper {
     }
 
     public void applyChanges(List<Pair<StoragePlayList, List<StoragePlayListItem>>> addedPlayLists,
-                             List<Change<StoragePlayList, StoragePlayList>> changedPlayLists) {
+                             List<Change<AppPlayList, StoragePlayList>> changedPlayLists,
+                             List<Pair<AppPlayList, List<StoragePlayListItem>>> itemsToInsert) {
         appDatabase.runInTransaction(() -> {
             //add
             for (Pair<StoragePlayList, List<StoragePlayListItem>> addedPlaylist: addedPlayLists) {
@@ -63,8 +64,8 @@ public class PlayListsDaoWrapper {
             }
 
             //update
-            for (Change<StoragePlayList, StoragePlayList> change: changedPlayLists) {
-                StoragePlayList oldItem = change.getOld();
+            for (Change<AppPlayList, StoragePlayList> change: changedPlayLists) {
+                AppPlayList oldItem = change.getOld();
                 StoragePlayList newItem = change.getObj();
                 long id = newItem.getStorageId();
 
@@ -74,11 +75,13 @@ public class PlayListsDaoWrapper {
                 }
                 String newName = newItem.getName();
                 if (!oldItem.getName().equals(newName)) {
-                    playListDao.updatePlayListNameByStorageId(
-                            id,
-                            getUniquePlayListName(newName, "-" + FileUtils.randomString(8))
-                    );
+                    playListDao.updatePlayListNameByStorageId(id, getUniquePlayListName(newName));
                 }
+            }
+
+            //insert items
+            for (Pair<AppPlayList, List<StoragePlayListItem>> itemToInsert: itemsToInsert){
+                insertPlayListItems(itemToInsert.second, itemToInsert.first.getId());
             }
         });
     }
@@ -109,8 +112,12 @@ public class PlayListsDaoWrapper {
         return id;
     }
 
-    public List<StoragePlayList> getAllAsStoragePlayLists() {
+    public List<AppPlayList> getAllAsStoragePlayLists() {
         return playListDao.getAllAsStoragePlayLists();
+    }
+
+    public long getPlayListItemsCount(long id) {
+        return playListDao.getPlayListItemsCount(id);
     }
 
     public void deletePlayList(long id) {

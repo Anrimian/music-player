@@ -15,7 +15,7 @@ import com.github.anrimian.musicplayer.data.database.entities.composition.Compos
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
@@ -62,14 +62,18 @@ public interface PlayListDao {
             "ORDER BY dateModified DESC")
     Observable<List<PlayList>> getPlayListsObservable();
 
+    @Query("SELECT count() FROM play_lists_entries WHERE playListId = :playlistId")
+    long getPlayListItemsCount(long playlistId);
+
     @Query("SELECT " +
+            "play_lists.id as id, " +
             "play_lists.storageId as storageId, " +
             "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified " +
             "FROM play_lists " +
             "WHERE storageId IS NOT NULL")
-    List<StoragePlayList> getAllAsStoragePlayLists();
+    List<AppPlayList> getAllAsStoragePlayLists();
 
     @Query("SELECT " +
             "play_lists.id as dbId, " +

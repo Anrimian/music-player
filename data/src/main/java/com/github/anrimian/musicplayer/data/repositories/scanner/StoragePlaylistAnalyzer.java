@@ -5,6 +5,7 @@ import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
@@ -27,12 +28,12 @@ public class StoragePlaylistAnalyzer {
     }
 
     public synchronized void applyPlayListData(LongSparseArray<StoragePlayList> newPlayLists) {
-        List<StoragePlayList> currentPlayLists = playListsDao.getAllAsStoragePlayLists();
-        LongSparseArray<StoragePlayList> currentPlayListsMap = AndroidCollectionUtils.mapToSparseArray(currentPlayLists,
-                StoragePlayList::getStorageId);
+        List<AppPlayList> currentPlayLists = playListsDao.getAllAsStoragePlayLists();
+        LongSparseArray<AppPlayList> currentPlayListsMap = AndroidCollectionUtils.mapToSparseArray(currentPlayLists,
+                AppPlayList::getStorageId);
 
         List<Pair<StoragePlayList, List<StoragePlayListItem>>> addedPlayLists = new ArrayList<>();
-        List<Change<StoragePlayList, StoragePlayList>> changedPlayLists = new ArrayList<>();
+        List<Change<AppPlayList, StoragePlayList>> changedPlayLists = new ArrayList<>();
         boolean hasChanges = AndroidCollectionUtils.processDiffChanges(currentPlayListsMap,
                 newPlayLists,
                 this::hasActualChanges,
@@ -40,12 +41,23 @@ public class StoragePlaylistAnalyzer {
                 item -> addedPlayLists.add(new Pair<>(item, playListsProvider.getPlayListItems(item.getStorageId()))),
                 (old, item) -> changedPlayLists.add(new Change<>(old, item)));
 
+        //add items to empty existing playlist
+        List<Pair<AppPlayList, List<StoragePlayListItem>>> itemsToInsert = new ArrayList<>();
+        for (AppPlayList currentPlayList: currentPlayLists) {
+            if (playListsDao.getPlayListItemsCount(currentPlayList.getId()) == 0) {
+                List<StoragePlayListItem> items = playListsProvider.getPlayListItems(currentPlayList.getStorageId());
+                if (!items.isEmpty()) {
+                    itemsToInsert.add(new Pair<>(currentPlayList, items));
+                }
+            }
+        }
+
         if (hasChanges) {
-            playListsDao.applyChanges(addedPlayLists, changedPlayLists);
+            playListsDao.applyChanges(addedPlayLists, changedPlayLists, itemsToInsert);
         }
     }
 
-    private boolean hasActualChanges(StoragePlayList first, StoragePlayList second) {
+    private boolean hasActualChanges(AppPlayList first, StoragePlayList second) {
         return (!Objects.equals(first.getName(), second.getName()))
                 && DateUtils.isAfter(first.getDateModified(), second.getDateModified());
     }

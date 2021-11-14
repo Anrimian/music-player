@@ -14,7 +14,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
-import com.github.anrimian.musicplayer.data.models.changes.Change;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
@@ -58,13 +57,16 @@ public class PlayListsDaoWrapperTest {
                 "test1",
                 new Date(),
                 new Date());
-        daoWrapper.applyChanges(asList(new Pair<>(playList1, emptyList()), new Pair<>(playList2, emptyList())),
-                emptyList());
+        daoWrapper.applyChanges(
+                asList(new Pair<>(playList1, emptyList()), new Pair<>(playList2, emptyList())),
+                emptyList(),
+                emptyList()
+        );
         StoragePlayList duplicatePlayList = new StoragePlayList(2L,
                 "test",
                 new Date(),
                 new Date());
-        daoWrapper.applyChanges(emptyList(), asList(new Change<>(playList1, duplicatePlayList)));
+//        daoWrapper.applyChanges(emptyList(), asList(new Change<>(playList1, duplicatePlayList)));
     }
 
     @Test
@@ -105,10 +107,10 @@ public class PlayListsDaoWrapperTest {
 
         StoragePlayList duplicatePlayList2 = new StoragePlayList(2L, "test", date, date);
         StoragePlayList duplicatePlayList3 = new StoragePlayList(3L, "test", date, date);
-        daoWrapper.applyChanges(emptyList(), asList(
-                new Change<>(playList2, duplicatePlayList2),
-                new Change<>(playList3, duplicatePlayList3)
-        ));
+//        daoWrapper.applyChanges(emptyList(), asList(
+//                new Change<>(playList2, duplicatePlayList2),
+//                new Change<>(playList3, duplicatePlayList3)
+//        ));
 
         System.out.println("KEKAS" + daoWrapper.getPlayListsObservable().blockingFirst());
     }
@@ -119,7 +121,7 @@ public class PlayListsDaoWrapperTest {
         daoWrapper.insertPlayList("test", date, date, () -> null);
 
         StoragePlayList playList = new StoragePlayList(1L, "test", date, date);
-        daoWrapper.applyChanges(asList(new Pair<>(playList, emptyList())), emptyList());
+        daoWrapper.applyChanges(asList(new Pair<>(playList, emptyList())), emptyList(), emptyList());
 
         //got 2 playlists
         System.out.println("KEKAS" + daoWrapper.getPlayListsObservable().blockingFirst());
