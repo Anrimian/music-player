@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.about;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -23,9 +26,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLay
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.github.anrimian.musicplayer.utils.logger.AppLogger;
 import com.github.anrimian.musicplayer.utils.logger.FileLog;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 public class AboutAppFragment extends Fragment implements FragmentLayerListener {
 
@@ -62,6 +62,7 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
 
         String aboutText = getString(R.string.about_app_text,
                 linkify("mailto:", R.string.about_app_text_write, R.string.feedback_email),
+                linkify("", R.string.privacy_policy, R.string.privacy_policy_link),
                 linkify("mailto:", R.string.about_app_text_here, R.string.feedback_email),
                 linkify("", R.string.about_app_text_here_link, R.string.source_code_link)
         );
