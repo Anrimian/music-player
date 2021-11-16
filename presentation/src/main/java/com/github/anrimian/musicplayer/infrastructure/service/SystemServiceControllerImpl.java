@@ -17,10 +17,6 @@ import com.github.anrimian.musicplayer.domain.controllers.SystemServiceControlle
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
-//if workaround with bind service will work - clear code later
-//what can be also tried:
-//-move media button receiver to external receiver
-//stop service from here too
 public class SystemServiceControllerImpl implements SystemServiceController {
 
     private final Context context;
@@ -37,7 +33,6 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         intent.putExtra(MusicService.REQUEST_CODE, Constants.Actions.PLAY);
         intent.putExtra(MusicService.PLAY_DELAY_MILLIS, playDelay);
         checkPermissionsAndStartServiceFromBg(context, intent);
-//        ContextCompat.startForegroundService(context, intent);
     }
 
     public SystemServiceControllerImpl(Context context) {
@@ -48,20 +43,18 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     public void startMusicService() {
         handler.post(() -> {
             Intent intent = new Intent(context, MusicService.class);
-            checkPermissionsAndStartServiceExp(context, intent);
-//            intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, 1);
-//            ContextCompat.startForegroundService(context, intent);
+            checkPermissionsAndStartServiceSafe(context, intent);
         });
     }
 
-    private static void checkPermissionsAndStartServiceExp(Context context, Intent intent) {
+    private static void checkPermissionsAndStartServiceSafe(Context context, Intent intent) {
         if (!Permissions.hasFilePermission(context)) {
             Components.getAppComponent()
                     .notificationDisplayer()
                     .showErrorNotification(R.string.no_file_permission);
             return;
         }
-        startServiceExp(context, intent);
+        startServiceSafe(context, intent);
     }
 
     private static void checkPermissionsAndStartServiceFromBg(Context context, Intent intent) {
@@ -74,7 +67,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         startServiceFromBg(context, intent);
     }
 
-    private static void startServiceExp(Context context, Intent intent) {
+    private static void startServiceSafe(Context context, Intent intent) {
         handler.post(() -> {
             try {
                 ServiceConnection connection = new ForegroundServiceStarterConnection(context, intent);

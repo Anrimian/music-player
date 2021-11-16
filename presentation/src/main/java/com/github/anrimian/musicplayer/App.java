@@ -20,7 +20,6 @@ In v0.9.3:
 -glide memory optimization
 -return eq attach logic back? - check sound
 -crash here (StorageCompositionsInserter.java:180)
--cleanup MusicService
 */
 //-rtl support(+slidr, swipe, icons, motion layout)
 public class App extends Application {
