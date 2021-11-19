@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.common.menu;
 
+import static android.view.View.MeasureSpec.makeMeasureSpec;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
@@ -7,12 +10,11 @@ import android.view.View.MeasureSpec;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 
+import androidx.appcompat.content.res.AppCompatResources;
+
 import com.github.anrimian.musicplayer.R;
 
 import javax.annotation.Nullable;
-
-import static android.view.View.MeasureSpec.makeMeasureSpec;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 @SuppressWarnings("WeakerAccess")
 public class AppPopupWindow {
@@ -33,6 +35,7 @@ public class AppPopupWindow {
 
         Context context = anchorView.getContext();
 
+
         //margins
         FrameLayout popupViewWrapper = new FrameLayout(context);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
@@ -48,7 +51,9 @@ public class AppPopupWindow {
 
         popupWindow.setAnimationStyle(R.style.PopupAnimationStyle);
         //fix for closing by back button or touch on android 5.1
-        popupWindow.setBackgroundDrawable(context.getDrawable(R.drawable.bg_transparent));
+        popupWindow.setBackgroundDrawable(AppCompatResources.getDrawable(context, R.drawable.bg_transparent));
+        //fix for closing by touch on android 12
+        popupWindow.setOutsideTouchable(true);
 
         popupView.measure(
                 makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
