@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+
 import android.database.sqlite.SQLiteException;
 
 import androidx.collection.LongSparseArray;
@@ -25,8 +27,6 @@ import com.github.anrimian.musicplayer.domain.utils.Objects;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class StorageCompositionsInserter {
 
@@ -176,7 +176,7 @@ public class StorageCompositionsInserter {
         if (Objects.equals(folderId, FolderMerger.UNKNOWN_CURRENT_FOLDER_ID)) {
             folderId = null;
         }
-        if (folderId != null && !foldersDao.isFolderExists(folderId)) {//likely it causes sqlite constraint exception, let's check it
+        if (folderId != null && !foldersDao.isFolderExists(folderId)) {
             throw new IllegalStateException("target folder not exists");
         }
         return CompositionMapper.toEntity(composition, artistId, albumId, folderId);

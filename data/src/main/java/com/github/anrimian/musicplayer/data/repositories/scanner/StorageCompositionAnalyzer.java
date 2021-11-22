@@ -58,6 +58,8 @@ public class StorageCompositionAnalyzer {
     //remove filePath from db - we detect move changes by tree analyzer
     //remove cutting tree on android 11 an higher
     //rework analyzer to only tree analyzer(
+
+    //there can be in addedFilesFolderMap composition storage id with non-existing folder id
     public synchronized void applyCompositionsData(
             LongSparseArray<StorageFullComposition> actualCompositionsMap) {//at the end check file path to relative path migration
         FolderNode<Long> actualFolderTree = folderTreeBuilder.createFileTree(fromSparseArray(actualCompositionsMap));
