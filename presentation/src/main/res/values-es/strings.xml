@@ -44,7 +44,6 @@
     <string name="add_to_playlist_error_template">No se pudo agregar la canción a la lista de reproducción: %1$s</string>
     <string name="delete_composition_error_template">No se pudo eliminar la canción: %1$s</string>
     <string name="add_to_playlist_success_template">Canciones \"%1$s\" agregadas a la lista de reproducción \"%2$s\"</string>
-    <string name="play_list_is_empty">La lista de reproducción está vacía</string>
     <string name="save_as_play_list">Guardar como lista de reproducción</string>
     <string name="cancel">Cancelar</string>
     <string name="deleting">Eliminando</string>
@@ -227,6 +226,21 @@
     <string name="rewind">Rebobinar</string>
     <string name="fast_forward">Avance rápido</string>
     <string name="show_covers_on_lock_screen">Mostrar portadas en la pantalla de bloqueo y en Android Auto</string>
+    <string name="equalizer_initialization_error">No se puede inicializar el ecualizador en la aplicación. Intente reiniciarlo.</string>
+    <string name="restart">Reiniciar</string>
+    <string name="scan_storage_description">Por lo general, todos los cambios con archivos en el dispositivo aparecerán automáticamente. Pero en algunos dispositivos o sistemas, no funcionará. Este botón ejecuta el escaneo de archivos manualmente.</string>
+    <string name="scanning_completed">Escaneo completado</string>
+    <string name="pause_on_zero_volume_level">Detenga la reproducción cuando el volumen llegue a cero</string>
+    <string name="covers">Cubiertas</string>
+    <string name="display_composition_file_name">Mostrar el nombre del archivo de composición en lugar del título</string>
+    <string name="name_order">Por nombre</string>
+    <string name="file_name_order">Por nombre de archivo</string>
+    <string name="play_list_is_empty">La lista de reproducción está vacía. Las composiciones se pueden agregar a las listas de reproducción en las pantallas de la biblioteca.</string>
+    <string name="file_scanner_state">Escaneo de etiquetas de archivos: %s</string>
+    <string name="show_all_audio_files">Mostrar todos los archivos de audio</string>
+    <string name="enabled_media_players">Reproductores multimedia habilitados</string>
+    <string name="advanced_settings">Ajustes avanzados</string>
+    <string name="media_players_setting_description">La aplicación utiliza varios reproductores multimedia para reproducir música. Aquí se pueden desactivar o cambiar la prioridad de uso. Todos los cambios entrarán en vigor solo después de reiniciar la aplicación.</string>
     <!---->
 
     <plurals name="compositions_count">

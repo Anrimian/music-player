@@ -223,12 +223,11 @@
     <string name="rewind">Rewind</string>
     <string name="fast_forward">Fast forward</string>
     <string name="show_covers_on_lock_screen">Show covers on lock screen and on android auto</string>
-
     <string name="equalizer_initialization_error">Unable to initialize in-app equalizer. Try to restart it.</string>
     <string name="restart">Restart</string>
     <string name="scan_storage_description">Usually all changes with files on the device will appear automatically. But on some devices or system builds it won\'t work. This button runs files scan manually.</string>
     <string name="scanning_completed">Scanning completed</string>
-    <string name="pause_on_zero_volume_level">Stop playing when volume level has been reached zero</string>
+    <string name="pause_on_zero_volume_level">Stop playing when volume level reaches zero</string>
     <string name="covers">Covers</string>
     <string name="display_composition_file_name">Display composition file name instead of title</string>
     <string name="name_order">By name</string>

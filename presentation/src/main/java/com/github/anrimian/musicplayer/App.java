@@ -15,13 +15,6 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
  * Created on 20.10.2017.
  */
 
-/*
-In v0.9.3:
--glide memory optimization
--return eq attach logic back? - check sound
--crash here (StorageCompositionsInserter.java:180)
-*/
-//-rtl support(+slidr, swipe, icons, motion layout)
 public class App extends Application {
 
     @Override
