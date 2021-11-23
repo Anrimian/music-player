@@ -177,7 +177,10 @@ public class StorageCompositionsInserter {
             folderId = null;
         }
         if (folderId != null && !foldersDao.isFolderExists(folderId)) {
-            throw new IllegalStateException("target folder not exists");
+            //for some reason in folder id map can be non-existing folder id
+            //TODO fix non-existing folder id
+            //throw new IllegalStateException("target folder not exists");
+            folderId = null;
         }
         return CompositionMapper.toEntity(composition, artistId, albumId, folderId);
     }
