@@ -1,17 +1,8 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-
-    signingConfigs {
-        test {
-            keyAlias '123456'
-            keyPassword '123456'
-            storeFile file("test.jks")
-            storePassword '123456'
-        }
-    }
 
     def config = rootProject.ext
 
@@ -21,29 +12,21 @@ android {
         minSdkVersion config.androidMinSdkVersion
         targetSdkVersion config.androidTargetSdkVersion
 
-        applicationId config.androidApplicationId
         versionCode config.androidVersionCode
         versionName config.androidVersionName
         testInstrumentationRunner config.testInstrumentationRunner
-        testApplicationId config.testApplicationId
-        archivesBaseName = "$applicationId-v$versionCode($versionName)"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
             minifyEnabled true
-            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         QA {
             initWith release
-            signingConfig signingConfigs.test
-            applicationIdSuffix ".QA"
         }
         debug {
             minifyEnabled false
-            shrinkResources false
-            applicationIdSuffix ".debug"
         }
 
     }

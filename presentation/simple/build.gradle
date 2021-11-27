@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+android {
+
+    signingConfigs {
+        test {
+            keyAlias '123456'
+            keyPassword '123456'
+            storeFile file("test.jks")
+            storePassword '123456'
+        }
+    }
+
+    def config = rootProject.ext
+
+    compileSdk config.androidCompileSdkVersion
+
+    defaultConfig {
+        minSdkVersion config.androidMinSdkVersion
+        targetSdkVersion config.androidTargetSdkVersion
+
+        applicationId config.androidApplicationId
+        versionCode config.androidVersionCode
+        versionName config.androidVersionName
+        testInstrumentationRunner config.testInstrumentationRunner
+        testApplicationId config.testApplicationId
+        archivesBaseName = "$applicationId-v$versionCode($versionName)"
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+        }
+        QA {
+            initWith release
+            signingConfig signingConfigs.test
+            applicationIdSuffix ".QA"
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            applicationIdSuffix ".debug"
+        }
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+    packagingOptions {
+        exclude "/META-INF/*.kotlin_module"
+        exclude "**/kotlin/**"
+        exclude "**/*.txt"
+        exclude "**/*.xml"
+        exclude "**/*.properties"
+    }
+}
+
+dependencies {
+    implementation project(':domain')
+    implementation project(':data')
+    implementation project(':presentation')
+}
