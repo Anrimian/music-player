@@ -71,6 +71,20 @@ public class StorageMusicProvider {
         }
     }
 
+    @Nullable
+    public static Cursor query(ContentResolver contentResolver,
+                               @RequiresPermission.Read @Nonnull Uri uri,
+                               @Nullable String[] projection,
+                               @Nullable String selection,
+                               @Nullable String[] selectionArgs,
+                               @Nullable String sortOrder) {
+        try {
+            return contentResolver.query(uri, projection, selection, selectionArgs, sortOrder, null);
+        } catch (Exception e) {
+            throw new ContentResolverQueryException(e);
+        }
+    }
+
     public StorageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
         contentResolver = context.getContentResolver();
         this.context = context;
@@ -602,10 +616,6 @@ public class StorageMusicProvider {
                          @Nullable String selection,
                          @Nullable String[] selectionArgs,
                          @Nullable String sortOrder) {
-        try {
-            return contentResolver.query(uri, projection, selection, selectionArgs, sortOrder, null);
-        } catch (Exception e) {
-            throw new ContentResolverQueryException(e);
-        }
+        return StorageMusicProvider.query(contentResolver, uri, projection, selection, selectionArgs, sortOrder);
     }
 }
