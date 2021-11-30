@@ -250,6 +250,9 @@ public class PlayerInteractor {
                 if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
                     playerStateSubject.onNext(PLAY);
                     musicPlayerController.resume();
+                    //on api 31 we have crash here. Possible solution:
+                    // do not remove foreground mode on audiofocus loss
+                    // on gain check PAUSED_EXTERNALLY and else, if not play  - stop foreground
                     systemServiceController.startMusicService();
                 }
                 break;
