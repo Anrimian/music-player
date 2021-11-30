@@ -18,7 +18,7 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -56,12 +56,13 @@ public class StoragePlayListsProvider {
     @Nullable
     public LongSparseArray<StoragePlayList> getPlayLists() {
         try {
-            StorageMusicProvider.checkIfMediaStoreAvailable(context);
+            MediaStoreUtils.checkIfMediaStoreAvailable(context);
         } catch (UnavailableMediaStoreException e) {
             return null;
         }
 
-        try(Cursor cursor = contentResolver.query(Playlists.EXTERNAL_CONTENT_URI,
+        try(Cursor cursor = MediaStoreUtils.query(contentResolver,
+                Playlists.EXTERNAL_CONTENT_URI,
                 null,
                 null,
                 null,
@@ -83,7 +84,7 @@ public class StoragePlayListsProvider {
     }
 
     public Long createPlayList(String name, Date dateAdded, Date dateModified) {
-        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+        MediaStoreUtils.checkIfMediaStoreAvailable(context);
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
@@ -102,7 +103,7 @@ public class StoragePlayListsProvider {
     }
 
     public StoragePlayList createPlayList(String name) {
-        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+        MediaStoreUtils.checkIfMediaStoreAvailable(context);
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
@@ -120,7 +121,7 @@ public class StoragePlayListsProvider {
     }
 
     public void deletePlayList(long id) {
-        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+        MediaStoreUtils.checkIfMediaStoreAvailable(context);
 
         contentResolver.delete(Playlists.EXTERNAL_CONTENT_URI,
                 Playlists._ID + " = ?",
@@ -205,7 +206,7 @@ public class StoragePlayListsProvider {
             //unsupported
             return;
         }
-        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+        MediaStoreUtils.checkIfMediaStoreAvailable(context);
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(Playlists.NAME, name);
@@ -216,7 +217,7 @@ public class StoragePlayListsProvider {
     }
 
     private void updateModifyTime(long playListId) {
-        StorageMusicProvider.checkIfMediaStoreAvailable(context);
+        MediaStoreUtils.checkIfMediaStoreAvailable(context);
 
         ContentValues playListValues = new ContentValues();
         playListValues.put(Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000L);

@@ -11,7 +11,7 @@ import android.provider.MediaStore.Audio.Albums;
 import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
 
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
@@ -34,7 +34,7 @@ public class StorageAlbumsProvider {
     }
 
     public LongSparseArray<StorageAlbum> getAlbums() {
-        try(Cursor cursor = StorageMusicProvider.query(contentResolver,
+        try(Cursor cursor = MediaStoreUtils.query(contentResolver,
                 Albums.EXTERNAL_CONTENT_URI,
                 new String[] {
                         Albums._ID,

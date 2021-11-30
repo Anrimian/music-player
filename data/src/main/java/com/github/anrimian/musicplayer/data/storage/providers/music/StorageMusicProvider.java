@@ -26,9 +26,8 @@ import androidx.annotation.RequiresPermission;
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
-import com.github.anrimian.musicplayer.data.storage.exceptions.ContentResolverQueryException;
-import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
+import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
@@ -59,31 +58,6 @@ public class StorageMusicProvider {
     private final ContentResolver contentResolver;
     private final Context context;
     private final StorageAlbumsProvider albumsProvider;
-
-    public static void checkIfMediaStoreAvailable(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            Set<String> volumes = MediaStore.getExternalVolumeNames(context);
-            if (!volumes.contains(MediaStore.VOLUME_EXTERNAL_PRIMARY)) {
-                //can crash in rare weird cases on android 10 so we check for existence
-                //https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android
-                throw new UnavailableMediaStoreException();
-            }
-        }
-    }
-
-    @Nullable
-    public static Cursor query(ContentResolver contentResolver,
-                               @RequiresPermission.Read @Nonnull Uri uri,
-                               @Nullable String[] projection,
-                               @Nullable String selection,
-                               @Nullable String[] selectionArgs,
-                               @Nullable String sortOrder) {
-        try {
-            return contentResolver.query(uri, projection, selection, selectionArgs, sortOrder, null);
-        } catch (Exception e) {
-            throw new ContentResolverQueryException(e);
-        }
-    }
 
     public StorageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
         contentResolver = context.getContentResolver();
@@ -584,7 +558,7 @@ public class StorageMusicProvider {
 
     private Uri getStorageUri() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            checkIfMediaStoreAvailable(context);
+            MediaStoreUtils.checkIfMediaStoreAvailable(context);
             return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         } else {
             return Media.EXTERNAL_CONTENT_URI;
@@ -616,6 +590,6 @@ public class StorageMusicProvider {
                          @Nullable String selection,
                          @Nullable String[] selectionArgs,
                          @Nullable String sortOrder) {
-        return StorageMusicProvider.query(contentResolver, uri, projection, selection, selectionArgs, sortOrder);
+        return MediaStoreUtils.query(contentResolver, uri, projection, selection, selectionArgs, sortOrder);
     }
 }
