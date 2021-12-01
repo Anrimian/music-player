@@ -1,5 +1,11 @@
 package com.github.anrimian.musicplayer.ui.settings.headset;
 
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
+
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,20 +13,24 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsHeadsetBinding;
 import com.github.anrimian.musicplayer.infrastructure.receivers.BluetoothConnectionReceiver;
+import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
-
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
+import com.google.android.material.snackbar.Snackbar;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
 public class HeadsetSettingsFragment extends Fragment {
 
     private FragmentSettingsHeadsetBinding viewBinding;
+
+    private RxPermissions rxPermissions;
 
     @Nullable
     @Override
@@ -40,12 +50,36 @@ public class HeadsetSettingsFragment extends Fragment {
         toolbar.setSubtitle(R.string.headset);
         toolbar.setTitleClickListener(null);
 
-        SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided);
+        rxPermissions = new RxPermissions(requireActivity());
 
-        onCheckChanged(viewBinding.cbPlayOnConnect, checked ->
-                BluetoothConnectionReceiver.setEnabled(requireContext(), checked)
-        );
+        SlidrPanel.simpleSwipeBack(viewBinding.clContainer, this, toolbar::onStackFragmentSlided);
+
+        onCheckChanged(viewBinding.cbPlayOnConnect, this::onPlayOnConnectChecked);
 
         setChecked(viewBinding.cbPlayOnConnect, BluetoothConnectionReceiver.isEnabled(requireContext()));
+    }
+
+    private void onPlayOnConnectChecked(boolean checked) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && checked) {
+            //noinspection ResultOfMethodCallIgnored
+            rxPermissions.request(Manifest.permission.BLUETOOTH_CONNECT)
+                    .subscribe(this::onBluetoothConnectPermissionResult);
+            return;
+        }
+        BluetoothConnectionReceiver.setEnabled(requireContext(), checked);
+    }
+
+    @TargetApi(Build.VERSION_CODES.S)
+    private void onBluetoothConnectPermissionResult(boolean granted) {
+        BluetoothConnectionReceiver.setEnabled(requireContext(), granted);
+        if (!granted) {
+            setChecked(viewBinding.cbPlayOnConnect, false);
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.BLUETOOTH_CONNECT)) {
+                AppSnackbar.make(viewBinding.clContainer, "Bluetooth connect permission required")
+                        .setAction("Open app settings", () -> AndroidUtilsKt.startAppSettings(requireActivity()))
+                        .duration(Snackbar.LENGTH_INDEFINITE)
+                        .show();
+            }
+        }
     }
 }

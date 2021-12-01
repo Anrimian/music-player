@@ -11,8 +11,11 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
+    <!--for bluetooth connection receiver-->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+
     <!--prevent rare crash on some devices with notification display-->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <!--remove permission from glide because we don't use internet for covers-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove"/>
