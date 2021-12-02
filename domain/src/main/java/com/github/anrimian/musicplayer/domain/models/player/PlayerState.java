@@ -10,7 +10,7 @@ public enum PlayerState {
     PAUSE,
     STOP,
     LOADING,
-    PAUSED_EXTERNALLY {
+    PAUSED_TRANSIENT {
         @Override
         public PlayerState toBaseState() {
             return PAUSE;

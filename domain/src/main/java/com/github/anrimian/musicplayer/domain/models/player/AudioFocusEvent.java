@@ -7,5 +7,6 @@ package com.github.anrimian.musicplayer.domain.models.player;
 public enum AudioFocusEvent {
     GAIN,
     LOSS,
-    LOSS_SHORTLY
+    LOSS_SHORTLY,
+    LOSS_TRANSIENT
 }

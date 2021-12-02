@@ -47,6 +47,15 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         });
     }
 
+    @Override
+    public void stopMusicService() {
+        handler.post(() -> {
+            Intent intent = new Intent(context, MusicService.class);
+            ServiceConnection connection = new ForegroundServiceStopConnection(context);
+            context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        });
+    }
+
     private static void checkPermissionsAndStartServiceSafe(Context context, Intent intent) {
         if (!Permissions.hasFilePermission(context)) {
             Components.getAppComponent()
@@ -101,6 +110,26 @@ public class SystemServiceControllerImpl implements SystemServiceController {
             MusicService service = binder.getService();
             ContextCompat.startForegroundService(context, intent);
             service.startForeground();
+            context.unbindService(this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {}
+    }
+
+    private static class ForegroundServiceStopConnection implements ServiceConnection {
+
+        private final Context context;
+
+        public ForegroundServiceStopConnection(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            MusicService.LocalBinder binder = (MusicService.LocalBinder) iBinder;
+            MusicService service = binder.getService();
+            service.stopForeground(false);
             context.unbindService(this);
         }
 

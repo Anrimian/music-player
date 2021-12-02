@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.data.utils.rx.audio_focus;
 
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.GAIN;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_SHORTLY;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_TRANSIENT;
+
 import android.content.Context;
 import android.media.AudioManager;
 
@@ -9,10 +14,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-
-import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.GAIN;
-import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS;
-import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_SHORTLY;
 
 /**
  * Created on 21.04.2018.
@@ -48,6 +49,10 @@ public class AudioFocusRxWrapper {
             switch (focusChange) {
                 case AudioManager.AUDIOFOCUS_GAIN: {
                     subject.onNext(GAIN);
+                    break;
+                }
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT: {
+                    subject.onNext(LOSS_TRANSIENT);
                     break;
                 }
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK: {

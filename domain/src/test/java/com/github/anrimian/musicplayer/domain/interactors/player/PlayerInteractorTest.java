@@ -4,6 +4,7 @@ import static com.github.anrimian.musicplayer.domain.interactors.TestBusinessDat
 import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.GAIN;
 import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS;
 import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_SHORTLY;
+import static com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent.LOSS_TRANSIENT;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
@@ -89,6 +90,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.pause();
 
         verify(musicPlayerController).resume(anyInt());
+        verify(systemServiceController).stopMusicService();
         verify(musicPlayerController).pause();
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
     }
@@ -103,6 +105,7 @@ public class PlayerInteractorTest {
         playerEventSubject.onNext(new PreparedEvent(composition));
         playerEventSubject.onNext(new ErrorEvent(IGNORED, composition));
 
+        verify(systemServiceController).stopMusicService();
         inOrder.verify(musicPlayerController).pause();
 
         musicPlayerInteractor.play();
@@ -124,7 +127,7 @@ public class PlayerInteractorTest {
     }
 
     @Test
-    public void onAudioFocusLossAndGainTest() {
+    public void onAudioFocusLossTest() {
         CompositionSource composition = fakeCompositionSource(0);
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
@@ -133,12 +136,27 @@ public class PlayerInteractorTest {
 
         audioFocusSubject.onNext(LOSS);
 
+        inOrder.verify(systemServiceController).stopMusicService();
+        inOrder.verify(musicPlayerController).pause();
+
+        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
+    }
+
+    @Test
+    public void onAudioFocusLossTransientAndGainTest() {
+        CompositionSource composition = fakeCompositionSource(0);
+        musicPlayerInteractor.prepareToPlay(composition);
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume(anyInt());
+
+        audioFocusSubject.onNext(LOSS_TRANSIENT);
+
         inOrder.verify(musicPlayerController).pause();
 
         audioFocusSubject.onNext(GAIN);
 
         inOrder.verify(musicPlayerController).resume();
-        inOrder.verify(systemServiceController).startMusicService();
 
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE, PLAY);
     }
@@ -191,7 +209,7 @@ public class PlayerInteractorTest {
         musicPlayerInteractor.prepareToPlay(composition);
         musicPlayerInteractor.play();
 
-        audioFocusSubject.onNext(LOSS);
+        audioFocusSubject.onNext(LOSS_TRANSIENT);
 
         inOrder.verify(musicPlayerController, never()).pause();
 
@@ -223,13 +241,14 @@ public class PlayerInteractorTest {
 
         inOrder.verify(musicPlayerController).resume(anyInt());
 
-        audioFocusSubject.onNext(LOSS);
+        audioFocusSubject.onNext(LOSS_TRANSIENT);
 
         inOrder.verify(musicPlayerController).pause();
 
         noisyAudioSubject.onNext(new Object());
         audioFocusSubject.onNext(GAIN);
 
+        inOrder.verify(systemServiceController).stopMusicService();
         inOrder.verify(musicPlayerController, never()).resume();
 
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
@@ -247,7 +266,7 @@ public class PlayerInteractorTest {
 
         inOrder.verify(musicPlayerController).pause();
 
-        audioFocusSubject.onNext(LOSS);
+        audioFocusSubject.onNext(LOSS_TRANSIENT);
         audioFocusSubject.onNext(GAIN);
 
         inOrder.verify(musicPlayerController, never()).resume();
@@ -267,6 +286,7 @@ public class PlayerInteractorTest {
 
         volumeSubject.onNext(0);
 
+        inOrder.verify(systemServiceController).stopMusicService();
         inOrder.verify(musicPlayerController).pause();
     }
 

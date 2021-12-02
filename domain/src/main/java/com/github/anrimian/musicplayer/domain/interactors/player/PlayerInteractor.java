@@ -3,8 +3,8 @@ package com.github.anrimian.musicplayer.domain.interactors.player;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.IDLE;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.LOADING;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSE;
-import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_EXTERNALLY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_PREPARE_ERROR;
+import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PAUSED_TRANSIENT;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.PLAY;
 import static com.github.anrimian.musicplayer.domain.models.player.PlayerState.STOP;
 import static io.reactivex.rxjava3.subjects.BehaviorSubject.createDefault;
@@ -82,6 +82,7 @@ public class PlayerInteractor {
         currentSource = null;
         currentSourceSubject.onNext(new Optional<>(null));
 
+        stopMusicService();
         musicPlayerController.stop();
         playerStateSubject.onNext(IDLE);
         systemEventsDisposable.clear();
@@ -123,12 +124,14 @@ public class PlayerInteractor {
     }
 
     public void stop() {
+        stopMusicService();
         musicPlayerController.stop();
         playerStateSubject.onNext(STOP);
         systemEventsDisposable.clear();
     }
 
     public void pause() {
+        stopMusicService();
         musicPlayerController.pause();
         playerStateSubject.onNext(PAUSE);
         systemEventsDisposable.clear();
@@ -231,12 +234,14 @@ public class PlayerInteractor {
             musicPlayerController.resume();
         }
         if (state == IDLE) {
+            stopMusicService();
             playerStateSubject.onNext(PAUSE);
         }
     }
 
     private void handleErrorWithComposition(ErrorType errorType) {
         if (errorType == ErrorType.IGNORED) {
+            stopMusicService();
             musicPlayerController.pause();
             playerStateSubject.onNext(PAUSED_PREPARE_ERROR);
             systemEventsDisposable.clear();
@@ -244,31 +249,37 @@ public class PlayerInteractor {
     }
 
     private void onAudioFocusChanged(AudioFocusEvent event) {
+        var playerState = playerStateSubject.getValue();
         switch (event) {
             case GAIN: {
                 musicPlayerController.setVolume(1f);
-                if (playerStateSubject.getValue() == PAUSED_EXTERNALLY) {
+                if (playerState == PAUSED_TRANSIENT) {
                     playerStateSubject.onNext(PLAY);
                     musicPlayerController.resume();
-                    //on api 31 we have crash here. Possible solution:
-                    // do not remove foreground mode on audiofocus loss
-                    // on gain check PAUSED_EXTERNALLY and else, if not play  - stop foreground
-                    systemServiceController.startMusicService();
+                } else if (playerState != PLAY && playerState != LOADING) {
+                    systemServiceController.stopMusicService();
                 }
                 break;
             }
             case LOSS_SHORTLY: {
-                if (playerStateSubject.getValue() == PLAY
+                if (playerState == PLAY
                         && settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled()) {
                     musicPlayerController.setVolume(0.5f);
                 }
                 break;
             }
-            case LOSS: {
-                if (playerStateSubject.getValue() == PLAY
-                        && settingsRepository.isPauseOnAudioFocusLossEnabled()) {
+            case LOSS_TRANSIENT: {
+                if (playerState == PLAY && settingsRepository.isPauseOnAudioFocusLossEnabled()) {
                     musicPlayerController.pause();
-                    playerStateSubject.onNext(PAUSED_EXTERNALLY);
+                    playerStateSubject.onNext(PAUSED_TRANSIENT);
+                    break;
+                }
+            }
+            case LOSS: {
+                if (playerState == PLAY && settingsRepository.isPauseOnAudioFocusLossEnabled()) {
+                    stopMusicService();
+                    musicPlayerController.pause();
+                    playerStateSubject.onNext(PAUSE);
                     break;
                 }
             }
@@ -276,7 +287,15 @@ public class PlayerInteractor {
     }
 
     private void onAudioBecomingNoisy(Object o) {
+        stopMusicService();
         musicPlayerController.pause();
         playerStateSubject.onNext(PAUSE);
     }
+
+    private void stopMusicService() {
+        if (playerStateSubject.getValue() == PLAY || playerStateSubject.getValue() == LOADING) {
+            systemServiceController.stopMusicService();
+        }
+    }
+
 }
