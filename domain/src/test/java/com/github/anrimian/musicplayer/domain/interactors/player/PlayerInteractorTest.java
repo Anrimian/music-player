@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -162,6 +163,28 @@ public class PlayerInteractorTest {
     }
 
     @Test
+    public void onAudioFocusLossTransientAndPauseAndGainTest() {
+        CompositionSource composition = fakeCompositionSource(0);
+        musicPlayerInteractor.prepareToPlay(composition);
+        musicPlayerInteractor.play();
+
+        inOrder.verify(musicPlayerController).resume(anyInt());
+
+        audioFocusSubject.onNext(LOSS_TRANSIENT);
+
+        inOrder.verify(musicPlayerController).pause();
+
+        musicPlayerInteractor.pause();
+
+        audioFocusSubject.onNext(GAIN);
+
+        inOrder.verify(systemServiceController).stopMusicService();
+        inOrder.verify(musicPlayerController, never()).resume();
+
+        playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);
+    }
+
+    @Test
     public void onAudioFocusLossShortlyAndGainTest() {
         CompositionSource composition = fakeCompositionSource(0);
         musicPlayerInteractor.prepareToPlay(composition);
@@ -248,7 +271,7 @@ public class PlayerInteractorTest {
         noisyAudioSubject.onNext(new Object());
         audioFocusSubject.onNext(GAIN);
 
-        inOrder.verify(systemServiceController).stopMusicService();
+        inOrder.verify(systemServiceController, times(1)).stopMusicService();
         inOrder.verify(musicPlayerController, never()).resume();
 
         playerStateSubscriber.assertValues(IDLE, PLAY, PAUSE);

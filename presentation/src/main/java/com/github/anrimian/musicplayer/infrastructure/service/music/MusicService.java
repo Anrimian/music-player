@@ -159,6 +159,11 @@ public class MusicService extends Service {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onServiceStateReceived));
 
+        serviceDisposable.add(Components.getAppComponent().systemServiceController()
+                .getStopForegroundSignal()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(o -> stopForeground(false)));
+
     }
 
     private void onServiceStateReceived(ServiceState serviceState) {

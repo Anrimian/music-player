@@ -82,7 +82,7 @@ public class PlayerInteractor {
         currentSource = null;
         currentSourceSubject.onNext(new Optional<>(null));
 
-        stopMusicService();
+        systemServiceController.stopMusicService();
         musicPlayerController.stop();
         playerStateSubject.onNext(IDLE);
         systemEventsDisposable.clear();
@@ -124,14 +124,14 @@ public class PlayerInteractor {
     }
 
     public void stop() {
-        stopMusicService();
+        systemServiceController.stopMusicService();
         musicPlayerController.stop();
         playerStateSubject.onNext(STOP);
         systemEventsDisposable.clear();
     }
 
     public void pause() {
-        stopMusicService();
+        systemServiceController.stopMusicService();
         musicPlayerController.pause();
         playerStateSubject.onNext(PAUSE);
         systemEventsDisposable.clear();
@@ -234,14 +234,14 @@ public class PlayerInteractor {
             musicPlayerController.resume();
         }
         if (state == IDLE) {
-            stopMusicService();
+            systemServiceController.stopMusicService();
             playerStateSubject.onNext(PAUSE);
         }
     }
 
     private void handleErrorWithComposition(ErrorType errorType) {
         if (errorType == ErrorType.IGNORED) {
-            stopMusicService();
+            systemServiceController.stopMusicService();
             musicPlayerController.pause();
             playerStateSubject.onNext(PAUSED_PREPARE_ERROR);
             systemEventsDisposable.clear();
@@ -277,7 +277,7 @@ public class PlayerInteractor {
             }
             case LOSS: {
                 if (playerState == PLAY && settingsRepository.isPauseOnAudioFocusLossEnabled()) {
-                    stopMusicService();
+                    systemServiceController.stopMusicService();
                     musicPlayerController.pause();
                     playerStateSubject.onNext(PAUSE);
                     break;
@@ -287,15 +287,9 @@ public class PlayerInteractor {
     }
 
     private void onAudioBecomingNoisy(Object o) {
-        stopMusicService();
+        systemServiceController.stopMusicService();
         musicPlayerController.pause();
         playerStateSubject.onNext(PAUSE);
-    }
-
-    private void stopMusicService() {
-        if (playerStateSubject.getValue() == PLAY || playerStateSubject.getValue() == LOADING) {
-            systemServiceController.stopMusicService();
-        }
     }
 
 }

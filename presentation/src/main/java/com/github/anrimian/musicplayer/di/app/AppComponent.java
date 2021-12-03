@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
+import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
@@ -97,4 +98,6 @@ public interface AppComponent {
 
     ThemeController themeController();
     EqualizerController equalizerController();
+
+    SystemServiceController systemServiceController();
 }

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.infrastructure.service;
 
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,9 +19,14 @@ import com.github.anrimian.musicplayer.domain.controllers.SystemServiceControlle
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 import com.github.anrimian.musicplayer.utils.Permissions;
 
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.PublishSubject;
+
 public class SystemServiceControllerImpl implements SystemServiceController {
 
     private final Context context;
+
+    private final PublishSubject<Object> stopForegroundSubject = PublishSubject.create();
 
     private static final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -49,11 +56,12 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     @Override
     public void stopMusicService() {
-        handler.post(() -> {
-            Intent intent = new Intent(context, MusicService.class);
-            ServiceConnection connection = new ForegroundServiceStopConnection(context);
-            context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        });
+        stopForegroundSubject.onNext(TRIGGER);
+    }
+
+    @Override
+    public Observable<Object> getStopForegroundSignal() {
+        return stopForegroundSubject;
     }
 
     private static void checkPermissionsAndStartServiceSafe(Context context, Intent intent) {
@@ -117,23 +125,4 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         public void onServiceDisconnected(ComponentName name) {}
     }
 
-    private static class ForegroundServiceStopConnection implements ServiceConnection {
-
-        private final Context context;
-
-        public ForegroundServiceStopConnection(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder iBinder) {
-            MusicService.LocalBinder binder = (MusicService.LocalBinder) iBinder;
-            MusicService service = binder.getService();
-            service.stopForeground(false);
-            context.unbindService(this);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {}
-    }
 }
