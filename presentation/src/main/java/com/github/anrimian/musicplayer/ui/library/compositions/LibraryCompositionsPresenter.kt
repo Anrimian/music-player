@@ -1,60 +1,49 @@
-package com.github.anrimian.musicplayer.ui.library.compositions;
+package com.github.anrimian.musicplayer.ui.library.compositions
 
-import androidx.annotation.NonNull;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
-
-import java.util.List;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
-
-
-public class LibraryCompositionsPresenter
-        extends BaseLibraryCompositionsPresenter<LibraryCompositionsView> {
-
-    private final LibraryCompositionsInteractor interactor;
-
-    public LibraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
-                                        PlayListsInteractor playListsInteractor,
-                                        LibraryPlayerInteractor playerInteractor,
-                                        DisplaySettingsInteractor displaySettingsInteractor,
-                                        ErrorParser errorParser,
-                                        Scheduler uiScheduler) {
-        super(playerInteractor, playListsInteractor, displaySettingsInteractor, errorParser, uiScheduler);
-        this.interactor = interactor;
+class LibraryCompositionsPresenter(
+    private val interactor: LibraryCompositionsInteractor,
+    playListsInteractor: PlayListsInteractor,
+    playerInteractor: LibraryPlayerInteractor,
+    displaySettingsInteractor: DisplaySettingsInteractor,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler
+) : BaseLibraryCompositionsPresenter<LibraryCompositionsView>(
+    playerInteractor,
+    playListsInteractor,
+    displaySettingsInteractor,
+    errorParser,
+    uiScheduler
+) {
+    override fun getCompositionsObservable(searchText: String?): Observable<List<Composition>> {
+        return interactor.getCompositionsObservable(searchText)
     }
 
-    @NonNull
-    @Override
-    protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
-        return interactor.getCompositionsObservable(searchText);
+    override fun getSavedListPosition(): ListPosition? {
+        return interactor.savedListPosition
     }
 
-    @Override
-    protected ListPosition getSavedListPosition() {
-        return interactor.getSavedListPosition();
+    override fun saveListPosition(listPosition: ListPosition) {
+        interactor.saveListPosition(listPosition)
     }
 
-    @Override
-    protected void saveListPosition(ListPosition listPosition) {
-        interactor.saveListPosition(listPosition);
+    fun onOrderMenuItemClicked() {
+        viewState.showSelectOrderScreen(interactor.order)
     }
 
-    void onOrderMenuItemClicked() {
-        getViewState().showSelectOrderScreen(interactor.getOrder());
-    }
-
-    void onOrderSelected(Order order) {
-        interactor.setOrder(order);
-        subscribeOnCompositions();
+    fun onOrderSelected(order: Order) {
+        interactor.order = order
+        subscribeOnCompositions()
     }
 }
