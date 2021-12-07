@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.folders.root;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +17,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
-import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersFragment;
+import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersFragmentKt;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
@@ -25,8 +27,6 @@ import java.util.List;
 
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 public class LibraryFoldersRootFragment extends LibraryFragment
         implements FolderRootView, BackButtonListener {
@@ -106,7 +106,7 @@ public class LibraryFoldersRootFragment extends LibraryFragment
 
     @Override
     public void showFolderScreens(List<Long> ids) {
-        navigation.addNewFragmentStack(mapList(ids, LibraryFoldersFragment::newInstance),
+        navigation.addNewFragmentStack(mapList(ids, LibraryFoldersFragmentKt::newFolderFragment),
                 R.anim.anim_alpha_appear);
     }
 

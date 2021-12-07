@@ -1,36 +1,24 @@
-package com.github.anrimian.musicplayer.ui.library.folders.wrappers;
+package com.github.anrimian.musicplayer.ui.library.folders.wrappers
 
-import androidx.annotation.NonNull;
-
-import com.github.anrimian.musicplayer.databinding.PartialStorageHeaderBinding;
-import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
-
-import static android.view.View.GONE;
-import static android.view.View.OnClickListener;
-import static android.view.View.VISIBLE;
+import android.view.View
+import com.github.anrimian.musicplayer.databinding.PartialStorageHeaderBinding
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 
 /**
  * Created on 01.11.2017.
  */
+class HeaderViewWrapper(private val viewBinding: PartialStorageHeaderBinding) {
 
-public class HeaderViewWrapper {
-
-    private final PartialStorageHeaderBinding viewBinding;
-
-    public HeaderViewWrapper(PartialStorageHeaderBinding viewBinding) {
-        this.viewBinding = viewBinding;
+    fun bind(folder: FolderFileSource) {
+        viewBinding.tvParentPath.text = folder.name
     }
 
-    public void bind(@NonNull FolderFileSource folder) {
-        viewBinding.tvParentPath.setText(folder.getName());
+    fun setOnClickListener(listener: View.OnClickListener) {
+        viewBinding.headerClickableItem.setOnClickListener(listener)
     }
 
-    public void setOnClickListener(OnClickListener listener) {
-        viewBinding.headerClickableItem.setOnClickListener(listener);
-    }
-
-    public void setVisible(boolean visible) {
-        viewBinding.getRoot().setVisibility(visible? VISIBLE: GONE);
+    fun setVisible(visible: Boolean) {
+        viewBinding.root.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
 }

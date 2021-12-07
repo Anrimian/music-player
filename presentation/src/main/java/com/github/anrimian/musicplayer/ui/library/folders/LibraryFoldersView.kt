@@ -1,157 +1,155 @@
-package com.github.anrimian.musicplayer.ui.library.folders;
+package com.github.anrimian.musicplayer.ui.library.folders
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
-import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
-import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
-
-import java.util.List;
-
-import moxy.MvpView;
-import moxy.viewstate.strategy.StateStrategyType;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
-import moxy.viewstate.strategy.alias.Skip;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource
+import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
+import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
+import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
+import moxy.MvpView
+import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
+import moxy.viewstate.strategy.alias.Skip
 
 /**
  * Created on 23.10.2017.
  */
 
-public interface LibraryFoldersView extends MvpView {
+private const val LIST_STATE = "list_state"
+private const val FOLDER_STATE = "back_path_button_state"
+private const val PROGRESS_DIALOG_STATE = "progress_dialog_state"
 
-    String LIST_STATE = "list_state";
-    String FOLDER_STATE = "back_path_button_state";
-    String PROGRESS_DIALOG_STATE = "progress_dialog_state";
+interface LibraryFoldersView : MvpView {
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showEmptyList();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showEmptyList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showEmptySearchResult();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showEmptySearchResult()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showList();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showLoading();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showLoading()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showError(ErrorCommand errorCommand);
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showError(errorCommand: ErrorCommand)
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
-    void showFolderInfo(FolderFileSource folder);
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = FOLDER_STATE)
+    fun showFolderInfo(folder: FolderFileSource)
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = FOLDER_STATE)
-    void hideFolderInfo();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = FOLDER_STATE)
+    fun hideFolderInfo()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
-    void hideProgressDialog();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
+    fun hideProgressDialog()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
-    void showMoveProgress();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
+    fun showMoveProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
-    void showDeleteProgress();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
+    fun showDeleteProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = PROGRESS_DIALOG_STATE)
-    void showRenameProgress();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
+    fun showRenameProgress()
 
     @OneExecution
-    void goBackToParentFolderScreen();
+    fun goBackToParentFolderScreen()
 
     @AddToEndSingle
-    void updateList(List<FileSource> update);
+    fun updateList(list: List<FileSource>)
 
     @OneExecution
-    void showSelectOrderScreen(Order folderOrder);
+    fun showSelectOrderScreen(folderOrder: Order)
 
     @OneExecution
-    void showSelectPlayListDialog();
+    fun showSelectPlayListDialog()
 
     @OneExecution
-    void showAddingToPlayListError(ErrorCommand errorCommand);
+    fun showAddingToPlayListError(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
+    fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>)
 
     @OneExecution
-    void showSelectPlayListForFolderDialog(FolderFileSource folder);
+    fun showSelectPlayListForFolderDialog(folder: FolderFileSource)
 
     @OneExecution
-    void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
+    fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>)
 
     @OneExecution
-    void showDeleteCompositionError(ErrorCommand errorCommand);
+    fun showDeleteCompositionError(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
+    fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>)
 
     @OneExecution
-    void showConfirmDeleteDialog(FolderFileSource folder);
+    fun showConfirmDeleteDialog(folder: FolderFileSource)
 
     @AddToEndSingle
-    void showSearchMode(boolean show);
+    fun showSearchMode(show: Boolean)
 
     @OneExecution
-    void sendCompositions(List<Composition> compositions);
+    fun sendCompositions(compositions: List<Composition>)
 
     @OneExecution
-    void showReceiveCompositionsForSendError(ErrorCommand errorCommand);
+    fun showReceiveCompositionsForSendError(errorCommand: ErrorCommand)
 
     @Skip
-    void goToMusicStorageScreen(Long folderId);
+    fun goToMusicStorageScreen(folderId: Long)
 
     @Skip
-    void showCompositionActionDialog(Composition composition);
+    fun showCompositionActionDialog(composition: Composition)
 
     @OneExecution
-    void showErrorMessage(ErrorCommand errorCommand);
+    fun showErrorMessage(errorCommand: ErrorCommand)
 
     @AddToEndSingle
-    void setDisplayCoversEnabled(boolean isCoversEnabled);
+    fun setDisplayCoversEnabled(isCoversEnabled: Boolean)
 
     @Skip
-    void showInputFolderNameDialog(FolderFileSource folder);
+    fun showInputFolderNameDialog(folder: FolderFileSource)
 
     @AddToEndSingle
-    void showSelectionMode(int count);
+    fun showSelectionMode(count: Int)
 
     @Skip
-    void onItemSelected(FileSource item, int position);
+    fun onItemSelected(item: FileSource, position: Int)
 
     @Skip
-    void onItemUnselected(FileSource item, int position);
+    fun onItemUnselected(item: FileSource, position: Int)
 
     @Skip
-    void setItemsSelected(boolean selected);
+    fun setItemsSelected(selected: Boolean)
 
     @Skip
-    void updateMoveFilesList();
+    fun updateMoveFilesList()
 
     @AddToEndSingle
-    void showMoveFileMenu(boolean show);
+    fun showMoveFileMenu(show: Boolean)
 
     @Skip
-    void showInputNewFolderNameDialog();
+    fun showInputNewFolderNameDialog()
 
     @OneExecution
-    void showAddedIgnoredFolderMessage(IgnoredFolder folder);
+    fun showAddedIgnoredFolderMessage(folder: IgnoredFolder)
 
     @OneExecution
-    void onCompositionsAddedToPlayNext(List<Composition> compositions);
+    fun onCompositionsAddedToPlayNext(compositions: List<Composition>)
 
     @OneExecution
-    void onCompositionsAddedToQueue(List<Composition> compositions);
+    fun onCompositionsAddedToQueue(compositions: List<Composition>)
 
     @AddToEndSingle
-    void showCurrentComposition(CurrentComposition currentComposition);
+    fun showCurrentComposition(currentComposition: CurrentComposition)
 
     @OneExecution
-    void restoreListPosition(ListPosition listPosition);
+    fun restoreListPosition(listPosition: ListPosition)
+
 }

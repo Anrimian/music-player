@@ -163,7 +163,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         viewState.showConfirmDeleteDialog(ListUtils.asList(composition))
     }
 
-    fun onDeleteFolderButtonClicked(folder: FolderFileSource?) {
+    fun onDeleteFolderButtonClicked(folder: FolderFileSource) {
         viewState.showConfirmDeleteDialog(folder)
     }
 
@@ -200,11 +200,11 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         addPreparedCompositionsToPlayList(playList)
     }
 
-    fun onAddFolderToPlayListButtonClicked(folder: FolderFileSource?) {
+    fun onAddFolderToPlayListButtonClicked(folder: FolderFileSource) {
         viewState.showSelectPlayListForFolderDialog(folder)
     }
 
-    fun onPlayListForFolderSelected(folderId: Long?, playList: PlayList?) {
+    fun onPlayListForFolderSelected(folderId: Long, playList: PlayList) {
         interactor.addCompositionsToPlayList(folderId, playList)
                 .subscribeOnUi(
                         { addedCompositions -> viewState.showAddingToPlayListComplete(playList, addedCompositions) },
@@ -243,7 +243,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         interactor.saveCurrentFolder(folderId)
     }
 
-    fun onRenameFolderClicked(folder: FolderFileSource?) {
+    fun onRenameFolderClicked(folder: FolderFileSource) {
         viewState.showInputFolderNameDialog(folder)
     }
 
@@ -373,8 +373,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
             RxUtils.dispose(fileActionDisposable, presenterDisposable)
             fileActionDisposable = lastEditAction!!
                     .doFinally { lastEditAction = null }
-                    .subscribe(viewState::updateMoveFilesList, this::onDefaultError)
-            presenterDisposable.add(fileActionDisposable)
+                    .subscribe(viewState::updateMoveFilesList, this::onDefaultError, presenterDisposable)
         }
     }
 
@@ -483,7 +482,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     private fun onAddingToPlayListCompleted(compositions: List<Composition>, playList: PlayList) {
         viewState.showAddingToPlayListComplete(playList, compositions)
         filesForPlayList.clear()
-        if (!selectedFiles.isEmpty()) {
+        if (selectedFiles.isNotEmpty()) {
             closeSelectionMode()
         }
     }
@@ -499,10 +498,9 @@ class LibraryFoldersPresenter(private val folderId: Long?,
             viewState.hideFolderInfo()
             return
         }
-        presenterDisposable.add(interactor.getFolderObservable(folderId)
-                .observeOn(uiScheduler)
-                .subscribe({ folder: FolderFileSource? -> viewState.showFolderInfo(folder) }, { throwable: Throwable -> onDefaultError(throwable) }) { goBackToPreviousScreen() }
-        )
+        interactor.getFolderObservable(folderId)
+                .subscribeOnUi(viewState::showFolderInfo, this::onDefaultError, this::goBackToPreviousScreen)
+
     }
 
     private fun subscribeOnChildFolders() {
