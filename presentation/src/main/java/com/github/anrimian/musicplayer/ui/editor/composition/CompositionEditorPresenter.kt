@@ -134,8 +134,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onNewGenreNameEntered(newName: String?, oldGenre: ShortGenre?) {
@@ -147,8 +146,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onRemoveGenreClicked(genre: ShortGenre) {
@@ -160,8 +158,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({ onGenreRemoved(genre) }, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({ onGenreRemoved(genre) }, this::onDefaultError, presenterDisposable)
     }
 
     fun onRestoreRemovedGenreClicked() {
@@ -180,8 +177,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onNewAlbumEntered(album: String?) {
@@ -193,8 +189,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onNewAlbumArtistEntered(artist: String?) {
@@ -206,8 +201,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onNewTitleEntered(title: String) {
@@ -219,8 +213,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onNewFileNameEntered(fileName: String) {
@@ -232,8 +225,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onNewLyricsEntered(text: String?) {
@@ -245,8 +237,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onCopyFileNameClicked() {
@@ -272,8 +263,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onNewCoverSelected() {
@@ -289,8 +279,7 @@ class CompositionEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showChangeFileProgress() }
                 .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onRetryFailedEditActionClicked() {
@@ -298,8 +287,7 @@ class CompositionEditorPresenter(
             RxUtils.dispose(changeDisposable, presenterDisposable)
             changeDisposable = lastEditAction!!
                     .doFinally { lastEditAction = null }
-                    .subscribe({}, this::onDefaultError)
-            presenterDisposable.add(changeDisposable)
+                    .subscribe({}, this::onDefaultError, presenterDisposable)
         }
     }
 

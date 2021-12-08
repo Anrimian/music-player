@@ -13,4 +13,7 @@ smusicplayer.feedback@gmail.com
 ## Credits
 Loui's - Portuguese localization\
 Ronny Hernandez - Spanish localization\
-SiltyNiKE - Ukrainian localization
+SiltyNiKE - Ukrainian localization\
+Petr Knyttl - Czech localization\
+By Burhan 2010 - Turkish localization
+

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore.Audio.Artists;
 
+import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
@@ -30,7 +31,8 @@ public class StorageArtistsProvider {
     }
 
     public Map<String, StorageArtist> getArtists() {
-        try(Cursor cursor = contentResolver.query(Artists.EXTERNAL_CONTENT_URI,
+        try(Cursor cursor = MediaStoreUtils.query(contentResolver,
+                Artists.EXTERNAL_CONTENT_URI,
                 new String[] {
                         Artists._ID,
                         Artists.ARTIST,

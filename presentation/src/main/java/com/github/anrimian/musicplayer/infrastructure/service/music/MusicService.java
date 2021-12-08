@@ -159,6 +159,11 @@ public class MusicService extends Service {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onServiceStateReceived));
 
+        serviceDisposable.add(Components.getAppComponent().systemServiceController()
+                .getStopForegroundSignal()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(o -> stopForeground(false)));
+
     }
 
     private void onServiceStateReceived(ServiceState serviceState) {
@@ -172,10 +177,6 @@ public class MusicService extends Service {
         if (this.playerState != serviceState.playerState) {
             this.playerState = serviceState.playerState;
             updateNotification = true;
-
-            if (playerState == PlayerState.PAUSE || playerState == PlayerState.STOP) {
-                stopForeground(false);
-            }
         }
 
         boolean isSourceEqual = Objects.equals(newCompositionSource, currentSource);

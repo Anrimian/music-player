@@ -9,6 +9,7 @@ import android.provider.MediaStore.Audio.Genres;
 import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
 
+import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
@@ -31,7 +32,8 @@ public class StorageGenresProvider {
     }
 
     public Map<String, StorageGenre> getGenres() {
-        try(Cursor cursor = contentResolver.query(Genres.EXTERNAL_CONTENT_URI,
+        try(Cursor cursor = MediaStoreUtils.query(contentResolver,
+                Genres.EXTERNAL_CONTENT_URI,
                 new String[] {
                         Genres._ID,
                         Genres.NAME
