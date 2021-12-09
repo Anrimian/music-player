@@ -1,108 +1,102 @@
-package com.github.anrimian.musicplayer.ui.player_screen;
+package com.github.anrimian.musicplayer.ui.player_screen
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import moxy.MvpView;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
-import moxy.viewstate.strategy.alias.Skip;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import moxy.MvpView
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
+import moxy.viewstate.strategy.alias.Skip
 
 /**
  * Created on 02.11.2017.
  */
-
-public interface PlayerView extends MvpView {
+interface PlayerView : MvpView {
+    
+    @AddToEndSingle
+    fun showPlayerState(state: PlayerState)
 
     @AddToEndSingle
-    void showPlayerState(PlayerState state);
+    fun setButtonPanelState(expanded: Boolean)
 
     @AddToEndSingle
-    void setButtonPanelState(boolean expanded);
+    fun setMusicControlsEnabled(show: Boolean)
 
     @AddToEndSingle
-    void setMusicControlsEnabled(boolean show);
+    fun showCurrentQueueItem(item: PlayQueueItem?, showCover: Boolean)
+
+    @OneExecution
+    fun scrollQueueToPosition(position: Int)
 
     @AddToEndSingle
-    void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover);
-
-    @OneExecution
-    void scrollQueueToPosition(int position);
+    fun updatePlayQueue(items: List<PlayQueueItem>)
 
     @AddToEndSingle
-    void updatePlayQueue(List<PlayQueueItem> items);
+    fun showRepeatMode(mode: Int)
 
     @AddToEndSingle
-    void showRepeatMode(int mode);
+    fun showRandomPlayingButton(active: Boolean)
 
     @AddToEndSingle
-    void showRandomPlayingButton(boolean active);
+    fun showTrackState(currentPosition: Long, duration: Long)
+
+    @OneExecution
+    fun showSelectPlayListDialog()
+
+    @OneExecution
+    fun showShareMusicDialog(composition: Composition)
+
+    @OneExecution
+    fun showAddingToPlayListError(errorCommand: ErrorCommand)
+
+    @OneExecution
+    fun showAddingToPlayListComplete(playList: PlayList?, compositions: List<Composition>)
+
+    @OneExecution
+    fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>)
+
+    @OneExecution
+    fun showDeleteCompositionError(errorCommand: ErrorCommand)
+
+    @OneExecution
+    fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>)
 
     @AddToEndSingle
-    void showTrackState(long currentPosition, long duration);
+    fun showPlayQueueSubtitle(size: Int)
 
     @OneExecution
-    void showSelectPlayListDialog();
+    fun showDrawerScreen(selectedDrawerScreenId: Int, selectedPlayListScreenId: Long)
 
     @OneExecution
-    void showShareMusicDialog(Composition composition);
-
-    @OneExecution
-    void showAddingToPlayListError(ErrorCommand errorCommand);
-
-    @OneExecution
-    void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
-
-    @OneExecution
-    void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
-
-    @OneExecution
-    void showDeleteCompositionError(ErrorCommand errorCommand);
-
-    @OneExecution
-    void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
-
-    @AddToEndSingle
-    void showPlayQueueSubtitle(int size);
-
-    @OneExecution
-    void showDrawerScreen(int selectedDrawerScreen, long selectedPlayListScreen);
-
-    @OneExecution
-    void showLibraryScreen(int selectedLibraryScreen);
+    fun showLibraryScreen(selectedLibraryScreen: Int)
 
     @Skip
-    void notifyItemMoved(int from, int to);
+    fun notifyItemMoved(from: Int, to: Int)
 
     @AddToEndSingle
-    void setPlayQueueCoversEnabled(boolean isCoversEnabled);
+    fun setPlayQueueCoversEnabled(isCoversEnabled: Boolean)
 
     @Skip
-    void startEditCompositionScreen(long id);
+    fun startEditCompositionScreen(id: Long)
 
     @OneExecution
-    void showErrorMessage(ErrorCommand errorCommand);
+    fun showErrorMessage(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showDeletedItemMessage();
+    fun showDeletedItemMessage()
 
     @AddToEndSingle
-    void displayPlaybackSpeed(float speed);
+    fun displayPlaybackSpeed(speed: Float)
 
     @AddToEndSingle
-    void showSpeedChangeFeatureVisible(boolean visible);
+    fun showSpeedChangeFeatureVisible(visible: Boolean)
 
     @AddToEndSingle
-    void showSleepTimerRemainingTime(long remainingMillis);
+    fun showSleepTimerRemainingTime(remainingMillis: Long)
 
     @AddToEndSingle
-    void showFileScannerState(FileScannerState state);
+    fun showFileScannerState(state: FileScannerState)
 }

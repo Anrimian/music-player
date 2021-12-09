@@ -1,563 +1,445 @@
-package com.github.anrimian.musicplayer.ui.player_screen;
+package com.github.anrimian.musicplayer.ui.player_screen
 
-import static android.view.View.VISIBLE;
-import static androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
-import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.CREATE_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.SELECT_PLAYLIST_TAG;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getAddToPlayListCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.getDeleteCompleteMessage;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
-import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHoldListener;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.clearVectorAnimationInfo;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
-import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
-
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
-
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
-import androidx.appcompat.widget.ActionMenuView;
-import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
-import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
-import com.github.anrimian.musicplayer.databinding.PartialDrawerHeaderBinding;
-import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractorKt;
-import com.github.anrimian.musicplayer.domain.models.Screens;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState;
-import com.github.anrimian.musicplayer.domain.models.scanner.Running;
-import com.github.anrimian.musicplayer.ui.ScreensMap;
-import com.github.anrimian.musicplayer.ui.about.AboutAppFragment;
-import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
-import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
-import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
-import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler;
-import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
-import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivityKt;
-import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
-import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment;
-import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment;
-import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment;
-import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment;
-import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListFragment;
-import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter;
-import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor;
-import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapper;
-import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapperImpl;
-import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.TabletPlayerPanelWrapper;
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment;
-import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment;
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragmentKt;
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment;
-import com.github.anrimian.musicplayer.ui.settings.SettingsFragment;
-import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
-import com.github.anrimian.musicplayer.ui.start.StartFragment;
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
-import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
-import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback;
-import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
-import com.github.anrimian.musicplayer.utils.Permissions;
-import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import moxy.MvpAppCompatFragment;
-import moxy.presenter.InjectPresenter;
-import moxy.presenter.ProvidePresenter;
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
+import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding
+import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding
+import com.github.anrimian.musicplayer.databinding.PartialDrawerHeaderBinding
+import com.github.anrimian.musicplayer.databinding.PartialQueueToolbarBinding
+import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.NO_TIMER
+import com.github.anrimian.musicplayer.domain.models.Screens
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState
+import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
+import com.github.anrimian.musicplayer.domain.models.scanner.Running
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
+import com.github.anrimian.musicplayer.ui.ScreensMap
+import com.github.anrimian.musicplayer.ui.about.AboutAppFragment
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
+import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
+import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
+import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
+import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment
+import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment
+import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment
+import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment
+import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListFragment
+import com.github.anrimian.musicplayer.ui.player_screen.view.adapter.PlayQueueAdapter
+import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapper
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapperImpl
+import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.TabletPlayerPanelWrapper
+import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.newPlayListFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment
+import com.github.anrimian.musicplayer.ui.settings.SettingsFragment
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
+import com.github.anrimian.musicplayer.ui.start.StartFragment
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility
+import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener
+import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
+import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper
+import com.github.anrimian.musicplayer.utils.Permissions
+import com.google.android.material.snackbar.Snackbar
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import moxy.MvpAppCompatFragment
+import moxy.ktx.moxyPresenter
+import java.util.*
+import kotlin.math.abs
 
 /**
  * Created on 19.10.2017.
  */
 
-public class PlayerFragment extends MvpAppCompatFragment implements BackButtonListener, PlayerView {
+private const val NO_ITEM = -1
+private const val SELECTED_DRAWER_ITEM = "selected_drawer_item"
 
-    private static final int NO_ITEM = -1;
-    private static final String SELECTED_DRAWER_ITEM = "selected_drawer_item";
+fun newPlayerFragment(openPlayQueue: Boolean = false): PlayerFragment {
+    val args = Bundle()
+    args.putBoolean(Constants.Arguments.OPEN_PLAY_QUEUE_ARG, openPlayQueue)
+    val fragment = PlayerFragment()
+    fragment.arguments = args
+    return fragment
+}
 
-    @InjectPresenter
-    PlayerPresenter presenter;
+class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
-    private FragmentDrawerBinding viewBinding;
-    private PartialDetailedMusicBinding panelBinding;
-    private PartialDrawerHeaderBinding drawerHeaderBinding;
-    private DrawerLayout drawer;
-    private NavigationView navigationView;
-    private RecyclerView rvPlayList;
-    private ImageView ivPlayPause;
-    private ImageView ivSkipToPrevious;
-    private ImageView ivSkipToNext;
-    private JugglerView fragmentContainer;
-    private TextView tvCurrentComposition;
-    private ImageView btnRepeatMode;
-    private ImageView btnRandomPlay;
-    private TextView tvPlayedTime;
-    private TextView tvTotalTime;
-    private SeekBar sbTrackState;
-    private View bottomSheetTopShadow;
-    private View topBottomSheetPanel;
-    private ImageView ivMusicIcon;
-    private ImageView btnActionsMenu;
-    private TextView tvCurrentCompositionAuthor;
-    private CoordinatorLayout clPlayQueueContainer;
-    @Nullable
-    private MotionLayout mlBottomSheet;
-    private AdvancedToolbar toolbar;
-    private ActionMenuView acvPlayQueueMenu;
-    private TextView tvQueueSubtitle;
+    private val presenter by moxyPresenter {
+        Components.getLibraryComponent().playerPresenter()
+    }
+    private lateinit var viewBinding: FragmentDrawerBinding
+    private lateinit var panelBinding: PartialDetailedMusicBinding
+    private lateinit var drawerHeaderBinding: PartialDrawerHeaderBinding
+    private lateinit var toolbarPlayQueueBinding: PartialQueueToolbarBinding
 
-    private PlayQueueAdapter playQueueAdapter;
+    private lateinit var toolbar: AdvancedToolbar
+    private lateinit var playQueueAdapter: PlayQueueAdapter
 
-    private int selectedDrawerItemId = NO_ITEM;
-    private int itemIdToStart = NO_ITEM;
+    private var selectedDrawerItemId = NO_ITEM
+    private var itemIdToStart = NO_ITEM
 
-    private final Handler secondScrollHandler = new Handler(Looper.getMainLooper());
-    private int currentPosition = -2;//for immediate first scroll
+    private val secondScrollHandler = Handler(Looper.getMainLooper())
+    private var currentPosition = -2 //for immediate first scroll
 
-    private LinearLayoutManager playQueueLayoutManager;
-    private SeekBarViewWrapper seekBarViewWrapper;
+    private lateinit var playQueueLayoutManager: LinearLayoutManager
+    private lateinit var seekBarViewWrapper: SeekBarViewWrapper
+    private lateinit var drawerLockStateProcessor: DrawerLockStateProcessor
 
-    private DrawerLockStateProcessor drawerLockStateProcessor;
-    private final CompositeDisposable viewDisposable = new CompositeDisposable();
+    private val viewDisposable = CompositeDisposable()
 
-    private FragmentNavigation navigation;
+    private lateinit var navigation: FragmentNavigation
+    private lateinit var playerPanelWrapper: PlayerPanelWrapper
 
-    private PlayerPanelWrapper playerPanelWrapper;
+    private lateinit var deletingErrorHandler: ErrorHandler
 
-    @Nullable
-    private Composition previousCoverComposition;
+    private var previousCoverComposition: Composition? = null
 
-    private ErrorHandler deletingErrorHandler;
-
-    public static PlayerFragment newInstance() {
-        return newInstance(false);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
-    public static PlayerFragment newInstance(boolean openPlayQueue) {
-        Bundle args = new Bundle();
-        args.putBoolean(OPEN_PLAY_QUEUE_ARG, openPlayQueue);
-        PlayerFragment fragment = new PlayerFragment();
-        fragment.setArguments(args);
-        return fragment;
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        viewBinding = FragmentDrawerBinding.inflate(inflater, container, false)
+        toolbar = viewBinding.toolbar.root
+        toolbarPlayQueueBinding = viewBinding.toolbarPlayQueue
+        panelBinding = viewBinding.clMusicPanel!!
+        return viewBinding.root
     }
 
-    @ProvidePresenter
-    PlayerPresenter providePresenter() {
-        return Components.getLibraryComponent().playerPresenter();
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground)
+        
+        toolbar.initializeViews(requireActivity().window)
+        toolbar.setupWithActivity(requireActivity() as AppCompatActivity)
+        
+        navigation = FragmentNavigation.from(childFragmentManager)
+        navigation.initialize(viewBinding.drawerFragmentContainer!!, savedInstanceState)
+        navigation.checkForEqualityOnReplace(true)
+        navigation.setExitAnimation(R.anim.anim_slide_out_right)
+        navigation.setEnterAnimation(R.anim.anim_slide_in_right)
+        navigation.setRootExitAnimation(R.anim.anim_alpha_disappear)
+        
+        drawerLockStateProcessor = DrawerLockStateProcessor(viewBinding.drawer)
+        drawerLockStateProcessor.setupWithNavigation(navigation)
+        viewDisposable.add(
+            toolbar.searchModeObservable.subscribe(drawerLockStateProcessor::onSearchModeChanged)
+        )
+        viewDisposable.add(
+            toolbar.selectionModeObservable.subscribe(drawerLockStateProcessor::onSelectionModeChanged)
+        )
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        viewBinding = FragmentDrawerBinding.inflate(inflater, container, false);
-        toolbar = viewBinding.toolbar.getRoot();
-        fragmentContainer = viewBinding.drawerFragmentContainer;
-        mlBottomSheet = viewBinding.getRoot().findViewById(R.id.ml_bottom_sheet);
-        navigationView = viewBinding.navigationView;
-        drawer = viewBinding.drawer;
-        acvPlayQueueMenu = viewBinding.toolbarPlayQueue.acvPlayQueue;
-
-        panelBinding = viewBinding.clMusicPanel;
-        assert panelBinding != null;
-        ivSkipToPrevious = panelBinding.ivSkipToPrevious;
-        ivSkipToNext = panelBinding.ivSkipToNext;
-        btnRepeatMode = panelBinding.btnInfinitePlay;
-        rvPlayList = viewBinding.rvPlaylist;
-        btnActionsMenu = panelBinding.btnActionsMenu;
-        topBottomSheetPanel = panelBinding.topPanel;
-        sbTrackState = panelBinding.sbTrackState;
-        ivPlayPause = panelBinding.ivPlayPause;
-        btnRandomPlay = panelBinding.btnRandomPlay;
-        bottomSheetTopShadow = viewBinding.bottomSheetTopShadow;
-        tvCurrentComposition = panelBinding.tvCurrentComposition;
-        tvPlayedTime = panelBinding.tvPlayedTime;
-        tvTotalTime = panelBinding.tvTotalTime;
-        ivMusicIcon = panelBinding.ivMusicIcon;
-        tvCurrentCompositionAuthor = panelBinding.tvCurrentCompositionAuthor;
-        clPlayQueueContainer = viewBinding.clPlayQueueContainer;
-        tvQueueSubtitle = viewBinding.toolbarPlayQueue.tvQueueSubtitle;
-        return viewBinding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground);
-
-        toolbar.initializeViews(requireActivity().getWindow());
-        toolbar.setupWithActivity((AppCompatActivity) requireActivity());
-
-        navigation = FragmentNavigation.from(getChildFragmentManager());
-        navigation.initialize(fragmentContainer, savedInstanceState);
-        navigation.checkForEqualityOnReplace(true);
-        navigation.setExitAnimation(R.anim.anim_slide_out_right);
-        navigation.setEnterAnimation(R.anim.anim_slide_in_right);
-        navigation.setRootExitAnimation(R.anim.anim_alpha_disappear);
-
-        drawerLockStateProcessor = new DrawerLockStateProcessor(viewBinding.drawer);
-        drawerLockStateProcessor.setupWithNavigation(navigation);
-        viewDisposable.add(toolbar.getSearchModeObservable()
-                .subscribe(drawerLockStateProcessor::onSearchModeChanged)
-        );
-        viewDisposable.add(toolbar.getSelectionModeObservable()
-                .subscribe(drawerLockStateProcessor::onSelectionModeChanged)
-        );
-
-        if (mlBottomSheet == null) {
-            playerPanelWrapper = new TabletPlayerPanelWrapper(view,
-                    drawerLockStateProcessor::onBottomSheetOpened);
+        val mlBottomSheet = viewBinding.root.findViewById<MotionLayout>(R.id.ml_bottom_sheet)
+        playerPanelWrapper = if (mlBottomSheet == null) {
+            TabletPlayerPanelWrapper(view, drawerLockStateProcessor::onBottomSheetOpened)
         } else {
-            playerPanelWrapper = new PlayerPanelWrapperImpl(view,
-                    viewBinding,
-                    panelBinding,
-                    mlBottomSheet,
-                    requireActivity(),
-                    savedInstanceState,
-                    presenter::onBottomPanelCollapsed,
-                    presenter::onBottomPanelExpanded,
-                    drawerLockStateProcessor::onBottomSheetOpened);
+            PlayerPanelWrapperImpl(
+                view,
+                viewBinding,
+                panelBinding,
+                mlBottomSheet,
+                requireActivity(),
+                savedInstanceState,
+                presenter::onBottomPanelCollapsed,
+                presenter::onBottomPanelExpanded,
+                drawerLockStateProcessor::onBottomSheetOpened
+            )
         }
-
-
-        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
-        View headerView = navigationView.inflateHeaderView(R.layout.partial_drawer_header);
-        drawerHeaderBinding = PartialDrawerHeaderBinding.bind(headerView);
-
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(requireActivity(), drawer, R.string.open_drawer, R.string.close_drawer);
-        DrawerArrowDrawable drawerArrowDrawable = createDrawerArrowDrawable();
-        drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
-
-        drawer.addDrawerListener(new SimpleDrawerListener(this::onDrawerClosed));
-
-        setupMenu(acvPlayQueueMenu, R.menu.play_queue_menu, this::onPlayQueueMenuItemClicked);
-
-        toolbar.setupWithNavigation(navigation,
-                drawerArrowDrawable,
-                () -> playerPanelWrapper.isBottomPanelExpanded());
-
-        ivSkipToPrevious.setOnClickListener(v -> presenter.onSkipToPreviousButtonClicked());
-        setOnHoldListener(ivSkipToPrevious, presenter::onFastSeekBackwardCalled);
-        ivSkipToNext.setOnClickListener(v -> presenter.onSkipToNextButtonClicked());
-        setOnHoldListener(ivSkipToNext, presenter::onFastSeekForwardCalled);
-        btnRepeatMode.setOnClickListener(this::onRepeatModeButtonClicked);
-
-        playQueueLayoutManager = new LinearLayoutManager(requireContext());
-        rvPlayList.setLayoutManager(playQueueLayoutManager);
-
-        playQueueAdapter = new PlayQueueAdapter(rvPlayList);
-        playQueueAdapter.setOnCompositionClickListener(presenter::onQueueItemClicked);
-        playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked);
-        playQueueAdapter.setIconClickListener(presenter::onQueueItemIconClicked);
-        rvPlayList.setAdapter(playQueueAdapter);
-
-        DragAndSwipeTouchHelperCallback callback = FormatUtils.withSwipeToDelete(rvPlayList,
-                getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
-                presenter::onItemSwipedToDelete,
-                ItemTouchHelper.START,
-                R.drawable.ic_remove_from_queue,
-                R.string.delete_from_queue);
-        callback.setOnMovedListener(presenter::onItemMoved);
-        callback.setOnStartDragListener(position -> presenter.onDragStarted());
-        callback.setOnEndDragListener(position -> presenter.onDragEnded());
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(rvPlayList);
-
-
+        viewBinding.navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected)
+        val headerView = viewBinding.navigationView.inflateHeaderView(R.layout.partial_drawer_header)
+        drawerHeaderBinding = PartialDrawerHeaderBinding.bind(headerView)
+        val drawerToggle = ActionBarDrawerToggle(
+            requireActivity(),
+            viewBinding.drawer,
+            R.string.open_drawer,
+            R.string.close_drawer
+        )
+        val drawerArrowDrawable = createDrawerArrowDrawable()
+        drawerToggle.drawerArrowDrawable = drawerArrowDrawable
+        viewBinding.drawer.addDrawerListener(SimpleDrawerListener(this::onDrawerClosed))
+        
+        ActionMenuUtil.setupMenu(
+            toolbarPlayQueueBinding.acvPlayQueue,
+            R.menu.play_queue_menu,
+            this::onPlayQueueMenuItemClicked
+        )
+        
+        toolbar.setupWithNavigation(navigation, drawerArrowDrawable) { 
+            playerPanelWrapper.isBottomPanelExpanded 
+        }
+        
+        panelBinding.ivSkipToPrevious.setOnClickListener { presenter.onSkipToPreviousButtonClicked() }
+        ViewUtils.setOnHoldListener(panelBinding.ivSkipToPrevious, presenter::onFastSeekBackwardCalled)
+        panelBinding.ivSkipToNext.setOnClickListener { presenter.onSkipToNextButtonClicked() }
+        ViewUtils.setOnHoldListener(panelBinding.ivSkipToNext, presenter::onFastSeekForwardCalled)
+        panelBinding.btnInfinitePlay.setOnClickListener { onRepeatModeButtonClicked(view) }
+        
+        playQueueLayoutManager = LinearLayoutManager(requireContext())
+        viewBinding.rvPlaylist!!.layoutManager = playQueueLayoutManager
+        playQueueAdapter = PlayQueueAdapter(viewBinding.rvPlaylist)
+        playQueueAdapter.setOnCompositionClickListener(presenter::onQueueItemClicked)
+        playQueueAdapter.setMenuClickListener(this::onPlayItemMenuClicked)
+        playQueueAdapter.setIconClickListener(presenter::onQueueItemIconClicked)
+        
+        viewBinding.rvPlaylist!!.adapter = playQueueAdapter
+        val callback = FormatUtils.withSwipeToDelete(
+            viewBinding.rvPlaylist!!,
+            AndroidUtils.getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
+            presenter::onItemSwipedToDelete,
+            ItemTouchHelper.START,
+            R.drawable.ic_remove_from_queue,
+            R.string.delete_from_queue
+        )
+        callback.setOnMovedListener(presenter::onItemMoved)
+        callback.setOnStartDragListener { presenter.onDragStarted() }
+        callback.setOnEndDragListener { presenter.onDragEnded() }
+        val itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(viewBinding.rvPlaylist!!)
+        
         if (savedInstanceState != null) {
-            selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM);
+            selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM)
         } else {
-            presenter.onCurrentScreenRequested();
+            presenter.onCurrentScreenRequested()
         }
-
-        btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked);
-        topBottomSheetPanel.setOnClickListener(v -> openPlayQueue());
-
-        seekBarViewWrapper = new SeekBarViewWrapper(sbTrackState);
-        seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo);
-        seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart);
-        seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop);
-
-        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvPlaybackSpeed);
-        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvSleepTime);
-
-        deletingErrorHandler = new DeleteErrorHandler(getChildFragmentManager(),
-                presenter::onRetryFailedDeleteActionClicked,
-                this::showEditorRequestDeniedMessage);
-
-        ChoosePlayListDialogFragment fragment = (ChoosePlayListDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(SELECT_PLAYLIST_TAG);
-        if (fragment != null) {
-            fragment.setOnCompleteListener(presenter::onPlayListForAddingSelected);
+        
+        panelBinding.btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked)
+        panelBinding.topPanel.setOnClickListener { openPlayQueue() }
+        
+        seekBarViewWrapper = SeekBarViewWrapper(panelBinding.sbTrackState)
+        seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo)
+        seekBarViewWrapper.setOnSeekStartListener(presenter::onSeekStart)
+        seekBarViewWrapper.setOnSeekStopListener(presenter::onSeekStop)
+        
+        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvPlaybackSpeed)
+        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvSleepTime)
+        
+        deletingErrorHandler = DeleteErrorHandler(
+            childFragmentManager,
+            presenter::onRetryFailedDeleteActionClicked, 
+            this::showEditorRequestDeniedMessage
+        )
+        
+        val fragment = childFragmentManager
+            .findFragmentByTag(Tags.SELECT_PLAYLIST_TAG) as ChoosePlayListDialogFragment?
+        fragment?.setOnCompleteListener(presenter::onPlayListForAddingSelected)
+        
+        val createPlayListFragment = childFragmentManager
+            .findFragmentByTag(Tags.CREATE_PLAYLIST_TAG) as CreatePlayListDialogFragment?
+        createPlayListFragment?.setOnCompleteListener(presenter::onPlayListForAddingCreated)
+        
+        if (requireArguments().getBoolean(Constants.Arguments.OPEN_PLAY_QUEUE_ARG)) {
+            requireArguments().remove(Constants.Arguments.OPEN_PLAY_QUEUE_ARG)
+            openPlayQueue()
         }
-
-        CreatePlayListDialogFragment createPlayListFragment = (CreatePlayListDialogFragment) getChildFragmentManager()
-                .findFragmentByTag(CREATE_PLAYLIST_TAG);
-        if (createPlayListFragment != null) {
-            createPlayListFragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
-        }
-
-        if (requireArguments().getBoolean(OPEN_PLAY_QUEUE_ARG)) {
-            requireArguments().remove(OPEN_PLAY_QUEUE_ARG);
-            openPlayQueue();
-        }
-
+        
         if (!Permissions.hasFilePermission(requireContext())) {
-            getParentFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_activity_container, new StartFragment())
-                    .commit();
+            parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.main_activity_container, StartFragment())
+                .commit()
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            if (drawer.getDrawerLockMode(GravityCompat.START) != LOCK_MODE_LOCKED_CLOSED) {
-                drawer.openDrawer(GravityCompat.START);
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            if (viewBinding.drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+                viewBinding.drawer.openDrawer(GravityCompat.START)
             } else {
-                onBackPressed();
+                onBackPressed()
             }
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        navigation.onSaveInstanceState(outState);
-        outState.putInt(SELECTED_DRAWER_ITEM, selectedDrawerItemId);
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        navigation.onSaveInstanceState(outState)
+        outState.putInt(SELECTED_DRAWER_ITEM, selectedDrawerItemId)
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        toolbar.release();
-        drawerLockStateProcessor.release();
-        viewDisposable.clear();
+    override fun onDestroyView() {
+        super.onDestroyView()
+        toolbar.release()
+        drawerLockStateProcessor.release()
+        viewDisposable.clear()
     }
 
-    @Override
-    public boolean onBackPressed() {
-        if (playerPanelWrapper.isBottomPanelExpanded()) {
-            playerPanelWrapper.collapseBottomPanelSmoothly();
-            return true;
+    override fun onBackPressed(): Boolean {
+        if (playerPanelWrapper.isBottomPanelExpanded) {
+            playerPanelWrapper.collapseBottomPanelSmoothly()
+            return true
         }
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-            return true;
+        if (viewBinding.drawer.isDrawerOpen(GravityCompat.START)) {
+            viewBinding.drawer.closeDrawer(GravityCompat.START)
+            return true
         }
-
-        Fragment fragment = navigation.getFragmentOnTop();
-        boolean processed = fragment instanceof BackButtonListener
-                && ((BackButtonListener) fragment).onBackPressed();
+        val fragment = navigation.fragmentOnTop
+        var processed = (fragment is BackButtonListener && fragment.onBackPressed())
         if (!processed) {
-            processed = FragmentNavigation.from(getChildFragmentManager()).goBack();
+            processed = FragmentNavigation.from(childFragmentManager).goBack()
         }
-        return processed;
+        return processed
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        presenter.onStart();
+    override fun onStart() {
+        super.onStart()
+        presenter.onStart()
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
+    override fun onStop() {
+        super.onStop()
         //battery saving
-        presenter.onStop();
-
-        clearVectorAnimationInfo(ivPlayPause);
+        presenter.onStop()
+        
+        AndroidUtils.clearVectorAnimationInfo(panelBinding.ivPlayPause)
     }
 
-    @Override
-    public void setButtonPanelState(boolean expanded) {
+    override fun setButtonPanelState(expanded: Boolean) {
         if (expanded) {
-            playerPanelWrapper.expandBottomPanel();
+            playerPanelWrapper.expandBottomPanel()
         } else {
-            playerPanelWrapper.collapseBottomPanel();
+            playerPanelWrapper.collapseBottomPanel()
         }
     }
 
-    @Override
-    public void showDrawerScreen(int screenId, long selectedPlayListScreenId) {
-        int itemId = ScreensMap.getMenuId(screenId);
-        selectedDrawerItemId = itemId;
-        navigationView.setCheckedItem(itemId);
-
-        switch (screenId) {
-            case Screens.LIBRARY: {
-                presenter.onLibraryScreenSelected();
-                break;
-            }
-            case Screens.PLAY_LISTS: {
-                List<Fragment> fragments = new ArrayList<>();
-                fragments.add(new PlayListsFragment());
-                if (selectedPlayListScreenId != 0) {
-                    fragments.add(PlayListFragmentKt.newPlayListFragment(selectedPlayListScreenId));
+    override fun showDrawerScreen(selectedDrawerScreenId: Int, selectedPlayListScreenId: Long) {
+        val itemId = ScreensMap.getMenuId(selectedDrawerScreenId)
+        selectedDrawerItemId = itemId
+        viewBinding.navigationView.setCheckedItem(itemId)
+        when (selectedDrawerScreenId) {
+            Screens.LIBRARY -> presenter.onLibraryScreenSelected()
+            Screens.PLAY_LISTS -> {
+                val fragments: MutableList<Fragment> = ArrayList()
+                fragments.add(PlayListsFragment())
+                if (selectedPlayListScreenId != 0L) {
+                    fragments.add(newPlayListFragment(selectedPlayListScreenId))
                 }
-                navigation.newRootFragmentStack(fragments, 0, R.anim.anim_alpha_appear);
-                break;
+                navigation.newRootFragmentStack(fragments, 0, R.anim.anim_alpha_appear)
             }
         }
     }
 
-    @Override
-    public void showLibraryScreen(int selectedLibraryScreen) {
-        Fragment fragment;
-        switch (selectedLibraryScreen) {
-            case Screens.LIBRARY_COMPOSITIONS: {
-                fragment = new LibraryCompositionsFragment();
-                break;
-            }
-            case Screens.LIBRARY_FOLDERS: {
-                fragment = new LibraryFoldersRootFragment();
-                break;
-            }
-            case Screens.LIBRARY_ARTISTS: {
-                fragment = new ArtistsListFragment();
-                break;
-            }
-            case Screens.LIBRARY_ALBUMS: {
-                fragment = new AlbumsListFragment();
-                break;
-            }
-            case Screens.LIBRARY_GENRES: {
-                fragment = new GenresListFragment();
-                break;
-            }
-            default: {
-                fragment = new LibraryCompositionsFragment();
-            }
+    override fun showLibraryScreen(selectedLibraryScreen: Int) {
+        val fragment = when (selectedLibraryScreen) {
+            Screens.LIBRARY_COMPOSITIONS -> LibraryCompositionsFragment()
+            Screens.LIBRARY_FOLDERS -> LibraryFoldersRootFragment()
+            Screens.LIBRARY_ARTISTS -> ArtistsListFragment()
+            Screens.LIBRARY_ALBUMS -> AlbumsListFragment()
+            Screens.LIBRARY_GENRES -> GenresListFragment()
+            else -> LibraryCompositionsFragment()
         }
-        startFragment(fragment);
+        startFragment(fragment)
     }
 
-    @Override
-    public void showPlayerState(PlayerState state) {
-        if (state == PlayerState.PLAY) {
-            AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_play_to_pause);
-            ivPlayPause.setContentDescription(getString(R.string.pause));
-            ivPlayPause.setOnClickListener(v -> presenter.onStopButtonClicked());
-            playQueueAdapter.showPlaying(true);
+    override fun showPlayerState(state: PlayerState) {
+        if (state === PlayerState.PLAY) {
+            AndroidUtils.setAnimatedVectorDrawable(panelBinding.ivPlayPause, R.drawable.anim_play_to_pause)
+            panelBinding.ivPlayPause.contentDescription = getString(R.string.pause)
+            panelBinding.ivPlayPause.setOnClickListener { presenter.onStopButtonClicked() }
+            playQueueAdapter.showPlaying(true)
         } else {
-            AndroidUtils.setAnimatedVectorDrawable(ivPlayPause, R.drawable.anim_pause_to_play);
-            ivPlayPause.setContentDescription(getString(R.string.play));
-            ivPlayPause.setOnClickListener(v -> presenter.onPlayButtonClicked());
-            playQueueAdapter.showPlaying(false);
+            AndroidUtils.setAnimatedVectorDrawable(panelBinding.ivPlayPause, R.drawable.anim_pause_to_play)
+            panelBinding.ivPlayPause.contentDescription = getString(R.string.play)
+            panelBinding.ivPlayPause.setOnClickListener { presenter.onPlayButtonClicked() }
+            playQueueAdapter.showPlaying(false)
         }
     }
 
-    @Override
-    public void setMusicControlsEnabled(boolean show) {
-        ivSkipToNext.setEnabled(show);
-        ivSkipToPrevious.setEnabled(show);
-        ivPlayPause.setEnabled(show);
-        btnRepeatMode.setEnabled(show);
-        btnRandomPlay.setEnabled(show);
-        sbTrackState.setEnabled(show);
-        acvPlayQueueMenu.getMenu().findItem(R.id.menu_save_as_playlist).setEnabled(show);
-        panelBinding.tvPlaybackSpeed.setEnabled(show);
+    override fun setMusicControlsEnabled(show: Boolean) {
+        panelBinding.ivSkipToNext.isEnabled = show
+        panelBinding.ivSkipToPrevious.isEnabled = show
+        panelBinding.ivPlayPause.isEnabled = show
+        panelBinding.btnInfinitePlay.isEnabled = show
+        panelBinding.btnRandomPlay.isEnabled = show
+        panelBinding.sbTrackState.isEnabled = show
+        toolbarPlayQueueBinding.acvPlayQueue.menu.findItem(R.id.menu_save_as_playlist).isEnabled = show
+        panelBinding.tvPlaybackSpeed.isEnabled = show
     }
 
-    @Override
-    public void showCurrentQueueItem(@Nullable PlayQueueItem item, boolean showCover) {
-        animateVisibility(bottomSheetTopShadow, VISIBLE);
-        animateVisibility(rvPlayList, VISIBLE);
-
-        btnActionsMenu.setEnabled(item != null);
+    override fun showCurrentQueueItem(item: PlayQueueItem?, showCover: Boolean) {
+        animateVisibility(viewBinding.bottomSheetTopShadow, View.VISIBLE)
+        animateVisibility(viewBinding.rvPlaylist!!, View.VISIBLE)
+        panelBinding.btnActionsMenu.isEnabled = item != null
         if (item == null) {
-            tvPlayedTime.setText(formatMilliseconds(0));
-            tvTotalTime.setText(formatMilliseconds(0));
-            sbTrackState.setProgress(0);
-
-            tvCurrentComposition.setText(R.string.no_current_composition);
-            tvCurrentCompositionAuthor.setText(R.string.unknown_author);
-            ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
-            String noCompositionMessage = getString(R.string.no_current_composition);
-            topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, noCompositionMessage));
-            rvPlayList.setContentDescription(noCompositionMessage);
-            sbTrackState.setContentDescription(noCompositionMessage);
-            previousCoverComposition = null;
+            panelBinding.tvPlayedTime.text = FormatUtils.formatMilliseconds(0)
+            panelBinding.tvTotalTime.text = FormatUtils.formatMilliseconds(0)
+            panelBinding.sbTrackState.progress = 0
+            panelBinding.tvCurrentComposition.setText(R.string.no_current_composition)
+            panelBinding.tvCurrentCompositionAuthor.setText(R.string.unknown_author)
+            panelBinding.ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder)
+            val noCompositionMessage = getString(R.string.no_current_composition)
+            panelBinding.topPanel.contentDescription =
+                getString(R.string.now_playing_template, noCompositionMessage)
+            viewBinding.rvPlaylist!!.contentDescription = noCompositionMessage
+            panelBinding.sbTrackState.contentDescription = noCompositionMessage
+            previousCoverComposition = null
         } else {
-            Composition composition = item.getComposition();
-            String compositionName = formatCompositionName(composition);
-            tvCurrentComposition.setText(compositionName);
-            tvTotalTime.setText(formatMilliseconds(composition.getDuration()));
-            tvCurrentCompositionAuthor.setText(formatCompositionAuthor(composition, requireContext()));
-            seekBarViewWrapper.setMax(composition.getDuration());
-            topBottomSheetPanel.setContentDescription(getString(R.string.now_playing_template, compositionName));
-            sbTrackState.setContentDescription(null);
-
+            val composition = item.composition
+            val compositionName = CompositionHelper.formatCompositionName(composition)
+            panelBinding.tvCurrentComposition.text = compositionName
+            panelBinding.tvTotalTime.text = FormatUtils.formatMilliseconds(composition.duration)
+            panelBinding.tvCurrentCompositionAuthor.text =
+                FormatUtils.formatCompositionAuthor(composition, requireContext())
+            seekBarViewWrapper.setMax(composition.duration)
+            panelBinding.topPanel.contentDescription =
+                getString(R.string.now_playing_template, compositionName)
+            panelBinding.sbTrackState.contentDescription = null
             if (showCover) {
                 Components.getAppComponent()
-                        .imageLoader()
-                        .displayImageInReusableTarget(ivMusicIcon, composition, previousCoverComposition, R.drawable.ic_music_placeholder);
-                previousCoverComposition = composition;
+                    .imageLoader()
+                    .displayImageInReusableTarget(
+                        panelBinding.ivMusicIcon,
+                        composition,
+                        previousCoverComposition,
+                        R.drawable.ic_music_placeholder
+                    )
+                previousCoverComposition = composition
             } else {
-                ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder);
-                previousCoverComposition = null;
+                previousCoverComposition = null
+                panelBinding.ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder)
             }
-
-            playQueueAdapter.onCurrentItemChanged(item);
+            playQueueAdapter.onCurrentItemChanged(item)
         }
     }
 
@@ -565,362 +447,308 @@ public class PlayerFragment extends MvpAppCompatFragment implements BackButtonLi
     //switch order mode(working)
     //new queue(so-so, but pass)
     //remove queue item(working)
-    @Override
-    public void scrollQueueToPosition(int position) {
-        secondScrollHandler.removeCallbacksAndMessages(null);
-        int positionDiff = Math.abs(position - currentPosition);
-        currentPosition = position;
+    override fun scrollQueueToPosition(position: Int) {
+        secondScrollHandler.removeCallbacksAndMessages(null)
+        val positionDiff = abs(position - currentPosition)
+        currentPosition = position
         if (RecyclerViewUtils.isPositionVisible(playQueueLayoutManager, position)) {
-            return;
+            return
         }
-
-        boolean smooth = positionDiff == 1
-                || position == playQueueLayoutManager.findFirstVisibleItemPosition()
-                || position == playQueueLayoutManager.findLastVisibleItemPosition();
-
-        RecyclerViewUtils.scrollToPosition(rvPlayList,
-                playQueueLayoutManager,
-                position,
-                smooth);
+        
+        val smooth = positionDiff == 1 
+                || position == playQueueLayoutManager.findFirstVisibleItemPosition() 
+                || position == playQueueLayoutManager.findLastVisibleItemPosition()
+        RecyclerViewUtils.scrollToPosition(
+            viewBinding.rvPlaylist!!,
+            playQueueLayoutManager,
+            position,
+            smooth
+        )
 
         //sometimes can not scroll, check twice
-        secondScrollHandler.postDelayed(() -> {
+        secondScrollHandler.postDelayed({
             if (!RecyclerViewUtils.isPositionVisible(playQueueLayoutManager, position)) {
-                RecyclerViewUtils.scrollToPosition(rvPlayList,
-                        playQueueLayoutManager,
-                        position,
-                        false);
+                RecyclerViewUtils.scrollToPosition(
+                    viewBinding.rvPlaylist!!,
+                    playQueueLayoutManager,
+                    position,
+                    false
+                )
             }
-        }, 300);
+        }, 300)
     }
 
-    @Override
-    public void updatePlayQueue(List<PlayQueueItem> items) {
-        playQueueAdapter.submitList(items);
+    override fun updatePlayQueue(items: List<PlayQueueItem>) {
+        playQueueAdapter.submitList(items)
     }
 
-    @Override
-    public void showRepeatMode(int mode) {
-        @DrawableRes int iconRes = getRepeatModeIcon(mode);
-        btnRepeatMode.setImageResource(iconRes);
-        String description = getString(getRepeatModeText(mode));
-        btnRepeatMode.setContentDescription(description);
+    override fun showRepeatMode(mode: Int) {
+        @DrawableRes val iconRes = FormatUtils.getRepeatModeIcon(mode)
+        panelBinding.btnInfinitePlay.setImageResource(iconRes)
+        val description = getString(FormatUtils.getRepeatModeText(mode))
+        panelBinding.btnInfinitePlay.contentDescription = description
     }
 
-    @Override
-    public void showRandomPlayingButton(boolean active) {
-        btnRandomPlay.setSelected(active);
+    override fun showRandomPlayingButton(active: Boolean) {
+        panelBinding.btnRandomPlay.isSelected = active
         if (active) {
-            btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(false));
+            panelBinding.btnRandomPlay.setOnClickListener {
+                presenter.onRandomPlayingButtonClicked(false)
+            }
         } else {
-            btnRandomPlay.setOnClickListener(v -> presenter.onRandomPlayingButtonClicked(true));
+            panelBinding.btnRandomPlay.setOnClickListener {
+                presenter.onRandomPlayingButtonClicked(true)
+            }
         }
     }
 
-    @Override
-    public void showTrackState(long currentPosition, long duration) {
-        seekBarViewWrapper.setProgress(currentPosition);
-        String formattedTime = formatMilliseconds(currentPosition);
-        sbTrackState.setContentDescription(getString(R.string.position_template, formattedTime));
-        tvPlayedTime.setText(formattedTime);
+    override fun showTrackState(currentPosition: Long, duration: Long) {
+        seekBarViewWrapper.setProgress(currentPosition)
+        val formattedTime = FormatUtils.formatMilliseconds(currentPosition)
+        panelBinding.sbTrackState.contentDescription = getString(R.string.position_template, formattedTime)
+        panelBinding.tvPlayedTime.text = formattedTime
     }
 
-    @Override
-    public void showShareMusicDialog(Composition composition) {
-        DialogUtils.shareComposition(requireContext(), composition);
+    override fun showShareMusicDialog(composition: Composition) {
+        DialogUtils.shareComposition(requireContext(), composition)
     }
 
-    @Override
-    public void showPlayQueueSubtitle(int size) {
-        tvQueueSubtitle.setText(formatCompositionsCount(requireContext(), size));
+    override fun showPlayQueueSubtitle(size: Int) {
+        toolbarPlayQueueBinding.tvQueueSubtitle.text = FormatUtils.formatCompositionsCount(requireContext(), size)
     }
 
-    @Override
-    public void notifyItemMoved(int from, int to) {
-        playQueueAdapter.notifyItemMoved(from, to);
+    override fun notifyItemMoved(from: Int, to: Int) {
+        playQueueAdapter.notifyItemMoved(from, to)
     }
 
-    @Override
-    public void setPlayQueueCoversEnabled(boolean isCoversEnabled) {
-        playQueueAdapter.setCoversEnabled(isCoversEnabled);
+    override fun setPlayQueueCoversEnabled(isCoversEnabled: Boolean) {
+        playQueueAdapter.setCoversEnabled(isCoversEnabled)
     }
 
-    @Override
-    public void startEditCompositionScreen(long id) {
-        startActivity(CompositionEditorActivityKt.newCompositionEditorIntent(requireContext(), id));
+    override fun startEditCompositionScreen(id: Long) {
+        startActivity(newCompositionEditorIntent(requireContext(), id))
     }
 
-    @Override
-    public void showErrorMessage(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clPlayQueueContainer, errorCommand.getMessage()).show();
+    override fun showErrorMessage(errorCommand: ErrorCommand) {
+        MessagesUtils.makeSnackbar(viewBinding.clPlayQueueContainer!!, errorCommand.message).show()
     }
 
-    @Override
-    public void showDeletedItemMessage() {
-        MessagesUtils.makeSnackbar(clPlayQueueContainer, R.string.queue_item_removed, Snackbar.LENGTH_LONG)
-                .setAction(R.string.cancel, presenter::onRestoreDeletedItemClicked)
-                .show();
+    override fun showDeletedItemMessage() {
+        MessagesUtils.makeSnackbar(
+            viewBinding.clPlayQueueContainer!!,
+            R.string.queue_item_removed,
+            Snackbar.LENGTH_LONG
+        ).setAction(R.string.cancel, presenter::onRestoreDeletedItemClicked)
+            .show()
     }
 
-    @Override
-    public void showAddingToPlayListError(ErrorCommand errorCommand) {
-        MessagesUtils.makeSnackbar(clPlayQueueContainer,
-                getString(R.string.add_to_playlist_error_template, errorCommand.getMessage()),
-                Snackbar.LENGTH_SHORT)
-                .show();
+    override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
+        MessagesUtils.makeSnackbar(
+            viewBinding.clPlayQueueContainer!!,
+            getString(R.string.add_to_playlist_error_template, errorCommand.message),
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
-    @Override
-    public void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions) {
-        String text = getAddToPlayListCompleteMessage(requireActivity(), playList, compositions);
-        MessagesUtils.makeSnackbar(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
+    override fun showAddingToPlayListComplete(playList: PlayList?, compositions: List<Composition>) {
+        val text = MessagesUtils.getAddToPlayListCompleteMessage(requireActivity(), playList, compositions)
+        MessagesUtils.makeSnackbar(viewBinding.clPlayQueueContainer!!, text, Snackbar.LENGTH_SHORT).show()
     }
 
-    @Override
-    public void showSelectPlayListDialog() {
-        ChoosePlayListDialogFragment dialog = new ChoosePlayListDialogFragment();
-        dialog.setOnCompleteListener(presenter::onPlayListForAddingSelected);
-        dialog.show(getChildFragmentManager(), SELECT_PLAYLIST_TAG);
+    override fun showSelectPlayListDialog() {
+        val dialog = ChoosePlayListDialogFragment()
+        dialog.setOnCompleteListener(presenter::onPlayListForAddingSelected)
+        dialog.show(childFragmentManager, Tags.SELECT_PLAYLIST_TAG)
     }
 
-    @Override
-    public void showConfirmDeleteDialog(List<Composition> compositionsToDelete) {
-        DialogUtils.showConfirmDeleteDialog(requireContext(),
-                compositionsToDelete,
-                () -> presenter.onDeleteCompositionsDialogConfirmed(compositionsToDelete));
+    override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {
+        DialogUtils.showConfirmDeleteDialog(requireContext(), compositionsToDelete) { 
+            presenter.onDeleteCompositionsDialogConfirmed(compositionsToDelete) 
+        }
     }
 
-    @Override
-    public void showDeleteCompositionError(ErrorCommand errorCommand) {
-        deletingErrorHandler.handleError(errorCommand, () ->
-                makeSnackbar(clPlayQueueContainer,
-                        getString(R.string.delete_composition_error_template, errorCommand.getMessage()),
-                        Snackbar.LENGTH_SHORT)
-                        .show()
-        );
+    override fun showDeleteCompositionError(errorCommand: ErrorCommand) {
+        deletingErrorHandler.handleError(errorCommand) {
+            MessagesUtils.makeSnackbar(
+                viewBinding.clPlayQueueContainer!!,
+                getString(R.string.delete_composition_error_template, errorCommand.message),
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
     }
 
-    @Override
-    public void showDeleteCompositionMessage(List<Composition> compositionsToDelete) {
-        String text = getDeleteCompleteMessage(requireActivity(), compositionsToDelete);
-        MessagesUtils.makeSnackbar(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show();
+    override fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>) {
+        val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
+        MessagesUtils.makeSnackbar(viewBinding.clPlayQueueContainer!!, text, Snackbar.LENGTH_SHORT).show()
     }
 
-    @Override
-    public void displayPlaybackSpeed(float speed) {
-        panelBinding.tvPlaybackSpeed.setText(getString(R.string.playback_speed_template, speed));
-        panelBinding.tvPlaybackSpeed.setOnClickListener(v ->
-                DialogUtils.showSpeedSelectorDialog(requireContext(),
-                        speed,
-                        presenter::onPlaybackSpeedSelected)
-        );
+    override fun displayPlaybackSpeed(speed: Float) {
+        panelBinding.tvPlaybackSpeed.text = getString(R.string.playback_speed_template, speed)
+        panelBinding.tvPlaybackSpeed.setOnClickListener {
+            DialogUtils.showSpeedSelectorDialog(
+                requireContext(), 
+                speed,
+                presenter::onPlaybackSpeedSelected
+            )
+        }
     }
 
-    @Override
-    public void showSpeedChangeFeatureVisible(boolean visible) {
-        panelBinding.tvPlaybackSpeed.setVisibility(visible? VISIBLE: View.GONE);
+    override fun showSpeedChangeFeatureVisible(visible: Boolean) {
+        panelBinding.tvPlaybackSpeed.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
-    @Override
-    public void showSleepTimerRemainingTime(long remainingMillis) {
+    override fun showSleepTimerRemainingTime(remainingMillis: Long) {
         //setVisibility() don't work in motion layout
-        if (remainingMillis == SleepTimerInteractorKt.NO_TIMER) {
-            panelBinding.tvSleepTime.setText("");
-            panelBinding.tvSleepTime.setBackground(null);
-            panelBinding.tvSleepTime.setCompoundDrawables(null, null, null, null);
-            panelBinding.tvSleepTime.setOnClickListener(null);
-            return;
+        if (remainingMillis == NO_TIMER) {
+            panelBinding.tvSleepTime.text = ""
+            panelBinding.tvSleepTime.background = null
+            panelBinding.tvSleepTime.setCompoundDrawables(null, null, null, null)
+            panelBinding.tvSleepTime.setOnClickListener(null)
+            return
         }
         if (!panelBinding.tvSleepTime.hasOnClickListeners()) {
             //initialize, set visible
-            Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_timer);
-            Resources resources = requireContext().getResources();
-            int iconSize = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_size);
-            icon.setBounds(0, 0, iconSize, iconSize);
-            icon.setTint(getColorFromAttr(requireContext(), android.R.attr.textColorSecondary));
-            panelBinding.tvSleepTime.setCompoundDrawables(icon, null, null, null);
-            int iconPadding = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_padding);
-            panelBinding.tvSleepTime.setCompoundDrawablePadding(iconPadding);
-            panelBinding.tvSleepTime.setBackgroundResource(R.drawable.bg_outline_text_button);
-            panelBinding.tvSleepTime.setOnClickListener(v ->
-                    new SleepTimerDialogFragment().show(getChildFragmentManager(), null)
-            );
+            val icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_timer)!!
+            val resources = requireContext().resources
+            val iconSize = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_size)
+            icon.setBounds(0, 0, iconSize, iconSize)
+            icon.setTint(
+                AndroidUtils.getColorFromAttr(
+                    requireContext(),
+                    android.R.attr.textColorSecondary
+                )
+            )
+            panelBinding.tvSleepTime.setCompoundDrawables(icon, null, null, null)
+            val iconPadding = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_padding)
+            panelBinding.tvSleepTime.compoundDrawablePadding = iconPadding
+            panelBinding.tvSleepTime.setBackgroundResource(R.drawable.bg_outline_text_button)
+            panelBinding.tvSleepTime.setOnClickListener {
+                SleepTimerDialogFragment().show(childFragmentManager, null)
+            }
         }
-
-        panelBinding.tvSleepTime.setText(FormatUtils.formatMilliseconds(remainingMillis));
+        panelBinding.tvSleepTime.text = FormatUtils.formatMilliseconds(remainingMillis)
     }
 
-    @Override
-    public void showFileScannerState(FileScannerState state) {
-        if (state instanceof Running) {
-            String fileName = ((Running) state).getComposition().getFileName();
-            drawerHeaderBinding.tvFileScannerState.setText(getString(R.string.file_scanner_state, fileName));
-            drawerHeaderBinding.tvFileScannerState.setVisibility(VISIBLE);
+    override fun showFileScannerState(state: FileScannerState) {
+        if (state is Running) {
+            val fileName = state.composition.fileName
+            drawerHeaderBinding.tvFileScannerState.text = getString(R.string.file_scanner_state, fileName)
+            drawerHeaderBinding.tvFileScannerState.visibility = View.VISIBLE
         } else {
-            drawerHeaderBinding.tvFileScannerState.setVisibility(View.GONE);
+            drawerHeaderBinding.tvFileScannerState.visibility = View.GONE
         }
     }
 
-    public void openPlayQueue() {
-        presenter.onOpenPlayQueueClicked();
-        playerPanelWrapper.openPlayQueue();
+    fun openPlayQueue() {
+        presenter.onOpenPlayQueueClicked()
+        playerPanelWrapper.openPlayQueue()
     }
 
-    private void onPlayQueueMenuItemClicked(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.menu_save_as_playlist: {
-                CreatePlayListDialogFragment fragment = new CreatePlayListDialogFragment();
-                fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated);
-                fragment.show(getChildFragmentManager(), CREATE_PLAYLIST_TAG);
-                break;
+    private fun onPlayQueueMenuItemClicked(menuItem: MenuItem) {
+        when (menuItem.itemId) {
+            R.id.menu_save_as_playlist -> {
+                val fragment = CreatePlayListDialogFragment()
+                fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated)
+                fragment.show(childFragmentManager, Tags.CREATE_PLAYLIST_TAG)
             }
-            case R.id.menu_sleep_timer: {
-                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
-                break;
-            }
-            case R.id.menu_equalizer: {
-                new EqualizerDialogFragment().show(getChildFragmentManager(), null);
-                break;
-            }
-            case R.id.menu_clear_play_queue: {
-                presenter.onClearPlayQueueClicked();
-                break;
-            }
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().show(childFragmentManager, null)
+            R.id.menu_equalizer -> EqualizerDialogFragment().show(childFragmentManager, null)
+            R.id.menu_clear_play_queue -> presenter.onClearPlayQueueClicked()
         }
     }
 
-    private void onNavigationIconClicked() {
-        if (drawer.getDrawerLockMode(GravityCompat.START) != LOCK_MODE_LOCKED_CLOSED) {
-            drawer.openDrawer(GravityCompat.START);
+    @Suppress("unused")
+    private fun onNavigationIconClicked() {
+        if (viewBinding.drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+            viewBinding.drawer.openDrawer(GravityCompat.START)
         } else {
-            onBackPressed();
+            onBackPressed()
         }
     }
 
-    private void startFragment(Fragment fragment) {
-        navigation.newRootFragment(fragment, 0, R.anim.anim_alpha_appear);
+    private fun startFragment(fragment: Fragment) {
+        navigation.newRootFragment(fragment, 0, R.anim.anim_alpha_appear)
     }
 
-    private void clearFragment() {
-        navigation.clearFragmentStack(R.anim.anim_alpha_disappear);
+    private fun clearFragment() {
+        navigation.clearFragmentStack(R.anim.anim_alpha_disappear)
     }
 
-    private void onCompositionMenuClicked(View view) {
-        PopupMenuWindow.showPopup(view,
-                R.menu.composition_short_actions_menu,
-                item -> {
-                    switch (item.getItemId()) {
-                        case R.id.menu_add_to_playlist: {
-                            presenter.onAddCurrentCompositionToPlayListButtonClicked();
-                            break;
-                        }
-                        case R.id.menu_share: {
-                            presenter.onShareCompositionButtonClicked();
-                            break;
-                        }
-                        case R.id.menu_delete: {
-                            presenter.onDeleteCurrentCompositionButtonClicked();
-                            break;
-                        }
-                        case R.id.menu_edit: {
-                            presenter.onEditCompositionButtonClicked();
-                            break;
-                        }
-                    }
-                });
-    }
-
-    private DrawerArrowDrawable createDrawerArrowDrawable() {
-        DrawerArrowDrawable drawerArrowDrawable = new DrawerArrowDrawable(requireActivity());
-        drawerArrowDrawable.setColor(getColorFromAttr(requireActivity(), R.attr.toolbarTextColorPrimary));
-        return drawerArrowDrawable;
-    }
-
-    private boolean onNavigationItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        boolean selected = false;
-        if (itemId == R.id.menu_settings) {
-            navigation.addNewFragment(new SettingsFragment());
-        } else if (itemId == R.id.menu_about) {
-            navigation.addNewFragment(new AboutAppFragment());
-        } else if (selectedDrawerItemId != itemId) {
-            selectedDrawerItemId = itemId;
-            itemIdToStart = itemId;
-            clearFragment();
-            selected = true;
+    private fun onCompositionMenuClicked(view: View) {
+        PopupMenuWindow.showPopup(view, R.menu.composition_short_actions_menu) { item ->
+            when (item.itemId) {
+                R.id.menu_add_to_playlist -> presenter.onAddCurrentCompositionToPlayListButtonClicked()
+                R.id.menu_share -> presenter.onShareCompositionButtonClicked()
+                R.id.menu_delete -> presenter.onDeleteCurrentCompositionButtonClicked()
+                R.id.menu_edit -> presenter.onEditCompositionButtonClicked()
+            }
         }
-        drawer.closeDrawer(GravityCompat.START);
-        return selected;
     }
 
-    private void onDrawerClosed() {
+    private fun createDrawerArrowDrawable() = DrawerArrowDrawable(requireActivity()).apply {
+        color = AndroidUtils.getColorFromAttr(requireActivity(), R.attr.toolbarTextColorPrimary)
+    }
+
+    private fun onNavigationItemSelected(item: MenuItem): Boolean {
+        val itemId = item.itemId
+        var selected = false
+        when {
+            itemId == R.id.menu_settings -> navigation.addNewFragment(SettingsFragment())
+            itemId == R.id.menu_about -> navigation.addNewFragment(AboutAppFragment())
+            itemId != selectedDrawerItemId -> {
+                selectedDrawerItemId = itemId
+                itemIdToStart = itemId
+                clearFragment()
+                selected = true
+            }
+        }
+        viewBinding.drawer.closeDrawer(GravityCompat.START)
+        return selected
+    }
+
+    private fun onDrawerClosed() {
         if (itemIdToStart != NO_ITEM) {
-            int screenId = ScreensMap.getScreenId(itemIdToStart);
-            presenter.onDrawerScreenSelected(screenId);
-            itemIdToStart = NO_ITEM;
+            val screenId = ScreensMap.getScreenId(itemIdToStart)
+            presenter.onDrawerScreenSelected(screenId)
+            itemIdToStart = NO_ITEM
         }
     }
 
-    private void onPlayItemMenuClicked(View view, PlayQueueItem playQueueItem) {
-        Composition composition = playQueueItem.getComposition();
-
-        PopupMenuWindow.showPopup(view,
-                R.menu.play_queue_item_menu,
-                item -> {
-                    switch (item.getItemId()) {
-                        case R.id.menu_add_to_playlist: {
-                            presenter.onAddQueueItemToPlayListButtonClicked(composition);
-                            break;
-                        }
-                        case R.id.menu_edit: {
-                            startActivity(CompositionEditorActivityKt.newCompositionEditorIntent(requireContext(), composition.getId()));
-                            break;
-                        }
-                        case R.id.menu_share: {
-                            onShareCompositionClicked(composition);
-                            break;
-                        }
-                        case R.id.menu_delete_from_queue: {
-                            presenter.onDeleteQueueItemClicked(playQueueItem);
-                            break;
-                        }
-                        case R.id.menu_delete: {
-                            presenter.onDeleteCompositionButtonClicked(composition);
-                            break;
-                        }
-                    }
-                });
+    private fun onPlayItemMenuClicked(view: View, playQueueItem: PlayQueueItem) {
+        val composition = playQueueItem.composition
+        PopupMenuWindow.showPopup(view, R.menu.play_queue_item_menu) { item ->
+            when (item.itemId) {
+                R.id.menu_add_to_playlist -> presenter.onAddQueueItemToPlayListButtonClicked(composition)
+                R.id.menu_edit -> startActivity(newCompositionEditorIntent(requireContext(), composition.id))
+                R.id.menu_share -> onShareCompositionClicked(composition)
+                R.id.menu_delete_from_queue -> presenter.onDeleteQueueItemClicked(playQueueItem)
+                R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(composition)
+            }
+        }
     }
 
-    private void onRepeatModeButtonClicked(View view) {
-        PopupMenuWindow.showPopup(view,
-                R.menu.repeat_mode_menu,
-                item -> {
-                    int repeatMode = RepeatMode.NONE;
-                    switch (item.getItemId()) {
-                        case R.id.menu_repeat_playlist: {
-                            repeatMode = RepeatMode.REPEAT_PLAY_LIST;
-                            break;
-                        }
-                        case R.id.menu_repeat_composition: {
-                            repeatMode = RepeatMode.REPEAT_COMPOSITION;
-                            break;
-                        }
-                        case R.id.menu_do_not_repeat: {
-                            repeatMode = RepeatMode.NONE;
-                            break;
-                        }
-                    }
-                    presenter.onRepeatModeChanged(repeatMode);
-                });
+    private fun onRepeatModeButtonClicked(view: View) {
+        PopupMenuWindow.showPopup(view, R.menu.repeat_mode_menu) { item ->
+            var repeatMode = RepeatMode.NONE
+            when (item.itemId) {
+                R.id.menu_repeat_playlist -> repeatMode = RepeatMode.REPEAT_PLAY_LIST
+                R.id.menu_repeat_composition -> repeatMode = RepeatMode.REPEAT_COMPOSITION
+                R.id.menu_do_not_repeat -> repeatMode = RepeatMode.NONE
+            }
+            presenter.onRepeatModeChanged(repeatMode)
+        }
     }
 
-    private void onShareCompositionClicked(Composition composition) {
-        DialogUtils.shareComposition(requireContext(), composition);
+    private fun onShareCompositionClicked(composition: Composition) {
+        DialogUtils.shareComposition(requireContext(), composition)
     }
 
-    private void showEditorRequestDeniedMessage() {
-        makeSnackbar(clPlayQueueContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
+    private fun showEditorRequestDeniedMessage() {
+        MessagesUtils.makeSnackbar(
+            viewBinding.clPlayQueueContainer!!,
+            R.string.android_r_edit_file_permission_denied,
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
 }
