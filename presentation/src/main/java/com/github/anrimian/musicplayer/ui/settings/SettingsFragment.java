@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.settings;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,14 +73,14 @@ public class SettingsFragment extends Fragment implements FragmentLayerListener 
     }
 
     private void onRescanStorageButtonClicked() {
+        Context appContext = requireContext().getApplicationContext();
         //noinspection ResultOfMethodCallIgnored
         Components.getAppComponent()
                 .mediaScannerRepository()
                 .runStorageAndFileScanner()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() ->
-                        Toast.makeText(requireContext(), R.string.scanning_completed, Toast.LENGTH_SHORT)
-                                .show()
+                        Toast.makeText(appContext, R.string.scanning_completed, Toast.LENGTH_SHORT).show()
                 );
     }
 }
