@@ -217,11 +217,19 @@ public class InternalEqualizer implements AppEqualizer {
                     currentAudioSessionId = audioSessionId;
                     mainEqualizer = newEqualizer(EQ_PRIORITY, audioSessionId);
                     if (mainEqualizer == null) {
-                        stateSubject.onNext(EqInitializationState.INITIALIZATION_ERROR);
                         deferredInitFunc = initFunc;
+                        stateSubject.onNext(EqInitializationState.INITIALIZATION_ERROR);
                     } else {
-                        stateSubject.onNext(EqInitializationState.INITIALIZED);
-                        initFunc.call(mainEqualizer);
+                        try {
+                            initFunc.call(mainEqualizer);
+                            stateSubject.onNext(EqInitializationState.INITIALIZED);
+                        } catch (RuntimeException e) {
+                            mainEqualizer.release();
+                            mainEqualizer = null;
+                            deferredInitFunc = initFunc;
+                            stateSubject.onNext(EqInitializationState.INITIALIZATION_ERROR);
+                            return null;
+                        }
                     }
                 }
                 return mainEqualizer;
@@ -235,7 +243,13 @@ public class InternalEqualizer implements AppEqualizer {
                     && stateSubject.getValue() == EqInitializationState.INITIALIZATION_ERROR) {
                 mainEqualizer = newEqualizer(EQ_PRIORITY, currentAudioSessionId);
                 if (mainEqualizer != null) {
-                    deferredInitFunc.call(mainEqualizer);
+                    try {
+                        deferredInitFunc.call(mainEqualizer);
+                    } catch (RuntimeException e) {
+                        mainEqualizer.release();
+                        mainEqualizer = null;
+                        return;
+                    }
                     deferredInitFunc = null;
                     mainEqualizer.setEnabled(true);
                     stateSubject.onNext(EqInitializationState.INITIALIZED);
