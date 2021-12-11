@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.settings.player.impls
 
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
+import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.indexOfOr
 import moxy.MvpPresenter
 import java.util.*
@@ -69,6 +70,10 @@ class EnabledMediaPlayersPresenter(
     }
 
     private fun swapItems(from: Int, to: Int) {
+        if (!ListUtils.isIndexInRange(mediaPlayers, from) || !ListUtils.isIndexInRange(mediaPlayers, to)) {
+            return
+        }
+
         Collections.swap(mediaPlayers, from, to)
         viewState.notifyItemMoved(from, to)
     }
