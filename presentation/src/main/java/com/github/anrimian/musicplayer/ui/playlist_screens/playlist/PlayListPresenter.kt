@@ -199,6 +199,10 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun swapItems(from: Int, to: Int) {
+        if (!ListUtils.isIndexInRange(items, from) || !ListUtils.isIndexInRange(items, to)) {
+            return
+        }
+
         Collections.swap(items, from, to)
         viewState.notifyItemMoved(from, to)
     }
