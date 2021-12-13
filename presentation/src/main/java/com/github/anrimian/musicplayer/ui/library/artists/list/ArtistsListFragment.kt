@@ -1,269 +1,222 @@
-package com.github.anrimian.musicplayer.ui.library.artists.list;
+package com.github.anrimian.musicplayer.ui.library.artists.list
 
-import static com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ARTIST_NAME_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.ORDER_TAG;
-import static com.github.anrimian.musicplayer.Constants.Tags.PROGRESS_DIALOG_TAG;
-import static com.github.anrimian.musicplayer.ui.common.format.MessagesUtils.makeSnackbar;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.databinding.FragmentLibraryArtistsBinding
+import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.domain.models.artist.Artist
+import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.models.order.OrderType
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
+import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
+import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
+import com.github.anrimian.musicplayer.ui.library.LibraryFragment
+import com.github.anrimian.musicplayer.ui.library.artists.items.newInstance
+import com.github.anrimian.musicplayer.ui.library.artists.list.adapter.ArtistsAdapter
+import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
+import com.google.android.material.snackbar.Snackbar
+import moxy.ktx.moxyPresenter
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+class ArtistsListFragment : LibraryFragment(), ArtistsListView, FragmentLayerListener,
+    BackButtonListener {
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.databinding.FragmentLibraryArtistsBinding;
-import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.artist.Artist;
-import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.models.order.OrderType;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
-import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
-import com.github.anrimian.musicplayer.ui.common.view.ViewUtils;
-import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler;
-import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment;
-import com.github.anrimian.musicplayer.ui.library.LibraryFragment;
-import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragmentKt;
-import com.github.anrimian.musicplayer.ui.library.artists.list.adapter.ArtistsAdapter;
-import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment;
-import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment;
-import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
-import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner;
-import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils;
-import com.google.android.material.snackbar.Snackbar;
-
-import java.util.List;
-
-import moxy.presenter.InjectPresenter;
-import moxy.presenter.ProvidePresenter;
-
-public class ArtistsListFragment extends LibraryFragment implements
-        ArtistsListView, FragmentLayerListener, BackButtonListener {
-
-    @InjectPresenter
-    ArtistsListPresenter presenter;
-
-    private FragmentLibraryArtistsBinding binding;
-
-    private RecyclerView recyclerView;
-    private CoordinatorLayout clListContainer;
-
-    private AdvancedToolbar toolbar;
-    private ArtistsAdapter adapter;
-    private LinearLayoutManager layoutManager;
-
-    private DialogFragmentRunner<InputTextDialogFragment> editArtistNameDialogRunner;
-    private DialogFragmentRunner<SelectOrderDialogFragment> selectOrderDialogRunner;
-    private DialogFragmentDelayRunner progressDialogRunner;
-
-    private ErrorHandler editorErrorHandler;
-
-    @ProvidePresenter
-    ArtistsListPresenter providePresenter() {
-        return Components.artistsComponent().artistsListPresenter();
+    private val presenter by moxyPresenter {
+        Components.artistsComponent().artistsListPresenter()
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        binding = FragmentLibraryArtistsBinding.inflate(inflater, container, false);
-        recyclerView = binding.recyclerView;
-        clListContainer = binding.listContainer;
-        return binding.getRoot();
+    private lateinit var binding: FragmentLibraryArtistsBinding
+
+    private lateinit var toolbar: AdvancedToolbar
+    private lateinit var adapter: ArtistsAdapter
+    private lateinit var layoutManager: LinearLayoutManager
+
+    private lateinit var editArtistNameDialogRunner: DialogFragmentRunner<InputTextDialogFragment>
+    private lateinit var selectOrderDialogRunner: DialogFragmentRunner<SelectOrderDialogFragment>
+    private lateinit var progressDialogRunner: DialogFragmentDelayRunner
+
+    private lateinit var editorErrorHandler: ErrorHandler
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentLibraryArtistsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        toolbar = requireActivity().findViewById(R.id.toolbar)
 
-        toolbar = requireActivity().findViewById(R.id.toolbar);
+        binding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked)
 
-        binding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked);
+        adapter = ArtistsAdapter(
+            binding.recyclerView,
+            this::goToArtistScreen,
+            this::onArtistMenuClicked
+        )
+        binding.recyclerView.adapter = adapter
+        layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.layoutManager = layoutManager
+        RecyclerViewUtils.attachFastScroller(binding.recyclerView)
 
-        adapter = new ArtistsAdapter(recyclerView,
-                this::goToArtistScreen,
-                this::onArtistMenuClicked);
-        recyclerView.setAdapter(adapter);
-
-        layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-        RecyclerViewUtils.attachFastScroller(recyclerView);
-
-        FragmentManager fm = getChildFragmentManager();
-        editArtistNameDialogRunner = new DialogFragmentRunner<>(fm,
-                ARTIST_NAME_TAG,
-                fragment -> fragment.setComplexCompleteListener((name, extra) -> {
-                    presenter.onNewArtistNameEntered(name, extra.getLong(ID_ARG));
-                })
-        );
-        selectOrderDialogRunner = new DialogFragmentRunner<>(fm,
-                ORDER_TAG,
-                f -> f.setOnCompleteListener(presenter::onOrderSelected));
-
-        progressDialogRunner = new DialogFragmentDelayRunner(fm, PROGRESS_DIALOG_TAG);
-
-        editorErrorHandler = new ErrorHandler(fm,
-                presenter::onRetryFailedEditActionClicked,
-                this::showEditorRequestDeniedMessage);
-    }
-
-    @Override
-    public void onFragmentMovedOnTop() {
-        super.onFragmentMovedOnTop();
-        AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
-        toolbar.setSubtitle(R.string.artists);
-        toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText());
-        toolbar.setupOptionsMenu(R.menu.library_artists_menu, this::onOptionsItemClicked);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        presenter.onStop(ViewUtils.getListPosition(layoutManager));
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        if (toolbar.isInSearchMode()) {
-            toolbar.setSearchModeEnabled(false);
-            return true;
+        val fm = childFragmentManager
+        editArtistNameDialogRunner = DialogFragmentRunner(fm, Tags.ARTIST_NAME_TAG) { fragment ->
+            fragment.setComplexCompleteListener { name, extra ->
+                presenter.onNewArtistNameEntered(name, extra.getLong(Constants.Arguments.ID_ARG))
+            }
         }
-        return false;
+        selectOrderDialogRunner = DialogFragmentRunner(fm, Tags.ORDER_TAG) { fragment ->
+            fragment.setOnCompleteListener(presenter::onOrderSelected)
+        }
+
+        progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG)
+        
+        editorErrorHandler = ErrorHandler(
+            fm,
+            presenter::onRetryFailedEditActionClicked,
+            this::showEditorRequestDeniedMessage
+        )
     }
 
-    @Override
-    public void showEmptyList() {
-        binding.progressStateView.showMessage(R.string.no_artists_in_library);
+    override fun onFragmentMovedOnTop() {
+        super.onFragmentMovedOnTop()
+        val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
+        toolbar.setSubtitle(R.string.artists)
+        toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText())
+        toolbar.setupOptionsMenu(R.menu.library_artists_menu, this::onOptionsItemClicked)
     }
 
-    @Override
-    public void showEmptySearchResult() {
-        binding.progressStateView.showMessage(R.string.compositions_for_search_not_found);
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop(ViewUtils.getListPosition(layoutManager))
     }
 
-    @Override
-    public void showList() {
-        binding.progressStateView.hideAll();
+    override fun onBackPressed(): Boolean {
+        if (toolbar.isInSearchMode) {
+            toolbar.setSearchModeEnabled(false)
+            return true
+        }
+        return false
     }
 
-    @Override
-    public void showLoading() {
-        binding.progressStateView.showProgress();
+    override fun showEmptyList() {
+        binding.progressStateView.showMessage(R.string.no_artists_in_library)
     }
 
-    @Override
-    public void showLoadingError(ErrorCommand errorCommand) {
-        binding.progressStateView.showMessage(errorCommand.getMessage(), true);
+    override fun showEmptySearchResult() {
+        binding.progressStateView.showMessage(R.string.compositions_for_search_not_found)
     }
 
-    @Override
-    public void submitList(List<Artist> artists) {
-        adapter.submitList(artists);
+    override fun showList() {
+        binding.progressStateView.hideAll()
     }
 
-    @Override
-    public void restoreListPosition(ListPosition listPosition) {
-        ViewUtils.scrollToPosition(layoutManager, listPosition);
+    override fun showLoading() {
+        binding.progressStateView.showProgress()
     }
 
-    @Override
-    public void showRenameProgress() {
-        ProgressDialogFragment fragment = ProgressDialogFragment.newInstance(R.string.rename_progress);
-        progressDialogRunner.show(fragment);
+    override fun showLoadingError(errorCommand: ErrorCommand) {
+        binding.progressStateView.showMessage(errorCommand.message, true)
     }
 
-    @Override
-    public void hideRenameProgress() {
-        progressDialogRunner.cancel();
+    override fun submitList(artists: List<Artist>) {
+        adapter.submitList(artists)
     }
 
-    @Override
-    public void showSelectOrderScreen(Order order) {
-        SelectOrderDialogFragment fragment = SelectOrderDialogFragment.newInstance(order,
-                OrderType.NAME,
-                OrderType.COMPOSITION_COUNT);
-        selectOrderDialogRunner.show(fragment);
+    override fun restoreListPosition(listPosition: ListPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition)
     }
 
-    @Override
-    public void showErrorMessage(ErrorCommand errorCommand) {
-        editorErrorHandler.handleError(errorCommand, () ->
-                makeSnackbar(clListContainer, errorCommand.getMessage(), Snackbar.LENGTH_LONG).show()
-        );
+    override fun showRenameProgress() {
+        val fragment = ProgressDialogFragment.newInstance(R.string.rename_progress)
+        progressDialogRunner.show(fragment)
     }
 
-    private void showEditArtistNameDialog(Artist artist) {
-        Bundle bundle = new Bundle();
-        bundle.putLong(ID_ARG, artist.getId());
-        InputTextDialogFragment fragment = new InputTextDialogFragment.Builder(R.string.change_name,
-                R.string.change,
-                R.string.cancel,
-                R.string.name,
-                artist.getName())
-                .canBeEmpty(false)
-                .extra(bundle)
-                .build();
-        editArtistNameDialogRunner.show(fragment);
+    override fun hideRenameProgress() {
+        progressDialogRunner.cancel()
     }
 
-    private void goToArtistScreen(Artist artist) {
-        FragmentNavigation.from(getParentFragmentManager())
-                .addNewFragment(ArtistItemsFragmentKt.newInstance(artist.getId()));
+    override fun showSelectOrderScreen(order: Order) {
+        val fragment = SelectOrderDialogFragment.newInstance(
+            order,
+            OrderType.NAME,
+            OrderType.COMPOSITION_COUNT
+        )
+        selectOrderDialogRunner.show(fragment)
     }
 
-    private void onArtistMenuClicked(View view, Artist artist) {
-        PopupMenuWindow.showPopup(view, R.menu.artist_menu, menuItem -> {
-            switch (menuItem.getItemId()) {
-                case R.id.menu_rename: {
-                    showEditArtistNameDialog(artist);
-                    break;
-                }
-            }
-        });
+    override fun showErrorMessage(errorCommand: ErrorCommand) {
+        editorErrorHandler.handleError(errorCommand) {
+            MessagesUtils.makeSnackbar(
+                binding.listContainer, errorCommand.message, Snackbar.LENGTH_LONG
+            ).show()
+        }
     }
 
-    private void onOptionsItemClicked(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_order: {
-                presenter.onOrderMenuItemClicked();
-                break;
-            }
-            case R.id.menu_search: {
-                toolbar.setSearchModeEnabled(true);
-                break;
-            }
-            case R.id.menu_sleep_timer: {
-                new SleepTimerDialogFragment().show(getChildFragmentManager(), null);
-                break;
-            }
-            case R.id.menu_equalizer: {
-                new EqualizerDialogFragment().show(getChildFragmentManager(), null);
-                break;
+    private fun showEditArtistNameDialog(artist: Artist) {
+        val bundle = Bundle()
+        bundle.putLong(Constants.Arguments.ID_ARG, artist.id)
+        val fragment = InputTextDialogFragment.Builder(
+            R.string.change_name,
+            R.string.change,
+            R.string.cancel,
+            R.string.name,
+            artist.name
+        ).canBeEmpty(false)
+            .extra(bundle)
+            .build()
+        editArtistNameDialogRunner.show(fragment)
+    }
+
+    private fun goToArtistScreen(artist: Artist) {
+        FragmentNavigation.from(parentFragmentManager).addNewFragment(newInstance(artist.id))
+    }
+
+    private fun onArtistMenuClicked(view: View, artist: Artist) {
+        PopupMenuWindow.showPopup(view, R.menu.artist_menu) { menuItem ->
+            when (menuItem.itemId) {
+                R.id.menu_rename -> showEditArtistNameDialog(artist)
             }
         }
     }
 
-    private void showEditorRequestDeniedMessage() {
-        makeSnackbar(clListContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show();
+    private fun onOptionsItemClicked(item: MenuItem) {
+        when (item.itemId) {
+            R.id.menu_order -> presenter.onOrderMenuItemClicked()
+            R.id.menu_search -> toolbar.setSearchModeEnabled(true)
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().show(childFragmentManager, null)
+            R.id.menu_equalizer -> EqualizerDialogFragment().show(childFragmentManager, null)
+        }
     }
 
+    private fun showEditorRequestDeniedMessage() {
+        MessagesUtils.makeSnackbar(
+            binding.listContainer,
+            R.string.android_r_edit_file_permission_denied,
+            Snackbar.LENGTH_LONG
+        ).show()
+    }
 }
