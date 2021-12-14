@@ -213,7 +213,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         ViewUtils.setOnHoldListener(panelBinding.ivSkipToPrevious, presenter::onFastSeekBackwardCalled)
         panelBinding.ivSkipToNext.setOnClickListener { presenter.onSkipToNextButtonClicked() }
         ViewUtils.setOnHoldListener(panelBinding.ivSkipToNext, presenter::onFastSeekForwardCalled)
-        panelBinding.btnInfinitePlay.setOnClickListener { onRepeatModeButtonClicked(view) }
+        panelBinding.btnInfinitePlay.setOnClickListener(this::onRepeatModeButtonClicked)
         
         playQueueLayoutManager = LinearLayoutManager(requireContext())
         viewBinding.rvPlaylist!!.layoutManager = playQueueLayoutManager
