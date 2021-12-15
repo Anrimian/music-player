@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
+import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteDiskIOException;
 
 import androidx.collection.LongSparseArray;
@@ -188,6 +189,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
 
     private boolean isStandardError(Throwable throwable) {
         return throwable instanceof SQLiteDiskIOException
+                || throwable instanceof SQLiteCantOpenDatabaseException
                 || isStandardUnwantedError(throwable);
     }
 
