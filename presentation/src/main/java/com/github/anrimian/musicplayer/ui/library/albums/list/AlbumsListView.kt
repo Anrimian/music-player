@@ -1,47 +1,44 @@
-package com.github.anrimian.musicplayer.ui.library.albums.list;
+package com.github.anrimian.musicplayer.ui.library.albums.list
 
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
+import moxy.MvpView
+import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
 
-import java.util.List;
+private const val LIST_STATE = "list_state"
 
-import moxy.MvpView;
-import moxy.viewstate.strategy.StateStrategyType;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
+interface AlbumsListView : MvpView {
 
-public interface AlbumsListView extends MvpView {
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showEmptyList()
 
-    String LIST_STATE = "list_state";
-    String RENAME_STATE = "rename_state";
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showEmptySearchResult()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showEmptyList();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showEmptySearchResult();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showLoading()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showList();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showLoading();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showLoadingError(ErrorCommand errorCommand);
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showLoadingError(errorCommand: ErrorCommand?)
 
     @AddToEndSingle
-    void submitList(List<Album> albums);
+    fun submitList(albums: List<Album>)
 
     @OneExecution
-    void showErrorMessage(ErrorCommand errorCommand);
+    fun showErrorMessage(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showSelectOrderScreen(Order order);
+    fun showSelectOrderScreen(order: Order)
 
     @OneExecution
-    void restoreListPosition(ListPosition listPosition);
+    fun restoreListPosition(listPosition: ListPosition)
+
 }
