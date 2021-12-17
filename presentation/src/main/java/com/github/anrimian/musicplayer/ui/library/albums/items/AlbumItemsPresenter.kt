@@ -1,91 +1,72 @@
-package com.github.anrimian.musicplayer.ui.library.albums.items;
+package com.github.anrimian.musicplayer.ui.library.albums.items
 
-import androidx.annotation.NonNull;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
+import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
+class AlbumItemsPresenter(
+    private val albumId: Long,
+    private val interactor: LibraryAlbumsInteractor,
+    playListsInteractor: PlayListsInteractor,
+    playerInteractor: LibraryPlayerInteractor,
+    displaySettingsInteractor: DisplaySettingsInteractor,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler
+) : BaseLibraryCompositionsPresenter<AlbumItemsView>(
+    playerInteractor,
+    playListsInteractor,
+    displaySettingsInteractor,
+    errorParser,
+    uiScheduler
+) {
 
-import java.util.List;
+    private var album: Album? = null
 
-import javax.annotation.Nullable;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
-
-
-public class AlbumItemsPresenter extends BaseLibraryCompositionsPresenter<AlbumItemsView> {
-
-    private final long albumId;
-    private final LibraryAlbumsInteractor interactor;
-
-    @Nullable
-    private Album album;
-
-    public AlbumItemsPresenter(long albumId,
-                               LibraryAlbumsInteractor interactor,
-                               PlayListsInteractor playListsInteractor,
-                               LibraryPlayerInteractor playerInteractor,
-                               DisplaySettingsInteractor displaySettingsInteractor,
-                               ErrorParser errorParser,
-                               Scheduler uiScheduler) {
-        super(playerInteractor,
-                playListsInteractor,
-                displaySettingsInteractor,
-                errorParser,
-                uiScheduler);
-        this.albumId = albumId;
-        this.interactor = interactor;
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        subscribeOnAlbumInfo()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        subscribeOnAlbumInfo();
+    override fun getCompositionsObservable(searchText: String?): Observable<List<Composition>> {
+        return interactor.getAlbumItemsObservable(albumId)
     }
 
-    @NonNull
-    @Override
-    protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
-        return interactor.getAlbumItemsObservable(albumId);
+    override fun getSavedListPosition(): ListPosition? {
+        return interactor.getSavedItemsListPosition(albumId)
     }
 
-    @Override
-    protected ListPosition getSavedListPosition() {
-        return interactor.getSavedItemsListPosition(albumId);
+    override fun saveListPosition(listPosition: ListPosition) {
+        interactor.saveItemsListPosition(albumId, listPosition)
     }
 
-    @Override
-    protected void saveListPosition(ListPosition listPosition) {
-        interactor.saveItemsListPosition(albumId, listPosition);
-    }
-
-    void onFragmentMovedToTop() {
+    fun onFragmentMovedToTop() {
         //save selected screen. Wait a little for all screens
     }
 
-    void onEditAlbumClicked() {
-        if (album != null) {
-            getViewState().showEditAlbumScreen(album);
-        }
+    fun onEditAlbumClicked() {
+        album?.let(viewState::showEditAlbumScreen)
     }
 
-    private void subscribeOnAlbumInfo() {
-        getPresenterDisposable().add(interactor.getAlbumObservable(albumId)
-                .observeOn(getUiScheduler())
-                .subscribe(this::onAlbumInfoReceived,
-                        t -> getViewState().closeScreen(),
-                        getViewState()::closeScreen));
+    private fun subscribeOnAlbumInfo() {
+        interactor.getAlbumObservable(albumId)
+            .subscribeOnUi(
+                this::onAlbumInfoReceived,
+                { viewState.closeScreen() },
+                viewState::closeScreen
+            )
     }
 
-    private void onAlbumInfoReceived(Album album) {
-        this.album = album;
-        getViewState().showAlbumInfo(album);
+    private fun onAlbumInfoReceived(album: Album) {
+        this.album = album
+        viewState.showAlbumInfo(album)
     }
+
 }

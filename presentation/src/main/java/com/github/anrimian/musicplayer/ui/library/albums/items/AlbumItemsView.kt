@@ -1,20 +1,20 @@
-package com.github.anrimian.musicplayer.ui.library.albums.items;
+package com.github.anrimian.musicplayer.ui.library.albums.items
 
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsView;
+import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsView
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
+import moxy.viewstate.strategy.alias.Skip
 
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
-import moxy.viewstate.strategy.alias.Skip;
-
-public interface AlbumItemsView extends BaseLibraryCompositionsView {
+interface AlbumItemsView : BaseLibraryCompositionsView {
 
     @AddToEndSingle
-    void showAlbumInfo(Album album);
+    fun showAlbumInfo(album: Album)
 
     @OneExecution
-    void closeScreen();
+    fun closeScreen()
 
     @Skip
-    void showEditAlbumScreen(Album album);
+    fun showEditAlbumScreen(album: Album)
+
 }

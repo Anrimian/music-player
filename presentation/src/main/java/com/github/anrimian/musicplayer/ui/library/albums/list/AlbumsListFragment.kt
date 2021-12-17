@@ -22,7 +22,7 @@ import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment
-import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment
+import com.github.anrimian.musicplayer.ui.library.albums.items.newAlbumItemsFragment
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
@@ -152,7 +152,7 @@ class AlbumsListFragment : LibraryFragment(), AlbumsListView, FragmentLayerListe
 
     private fun goToAlbumScreen(album: Album) {
         FragmentNavigation.from(parentFragmentManager)
-            .addNewFragment(AlbumItemsFragment.newInstance(album.id))
+            .addNewFragment(newAlbumItemsFragment(album.id))
     }
 
     private fun onAlbumMenuClicked(view: View, album: Album) {

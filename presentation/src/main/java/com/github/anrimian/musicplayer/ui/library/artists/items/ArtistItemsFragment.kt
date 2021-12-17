@@ -30,7 +30,7 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
-import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment
+import com.github.anrimian.musicplayer.ui.library.albums.items.newAlbumItemsFragment
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.AlbumsViewHolder
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistAlbumsPresenter
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.ArtistItemsAdapter
@@ -379,7 +379,7 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     private fun onAlbumClicked(album: Album) {
         FragmentNavigation.from(parentFragmentManager())
-            .addNewFragment(AlbumItemsFragment.newInstance(album.id))
+            .addNewFragment(newAlbumItemsFragment(album.id))
     }
 
     private fun onOptionsItemClicked(item: MenuItem) {
