@@ -92,7 +92,7 @@ public interface PlayListDao {
             "WHERE play_lists.id = :id ")
     Observable<List<PlayList>> getPlayListObservable(long id);
 
-    @RawQuery(observedEntities = { PlayListEntity.class, ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
+    @RawQuery(observedEntities = { PlayListEntryEntity.class, ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
     Observable<List<PlayListEntryDto>> getPlayListItemsObservable(SimpleSQLiteQuery query);
 
     @Query("SELECT " +
