@@ -379,7 +379,10 @@ public class CustomAsyncListDiffer<T> {
         diffResult.dispatchUpdatesTo(mUpdateCallback);
         onCurrentListChanged(previousList, commitCallback);
 
-        if (llm != null && position == 0 && diffResult.convertOldPositionToNew(0) != 0) {
+        if (llm != null
+                && position == 0
+                && !previousList.isEmpty() // should prevent crash in convertOldPositionToNew
+                && diffResult.convertOldPositionToNew(0) != 0) {
             RecyclerViewUtils.scrollToPosition(recyclerView,
                     llm,
                     0,
