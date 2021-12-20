@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.dialogs.menu;
 
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getMenuItems;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -7,13 +9,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
 import java.util.List;
-
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getMenuItems;
 
 public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
 
@@ -22,16 +23,31 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
     @LayoutRes
     private final int menuViewRes;
 
+    @Nullable
+    private final MenuItem selectedMenuItem;
+
     private OnItemClickListener<MenuItem> onItemClickListener;
 
-    public MenuAdapter(List<? extends MenuItem> items, @LayoutRes int menuViewRes) {
-        this.items = items;
-        this.menuViewRes = menuViewRes;
+    public MenuAdapter(Menu menu, @LayoutRes int menuViewRes) {
+        this(menu, menuViewRes, null);
+    }
+    public MenuAdapter(Menu menu,
+                       @LayoutRes int menuViewRes,
+                       @Nullable MenuItem selectedMenuItem) {
+        this(getMenuItems(menu), menuViewRes, selectedMenuItem);
     }
 
-    public MenuAdapter(Menu menu, @LayoutRes int menuViewRes) {
-        this.items = getMenuItems(menu);
+    public MenuAdapter(List<? extends MenuItem> items,
+                       @LayoutRes int menuViewRes) {
+        this(items, menuViewRes, null);
+    }
+
+    public MenuAdapter(List<? extends MenuItem> items,
+                       @LayoutRes int menuViewRes,
+                       @Nullable MenuItem selectedMenuItem) {
+        this.items = items;
         this.menuViewRes = menuViewRes;
+        this.selectedMenuItem = selectedMenuItem;
     }
 
     @NonNull
@@ -45,7 +61,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
-        holder.bind(items.get(position));
+        MenuItem menuItem = items.get(position);
+        holder.bind(items.get(position), menuItem.equals(selectedMenuItem));
     }
 
     @Override
