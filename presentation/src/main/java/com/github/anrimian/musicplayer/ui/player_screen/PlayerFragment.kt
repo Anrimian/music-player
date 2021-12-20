@@ -728,7 +728,12 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     }
 
     private fun onRepeatModeButtonClicked(view: View) {
-        PopupMenuWindow.showPopup(view, R.menu.repeat_mode_menu) { item ->
+        //TODO select current
+        val menu = AndroidUtils.createMenu(view.getContext(), R.menu.repeat_mode_menu);
+        val items = AndroidUtils.getMenuItems(menu)
+        items.first().isChecked = true
+//        val menu = AndroidUtils.getMenuItems(R.menu.repeat_mode_menu)
+        PopupMenuWindow.showPopup(view, items) { item ->
             var repeatMode = RepeatMode.NONE
             when (item.itemId) {
                 R.id.menu_repeat_playlist -> repeatMode = RepeatMode.REPEAT_PLAY_LIST

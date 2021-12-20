@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common.menu;
 
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getMenuItems;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.Gravity;
@@ -23,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getMenuItems;
-
 public class PopupMenuWindow {
 
     public static void showPopup(View anchorView,
@@ -38,8 +38,21 @@ public class PopupMenuWindow {
                                  int gravity,
                                  Callback<MenuItem> listener) {
         Menu menu = AndroidUtils.createMenu(anchorView.getContext(), menuResId);
+        showPopup(anchorView, getMenuItems(menu), gravity, listener);
+    }
+
+    public static void showPopup(View anchorView,
+                                 List<? extends MenuItem> menuItems,
+                                 Callback<MenuItem> listener) {
+        showPopup(anchorView, menuItems, Gravity.START, listener);
+    }
+
+    public static void showPopup(View anchorView,
+                                 List<? extends MenuItem> menuItems,
+                                 int gravity,
+                                 Callback<MenuItem> listener) {
         int screenMargin = anchorView.getResources().getDimensionPixelSize(R.dimen.popup_screen_margin);
-        showPopup(anchorView, getMenuItems(menu), listener, gravity, screenMargin);
+        showPopup(anchorView, menuItems, listener, gravity, screenMargin);
     }
 
     public static void showActionBarPopup(View anchorView,

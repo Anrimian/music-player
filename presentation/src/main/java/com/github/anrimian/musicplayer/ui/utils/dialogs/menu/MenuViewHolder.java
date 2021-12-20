@@ -35,15 +35,15 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
         itemView.setOnClickListener(v -> onItemClickListener.onItemClick(menuItem));
     }
 
-    void bind(MenuItem menuItem, boolean selected) {
-        if (selected) {
+    void bind(MenuItem menuItem) {
+        this.menuItem = menuItem;
+        tvTitle.setText(menuItem.getTitle());
+
+        if (menuItem.isChecked()) {
             tvTitle.setTextColor(getColorFromAttr(itemView.getContext(), R.attr.colorAccent));
         } else {
             tvTitle.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.color_text_primary));
         }
-
-        this.menuItem = menuItem;
-        tvTitle.setText(menuItem.getTitle());
 
         Drawable icon = menuItem.getIcon();
         ivIcon.setVisibility(icon == null? View.GONE: View.VISIBLE);
