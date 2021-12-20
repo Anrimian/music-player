@@ -1,49 +1,47 @@
-package com.github.anrimian.musicplayer.ui.library.genres.list;
+package com.github.anrimian.musicplayer.ui.library.genres.list
 
-import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy;
+import com.github.anrimian.musicplayer.domain.models.genres.Genre
+import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
+import moxy.MvpView
+import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
 
-import java.util.List;
+private const val LIST_STATE = "list_state"
+private const val RENAME_STATE = "rename_state"
 
-import moxy.MvpView;
-import moxy.viewstate.strategy.StateStrategyType;
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
+interface GenresListView : MvpView {
 
-public interface GenresListView extends MvpView {
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showEmptyList()
 
-    String LIST_STATE = "list_state";
-    String RENAME_STATE = "rename_state";
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showEmptySearchResult()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showEmptyList();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showEmptySearchResult();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showLoading()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showList();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    fun showLoadingError(errorCommand: ErrorCommand)
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showLoading();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = RENAME_STATE)
+    fun showRenameProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = LIST_STATE)
-    void showLoadingError(ErrorCommand errorCommand);
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
-    void showRenameProgress();
-
-    @StateStrategyType(value = SingleStateByTagStrategy.class, tag = RENAME_STATE)
-    void hideRenameProgress();
+    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = RENAME_STATE)
+    fun hideRenameProgress()
 
     @AddToEndSingle
-    void submitList(List<Genre> genres);
+    fun submitList(genres: List<Genre>)
 
     @OneExecution
-    void showSelectOrderScreen(Order order);
+    fun showSelectOrderScreen(order: Order)
 
     @OneExecution
-    void showErrorMessage(ErrorCommand errorCommand);
+    fun showErrorMessage(errorCommand: ErrorCommand)
+
 }
