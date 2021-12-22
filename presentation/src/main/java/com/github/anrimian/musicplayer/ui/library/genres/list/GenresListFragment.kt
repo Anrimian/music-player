@@ -22,7 +22,7 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
-import com.github.anrimian.musicplayer.ui.library.genres.items.GenreItemsFragment
+import com.github.anrimian.musicplayer.ui.library.genres.items.newGenreItemsFragment
 import com.github.anrimian.musicplayer.ui.library.genres.list.adapter.GenresAdapter
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
@@ -194,7 +194,7 @@ class GenresListFragment : LibraryFragment(), GenresListView, FragmentLayerListe
 
     private fun goToGenreScreen(genre: Genre) {
         FragmentNavigation.from(parentFragmentManager)
-            .addNewFragment(GenreItemsFragment.newInstance(genre.id))
+            .addNewFragment(newGenreItemsFragment(genre.id))
     }
 
     private fun onOptionsItemClicked(item: MenuItem) {

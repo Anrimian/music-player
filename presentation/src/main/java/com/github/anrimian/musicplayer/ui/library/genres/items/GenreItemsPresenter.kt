@@ -1,102 +1,83 @@
-package com.github.anrimian.musicplayer.ui.library.genres.items;
+package com.github.anrimian.musicplayer.ui.library.genres.items
 
-import androidx.annotation.NonNull;
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.genres.Genre
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.disposables.Disposable
 
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter;
+class GenreItemsPresenter(
+    private val genreId: Long,
+    private val interactor: LibraryGenresInteractor,
+    playListsInteractor: PlayListsInteractor,
+    playerInteractor: LibraryPlayerInteractor,
+    displaySettingsInteractor: DisplaySettingsInteractor,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler
+) : BaseLibraryCompositionsPresenter<GenreItemsView>(
+    playerInteractor,
+    playListsInteractor,
+    displaySettingsInteractor,
+    errorParser,
+    uiScheduler
+) {
 
-import java.util.List;
+    private var changeDisposable: Disposable? = null
+    private var genre: Genre? = null
 
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.Disposable;
-
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.dispose;
-
-
-public class GenreItemsPresenter extends BaseLibraryCompositionsPresenter<GenreItemsView> {
-
-    private final long genreId;
-    private final LibraryGenresInteractor interactor;
-
-    private Disposable changeDisposable;
-
-    private Genre genre;
-
-    public GenreItemsPresenter(long genreId,
-                               LibraryGenresInteractor interactor,
-                               PlayListsInteractor playListsInteractor,
-                               LibraryPlayerInteractor playerInteractor,
-                               DisplaySettingsInteractor displaySettingsInteractor,
-                               ErrorParser errorParser,
-                               Scheduler uiScheduler) {
-        super(playerInteractor,
-                playListsInteractor,
-                displaySettingsInteractor,
-                errorParser,
-                uiScheduler);
-        this.genreId = genreId;
-        this.interactor = interactor;
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        subscribeOnGenreInfo()
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-        subscribeOnGenreInfo();
+    override fun getCompositionsObservable(searchText: String?): Observable<List<Composition>> {
+        return interactor.getGenreItemsObservable(genreId)
     }
 
-    @NonNull
-    @Override
-    protected Observable<List<Composition>> getCompositionsObservable(String searchText) {
-        return interactor.getGenreItemsObservable(genreId);
+    override fun getSavedListPosition(): ListPosition? {
+        return null
     }
 
-    @Override
-    protected ListPosition getSavedListPosition() {
-        return null;
-    }
+    override fun saveListPosition(listPosition: ListPosition) {}
 
-    @Override
-    protected void saveListPosition(ListPosition listPosition) {
-
-    }
-
-    void onFragmentMovedToTop() {
+    fun onFragmentMovedToTop() {
         //save selected genre screen. Wait a little for all screens
     }
 
-    void onRenameGenreClicked() {
-        if (genre != null) {
-            getViewState().showRenameGenreDialog(genre);
-        }
+    fun onRenameGenreClicked() {
+        genre?.let(viewState::showRenameGenreDialog)
     }
 
-    void onNewGenreNameEntered(String name, long genreId) {
-        dispose(changeDisposable);
+    fun onNewGenreNameEntered(name: String?, genreId: Long) {
+        RxUtils.dispose(changeDisposable)
         changeDisposable = interactor.updateGenreName(name, genreId)
-                .observeOn(getUiScheduler())
-                .doOnSubscribe(d -> getViewState().showRenameProgress())
-                .doFinally(() -> getViewState().hideRenameProgress())
-                .subscribe(() -> {}, this::onDefaultError);
+            .observeOn(uiScheduler)
+            .doOnSubscribe { viewState.showRenameProgress() }
+            .doFinally { viewState.hideRenameProgress() }
+            .subscribe({}, this::onDefaultError)
     }
 
-    private void subscribeOnGenreInfo() {
-        getPresenterDisposable().add(interactor.getGenreObservable(genreId)
-                .observeOn(getUiScheduler())
-                .subscribe(this::onGenreInfoReceived,
-                        t -> getViewState().closeScreen(),
-                        getViewState()::closeScreen));
+    private fun subscribeOnGenreInfo() {
+        interactor.getGenreObservable(genreId)
+            .subscribeOnUi(
+                this::onGenreInfoReceived,
+                { viewState.closeScreen() },
+                viewState::closeScreen
+            )
+
     }
 
-    private void onGenreInfoReceived(Genre genre) {
-        this.genre = genre;
-        getViewState().showGenreInfo(genre);
+    private fun onGenreInfoReceived(genre: Genre) {
+        this.genre = genre
+        viewState.showGenreInfo(genre)
     }
+
 }
