@@ -1,72 +1,69 @@
-package com.github.anrimian.musicplayer.ui.library.common.compositions;
+package com.github.anrimian.musicplayer.ui.library.common.compositions
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-import com.github.anrimian.musicplayer.ui.common.mvp.ListMvpView;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.common.mvp.ListMvpView
+import moxy.viewstate.strategy.alias.AddToEndSingle
+import moxy.viewstate.strategy.alias.OneExecution
+import moxy.viewstate.strategy.alias.Skip
 
-import java.util.Collection;
-import java.util.List;
-
-import moxy.viewstate.strategy.alias.AddToEndSingle;
-import moxy.viewstate.strategy.alias.OneExecution;
-import moxy.viewstate.strategy.alias.Skip;
-
-public interface BaseLibraryCompositionsView extends ListMvpView<Composition> {
+interface BaseLibraryCompositionsView : ListMvpView<Composition> {
 
     @OneExecution
-    void showSelectPlayListDialog();
+    fun showSelectPlayListDialog()
 
     @OneExecution
-    void showAddingToPlayListError(ErrorCommand errorCommand);
+    fun showAddingToPlayListError(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showAddingToPlayListComplete(PlayList playList, List<Composition> compositions);
+    fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>)
 
     @OneExecution
-    void showConfirmDeleteDialog(List<Composition> compositionsToDelete);
+    fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>)
 
     @OneExecution
-    void showDeleteCompositionError(ErrorCommand errorCommand);
+    fun showDeleteCompositionError(errorCommand: ErrorCommand)
 
     @OneExecution
-    void showDeleteCompositionMessage(List<Composition> compositionsToDelete);
+    fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>)
 
     @Skip
-    void onCompositionSelected(Composition composition, int position);
+    fun onCompositionSelected(composition: Composition, position: Int)
 
     @Skip
-    void onCompositionUnselected(Composition composition, int position);
+    fun onCompositionUnselected(composition: Composition, position: Int)
 
     @Skip
-    void setItemsSelected(boolean selected);
+    fun setItemsSelected(selected: Boolean)
 
     @AddToEndSingle
-    void showSelectionMode(int count);
+    fun showSelectionMode(count: Int)
 
     @Skip
-    void shareCompositions(Collection<Composition> selectedCompositions);
+    fun shareCompositions(selectedCompositions: Collection<Composition>)
 
     @Skip
-    void showCompositionActionDialog(Composition composition, int position);
+    fun showCompositionActionDialog(composition: Composition, position: Int)
 
     @OneExecution
-    void showErrorMessage(ErrorCommand errorCommand);
+    fun showErrorMessage(errorCommand: ErrorCommand)
 
     @AddToEndSingle
-    void setDisplayCoversEnabled(boolean isCoversEnabled);
+    fun setDisplayCoversEnabled(isCoversEnabled: Boolean)
 
     @OneExecution
-    void onCompositionsAddedToPlayNext(List<Composition> compositions);
+    fun onCompositionsAddedToPlayNext(compositions: List<Composition>)
 
     @OneExecution
-    void onCompositionsAddedToQueue(List<Composition> compositions);
+    fun onCompositionsAddedToQueue(compositions: List<Composition>)
 
     @AddToEndSingle
-    void showCurrentComposition(CurrentComposition currentComposition);
+    fun showCurrentComposition(currentComposition: CurrentComposition)
 
     @OneExecution
-    void restoreListPosition(ListPosition listPosition);
+    fun restoreListPosition(listPosition: ListPosition)
+
 }

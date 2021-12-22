@@ -69,7 +69,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
     
     private lateinit var deletingErrorHandler: ErrorHandler
 
-    override fun getBasePresenter(): BaseLibraryCompositionsPresenter<AlbumItemsView> {
+    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<AlbumItemsView> {
         return presenter
     }
 

@@ -71,7 +71,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
     private lateinit var progressDialogRunner: DialogFragmentDelayRunner
     private lateinit var deletingErrorHandler: ErrorHandler
 
-    override fun getBasePresenter(): BaseLibraryCompositionsPresenter<GenreItemsView> {
+    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<GenreItemsView> {
         return presenter
     }
 
