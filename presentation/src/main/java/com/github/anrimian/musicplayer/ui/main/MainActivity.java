@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.main;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -19,6 +21,7 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
+import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragmentKt;
 import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
@@ -26,8 +29,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.utils.Permissions;
 import com.github.anrimian.musicplayer.utils.logger.AppLogger;
 import com.github.anrimian.musicplayer.utils.logger.FileLog;
-
-import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void goToMainScreen() {
         boolean openPlayQueue = getOpenPlayQueueArg(getIntent());
-        startFragment(PlayerFragment.newInstance(openPlayQueue));
+        startFragment(PlayerFragmentKt.newPlayerFragment(openPlayQueue));
     }
 
     private void startFragment(Fragment fragment) {

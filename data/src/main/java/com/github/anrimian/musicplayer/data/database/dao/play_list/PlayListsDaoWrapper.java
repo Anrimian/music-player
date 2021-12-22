@@ -152,7 +152,7 @@ public class PlayListsDaoWrapper {
     public Observable<List<PlayListItem>> getPlayListItemsObservable(long playListId,
                                                                      boolean useFileName) {
         String query = PlayListDao.getPlaylistItemsQuery(useFileName);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {playListId} );
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] { playListId } );
         return playListDao.getPlayListItemsObservable(sqlQuery)
                 .map(entities -> mapList(entities, this::toItem));
     }

@@ -15,9 +15,10 @@ class AlbumEditorPresenter(
         uiScheduler: Scheduler,
         errorParser: ErrorParser
 ) : AppPresenter<AlbumEditorView>(uiScheduler, errorParser) {
-    
-    private var changeDisposable: Disposable? = null
+
     private var album: Album? = null
+
+    private var changeDisposable: Disposable? = null
     private var lastEditAction: Completable? = null
     
     override fun onFirstViewAttach() {
@@ -57,8 +58,7 @@ class AlbumEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showRenameProgress() }
                 .doFinally { viewState.hideRenameProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onNewNameEntered(name: String?) {
@@ -70,8 +70,7 @@ class AlbumEditorPresenter(
                 .observeOn(uiScheduler)
                 .doOnSubscribe { viewState.showRenameProgress() }
                 .doFinally { viewState.hideRenameProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
-        presenterDisposable.add(changeDisposable)
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     fun onRetryFailedEditActionClicked() {
@@ -79,8 +78,7 @@ class AlbumEditorPresenter(
             RxUtils.dispose(changeDisposable, presenterDisposable)
             changeDisposable = lastEditAction!!
                     .doFinally { lastEditAction = null }
-                    .subscribe({}, this::onDefaultError)
-            presenterDisposable.add(changeDisposable)
+                    .subscribe({}, this::onDefaultError, presenterDisposable)
         }
     }
 
