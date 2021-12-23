@@ -1,9 +1,11 @@
 package com.github.anrimian.musicplayer.utils.logger;
 
+import static java.io.File.separator;
+
 import android.content.Context;
 import android.os.Build;
 
-import com.github.anrimian.musicplayer.BuildConfig;
+import com.github.anrimian.musicplayer.ui.utils.AppInfoKt;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,8 +19,6 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import static java.io.File.separator;
 
 @SuppressWarnings("WeakerAccess")
 public class FileLog {
@@ -90,7 +90,7 @@ public class FileLog {
 
     private void appendSystemInfo(StringBuilder sb) {
         sb.append("App version code: ");
-        sb.append(BuildConfig.VERSION_CODE);
+        sb.append(AppInfoKt.getAppInfo(context).getVersionCode());
         sb.append("\n");
 
         sb.append("Android system version: ");

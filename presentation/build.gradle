@@ -12,8 +12,6 @@ android {
         minSdkVersion config.androidMinSdkVersion
         targetSdkVersion config.androidTargetSdkVersion
 
-        versionCode config.androidVersionCode
-        versionName config.androidVersionName
         testInstrumentationRunner config.testInstrumentationRunner
         vectorDrawables.useSupportLibrary = true
     }

@@ -15,12 +15,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.github.anrimian.musicplayer.BuildConfig;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentAboutBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
+import com.github.anrimian.musicplayer.ui.utils.AppInfo;
+import com.github.anrimian.musicplayer.ui.utils.AppInfoKt;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
@@ -83,9 +84,10 @@ public class AboutAppFragment extends Fragment implements FragmentLayerListener 
     public void onFragmentMovedOnTop() {
         AdvancedToolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.app_name);
+        AppInfo appInfo = AppInfoKt.getAppInfo(requireContext());
         toolbar.setSubtitle(getString(R.string.version_template,
-                BuildConfig.VERSION_NAME,
-                BuildConfig.VERSION_CODE));
+                appInfo.getVersionName(),
+                appInfo.getVersionCode()));
         toolbar.setTitleClickListener(null);
         toolbar.clearOptionsMenu();
     }
