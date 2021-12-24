@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -71,4 +72,11 @@ dependencies {
     implementation project(':domain')
     implementation project(':data')
     implementation project(':presentation')
+
+    def deps = rootProject.ext
+
+    implementation deps.appCompat
+
+    implementation deps.dagger
+    kapt deps.daggerCompiler
 }

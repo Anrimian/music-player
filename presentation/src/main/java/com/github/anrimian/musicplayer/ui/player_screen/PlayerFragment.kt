@@ -36,7 +36,6 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
-import com.github.anrimian.musicplayer.ui.ScreensMap
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
@@ -44,6 +43,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
+import com.github.anrimian.musicplayer.ui.common.navigation.ScreensMap
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
@@ -278,6 +278,12 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
                 .beginTransaction()
                 .replace(R.id.main_activity_container, StartFragment())
                 .commit()
+        }
+
+        if (savedInstanceState == null) {
+            Components.getAppComponent()
+                .specificNavigation()
+                .attachShortSyncStateFragment(childFragmentManager, R.id.flShortSyncState)
         }
     }
 

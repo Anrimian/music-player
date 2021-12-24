@@ -29,6 +29,7 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
+import com.github.anrimian.musicplayer.ui.common.navigation.SpecialNavigation;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerPresenter;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
@@ -100,4 +101,5 @@ public interface AppComponent {
     EqualizerController equalizerController();
 
     SystemServiceController systemServiceController();
+    SpecialNavigation specificNavigation();
 }
