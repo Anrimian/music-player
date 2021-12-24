@@ -43,14 +43,14 @@ import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
 import javax.inject.Singleton;
 
-import dagger.Component;
+import dagger.Subcomponent;
 
 /**
  * Created on 11.02.2017.
  */
 
 @Singleton
-@Component(modules = {
+@Subcomponent(modules = {
         AppModule.class,
         SchedulerModule.class,
         ErrorModule.class,

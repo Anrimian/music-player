@@ -15,7 +15,7 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
  * Created on 20.10.2017.
  */
 
-public class App extends Application {
+public abstract class App extends Application {
 
     @Override
     public void onCreate() {
@@ -23,7 +23,7 @@ public class App extends Application {
         RxJavaPlugins.setErrorHandler(new RxJavaErrorConsumer());
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
-        Components.init(getApplicationContext());
+        initComponents();
 
 //        DevTools.run(this);
 
@@ -37,4 +37,7 @@ public class App extends Application {
             appComponent.mediaScannerRepository().runStorageObserver();
         }
     }
+
+    protected abstract void initComponents();
+
 }

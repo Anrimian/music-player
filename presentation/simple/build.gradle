@@ -77,6 +77,8 @@ dependencies {
 
     implementation deps.appCompat
 
+    implementation deps.rxAndroid
+
     implementation deps.dagger
     kapt deps.daggerCompiler
 }

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -32,26 +34,12 @@ import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
 
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
-
 /**
  * Created on 11.02.2017.
  */
 
 @Module
 public class AppModule {
-
-    private final Context appContext;
-
-    public AppModule(@NonNull Context appContext) {
-        this.appContext = appContext;
-    }
-
-    @Provides
-    @NonNull
-    Context provideAppContext() {
-        return appContext;
-    }
 
     @Provides
     @Nonnull

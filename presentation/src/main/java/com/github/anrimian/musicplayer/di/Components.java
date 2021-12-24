@@ -1,11 +1,7 @@
 package com.github.anrimian.musicplayer.di;
 
 
-import android.content.Context;
-
 import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.di.app.AppModule;
-import com.github.anrimian.musicplayer.di.app.DaggerAppComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
@@ -51,8 +47,8 @@ public class Components {
     private LibraryComponent libraryComponent;
     private LibraryFilesComponent libraryFilesComponent;
 
-    public static void init(Context appContext) {
-        instance = new Components(appContext);
+    public static void init(AppComponent appComponent) {
+        instance = new Components(appComponent);
     }
 
     private static Components getInstance() {
@@ -62,8 +58,8 @@ public class Components {
         return instance;
     }
 
-    private Components(Context appContext) {
-        appComponent = buildAppComponent(appContext);
+    private Components(AppComponent appComponent) {
+        this.appComponent = appComponent;
     }
 
     public static AppComponent getAppComponent() {
@@ -146,12 +142,6 @@ public class Components {
             libraryFilesComponent = getLibraryComponent().libraryFilesComponent(new LibraryFilesModule());
         }
         return libraryFilesComponent;
-    }
-
-    private AppComponent buildAppComponent(Context appContext) {
-        return DaggerAppComponent.builder()
-                .appModule(new AppModule(appContext))
-                .build();
     }
 
 }

@@ -70,7 +70,7 @@ import io.reactivex.rxjava3.core.Scheduler;
  */
 
 @Module
-class MusicModule {
+public class MusicModule {
 
     @Provides
     @NonNull
