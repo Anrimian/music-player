@@ -25,7 +25,6 @@
 #-renamesourcefileattribute SourceFile
 
 #default rules
--useuniqueclassmembernames
 -renamesourcefileattribute SourceFile
 -keepattributes *Annotation*,SourceFile,LineNumberTable
 -printmapping out.map
@@ -46,6 +45,13 @@
 -keep class org.jaudiotagger.tag.flac.**{*;}
 -keep class org.jaudiotagger.logging.**{*;}
 -keep class org.jaudiotagger.tag.vorbiscomment.**{*;}
+
+#slidr
+-dontwarn com.r0adkll.slidr.R$id
+
+#chips layout manager
+#not working https://github.com/BelooS/ChipsLayoutManager/issues/31
+-dontwarn com.beloo.widget.chipslayoutmanager.**
 
 #kotlin
 -dontwarn kotlin.**
