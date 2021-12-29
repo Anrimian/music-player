@@ -41,6 +41,18 @@ import io.reactivex.rxjava3.core.Scheduler;
 @Module
 public class AppModule {
 
+    private final Context appContext;
+
+    public AppModule(Context appContext) {
+        this.appContext = appContext;
+    }
+
+    @Provides
+    @Nonnull
+    Context appContext() {
+        return appContext;
+    }
+
     @Provides
     @Nonnull
     @Singleton

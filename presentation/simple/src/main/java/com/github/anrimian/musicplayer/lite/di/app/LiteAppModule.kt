@@ -1,21 +1,16 @@
 package com.github.anrimian.musicplayer.lite.di.app
 
-import android.content.Context
 import com.github.anrimian.musicplayer.lite.ui.SpecialNavigationImpl
 import com.github.anrimian.musicplayer.ui.common.navigation.SpecialNavigation
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
-class LiteAppModule(private val appContext: Context) {
+class LiteAppModule {
 
     @Provides
-    fun provideAppContext(): Context {
-        return appContext
-    }
-
-    @Provides
-    @LiteAppSingleton
+    @Singleton
     fun navigation(): SpecialNavigation = SpecialNavigationImpl()
 
 }
