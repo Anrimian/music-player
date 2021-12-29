@@ -548,7 +548,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         PopupMenuWindow.showPopup(
             view,
             R.menu.folder_item_menu
-        ) { item: MenuItem ->
+        ) { item ->
             when (item.itemId) {
                 R.id.menu_play -> presenter.onPlayFolderClicked(folder)
                 R.id.menu_play_next -> presenter.onPlayNextFolderClicked(folder)

@@ -85,7 +85,7 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
     private lateinit var editorErrorHandler: ErrorHandler
 
 
-    override fun getBasePresenter(): BaseLibraryCompositionsPresenter<ArtistItemsView> {
+    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<ArtistItemsView> {
         return presenter
     }
 

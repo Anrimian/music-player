@@ -285,11 +285,15 @@ public class InternalEqualizer implements AppEqualizer {
                 } else {
                     equalizer = mainEqualizer;
                 }
-                T result = func.map(equalizer);
-                if (mainEqualizer == null) {
-                    equalizer.release();
+                try {
+                    return func.map(equalizer);
+                } catch (Exception e) {
+                    throw new EqInitializationException(e);
+                } finally {
+                    if (mainEqualizer == null) {
+                        equalizer.release();
+                    }
                 }
-                return result;
             }
         }
 

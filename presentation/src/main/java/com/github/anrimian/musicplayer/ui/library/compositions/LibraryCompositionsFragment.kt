@@ -62,7 +62,7 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
     private lateinit var selectOrderDialogRunner: DialogFragmentRunner<SelectOrderDialogFragment>
     private lateinit var deletingErrorHandler: ErrorHandler
 
-    override fun getBasePresenter(): BaseLibraryCompositionsPresenter<LibraryCompositionsView> = presenter
+    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<LibraryCompositionsView> = presenter
 
     override fun onCreateView(
         inflater: LayoutInflater,

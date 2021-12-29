@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.ui.library.albums.items
+package com.github.anrimian.musicplayer.ui.library.genres.items
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,19 +13,18 @@ import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentBaseFabListBinding
 import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
-import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
-import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
@@ -33,7 +32,9 @@ import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibrar
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
@@ -43,33 +44,34 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper
 import com.google.android.material.snackbar.Snackbar
 import moxy.ktx.moxyPresenter
 
-fun newAlbumItemsFragment(albumId: Long): AlbumItemsFragment {
+fun newGenreItemsFragment(genreId: Long): GenreItemsFragment {
     val args = Bundle()
-    args.putLong(Constants.Arguments.ID_ARG, albumId)
-    val fragment = AlbumItemsFragment()
+    args.putLong(Constants.Arguments.ID_ARG, genreId)
+    val fragment = GenreItemsFragment()
     fragment.arguments = args
     return fragment
 }
 
-class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, FragmentLayerListener,
+class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, FragmentLayerListener,
     BackButtonListener {
 
     private val presenter by moxyPresenter {
-        Components.albumItemsComponent(getAlbumId()).albumItemsPresenter()
+        Components.genreItemsComponent(getGenreId()).genreItemsPresenter()
     }
-    
     private lateinit var viewBinding: FragmentBaseFabListBinding
-    
+
     private lateinit var toolbar: AdvancedToolbar
+
     private lateinit var adapter: CompositionsAdapter
-    private lateinit var layoutManager: LinearLayoutManager
-    
+
     private lateinit var compositionActionDialogRunner: DialogFragmentRunner<CompositionActionDialogFragment>
     private lateinit var choosePlayListDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
-    
+    private lateinit var editGenreNameDialogRunner: DialogFragmentRunner<InputTextDialogFragment>
+
+    private lateinit var progressDialogRunner: DialogFragmentDelayRunner
     private lateinit var deletingErrorHandler: ErrorHandler
 
-    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<AlbumItemsView> {
+    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<GenreItemsView> {
         return presenter
     }
 
@@ -86,7 +88,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         super.onViewCreated(view, savedInstanceState)
         toolbar = requireActivity().findViewById(R.id.toolbar)
 
-        viewBinding.progressStateView.onTryAgainClick { presenter.onTryAgainLoadCompositionsClicked() }
+        viewBinding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked)
 
         RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView, true)
         adapter = CompositionsAdapter(
@@ -98,10 +100,9 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
             presenter::onCompositionMenuClicked
         )
         viewBinding.recyclerView.adapter = adapter
-        viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
-
-        layoutManager = LinearLayoutManager(context)
+        val layoutManager = LinearLayoutManager(context)
         viewBinding.recyclerView.layoutManager = layoutManager
+
         val callback = ShortSwipeCallback(requireContext(),
             R.drawable.ic_play_next,
             R.string.play_next,
@@ -109,6 +110,8 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         )
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
+
+        viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
 
         SlidrPanel.simpleSwipeBack(
             viewBinding.listContainer,
@@ -128,6 +131,13 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         compositionActionDialogRunner = DialogFragmentRunner(fm, Tags.COMPOSITION_ACTION_TAG) { f ->
             f.setOnTripleCompleteListener(this::onCompositionActionSelected)
         }
+        editGenreNameDialogRunner = DialogFragmentRunner(fm, Tags.GENRE_NAME_TAG) { fragment ->
+            fragment.setComplexCompleteListener { name, extra ->
+                presenter.onNewGenreNameEntered(name, extra.getLong(Constants.Arguments.ID_ARG))
+            }
+        }
+
+        progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG)
     }
 
     override fun onFragmentMovedOnTop() {
@@ -137,12 +147,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         toolbar.setupSearch(null, null)
         toolbar.setTitleClickListener(null)
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu, this::onActionModeItemClicked)
-        toolbar.setupOptionsMenu(R.menu.album_menu, this::onOptionsItemClicked)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.onStop(ViewUtils.getListPosition(layoutManager))
+        toolbar.setupOptionsMenu(R.menu.genre_menu, this::onOptionsItemClicked)
     }
 
     override fun onBackPressed(): Boolean {
@@ -157,18 +162,15 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         return false
     }
 
-    override fun showAlbumInfo(album: Album) {
-        toolbar.title = album.name
-        toolbar.subtitle = FormatUtils.formatAlbumAdditionalInfo(
-            context,
-            album,
-            R.drawable.ic_description_text_circle_inverse
-        )
+    override fun showGenreInfo(genre: Genre) {
+        toolbar.title = genre.name
+        toolbar.subtitle =
+            FormatUtils.formatCompositionsCount(requireContext(), genre.compositionsCount)
     }
 
     override fun showEmptyList() {
         viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.showMessage(R.string.no_compositions)
+        viewBinding.progressStateView.showMessage(R.string.no_items_in_genre)
     }
 
     override fun showEmptySearchResult() {
@@ -193,9 +195,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         adapter.submitList(genres)
     }
 
-    override fun restoreListPosition(listPosition: ListPosition) {
-        ViewUtils.scrollToPosition(layoutManager, listPosition)
-    }
+    override fun restoreListPosition(listPosition: ListPosition) {}
 
     override fun onCompositionSelected(composition: Composition, position: Int) {
         adapter.setItemSelected(position)
@@ -218,8 +218,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
             viewBinding.listContainer,
             getString(R.string.add_to_playlist_error_template, errorCommand.message),
             Snackbar.LENGTH_SHORT
-        )
-            .show()
+        ).show()
     }
 
     override fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>) {
@@ -294,6 +293,30 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
             .show()
     }
 
+    override fun showRenameGenreDialog(genre: Genre) {
+        val bundle = Bundle()
+        bundle.putLong(Constants.Arguments.ID_ARG, genre.id)
+        val fragment = InputTextDialogFragment.Builder(
+            R.string.change_name,
+            R.string.change,
+            R.string.cancel,
+            R.string.name,
+            genre.name
+        ).canBeEmpty(false)
+            .extra(bundle)
+            .build()
+        editGenreNameDialogRunner.show(fragment)
+    }
+
+    override fun showRenameProgress() {
+        val fragment = ProgressDialogFragment.newInstance(R.string.rename_progress)
+        progressDialogRunner.show(fragment)
+    }
+
+    override fun hideRenameProgress() {
+        progressDialogRunner.cancel()
+    }
+
     override fun onCompositionsAddedToPlayNext(compositions: List<Composition>) {
         val message = MessagesUtils.getPlayNextMessage(requireContext(), compositions)
         MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
@@ -304,19 +327,15 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun showEditAlbumScreen(album: Album) {
-        startActivity(AlbumEditorActivity.newIntent(requireContext(), album.id))
-    }
-
     override fun closeScreen() {
         FragmentNavigation.from(parentFragmentManager).goBack()
     }
 
-    private fun getAlbumId() = requireArguments().getLong(Constants.Arguments.ID_ARG)
+    private fun getGenreId() = requireArguments().getLong(Constants.Arguments.ID_ARG)
 
     private fun onOptionsItemClicked(item: MenuItem) {
         when (item.itemId) {
-            R.id.menu_edit -> presenter.onEditAlbumClicked()
+            R.id.menu_rename -> presenter.onRenameGenreClicked()
         }
     }
 
