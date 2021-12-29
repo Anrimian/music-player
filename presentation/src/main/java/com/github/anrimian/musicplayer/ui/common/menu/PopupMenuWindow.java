@@ -34,6 +34,12 @@ public class PopupMenuWindow {
     }
 
     public static void showPopup(View anchorView,
+                                 Menu menu,
+                                 Callback<MenuItem> listener) {
+        showPopup(anchorView, getMenuItems(menu), Gravity.START, listener);
+    }
+
+    public static void showPopup(View anchorView,
                                  @MenuRes int menuResId,
                                  int gravity,
                                  Callback<MenuItem> listener) {
