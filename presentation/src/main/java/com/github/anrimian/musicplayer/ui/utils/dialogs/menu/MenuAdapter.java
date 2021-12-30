@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.dialogs.menu;
 
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getMenuItems;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,8 +15,6 @@ import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
 import java.util.List;
 
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getMenuItems;
-
 public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
 
     private final List<? extends MenuItem> items;
@@ -24,13 +24,12 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuViewHolder> {
 
     private OnItemClickListener<MenuItem> onItemClickListener;
 
-    public MenuAdapter(List<? extends MenuItem> items, @LayoutRes int menuViewRes) {
-        this.items = items;
-        this.menuViewRes = menuViewRes;
+    public MenuAdapter(Menu menu, @LayoutRes int menuViewRes) {
+        this(getMenuItems(menu), menuViewRes);
     }
 
-    public MenuAdapter(Menu menu, @LayoutRes int menuViewRes) {
-        this.items = getMenuItems(menu);
+    public MenuAdapter(List<? extends MenuItem> items, @LayoutRes int menuViewRes) {
+        this.items = items;
         this.menuViewRes = menuViewRes;
     }
 

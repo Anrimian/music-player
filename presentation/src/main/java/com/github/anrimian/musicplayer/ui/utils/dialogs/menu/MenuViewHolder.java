@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.dialogs.menu;
 
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -9,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.LayoutRes;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
@@ -35,6 +38,12 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
     void bind(MenuItem menuItem) {
         this.menuItem = menuItem;
         tvTitle.setText(menuItem.getTitle());
+
+        if (menuItem.isChecked()) {
+            tvTitle.setTextColor(getColorFromAttr(itemView.getContext(), R.attr.colorAccent));
+        } else {
+            tvTitle.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.color_text_primary));
+        }
 
         Drawable icon = menuItem.getIcon();
         ivIcon.setVisibility(icon == null? View.GONE: View.VISIBLE);

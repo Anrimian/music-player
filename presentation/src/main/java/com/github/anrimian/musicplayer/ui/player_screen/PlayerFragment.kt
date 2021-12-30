@@ -213,8 +213,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         ViewUtils.setOnHoldListener(panelBinding.ivSkipToPrevious, presenter::onFastSeekBackwardCalled)
         panelBinding.ivSkipToNext.setOnClickListener { presenter.onSkipToNextButtonClicked() }
         ViewUtils.setOnHoldListener(panelBinding.ivSkipToNext, presenter::onFastSeekForwardCalled)
-        panelBinding.btnInfinitePlay.setOnClickListener(this::onRepeatModeButtonClicked)
-        
+
         playQueueLayoutManager = LinearLayoutManager(requireContext())
         viewBinding.rvPlaylist!!.layoutManager = playQueueLayoutManager
         playQueueAdapter = PlayQueueAdapter(viewBinding.rvPlaylist)
@@ -493,6 +492,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         panelBinding.btnInfinitePlay.setImageResource(iconRes)
         val description = getString(FormatUtils.getRepeatModeText(mode))
         panelBinding.btnInfinitePlay.contentDescription = description
+
+        panelBinding.btnInfinitePlay.setOnClickListener { view -> onRepeatModeButtonClicked(view, mode) }
     }
 
     override fun showRandomPlayingButton(active: Boolean) {
@@ -733,13 +734,20 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         }
     }
 
-    private fun onRepeatModeButtonClicked(view: View) {
-        PopupMenuWindow.showPopup(view, R.menu.repeat_mode_menu) { item ->
-            var repeatMode = RepeatMode.NONE
-            when (item.itemId) {
-                R.id.menu_repeat_playlist -> repeatMode = RepeatMode.REPEAT_PLAY_LIST
-                R.id.menu_repeat_composition -> repeatMode = RepeatMode.REPEAT_COMPOSITION
-                R.id.menu_do_not_repeat -> repeatMode = RepeatMode.NONE
+    private fun onRepeatModeButtonClicked(view: View, currentRepeatMode: Int) {
+        val selectedItemId = when(currentRepeatMode) {
+            RepeatMode.REPEAT_PLAY_LIST -> R.id.menu_repeat_playlist
+            RepeatMode.REPEAT_COMPOSITION -> R.id.menu_repeat_composition
+            else -> R.id.menu_do_not_repeat
+        }
+        val menu = AndroidUtils.createMenu(requireContext(), R.menu.repeat_mode_menu)
+        menu.findItem(selectedItemId).isChecked = true
+
+        PopupMenuWindow.showPopup(view, menu) { item ->
+            val repeatMode = when (item.itemId) {
+                R.id.menu_repeat_playlist -> RepeatMode.REPEAT_PLAY_LIST
+                R.id.menu_repeat_composition -> RepeatMode.REPEAT_COMPOSITION
+                else -> RepeatMode.NONE
             }
             presenter.onRepeatModeChanged(repeatMode)
         }
