@@ -50,8 +50,7 @@
 -dontwarn com.r0adkll.slidr.R$id
 
 #chips layout manager
-#not working https://github.com/BelooS/ChipsLayoutManager/issues/31
--dontwarn com.beloo.widget.chipslayoutmanager.**
+#https://github.com/BelooS/ChipsLayoutManager/issues/31
 
 #kotlin
 -dontwarn kotlin.**

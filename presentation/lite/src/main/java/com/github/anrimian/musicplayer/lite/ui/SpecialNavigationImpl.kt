@@ -9,6 +9,6 @@ class SpecialNavigationImpl: SpecialNavigation {
         fm: FragmentManager,
         containerId: Int,
     ) {
-        fm.beginTransaction().add(EmptyFragment(), null).commit()
+
     }
 }
