@@ -1,0 +1,132 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+    </style>
+
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!--primary colors-->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryDarkSecondary">@color/colorPrimaryDarkSecondary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimary</item>
+
+        <!--control colors-->
+        <item name="disabledColor">@color/disabled_color</item>
+        <item name="buttonColor">@color/primary_button_color</item>
+        <item name="secondaryButtonColor">@color/secondary_button_color</item>
+        <item name="brightButtonColor">@color/colorAccent</item>
+        <item name="buttonColorInverse">@color/icon_color</item>
+        <item name="dialogColorControlHighlight">@color/color_control_highlight</item>
+        <item name="colorControlHighlightInverse">@color/color_control_highlight_dark</item>
+        <item name="colorControlThird">@color/color_control_third</item>
+
+        <!--text colors-->
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:textColorSecondary">@color/text_color_secondary</item>
+        <item name="toolbarTextColorPrimary">@color/text_color_primary_dark</item>
+        <item name="toolbarTextColorSecondary">@color/text_color_secondary_dark</item>
+        <item name="dialogTitleColor">@color/text_color_primary</item>
+        <item name="textColorDisabled">@color/text_color_disabled</item>
+        <item name="colorError">@color/colorError</item>
+        <item name="dialogButtonColor">?attr/colorAccent</item>
+
+        <!--toolbar-->
+        <item name="toolbarColor">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+        <item name="actionModeTextColor">@color/secondary_button_color</item>
+        <item name="actionModeStatusBarColor">@color/selectionStatusBarColor</item>
+        <item name="actionModeBackgroundColor">@android:color/white</item>
+
+        <!--background-->
+        <item name="android:colorBackground">@color/light_background_level_0</item>
+        <item name="listBackground">@color/light_light_gray</item>
+        <item name="listItemBottomBackground">@color/list_item_bottom_background_light</item>
+        <item name="listItemBackground">@color/light_background_level_1</item>
+        <item name="playerPanelBackground">?attr/listItemBackground</item>
+        <item name="popupMenuBackgroundColor">@color/popup_menu_background_color</item>
+        <item name="dialogBackground">@android:color/white</item>
+        <item name="subToolbarBackground">?attr/listItemBackground</item>
+        <item name="snackbarBackground">@color/snackbar_color</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@color/colorPrimary</item>
+
+        <!--other-->
+        <item name="android:dividerHorizontal">@color/divider_color</item>
+        <item name="android:alertDialogTheme">@style/DialogStyle</item>
+        <item name="android:listDivider">@drawable/divider</item>
+    </style>
+
+    <style name="AppTheme.NightModeSpecific" parent="AppTheme">
+
+    </style>
+
+    <style name="AppTheme.VersionSpecific" parent="AppTheme.NightModeSpecific">
+
+    </style>
+
+    <style name="NavigationViewStyle">
+        <item name="colorPrimary">?attr/navigationViewPrimaryColor</item>
+        <item name="android:windowBackground">?attr/listItemBackground</item>
+    </style>
+
+    <style name="SlidrActivityTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+    </style>
+
+    <style name="DialogActivityTheme">
+        <item name="android:windowMinWidthMajor">@dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/dialog_min_width_minor</item>
+        <item name="android:windowElevation">@dimen/floating_window_z</item>
+
+        <item name="android:windowAnimationStyle">@style/DialogActivityAnimation</item>
+        <item name="android:windowBackground">@drawable/bg_dialog</item>
+
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+    <style name="DialogActivityAnimation" parent="@android:style/Animation.Dialog">
+        <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in_bottom</item>
+        <!--don't see any affects from close animation, but leave it-->
+        <item name="android:activityCloseExitAnimation">@anim/anim_slide_out_bottom</item>
+    </style>
+
+    <style name="WindowAnimationTransition" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/anim_slide_in_right</item>
+        <item name="android:activityCloseExitAnimation">@anim/anim_slide_out_right</item>
+    </style>
+
+    <style name="Divider" parent="AppTheme">
+        <item name="android:background">?android:attr/dividerHorizontal</item>
+    </style>
+
+    <style name="Divider.Horizontal" parent="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1px</item>
+    </style>
+
+    <style name="Divider.Horizontal.Constraint" parent="Divider.Horizontal">
+        <item name="android:layout_width">0dp</item>
+    </style>
+
+    <style name="Divider.Vertical" parent="Divider">
+        <item name="android:layout_width">1px</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+</resources>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/fl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/colorBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_display"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/display"/>
+
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
+
+            <TextView
+                android:id="@+id/tv_library"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/library"/>
+
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
+
+            <TextView
+                android:id="@+id/tv_player"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/playing"/>
+
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
+
+            <TextView
+                android:id="@+id/tv_headset"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/headset"/>
+
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
+
+            <TextView
+                android:id="@+id/tv_theme"
+                style="@style/TextStyleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/theme"/>
+
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/toolbar_content_start"/>
+
+            <LinearLayout
+                android:id="@+id/llRunRescanStorage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="?selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/iv_title_edit"
+                    style="@style/ButtonStyle"
+                    android:layout_width="@dimen/toolbar_content_start"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:background="@null"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_storage" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/TextStyle.Medium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="@dimen/content_horizontal_margin"
+                        android:paddingTop="@dimen/content_vertical_margin"
+                        android:text="@string/scan_storage"
+                        tools:ignore="RtlSymmetry" />
+
+                    <TextView
+                        style="@style/TextStyle.Subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="@dimen/content_horizontal_margin"
+                        android:paddingTop="@dimen/content_spacing_margin"
+                        android:paddingBottom="@dimen/content_vertical_margin"
+                        android:text="@string/scan_storage_description"
+                        tools:ignore="RtlSymmetry" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

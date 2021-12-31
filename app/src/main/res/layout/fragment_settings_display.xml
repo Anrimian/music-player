@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsvContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="ifContentScrolls"
+        android:background="?android:attr/colorBackground">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/TextStyle.ContentTitle"
+                android:id="@+id/tvCoversTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/covers"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbCovers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/show_covers"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCoversTitle"/>
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbCoversInNotification"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/show_covers_in_notification"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbCovers" />
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbColoredNotification"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/colored_notification"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbCoversInNotification" />
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbShowCoverStubInNotification"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/show_cover_stub_in_notification"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbColoredNotification" />
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbNotificationOnLockScreen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/show_covers_on_lock_screen"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbShowCoverStubInNotification" />
+
+            <TextView
+                style="@style/TextStyle.ContentTitle"
+                android:id="@+id/tvCompositionsTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/compositions"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbNotificationOnLockScreen"/>
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbUseFileName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/display_composition_file_name"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCompositionsTitle"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

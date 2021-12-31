@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsvContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="ifContentScrolls"
+        android:background="?android:attr/colorBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_themes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:background="?android:attr/colorBackground"
+                android:paddingStart="@dimen/list_horizontal_margin"
+                android:paddingEnd="@dimen/list_horizontal_margin"
+                android:clipToPadding="false"/>
+
+            <View
+                style="@style/Divider.Horizontal"
+                android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cb_auto_night_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/auto_night_mode"
+                android:layout_marginTop="@dimen/content_spacing_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>

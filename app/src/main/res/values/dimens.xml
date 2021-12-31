@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--specific sizes-->
+    <item name="choose_playlist_dialog_height" type="dimen" format="float">0.5</item>
+    <item name="composition_action_dialog_height" type="dimen" format="float">0.6</item>
+
+    <dimen name="music_control_button_padding_collapsed">12dp</dimen>
+    <dimen name="music_control_button_padding_expanded">7dp</dimen>
+
+    <!--animation-->
+    <integer name="button_animation_duration">300</integer>
+
+    <dimen name="text_size_xxsmall">12sp</dimen>
+    <dimen name="text_size_xsmall">13sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_small_2">15sp</dimen>
+    <dimen name="text_size_normal">16sp</dimen>
+    <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_xlarge">22sp</dimen>
+    <dimen name="text_size_xxlarge">24sp</dimen>
+
+    <!--defaults-->
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_normal">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_xlarge">32dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+
+    <dimen name="top_control_button_size">48dp</dimen>
+
+    <!--content margins-->
+    <dimen name="content_spacing_margin">8dp</dimen>
+    <dimen name="content_spacing_vertical_margin">6dp</dimen>
+    <dimen name="content_internal_margin">8dp</dimen>
+    <dimen name="content_horizontal_margin">16dp</dimen>
+    <dimen name="content_vertical_margin">16dp</dimen>
+    <dimen name="content_margin">16dp</dimen>
+
+    <dimen name="drawer_content_margin">14dp</dimen>
+    <!--list margins-->
+    <dimen name="list_vertical_margin">14dp</dimen>
+    <dimen name="content_vertical_spacing_margin">4dp</dimen>
+   <!--content_vertical_margin*2(32) + fab size(56) -->
+    <dimen name="list_bottom_padding_with_fab">88dp</dimen>
+    <dimen name="list_horizontal_margin">8dp</dimen>
+
+    <!--dialogs-->
+    <dimen name="dialog_content_margin_start">20dp</dimen>
+    <item name="dialog_min_width_major" type="dimen">65%</item>
+    <item name="dialog_min_width_minor" type="dimen">95%</item>
+    <dimen name="floating_window_z">16dp</dimen>
+    <dimen name="dialog_button_margin_vertical">8dp</dimen>
+    <dimen name="dialog_button_margin_horizontal">12dp</dimen>
+
+    <dimen name="subtitle_height">48dp</dimen>
+
+    <dimen name="icon_size">48dp</dimen>
+
+
+    <dimen name="current_composition_collapse_text_size">13sp</dimen>
+    <dimen name="current_composition_expand_text_size">15sp</dimen>
+
+    <dimen name="dialog_margin_content_vertical">12dp</dimen>
+    <dimen name="dialog_margin_content_horizontal">8dp</dimen>
+
+    <!--radio button-->
+    <dimen name="radio_button_text_margin_start">16dp</dimen>
+    <dimen name="radio_button_text_vertical_padding">15dp</dimen>
+    <dimen name="radio_button_description_padding">48dp</dimen>
+
+    <!--player bottom sheet-->
+    <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>
+    <dimen name="bottom_sheet_top_left_shadow_height">6dp</dimen>
+    <dimen name="bottom_sheet_shadow_height">8dp</dimen>
+    <dimen name="bottom_sheet_shadow_internal_margin">4dp</dimen>
+    <dimen name="bottom_sheet_height">60dp</dimen>
+    <dimen name="bottom_sheet_expand_height">190dp</dimen>
+    <dimen name="control_button_width">52dp</dimen>
+
+    <dimen name="bottom_sheet_content_margin">16dp</dimen>
+    <dimen name="play_button_expand_margin">8dp</dimen>
+    <dimen name="play_button_expand_size">56dp</dimen>
+    <dimen name="button_expand_size">48dp</dimen>
+    <dimen name="popup_menu_item_icon_size">20dp</dimen>
+
+    <!--modal bottom sheet-->
+    <dimen name="sheet_dialog_title_collapsed_size">14sp</dimen>
+    <dimen name="sheet_dialog_title_expanded_size">19sp</dimen>
+    <dimen name="bottom_sheet_width">0dp</dimen>
+
+    <!--toolbar-->
+    <dimen name="toolbar_title_menu_button_size">24dp</dimen>
+    <dimen name="toolbar_content_start">72dp</dimen>
+    <dimen name="toolbar_control_offset">0dp</dimen>
+    <!--toolbar has own offset on large screens, remove after toolbar removing-->
+    <dimen name="toolbar_control_offset_2">0dp</dimen>
+
+    <!--widgets-->
+    <dimen name="widget_content_margin_vertical">0dp</dimen>
+    <dimen name="widget_content_spacing_margin">0dp</dimen>
+    <dimen name="widget_content_margin_horizontal">8dp</dimen>
+
+    <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">8dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_vertical">4dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_horizontal">2dp</dimen>
+
+    <!--swipe panel-->
+    <dimen name="swipe_panel_width">90dp</dimen>
+    <dimen name="swipe_panel_padding_end">8dp</dimen>
+    <dimen name="swipe_panel_text_top_padding">4dp</dimen>
+    <dimen name="swipe_panel_icon_size">24dp</dimen>
+    <dimen name="swipe_panel_text_size">11sp</dimen>
+
+    <!--chips-->
+    <dimen name="chip_corner_radius">22dp</dimen>
+    <dimen name="chip_horizontal_margin">8dp</dimen>
+    <dimen name="chip_height">32dp</dimen>
+    <dimen name="chip_button_width">34dp</dimen>
+    <dimen name="chip_spacing_margin">8dp</dimen>
+
+    <!--covers-->
+    <integer name="icon_image_size">130</integer>
+    <integer name="icon_image_full_size">1000</integer>
+
+    <!--snackbar-->
+    <integer name="snackbar_max_lines">5</integer>
+    <dimen name="snackbar_padding_start">16dp</dimen>
+    <dimen name="snackbar_padding_end">8dp</dimen>
+    <dimen name="snackbar_padding_vertical">16dp</dimen>
+    <dimen name="snackbar_padding_button_vertical">8dp</dimen>
+    <dimen name="snackbar_margin_content">16dp</dimen>
+    <dimen name="snackbar_margin">8dp</dimen>
+    <dimen name="snackbar_corners">4dp</dimen>
+
+    <!--scrollbars-->
+    <dimen name="scrollbar_thumb_vertical_padding">16dp</dimen>
+    <dimen name="scrollbar_width">4dp</dimen>
+
+    <!--popup-->
+    <dimen name="popup_screen_margin">16dp</dimen>
+    <dimen name="action_bar_popup_screen_margin">8dp</dimen>
+    <dimen name="popup_item_horizontal_margin">16dp</dimen>
+
+    <!--seekbar-->
+    <dimen name="seekbar_height">2dp</dimen>
+    <dimen name="seekbar_corner_radius">6dp</dimen>
+
+    <!--cards-->
+    <dimen name="card_corner_radius">8dp</dimen>
+
+    <!--sleep timer-->
+    <dimen name="sleep_timer_icon_size">12dp</dimen>
+    <dimen name="sleep_timer_icon_padding">2dp</dimen>
+
+</resources>

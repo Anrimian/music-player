@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView
+        android:id="@+id/library_folders_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.github.anrimian.musicplayer.ui.utils.views.progress_state.ProgressStateView
+        android:id="@+id/progressStateView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</FrameLayout>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/colorBackground">
+
+        <TextView
+            android:id="@+id/tvExcludedFolders"
+            style="@style/TextStyleButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/excluded_folders"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <CheckBox
+            style="@style/CheckboxStyle"
+            android:id="@+id/cbDoNotShowDeleteDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/do_not_show_confirm_delete_dialog"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvExcludedFolders"/>
+
+        <CheckBox
+            style="@style/CheckboxStyle"
+            android:id="@+id/cbShowAllAudioFiles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/show_all_audio_files"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cbDoNotShowDeleteDialog"/>
+
+        <TextView
+            style="@style/TextStyle.Medium"
+            android:id="@+id/tvAudioMinDurationTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/toolbar_content_start"
+            android:paddingEnd="@dimen/content_horizontal_margin"
+            android:paddingTop="@dimen/content_vertical_margin"
+            android:text="@string/exclude_compositions_with_duration_less_than"
+            app:layout_constraintTop_toBottomOf="@id/cbShowAllAudioFiles"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            style="@style/TextStyle.Subtitle"
+            android:id="@+id/tvAudioMinDurationValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/toolbar_content_start"
+            android:paddingEnd="@dimen/content_horizontal_margin"
+            android:paddingTop="@dimen/content_spacing_margin"
+            android:paddingBottom="@dimen/content_vertical_margin"
+            tools:text="@string/with_duration_less_than"
+            app:layout_constraintTop_toBottomOf="@id/tvAudioMinDurationTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <FrameLayout
+            android:id="@+id/flAudioMinDurationClickableArea"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:foreground="?selectableItemBackground"
+            android:contentDescription="@string/exclude_compositions_with_duration_less_than"
+            app:layout_constraintTop_toTopOf="@id/tvAudioMinDurationTitle"
+            app:layout_constraintBottom_toBottomOf="@id/tvAudioMinDurationValue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

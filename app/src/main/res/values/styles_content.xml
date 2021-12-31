@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ButtonStyle">
+        <item name="android:layout_width">@dimen/button_expand_size</item>
+        <item name="android:layout_height">@dimen/button_expand_size</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:background">?actionBarItemBackground</item>
+        <item name="tint">@color/color_button</item>
+    </style>
+
+    <style name="ButtonStyle.Main">
+        <item name="android:layout_width">@dimen/control_button_width</item>
+        <item name="android:layout_height">@dimen/control_button_width</item>
+        <item name="android:background">@drawable/bg_selectable_round_shape</item>
+    </style>
+
+    <style name="ButtonStyle.Menu">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="tint">@color/color_button_secondary</item>
+    </style>
+
+    <style name="BrightButtonStyle">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:tint">@android:color/white</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+
+    <style name="BaseButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/bg_button_outline</item>
+        <item name="android:textColor">@color/color_accent_state</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="ButtonBorderlessStyle" parent="@style/BaseButtonBorderlessStyle"/>
+
+    <style name="ButtonBorderlessStyleInverse" parent="ButtonBorderlessStyle">
+        <item name="android:background">@drawable/bg_button_outline_inverse</item>
+    </style>
+
+    <style name="ButtonBrightStyle" parent="@style/Widget.AppCompat.Button.Colored">
+    </style>
+
+    <style name="ButtonOutlineStyle" parent="@style/Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_outline_button</item>
+        <item name="android:textColor">@color/color_accent_state</item>
+    </style>
+
+    <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/color_text_primary</item>
+    </style>
+
+    <style name="TextStyleItemPrimary" parent="TextStyle">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextStyle.Chip">
+        <item name="android:textStyle">bold</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxWidth">240dp</item>
+    </style>
+
+    <style name="TextStyleItemPrimary.Medium">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="TextStyleButton" parent="@style/Base.TextAppearance.AppCompat.Body1">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:paddingTop">@dimen/content_vertical_margin</item>
+        <item name="android:paddingBottom">@dimen/content_vertical_margin</item>
+        <item name="android:paddingStart">@dimen/toolbar_content_start</item>
+        <item name="android:paddingEnd">@dimen/content_horizontal_margin</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="TextStyleButtonSingle" parent="@style/Base.TextAppearance.AppCompat.Body1">
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:paddingTop">@dimen/content_vertical_margin</item>
+        <item name="android:paddingBottom">@dimen/content_vertical_margin</item>
+        <item name="android:paddingEnd">@dimen/content_horizontal_margin</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="TextStyleDialogItem" parent="@style/TextStyle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">
+
+    </style>
+
+    <style name="TextStyleContentSubtitle" parent="Content.SecondaryText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="TextStyle.Small">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextStyleSpeedButton" parent="TextStyle">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/bg_outline_text_button</item>
+        <item name="android:textColor">@color/color_text_secondary</item>
+        <item name="android:padding">4dp</item>
+    </style>
+
+    <style name="TextStyleContentSubtitle.Small">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="TextStyleContentSubtitle.Medium">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextStyle.Time">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextStyleSleepTime" parent="@style/TextStyleSpeedButton">
+        <item name="android:contentDescription">@string/sleep_timer</item>
+    </style>
+
+    <style name="TextStyle.Subtitle">
+        <item name="android:textColor">@color/color_text_secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextStyle.Subtitle.Small">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextStyleItemPrimary.Small">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextStyle.Medium">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="TextStyle.BigTimer">
+        <item name="android:textSize">36sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextStyle.Composition">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ButtonStyle.Main.Expanded">
+        <item name="android:layout_width">@dimen/play_button_expand_size</item>
+        <item name="android:layout_height">@dimen/play_button_expand_size</item>
+    </style>
+
+    <style name="ImageStyle">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+    </style>
+
+    <style name="ImageStyle.ItemImage">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.CircleImageView</item>
+    </style>
+
+    <style name="ShapeAppearance.CircleImageView" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ImageStyle.Small">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+    </style>
+
+    <style name="TextStyle.Error">
+        <item name="android:textColor">?attr/colorError</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextStyle.Snackbar">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextStyle.Progress">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textColorHint">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="TextStyle.ContentTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+</resources>

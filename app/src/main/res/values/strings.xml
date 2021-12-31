@@ -1,0 +1,292 @@
+<resources>
+
+    <string name="open_drawer">Open drawer</string>
+    <string name="close_drawer">Close drawer</string>
+    <string name="try_again">Try again</string>
+    <string name="can_not_work_without_file_permission">Application can not work without file permission</string>
+    <string name="close">Close</string>
+    <string name="library">Library</string>
+    <string name="settings">Settings</string>
+    <string name="internal_app_error">Internal app error</string>
+    <string name="unexpected_error">Error: %s</string>
+    <string name="file_not_found">File not found</string>
+    <string name="compositions_on_device_not_found">No songs found on the device</string>
+    <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
+    <string name="compositions_for_search_not_found">No matching search results found</string>
+    <string name="foreground_channel_description">Foreground player notification</string>
+    <string name="previous_track">Previous track</string>
+    <string name="next_track">Next track</string>
+    <string name="folder">Folder</string>
+    <string name="content_description_menu">Open current composition menu</string>
+    <string name="content_description_menu_template">Open composition menu: %s</string>
+    <string name="share">Send</string>
+    <string name="content_description_repeat_mode">Repeat mode menu</string>
+    <string name="content_description_shuffle">Shuffle mode</string>
+    <string name="unknown_author">Unknown author</string>
+    <string name="delete">Delete</string>
+    <string name="delete_folder">Delete folder</string>
+    <string name="add_date_order">By date of addition</string>
+    <string name="order">Sorting</string>
+    <string name="folders">Folders</string>
+    <string name="compositions">Songs</string>
+    <string name="play_lists">Playlists</string>
+    <string name="play_lists_on_device_not_found">No playlists found on the device</string>
+    <string name="name">Name</string>
+    <string name="create">Create</string>
+    <string name="create_playlist">Create playlist</string>
+    <string name="create_playlist_error_template">Can not create playlist: %1$s</string>
+    <string name="change_playlist_name_error_template">Can not change playlist name: %1$s</string>
+    <string name="name_can_not_be_empty">name can not be empty</string>
+    <string name="create_progress">Creating…</string>
+    <string name="play_list_with_this_name_already_exists">playlist with this name already exists</string>
+    <string name="add_to_playlist">Add to playlist</string>
+    <string name="select_play_list">Select playlist</string>
+    <string name="add_to_playlist_error_template">Can not add song to playlist: %1$s</string>
+    <string name="delete_composition_error_template">Can not delete song: %1$s</string>
+    <string name="add_to_playlist_success_template">Song \"%1$s\" added to playlist \"%2$s\"</string>
+    <string name="save_as_play_list">Save as playlist</string>
+    <string name="cancel">Cancel</string>
+    <string name="deleting">Deleting</string>
+    <string name="delete_composition_template">Delete song \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_empty_folder">Delete folder \"%s\"? This action cannot be undone.</string>
+    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_template">Delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_composition_success">Song \"%1$s\" deleted</string>
+    <string name="search">Search</string>
+    <string name="play_queue">Play queue</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="play_all">Play all</string>
+    <string name="repeat_playlist">Repeat play queue</string>
+    <string name="repeat_composition">Repeat song</string>
+    <string name="do_not_repeat">Do not repeat</string>
+    <string name="delete_from_queue">Delete from play queue</string>
+    <string name="delete_from_play_list">Delete from playlist</string>
+    <string name="add_item_to_playlist_error_template">Can not add song to playlist: %1$s</string>
+    <string name="delete_from_playlist_success_template">Song \"%1$s\" deleted from playlist \"%2$s\"</string>
+    <string name="delete_playlist_template">Delete playlist \"%1$s\"?</string>
+    <string name="play_list_delete_error">Can not delete playlist: %1$s </string>
+    <string name="play_not_exists">Playlist don\'t exists</string>
+    <string name="play_list_deleted">Playlist \"%1$s\" was deleted</string>
+    <string name="can_not_receive_file_for_send">Can\'t receive files for send: %1$s</string>
+    <string name="position_template">Current play time: %1$s</string>
+    <string name="now_playing_template">Now playing: %1$s. Open play queue.</string>
+    <string name="play_all_in_folder">Play all in folder</string>
+    <string name="delete_playlist">Delete playlist</string>
+    <string name="storage_timeout_error_message">
+        Device media storage is not responding.
+        This is a really strange and rare issue.
+        Try to reboot the device, perhaps it will solve this problem.
+    </string>
+    <string name="select_all">Select all</string>
+    <string name="file_uri_extract_error">
+        Can\'t get system path for composition \"%s\" to send.
+        Possible it is in private system folder.
+    </string>
+    <string name="loading_progress">Loading…</string>
+    <string name="alphabetical_order_desc_title">Z - A</string>
+    <string name="add_date_order_desc_title">Later first</string>
+    <string name="play_action">Play</string>
+    <string name="play_next">Play next</string>
+    <string name="add_to_play_queue">Add to queue</string>
+    <string name="edit_name">Rename</string>
+    <string name="change">Change</string>
+    <string name="no_current_composition">No current composition</string>
+    <string name="show_covers">Show covers</string>
+    <string name="show_covers_in_notification">Show covers in notification</string>
+    <string name="colored_notification">Color notification in cover colors</string>
+    <string name="display">Display</string>
+    <string name="decrease_volume_on_notification">Decrease volume when notification is received</string>
+    <string name="playing">Player</string>
+    <string name="error_channel_description">Playing error notifications</string>
+    <string name="playing_error">Play error</string>
+    <string name="no_file_permission">No file permission</string>
+    <string name="about_app">About</string>
+    <string name="version_template">Version %1$s(Build %2$d)</string>
+    <string name="theme">Theme</string>
+    <string name="dark_theme">Dark</string>
+    <string name="edit">Edit</string>
+    <string name="edit_tags">Edit tags</string>
+    <string name="change_author_name">Change artist</string>
+    <string name="change_title">Change title</string>
+    <string name="title">Title</string>
+    <string name="filename">File name</string>
+    <string name="artist">Artist</string>
+    <string name="change_file_name">Change file name</string>
+    <string name="copied_message">Text copied</string>
+    <string name="folder_name">Folder name</string>
+    <string name="rename_folder">Rename folder</string>
+    <string name="cut">Cut</string>
+    <string name="copy">Copy</string>
+    <string name="paste">Paste</string>
+    <string name="paste_in_new_folder">Paste in new folder</string>
+    <string name="move_in_the_same_folder_error">Target and source folder matches</string>
+    <string name="file_already_exists">File with this name already exists</string>
+    <string name="new_folder">New folder</string>
+    <string name="play_on_connect_bluetooth_device">Start playing when bluetooth device is connected</string>
+    <string name="headset">Headset</string>
+    <string name="scan_storage">Rescan media storage</string>
+    <string name="auto_night_mode">Auto night mode</string>
+    <string name="unsupported_format_hint">Unsupported format</string>
+    <string name="artists">Artists</string>
+    <string name="no_artists_in_library">No artists in library</string>
+    <string name="albums">Albums</string>
+    <string name="no_albums_in_library">No albums in library</string>
+    <string name="genres">Genres</string>
+    <string name="no_genres_in_library">No genres in library</string>
+    <string name="no_items_in_genre">No compositions in selected genre</string>
+    <string name="no_compositions">No compositions</string>
+    <string name="change_album_name">Change album</string>
+    <string name="album">Album</string>
+    <string name="genre">Genre</string>
+    <string name="change_composition_genre">Change composition genre</string>
+    <string name="change_name">Change name</string>
+    <string name="rename_progress">Renaming…</string>
+    <string name="album_artist">Album artist</string>
+    <string name="change_album_artist">Change album artist</string>
+    <string name="edit_album_tags">Edit album tags</string>
+    <string name="by_composition_count">By composition count</string>
+    <string name="by_duration">By duration</string>
+    <string name="longest_first">Longest first</string>
+    <string name="more_first">More first</string>
+    <string name="artist_already_exists">Artist with this name already exists</string>
+    <string name="album_already_exists">Album with this name already exists</string>
+    <string name="genre_already_exists">Genre with this name already exists</string>
+    <string name="remove_genre">Remove genre</string>
+    <string name="add_composition_genre">Add genre</string>
+    <string name="add">Add</string>
+    <string name="edit_genre">Edit genre</string>
+    <string name="genre_removed_message">Genre \"%s\" was removed</string>
+    <string name="exclude_from_scanning">Hide</string>
+    <string name="ignored_folder_added">Folder \'%s\' added to excluded folder list</string>
+    <string name="excluded_folders">Excluded folders</string>
+    <string name="remove_excluded_folder">Remove excluded folder</string>
+    <string name="ignored_folder_removed">Excluded folder removed</string>
+    <string name="moving_and_destination_folders_matches">Moving and destination folders matches</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
+    <string name="move_progress">Moving…</string>
+    <string name="delete_progress">Deleting…</string>
+    <string name="play_next_message_single">Composition \"%s\" will be played next</string>
+    <string name="added_to_queue_message_single">Composition \"%s\" added to end of play queue</string>
+    <string name="queue_item_removed">Queue item removed</string>
+    <string name="by_size">By size</string>
+    <string name="largest_first">Largest first</string>
+    <string name="log_info_text">Some non-fatal errors occurred and info about them recorded into log file. Application doesn\'t send logs automatically, but you can send them manually. That will help improve app quality. Current log file size: %d KB</string>
+    <string name="view_file">View file</string>
+    <string name="send_file">Send file</string>
+    <string name="delete_file">Delete file</string>
+    <string name="log_file_deleted">Log file deleted</string>
+    <string name="pick_email_app_to_send">Pick a email app to send</string>
+    <string name="clear_play_queue">Clear play queue</string>
+    <string name="no_excluded_folders">Folders excluded from scanning will be appear here</string>
+    <string name="keep_playing_after_window_close">Keep playing after window closing</string>
+    <string name="unknown_play_error">Unknown play error</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="system_equalizer">System equalizer</string>
+    <string name="no_equalizer">None</string>
+    <string name="external_equalizer_description">System equalizer work depends on external equalizer application and may not work with some applications</string>
+    <string name="external_equalizer_not_found">External equalizer application not found</string>
+    <string name="open">Open</string>
+    <string name="cover">Cover</string>
+    <string name="change_cover">Change cover</string>
+    <string name="pick_from_gallery">Pick from gallery</string>
+    <string name="remove_cover">Remove cover</string>
+    <string name="editor_timeout_error">Tag editor timed out. Perhaps file format is unsupported</string>
+    <string name="change_lyrics">Change lyrics</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="check_tags_error">Failed to check composition tags: %s</string>
+    <string name="changing_file_progress">Changing file…</string>
+    <string name="android_r_edit_file_permission_denied">
+        From Android 11 editing and deleting files requires explicit system permission
+    </string>
+    <string name="error_report">Error report</string>
+    <string name="critical_error_report_message">Fatal error occurred and due to this app can\'t start. Appearing of this errors is highly unwanted. Application doesn\'t send any info  automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
+    <string name="error_report_message">Fatal error occurred. Application doesn\'t send any info automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
+    <string name="show_error_report_dialog_on_start">Show error report dialog on application start after app crashes</string>
+    <string name="do_not_show_confirm_delete_dialog">Don\'t show application confirm delete dialog</string>
+    <string name="app_equalizer">App equalizer</string>
+    <string name="presets">Presets</string>
+    <string name="playback_speed">Playback speed</string>
+    <string name="reset">Reset</string>
+    <string name="apply">Apply</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="start">Start</string>
+    <string name="resume">Resume</string>
+    <string name="sleep_timer_message">Playing will be stopped in:</string>
+    <string name="stop">Stop</string>
+    <string name="exclude_compositions_with_duration_less_than">Exclude compositions from scanning</string>
+    <string name="with_duration_less_than">With duration less than %s</string>
+    <string name="pause_on_audiofocus_loss">Stop playing on calling, music/video playing, etc.</string>
+    <string name="show_cover_stub_in_notification">Show cover stub in notification when cover is not found</string>
+    <string name="write_to_this_is_not_allowed">No permission to modify this file. Try through file manager.</string>
+    <string name="shuffle_all_and_play">Shuffle all and play</string>
+    <string name="rewind">Rewind</string>
+    <string name="fast_forward">Fast forward</string>
+    <string name="show_covers_on_lock_screen">Show covers on lock screen and on android auto</string>
+    <string name="equalizer_initialization_error">Unable to initialize in-app equalizer. Try to restart it.</string>
+    <string name="restart">Restart</string>
+    <string name="scan_storage_description">Usually all changes with files on the device will appear automatically. But on some devices or system builds it won\'t work. This button runs files scan manually.</string>
+    <string name="scanning_completed">Scanning completed</string>
+    <string name="pause_on_zero_volume_level">Stop playing when volume level reaches zero</string>
+    <string name="covers">Covers</string>
+    <string name="display_composition_file_name">Display composition file name instead of title</string>
+    <string name="name_order">By name</string>
+    <string name="file_name_order">By file name</string>
+    <string name="play_list_is_empty">Playlist is empty. Compositions can be added to playlists on library screens.</string>
+    <string name="file_scanner_state">Scanning file tags: %s</string>
+    <string name="show_all_audio_files">Show all audio files</string>
+    <string name="enabled_media_players">Enabled media players</string>
+    <string name="advanced_settings">Advanced</string>
+    <string name="media_players_setting_description">App uses several media players for music playing. Here they can be disabled or changed use priority. All changes will take effect only after application restart.</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s song</item>
+        <item quantity="other">%1$s songs</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s song</item>
+        <item quantity="other">%1$s songs</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s file</item>
+        <item quantity="other">%1$s files</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s album</item>
+        <item quantity="other">%1$s albums</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s song will be played next</item>
+        <item quantity="other">%s songs will be played next</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s song added to end of play queue</item>
+        <item quantity="other">%s songs added to end of play queue</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d song added to playlist \"%2$s\"</item>
+        <item quantity="other">%1$d songs added to playlist \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d song deleted from playlist \"%2$s\"</item>
+        <item quantity="other">%1$d songs deleted from playlist \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d song deleted</item>
+        <item quantity="other">%1$d songs deleted</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d second</item>
+        <item quantity="other">%1$d seconds</item>
+    </plurals>
+
+</resources>

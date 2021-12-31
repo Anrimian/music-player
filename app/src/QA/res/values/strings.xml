@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">(QA)Music Player</string>
+    <string name="file_provider_authorities" translatable="false">share_file_provider - QA</string>
+    <string name="covers_file_provider_authorities" translatable="false">
+                com.github.anrimian.simplemusicplayer.covers_file_provider - QA
+    </string>
+</resources>

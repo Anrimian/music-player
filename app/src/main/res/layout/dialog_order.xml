@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/content_internal_margin">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:layout_marginTop="@dimen/dialog_margin_content_vertical"
+            android:layout_marginBottom="@dimen/content_internal_margin"
+            tools:listitem="@layout/item_order"/>
+
+        <CheckBox
+            android:id="@+id/cb_desc"
+            style="@style/BaseCheckboxStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/content_horizontal_margin"
+            android:layout_marginRight="@dimen/content_horizontal_margin"
+            tools:text="reverse order"/>
+
+        <CheckBox
+            style="@style/BaseCheckboxStyle"
+            android:id="@+id/cbUseFileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/display_composition_file_name"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
