@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name" translatable="false">(D)Music Player</string>
+    <string name="file_provider_authorities" translatable="false">
+                com.github.anrimian.simplemusicplayer.share_file_provider(debug)
+    </string>
+    <string name="covers_file_provider_authorities" translatable="false">
+                com.github.anrimian.simplemusicplayer.covers_file_provider(debug)
+    </string>
+
+</resources>

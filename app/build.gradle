@@ -1,0 +1,101 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+
+    def config = rootProject.ext
+
+    compileSdkVersion config.androidCompileSdkVersion
+    buildToolsVersion config.androidBuildToolsVersion
+    defaultConfig {
+        minSdkVersion config.androidMinSdkVersion
+        targetSdkVersion config.androidTargetSdkVersion
+
+        testInstrumentationRunner config.testInstrumentationRunner
+        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        QA {
+            initWith release
+        }
+        debug {
+            minifyEnabled false
+        }
+
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+    packagingOptions {
+        exclude "/META-INF/*.kotlin_module"
+        exclude "**/kotlin/**"
+        exclude "**/*.txt"
+        exclude "**/*.xml"
+        exclude "**/*.properties"
+    }
+}
+
+
+dependencies {
+    implementation project(':domain')
+    implementation project(':data')
+
+    def deps = rootProject.ext
+
+    implementation kotlinStdLib
+
+    implementation deps.appCompat
+    implementation deps.appCompatResources
+    implementation deps.material
+    implementation deps.recyclerView
+    implementation deps.recyclerViewFastScroll
+    implementation deps.constraintLayout
+    implementation deps.supportMedia
+
+    implementation deps.rxAndroid
+    implementation deps.rxPermissions
+
+    debugImplementation deps.acraReportDialog
+
+    implementation deps.moxy
+    implementation deps.moxyAppcompat
+    implementation deps.moxyMaterial
+    implementation deps.moxyKtx
+    kapt deps.moxyCompiler
+
+    implementation deps.dagger
+    kapt deps.daggerCompiler
+
+    implementation deps.room
+    kapt deps.roomCompiler
+
+    implementation deps.glide
+    kapt deps.glideCompiler
+
+    implementation deps.slidr
+
+    implementation deps.chipsLayoutManager
+
+    compileOnly deps.javaxAnnotation
+
+    testImplementation deps.junit
+    testImplementation deps.mockito
+
+//    androidTestImplementation deps.dexmaker
+//    androidTestImplementation deps.dexmakerMockito
+    androidTestImplementation deps.mockito
+    androidTestImplementation deps.espresso
+}

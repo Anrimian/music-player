@@ -1,4 +1,6 @@
-include ':presentation', ':data'
-include ':domain'
-
+include ':presentation'
 include ':presentation:lite'
+//include ':app'
+//include ':app:lite'
+include ':data'
+include ':domain'
