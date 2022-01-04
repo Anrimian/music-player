@@ -23,9 +23,9 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
+import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
@@ -180,16 +180,18 @@ public class DialogUtils {
 
         var viewBinding = DialogSpeedSelectorBinding.inflate(LayoutInflater.from(context));
 
-        viewBinding.rangeSlider.setValueFrom(minSpeed);
-        viewBinding.rangeSlider.setValueTo(maxSpeed);
-        viewBinding.tvSpeedMin.setText(context.getString(R.string.playback_speed_template, minSpeed));
-        viewBinding.tvSpeedMax.setText(context.getString(R.string.playback_speed_template, maxSpeed));
-        viewBinding.rangeSlider.addOnChangeListener((slider, value, fromUser) -> {
+        viewBinding.sbSpeed.setMax((int) ((maxSpeed - minSpeed) * 100));
+        SeekBarViewWrapper seekBarViewWrapper = new SeekBarViewWrapper(viewBinding.sbSpeed);
+        seekBarViewWrapper.setProgressChangeListener(progress -> {
+            float value = (progress / 100f) + minSpeed;
             viewBinding.btnReset.setEnabled(value != defaultSpeed);
             viewBinding.tvCurrentSpeed.setText(context.getString(R.string.playback_speed_template, value));
         });
-        viewBinding.rangeSlider.setValue(currentSpeed);
-        CompatUtils.setSliderStyle(viewBinding.rangeSlider);
+        seekBarViewWrapper.setProgress((int) ((currentSpeed - minSpeed) * 100));
+
+        viewBinding.tvSpeedMin.setText(context.getString(R.string.playback_speed_template, minSpeed));
+        viewBinding.tvSpeedMax.setText(context.getString(R.string.playback_speed_template, maxSpeed));
+        viewBinding.tvCurrentSpeed.setText(context.getString(R.string.playback_speed_template, currentSpeed));
 
         Dialog dialog = new AlertDialog.Builder(context)
                 .setTitle(R.string.playback_speed)
@@ -198,7 +200,8 @@ public class DialogUtils {
 
         viewBinding.btnCancel.setOnClickListener(v -> dialog.dismiss());
         viewBinding.btnApply.setOnClickListener(v -> {
-            onSpeedSelected.call(viewBinding.rangeSlider.getValue());
+            float value = (viewBinding.sbSpeed.getProgress() / 100f) + minSpeed;
+            onSpeedSelected.call(value);
             dialog.dismiss();
         });
         viewBinding.btnReset.setOnClickListener(v -> {
