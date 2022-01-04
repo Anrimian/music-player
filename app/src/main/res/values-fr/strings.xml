@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="open_drawer">Ouvrir le menu</string>
+    <string name="close_drawer">Fermer le menu</string>
+    <string name="try_again">Essayer encore</string>
+    <string name="can_not_work_without_file_permission">L\'application ne peut pas fonctionner sans l\'autorisation sur fichier</string>
+    <string name="close">Fermer</string>
+    <string name="library">Bibliothèque</string>
+    <string name="settings">Paramètres</string>
+    <string name="internal_app_error">Erreur interne à l\'application</string>
+    <string name="unexpected_error">Erreur: %s</string>
+    <string name="file_not_found">Fichier non trouvé</string>
+    <string name="compositions_on_device_not_found">Aucune chanson trouvée sur l\'appareil</string>
+    <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
+    <string name="compositions_for_search_not_found">Aucun résultat de recherche correspondant n\'a été trouvé</string>
+    <string name="foreground_channel_description">Notification du lecteur au premier plan</string>
+    <string name="previous_track">Piste précédante</string>
+    <string name="next_track">Piste suivante</string>
+    <string name="folder">Dossier</string>
+    <string name="content_description_menu">Open current composition menu</string>
+    <string name="content_description_menu_template">Open composition menu: %s</string>
+    <string name="share">Envoyer</string>
+    <string name="content_description_repeat_mode">Menu du mode répétition</string>
+    <string name="content_description_shuffle">Mode aléatoire</string>
+    <string name="unknown_author">Artiste(s) inconnu(s)</string>
+    <string name="delete">Supprimer</string>
+    <string name="delete_folder">Supprimer le dossier</string>
+    <string name="add_date_order">Par date d\'ajout</string>
+    <string name="order">Triage</string>
+    <string name="folders">Dossiers</string>
+    <string name="compositions">Morceaux</string>
+    <string name="play_lists">Playlists</string>
+    <string name="play_lists_on_device_not_found">Aucune playlist n\'a été trouvée sur le péripherique</string>
+    <string name="name">Nom</string>
+    <string name="create">Créer</string>
+    <string name="create_playlist">Crée une playlist</string>
+    <string name="create_playlist_error_template">Impossible de créer playlist: %1$s</string>
+    <string name="change_playlist_name_error_template">Impossible de changer le nom de la playlist: %1$s</string>
+    <string name="name_can_not_be_empty">Le nom ne peut pas être vide</string>
+    <string name="create_progress">En cours de création…</string>
+    <string name="play_list_with_this_name_already_exists">Une playlist portant ce nom existe déjà</string>
+    <string name="add_to_playlist">Ajouter à la playlist</string>
+    <string name="select_play_list">Selectionner la playlist</string>
+    <string name="add_to_playlist_error_template">Impossible d\'ajouter une chanson à la playlist: %1$s</string>
+    <string name="delete_composition_error_template">Impossible de supprimer le morceau %1$s</string>
+    <string name="add_to_playlist_success_template">Le morceau "%1$s\" a été ajouté à la playlist "%2$s\".</string>
+    <string name="save_as_play_list">Enregistrer comme playlist</string>
+    <string name="cancel">Annuler</string>
+    <string name="deleting">Suppression</string>
+    <string name="delete_composition_template">Supprimer le morceau \"%1$s\" ? Cette action ne peut pas être annulée.</string>
+    <string name="delete_empty_folder">Supprimer le dossier \"%s\" ? Cette action ne peut pas être annulée.</string>
+    <string name="delete_folder_template">Supprimer %2$s du dossier \"%1$s\" ? Cette action ne peut pas être annulée.</string>
+    <string name="delete_template">
+        Supprimer \"%1$s\" ? Cette action ne peut pas être annulée.
+        chanson
+    </string>
+    <string name="delete_composition_success">Le morceau \"%1$s\" a été</string>
+    <string name="search">Rechercher</string>
+    <string name="play_queue">Lancer la lecture de la file d\'attente</string>
+    <string name="pause">Pause</string>
+    <string name="play">Lire</string>
+    <string name="play_all">Lire tout</string>
+    <string name="repeat_playlist">Tout repéter</string>
+    <string name="repeat_composition">Repéter le morceau</string>
+    <string name="do_not_repeat">Ne pas repéter</string>
+    <string name="delete_from_queue">Supprimer de la la file d\'attente</string>
+    <string name="delete_from_play_list">Supprimer de la playlist</string>
+    <string name="add_item_to_playlist_error_template">Impossible d\'ajouter le morceau à la playlist: %1$s</string>
+    <string name="delete_from_playlist_success_template">Le morceau \"%1$s\" q été supprimé de la playlist \"%2$s\"</string>
+    <string name="delete_playlist_template">Supprimer la playlist \"%1$s\"?</string>
+    <string name="play_list_delete_error">Impossible de supprimer la playlist: %1$s </string>
+    <string name="play_not_exists">La playlist n\'existe pas</string>
+    <string name="play_list_deleted">La playlist \"%1$s\" a été supprimée</string>
+    <string name="can_not_receive_file_for_send">Impossible de recevoir le fichier pour le transfert: %1$s</string>
+    <string name="position_template">Temps de lecture du fichier suivant: %1$s</string>
+    <string name="now_playing_template">En cours de lecture: %1$s. Ouvrir la liste de lecture.</string>
+    <string name="play_all_in_folder">Lire toutes les morceaux dans le dossier</string>
+    <string name="delete_playlist">Supprimer la playlist</string>
+    <string name="storage_timeout_error_message">
+        Le péripherique de stockage média ne répond pas.
+        C\'est un problème vraiment étrange et rare.
+        Essayez de redémarrer l\'appareil, cela résoudra peut-être le problème.
+    </string>
+    <string name="select_all">Selectionner tout</string>
+    <string name="file_uri_extract_error">
+        Impossible d\'obtenir le chemin du système pour la chanson\"%s\" à envoyer.
+        Il est possible qu\'elle soit dans un dossier système privé.
+    </string>
+    <string name="loading_progress">En cours de chargement…</string>
+    <string name="alphabetical_order_desc_title">Z - A</string>
+    <string name="add_date_order_desc_title">Les plus anciens d\'abord</string>
+    <string name="play_action">Lire</string>
+    <string name="play_next">Lire après</string>
+    <string name="add_to_play_queue">Ajouter à la liste</string>
+    <string name="edit_name">Renommer</string>
+    <string name="change">Changer</string>
+    <string name="no_current_composition">Aucune chanson en cours</string>
+    <string name="show_covers">Afficher les covers</string>
+    <string name="show_covers_in_notification">Afficher la cover dans la barre des notifications</string>
+    <string name="colored_notification">Les couleurs des notifications seront fonction de la couleur de la cover de la chanson en cours</string>
+    <string name="display">Afficher</string>
+    <string name="decrease_volume_on_notification">Diminuer le volume lorsqu\'une notification est reçue</string>
+    <string name="playing">Lecture</string>
+    <string name="error_channel_description">Notifications d\'erreurs de lecture</string>
+    <string name="playing_error">Erreur de lecture</string>
+    <string name="no_file_permission">Aucune autorisation sur le fichier</string>
+    <string name="about_app">About</string>
+    <string name="version_template">Version %1$s(Compilée %2$d)</string>
+    <string name="theme">Thème</string>
+    <string name="dark_theme">Sombre</string>
+    <string name="edit">Modifier</string>
+    <string name="edit_tags">Modifier les informations</string>
+    <string name="change_author_name">Change artist</string>
+    <string name="change_title">Changer le morceau</string>
+    <string name="title">Titre</string>
+    <string name="filename">Nom du fichier</string>
+    <string name="artist">Artiste</string>
+    <string name="change_file_name">Changer le nom du fichier</string>
+    <string name="copied_message">Text copié</string>
+    <string name="folder_name">Nom du dossier</string>
+    <string name="rename_folder">Renommer le dossier</string>
+    <string name="cut">Couper</string>
+    <string name="copy">Copier</string>
+    <string name="paste">Coller</string>
+    <string name="paste_in_new_folder">Coller dans un nouveau dossier</string>
+    <string name="move_in_the_same_folder_error">Le dossier source et la destination sont identiques</string>
+    <string name="file_already_exists">Un fichier portant ce nom existe déjà</string>
+    <string name="new_folder">Nouveau dossier</string>
+    <string name="play_on_connect_bluetooth_device">Lancer la lecture quand un péripherique bluetooth est connecté</string>
+    <string name="headset">Casque audio</string>
+    <string name="scan_storage">Relancer la recherche dans le stockage multimédia</string>
+    <string name="auto_night_mode">Mode nuit automatique</string>
+    <string name="unsupported_format_hint">Format non pris en charge</string>
+    <string name="artists">Artistes</string>
+    <string name="no_artists_in_library">Aucun artiste dans la bibliothèque</string>
+    <string name="albums">Albums</string>
+    <string name="no_albums_in_library">Aucun album dans la bibliothèque</string>
+    <string name="genres">Genres</string>
+    <string name="no_genres_in_library">Aucun genre dans la bibliothèque</string>
+    <string name="no_items_in_genre">Aucune chanson dans le genre sélectionné</string>
+    <string name="no_compositions">Aucune chanson</string>
+    <string name="change_album_name">Changer d\'album</string>
+    <string name="album">Album</string>
+    <string name="genre">Genre</string>
+    <string name="change_composition_genre">Changer le genre du morceau</string>
+    <string name="change_name">Changer le nom</string>
+    <string name="rename_progress">Modification du nom…</string>
+    <string name="album_artist">Artiste de l\'album</string>
+    <string name="change_album_artist">Changer l\'artiste de l\'album</string>
+    <string name="edit_album_tags">Modifier les informations des albums</string>
+    <string name="by_composition_count">Par nombre de composition</string>
+    <string name="by_duration">Par durée</string>
+    <string name="longest_first">Les plus long d\'abord</string>
+    <string name="more_first">Les plus nombreux d\'abord</string>
+    <string name="artist_already_exists">L\'artiste portant ce nom existe déjà</string>
+    <string name="album_already_exists">L\'album portant ce nom existe déjà</string>
+    <string name="genre_already_exists">Le genre portant ce nom existe déjà</string>
+    <string name="remove_genre">Supprimer le genre</string>
+    <string name="add_composition_genre">Ajouter un genre</string>
+    <string name="add">Ajouter</string>
+    <string name="edit_genre">Modifier le genre</string>
+    <string name="genre_removed_message">Le genre \"%s\" q été supprimé</string>
+    <string name="exclude_from_scanning">Masquer</string>
+    <string name="ignored_folder_added">Dossier \'%s\' ajouté à la liste des dossiers exclus</string>
+    <string name="excluded_folders">Dossiers exclus</string>
+    <string name="remove_excluded_folder">Supprimer le dossier exclu</string>
+    <string name="ignored_folder_removed">Suppression du dossier exclu</string>
+    <string name="moving_and_destination_folders_matches">Le dossier de déplacement et celui de la destination sont identiques</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Le dossier portant ce nom existe déjà dans le dossier cible.</string>
+    <string name="move_progress">Déplacement…</string>
+    <string name="delete_progress">Suppression…</string>
+    <string name="play_next_message_single">La composition \"%s\" sera jouée la fois suivante.</string>
+    <string name="added_to_queue_message_single">Composition "%s\" ajoutée à la file d\'attente de fin de lecture</string>
+    <string name="queue_item_removed">Élément de la file d\'attente supprimé</string>
+    <string name="by_size">Par taille</string>
+    <string name="largest_first">Les plus volumineux d\'abord</string>
+    <string name="log_info_text">Certaines erreurs non fatales se sont produites et les informations les concernant sont enregistrées dans le fichier journal. L\'application n\'envoie pas les journaux automatiquement, mais vous pouvez les envoyer manuellement. Cela aidera à améliorer la qualité de l\'application. Taille actuelle du fichier journal: %d KB</string>
+    <string name="view_file">Voir le fichier</string>
+    <string name="send_file">Envoyer le fichier</string>
+    <string name="delete_file">Supprimer le fichier</string>
+    <string name="log_file_deleted">Fichier log supprimé</string>
+    <string name="pick_email_app_to_send">Pick a email app to send</string>
+    <string name="clear_play_queue">Effacer la file d\'attente de lecture</string>
+    <string name="no_excluded_folders">Les dossiers exclus de la recherche apparaîtront ici.</string>
+    <string name="keep_playing_after_window_close">Continuer la lecture après la fermeture de la fenêtre</string>
+    <string name="unknown_play_error">Erreur de lecture</string>
+    <string name="equalizer">Égaliseur</string>
+    <string name="system_equalizer">Égaliseur du système</string>
+    <string name="no_equalizer">Aucun</string>
+    <string name="external_equalizer_description">Le fonctionnement de l\'égaliseur système dépend de  l\'égaliseur externe à l\'application et peut ne pas fonctionner avec certaines applications.</string>
+    <string name="external_equalizer_not_found">Egaliseur externe l\'application  non trouvée</string>
+    <string name="open">Ouvrir</string>
+    <string name="cover">Cover</string>
+    <string name="change_cover">Changer la cover</string>
+    <string name="pick_from_gallery">Choisir à partir de la gallerie</string>
+    <string name="remove_cover">Supprimer la cover</string>
+    <string name="editor_timeout_error">L\'éditeur de tags s\'est arrêté. Le format du fichier n\'est peut-être pas pris en charge</string>
+    <string name="change_lyrics">Changer les lyrics</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="check_tags_error">Échec de la vérification des informations: %s</string>
+    <string name="changing_file_progress">Changement de fichier…</string>
+    <string name="android_r_edit_file_permission_denied">
+        À partir d\'Android 11, l\'édition et la suppression de fichiers nécessitent une autorisation explicite du système.
+    </string>
+    <string name="error_report">Rapport d\'erreurs</string>
+    <string name="critical_error_report_message">Une erreur s\'est produite et l\'application ne peut pas démarrer. L\'apparition de cette erreur est nettement indésirable.  L\'application n\'envoie pas d\'informations automatiquement, mais vous pouvez envoyer le fichier avec le journal des erreurs manuellement par e-mail. Cela aidera à corriger cette erreur.</string>
+    <string name="error_report_message">Une erreur s\'est produite. L\'application n\'envoie pas d\'informations automatiquement, mais vous pouvez envoyer le fichier avec le journal des erreurs manuellement par e-mail. Cela aidera à corriger cette erreur.</string>
+    <string name="show_error_report_dialog_on_start">Afficher le dialogue de rapport d\'erreur au démarrage de l\'application après un plantage de l\'application</string>
+    <string name="do_not_show_confirm_delete_dialog">Ne pas afficher la boîte de dialogue de confirmation de suppression de l\'application</string>
+    <string name="app_equalizer">Égaliseur de l\'application</string>
+    <string name="presets">Préréglages</string>
+    <string name="playback_speed">Vitesse de lecture</string>
+    <string name="reset">Reinitialiser</string>
+    <string name="apply">Appliquer</string>
+    <string name="sleep_timer">Mise en veille</string>
+    <string name="start">Démarrer</string>
+    <string name="resume">Continuer</string>
+    <string name="sleep_timer_message">La lecture s\'arrêtera dans:</string>
+    <string name="stop">Stop</string>
+    <string name="exclude_compositions_with_duration_less_than">Exclure les compositions de la recherche</string>
+    <string name="with_duration_less_than">D\'une durée inférieure à %s</string>
+    <string name="pause_on_audiofocus_loss">Arrêter la lecture pendant un appel, la lecture d\'un fichier audio/vidéo, etc.</string>
+    <string name="show_cover_stub_in_notification">Afficher le bout de la cover dans la notification lorsque la cover n\'est pas trouvée</string>
+    <string name="write_to_this_is_not_allowed">Aucune permission pour modifier ce fichier n\'a été accordée. Essayez avec le gestionnaire de fichiers.</string>
+    <string name="shuffle_all_and_play">Tout mélanger et lire</string>
+    <string name="rewind">Rembobinage</string>
+    <string name="fast_forward">Lecture rapide</string>
+    <string name="show_covers_on_lock_screen">Afficher les covers sur l\'écran de verrouillage et sur android auto</string>
+    <string name="equalizer_initialization_error">Impossible d\'initialiser l\'égaliseur intégré à l\'application. Essayez de le redémarrer.</string>
+    <string name="restart">Redémarrer</string>
+    <string name="scan_storage_description">En général, toutes les modifications apportées aux fichiers sur l\'appareil apparaissent automatiquement. Mais sur certains appareils ou certaines versions du système, cela ne fonctionnera pas. Ce bouton permet de lancer manuellement l\'analyse des fichiers.</string>
+    <string name="scanning_completed">Recherche achevée</string>
+    <string name="pause_on_zero_volume_level">Arrêter la lecture lorsque le niveau de volume est à zéro</string>
+    <string name="covers">Covers</string>
+    <string name="display_composition_file_name">Afficher le nom du fichier de composition au lieu du titre</string>
+    <string name="name_order">Par nom</string>
+    <string name="file_name_order">Par nom de fichier</string>
+    <string name="play_list_is_empty">Playlist vide. Les compositions peuvent être ajoutées aux listes de lecture sur les écrans de la bibliothèque..</string>
+    <string name="file_scanner_state">Recherche des fichiers par informations: %s</string>
+    <string name="show_all_audio_files">Afficher tous les fichiers audio</string>
+    <string name="enabled_media_players">Lecteurs multimédias activés</string>
+    <string name="advanced_settings">Advancé</string>
+    <string name="media_players_setting_description">L\'application utilise plusieurs lecteurs multimédia pour la lecture de la musique. Il est possible de les désactiver ou de modifier la priorité d\'utilisation. Tous les changements ne prendront effet qu\'après le redémarrage de l\'application.</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s morceau</item>
+        <item quantity="other">%1$s morceaux</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s morceau</item>
+        <item quantity="other">%1$s morceaux</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s fichier</item>
+        <item quantity="other">%1$s fichiers</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s album</item>
+        <item quantity="other">%1$s albums</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s morceau sera joué à la suite</item>
+        <item quantity="other">%s morceaux seront joués à la suite</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s morceau ajouté à la fin de la liste de lecture</item>
+        <item quantity="other">%s morceaux ajoutés à la fin de la liste de lecture</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d morceau ajouté à la playlist \"%2$s\"</item>
+        <item quantity="other">%1$d morceaux ajoutés à la playlist \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d morceaux supprimés de la playlist \"%2$s\"</item>
+        <item quantity="other">%1$d morceaux supprimés de la playlist \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d morceau supprimé</item>
+        <item quantity="other">%1$d morceaux supprimés</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d seconde</item>
+        <item quantity="other">%1$d secondes</item>
+    </plurals>
+
+</resources>
