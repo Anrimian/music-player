@@ -26,16 +26,16 @@
             android:layout_marginEnd="@dimen/content_spacing_margin"
             android:layout_marginRight="@dimen/content_spacing_margin"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tv_current_composition"/>
 
         <Constraint
             android:id="@+id/tv_current_composition"
             style="@style/TextStyle.Medium"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/bottom_sheet_height"
             android:layout_marginEnd="@dimen/content_spacing_margin"
             android:layout_marginStart="@dimen/content_horizontal_margin"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_skip_to_previous"
             app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_previous"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
