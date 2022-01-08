@@ -38,14 +38,16 @@ public class ExternalEqualizer implements AppEqualizer {
     public void launchExternalEqualizerSetup(Activity activity, int audioSessionId) {
         if (audioSessionId == AudioEffect.ERROR_BAD_VALUE) {
             Toast.makeText(activity, "No Session Id", Toast.LENGTH_LONG).show();
-        } else {
-            try {
-                Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-                intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, activity.getPackageName());
-                intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId);
-                intent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
-                activity.startActivityForResult(intent, 0);
-            } catch (ActivityNotFoundException ignored) { }
+            return;
+        }
+        try {
+            Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+            intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, activity.getPackageName());
+            intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId);
+            intent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
+            activity.startActivityForResult(intent, 0);
+        } catch (ActivityNotFoundException | SecurityException e) {
+            Toast.makeText(activity, "Unable to start eq: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
