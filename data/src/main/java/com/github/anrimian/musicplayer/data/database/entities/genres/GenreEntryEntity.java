@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.database.entities.composition.Compos
 
 import javax.annotation.Nullable;
 
+//TODO remove id(and storageId?) and make primary key from audioId and genreId
 @Entity(tableName = "genre_entries",
         foreignKeys = {
                 @ForeignKey(entity = CompositionEntity.class,
