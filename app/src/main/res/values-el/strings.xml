@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="open_drawer">Άνοιγμα λίστας</string>
+    <string name="close_drawer">Κλείσιμο λίστας</string>
+    <string name="try_again">Προσπαθήστε ξανά</string>
+    <string name="can_not_work_without_file_permission">Η εφαρμογή δεν μπορεί να λειτουργήσει χωρίς να έχει πρόσβαση στα αρχεία</string>
+    <string name="close">Κλείσιμο</string>
+    <string name="library">Βιβλιοθήκη</string>
+    <string name="settings">Ρυθμίσεις</string>
+    <string name="internal_app_error">Εσωτερικό σφάλμα</string>
+    <string name="unexpected_error">Σφάλμα: %s</string>
+    <string name="file_not_found">Το αρχείο δεν βρέθηκε</string>
+    <string name="compositions_on_device_not_found">Δεν βρέθηκαν τραγούδια στη συσκευή</string>
+    <string name="compositions_and_folders_for_search_not_found">Δεν βρέθηκαν αποτελέσματα που να ταιριάζουν σε κομμάτια ή φακέλους</string>
+    <string name="compositions_for_search_not_found">Δεν βρέθηκαν αποτελέσματα</string>
+    <string name="foreground_channel_description">Ειδοποίηση τρέχουσας αναπαραγωγής</string>
+    <string name="previous_track">Προηγούμενο τραγούδι</string>
+    <string name="next_track">Επόμενο τραγούδι</string>
+    <string name="folder">Φάκελος</string>
+    <string name="content_description_menu">Άνοιγμα μενού τρέχοντος κομματιού</string>
+    <string name="content_description_menu_template">Άνοιγμα μενού κομματιού: %s</string>
+    <string name="share">Αποστολή</string>
+    <string name="content_description_repeat_mode">Μενού επανάληψης</string>
+    <string name="content_description_shuffle">Τυχαία αναπαραγωγή</string>
+    <string name="unknown_author">Άγνωστος καλλιτέχνης</string>
+    <string name="delete">Διαγραφή</string>
+    <string name="delete_folder">Διαγραφή φακέλου</string>
+    <string name="add_date_order">Κατά ημερομηνία προσθήκης</string>
+    <string name="order">Ταξινόμηση</string>
+    <string name="folders">Φάκελοι</string>
+    <string name="compositions">Τραγούδια</string>
+    <string name="play_lists">Λίστες αναπαραγωγής</string>
+    <string name="play_lists_on_device_not_found">Δεν βρέθηκαν λίστες αναπαραγωγής στη συσκευή</string>
+    <string name="name">Όνομα</string>
+    <string name="create">Δημιουργία</string>
+    <string name="create_playlist">Δημιουργία λίστας αναπαραγωγής</string>
+    <string name="create_playlist_error_template">Αδυναμία δημιουργίας λίστας αναπαραγωγής: %1$s</string>
+    <string name="change_playlist_name_error_template">Αδυναμία μετονομασίας λίστας αναπαραγωγής: %1$s</string>
+    <string name="name_can_not_be_empty">το όνομα δεν μπορεί να είναι κενό</string>
+    <string name="create_progress">Δημιουργία…</string>
+    <string name="play_list_with_this_name_already_exists">υπάρχει ήδη μια λίστα αναπαραγωγής με αυτό το όνομα</string>
+    <string name="add_to_playlist">Προσθήκη σε λίστα αναπαραγωγής</string>
+    <string name="select_play_list">Επιλογή λίστας αναπαραγωγής</string>
+    <string name="add_to_playlist_error_template">Αδυναμία προσθήκης τραγουδιού στη λίστα αναπαραγωγής: %1$s</string>
+    <string name="delete_composition_error_template">Αδυναμία διαγραφής τραγουδιού: %1$s</string>
+    <string name="add_to_playlist_success_template">Το τραγούδι \"%1$s\" προστέθηκε στη λίστα αναπαραγωγής \"%2$s\"</string>
+    <string name="save_as_play_list">Αποθήκευση ως λίστα αναπαραγωγής</string>
+    <string name="cancel">Ακύρωση</string>
+    <string name="deleting">Διαγραφή</string>
+    <string name="delete_composition_template">Διαγραφή τραγουδιού \"%1$s\"; Αυτό δεν μπορεί να αναιρεθεί.</string>
+    <string name="delete_empty_folder">Διαγραφή φακέλου \"%s\"; Αυτό δεν μπορεί να αναιρεθεί.</string>
+    <string name="delete_folder_template">Διαγραφή %2$s από το φάκελο \"%1$s\"; Αυτό δεν μπορεί να αναιρεθεί.</string>
+    <string name="delete_template">Διαγραφή \"%1$s\"; Αυτό δεν μπορεί να αναιρεθεί.</string>
+    <string name="delete_composition_success">Το τραγούδι \"%1$s\" διαγράφηκε</string>
+    <string name="search">Αναζήτηση</string>
+    <string name="play_queue">Αναπαραγωγή λίστας</string>
+    <string name="pause">Παύση</string>
+    <string name="play">Αναπαραγωγή</string>
+    <string name="play_all">Αναπαραγωγή όλων</string>
+    <string name="repeat_playlist">Επανάληψη τρέχουσας λίστας</string>
+    <string name="repeat_composition">Επανάληψη τραγουδιού</string>
+    <string name="do_not_repeat">Να μην γίνεται επανάληψη</string>
+    <string name="delete_from_queue">Διαγραφή από τη τρέχουσα λίστα</string>
+    <string name="delete_from_play_list">Διαγραφή από τη λίστα αναπαραγωγής</string>
+    <string name="add_item_to_playlist_error_template">Αδυναμία προσθήκης τραγουδιού στη λίστα αναπαραγωγής: %1$s</string>
+    <string name="delete_from_playlist_success_template">Το τραγούδι \"%1$s\" διαγράφηκε από τη λίστα αναπαραγωγής \"%2$s\"</string>
+    <string name="delete_playlist_template">Διαγραφή λίστας αναπαραγωγής \"%1$s\";</string>
+    <string name="play_list_delete_error">Αδυναμία διαγραφής λίστας αναπαραγωγής: %1$s </string>
+    <string name="play_not_exists">Η λίστα αναπαραγωγής δεν υπάρχει</string>
+    <string name="play_list_deleted">Η λίστα αναπαραγωγής \"%1$s\" διαγράφηκε</string>
+    <string name="can_not_receive_file_for_send">Αδυναμία λήψης αρχείων προς αποστολή: %1$s</string>
+    <string name="position_template">Τρέχων χρόνος αναπαραγωγής: %1$s</string>
+    <string name="now_playing_template">Τώρα παίζει: %1$s. Άνοιγμα τρέχουσας λίστας.</string>
+    <string name="play_all_in_folder">Αναπαραγωγή όλων στο φάκελο</string>
+    <string name="delete_playlist">Διαγραφή λίστας αναπαραγωγής</string>
+    <string name="storage_timeout_error_message">
+        Ο εσωτερικός χώρος αποθήκευσης της συσκευής δεν ανταποκρίνεται.
+        Αυτό είναι κάτι πολύ περίεργο και σπάνιο.
+        Δοκιμάστε να επανεκκινήσετε τη συσκευή σας, αυτό ίσως να διορθώσει το πρόβλημα.
+    </string>
+    <string name="select_all">Επιλογή όλων</string>
+    <string name="file_uri_extract_error">
+        Αδυναμία εύρεσης διαδρομής συστήματος για αποστολή κομματιού \"%s\".
+        Πιθανότατα να βρίσκεται σε κάποιο φάκελο συστήματος.
+    </string>
+    <string name="loading_progress">Φόρτωση…</string>
+    <string name="alphabetical_order_desc_title">Ω - Α</string>
+    <string name="add_date_order_desc_title">Τελευταίο πρώτο</string>
+    <string name="play_action">Αναπαραγωγή</string>
+    <string name="play_next">Αναπαραγωγή επόμενου</string>
+    <string name="add_to_play_queue">Προσθήκη στη τρέχουσα λίστα</string>
+    <string name="edit_name">Μετονομασία</string>
+    <string name="change">Αλλαγή</string>
+    <string name="no_current_composition">Κανένα τρέχων κομμάτι</string>
+    <string name="show_covers">Εμφάνιση εξώφυλλων</string>
+    <string name="show_covers_in_notification">Εμφάνιση εξώφυλλων στην ειδοποίηση</string>
+    <string name="colored_notification">Χρώμα ειδοποίησης ίδιο με τα χρώματα εξωφύλλου</string>
+    <string name="display">Εμφάνιση</string>
+    <string name="decrease_volume_on_notification">Μείωση έντασης κατά τη λήψη ειδοποιήσεων</string>
+    <string name="playing">Αναπαραγωγέας</string>
+    <string name="error_channel_description">Εμφάνιση ειδοποίησης σφάλματος</string>
+    <string name="playing_error">Σφάλμα αναπαραγωγής</string>
+    <string name="no_file_permission">Αδυναμία πρόσβασης στο αρχείο</string>
+    <string name="about_app">Σχετικά με</string>
+    <string name="version_template">Έκδοση %1$s(Κατασκευή %2$d)</string>
+    <string name="theme">Θέμα</string>
+    <string name="dark_theme">Σκούρο</string>
+    <string name="edit">Επεξεργασία</string>
+    <string name="edit_tags">Επεξεργασία ετικετών</string>
+    <string name="change_author_name">Αλλαγή καλλιτέχνη</string>
+    <string name="change_title">Αλλαγή τίτλου</string>
+    <string name="title">Τίτλος</string>
+    <string name="filename">Όνομα αρχείου</string>
+    <string name="artist">Καλλιτέχνης</string>
+    <string name="change_file_name">Αλλαγή ονόματος αρχείου</string>
+    <string name="copied_message">Κείμενο αντιγράφηκε</string>
+    <string name="folder_name">Όνομα φακέλου</string>
+    <string name="rename_folder">Μετονομασία φακέλου</string>
+    <string name="cut">Αποκοπή</string>
+    <string name="copy">Αντιγραφή</string>
+    <string name="paste">Επικόλληση</string>
+    <string name="paste_in_new_folder">Επικόλληση σε νέο φάκελο</string>
+    <string name="move_in_the_same_folder_error">Ο τελικός και ο αρχικός φάκελος ταιριάζουν</string>
+    <string name="file_already_exists">Υπάρχει ήδη ένα αρχείο με αυτό το όνομα</string>
+    <string name="new_folder">Νέος φάκελος</string>
+    <string name="play_on_connect_bluetooth_device">Εκκίνηση αναπαραγωγής όταν συνδέεται συσκευή bluetooth</string>
+    <string name="headset">Ακουστικά</string>
+    <string name="scan_storage">Εκ νέου σάρωση πολυμέσων</string>
+    <string name="auto_night_mode">Αυτόματη λειτουργία νύχτας</string>
+    <string name="unsupported_format_hint">Μη υποστηριζόμενος τύπος αρχείου</string>
+    <string name="artists">Καλλιτέχνες</string>
+    <string name="no_artists_in_library">Δεν βρέθηκαν καλλιτέχνες στη βιβλιοθήκη</string>
+    <string name="albums">Δίσκοι</string>
+    <string name="no_albums_in_library">Δεν βρέθηκαν δίσκοι στη βιβλιοθήκη</string>
+    <string name="genres">Είδη</string>
+    <string name="no_genres_in_library">Δεν βρέθηκαν είδη στη βιβλιοθήκη</string>
+    <string name="no_items_in_genre">Δεν βρέθηκαν τραγούδια για το επιλεγμένο είδος</string>
+    <string name="no_compositions">Δεν βρέθηκαν τραγούδια</string>
+    <string name="change_album_name">Αλλαγή δίσκου</string>
+    <string name="album">Δίσκος</string>
+    <string name="genre">Είδος</string>
+    <string name="change_composition_genre">Αλλαγή είδους κομματιού</string>
+    <string name="change_name">Αλλαγή ονόματος</string>
+    <string name="rename_progress">Μετονομασία…</string>
+    <string name="album_artist">Καλλιτέχνης δίσκου</string>
+    <string name="change_album_artist">Αλλαγή καλλιτέχνη δίσκου</string>
+    <string name="edit_album_tags">Επεξεργασία ετικετών δίσκου</string>
+    <string name="by_composition_count">Κατά αριθμό κομματιών</string>
+    <string name="by_duration">Κατά διάρκεια</string>
+    <string name="longest_first">Μεγαλύτερο πρώτο</string>
+    <string name="more_first">Πρώτα τα περισσότερα</string>
+    <string name="artist_already_exists">Ένας καλλιτέχνης με αυτό το όνομα υπάρχει ήδη</string>
+    <string name="album_already_exists">Ένας δίσκος με αυτό το όνομα υπάρχει ήδη</string>
+    <string name="genre_already_exists">Ένα είδος με αυτό το όνομα υπάρχει ήδη</string>
+    <string name="remove_genre">Διαγραφή είδους</string>
+    <string name="add_composition_genre">Προσθήκη είδους</string>
+    <string name="add">Προσθήκη</string>
+    <string name="edit_genre">Επεξεργασία είδους</string>
+    <string name="genre_removed_message">Το είδος \"%s\" διαγράφηκε</string>
+    <string name="exclude_from_scanning">Απόκρυψη</string>
+    <string name="ignored_folder_added">Ο φάκελος \'%s\' προστέθηκε στη λίστα με τους φακέλους που εξαιρούνται από την αναζήτηση.</string>
+    <string name="excluded_folders">Εξαιρούμενοι φάκελοι</string>
+    <string name="remove_excluded_folder">Διαγραφή εξαιρουμένου φακέλου</string>
+    <string name="ignored_folder_removed">Ο εξαιρούμενος φάκελος διαγράφηκε</string>
+    <string name="moving_and_destination_folders_matches">Οι φάκελοι μετακίνησης και προορισμού ταιριάζουν</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Ένας φάκελος με αυτό το όνομα υπάρχει ήδη στο φάκελο προορισμού</string>
+    <string name="move_progress">Μετακίνηση…</string>
+    <string name="delete_progress">Διαγραφή…</string>
+    <string name="play_next_message_single">Το κομμάτι \"%s\" θα παίξει μετά</string>
+    <string name="added_to_queue_message_single">Το κομμάτι \"%s\" προστέθηκε στο τέλος της τρέχουσας λίστας</string>
+    <string name="queue_item_removed">Το αντικείμενο της τρέχουσας λίστας αφαιρέθηκε</string>
+    <string name="by_size">Κατά μέγεθος</string>
+    <string name="largest_first">Μεγαλύτερο πρώτο</string>
+    <string name="log_info_text">Συνέβησαν κάποια μη κρίσιμα σφάλματα και οι πληροφορίες γι\'αυτά αποθηκεύτηκαν σε αρχείο καταγραφής αναφορών. Η εφαρμογή δεν στέλνει αυτόματα αναφορές, αλλά μπορείτε να τις στείλετε χειροκίνητα. Αυτό θα βοηθήσει στη βελτίωση της ποιότητας της εφαρμογής. Μέγεθος τρέχων αρχείου αναφοράς: %d KB</string>
+    <string name="view_file">Εμφάνιση αρχείου</string>
+    <string name="send_file">Αποστολή αρχείου</string>
+    <string name="delete_file">Διαγραφή αρχείου</string>
+    <string name="log_file_deleted">Το αρχείο αναφοράς διαγράφηκε</string>
+    <string name="pick_email_app_to_send">Διαλέξτε μια εφαρμογή email για αποστολή</string>
+    <string name="clear_play_queue">Καθαρισμός τρέχουσας λίστας</string>
+    <string name="no_excluded_folders">Οι φάκελοι που εξαιρούνται από την αναζήτηση θα εμφανίζονται εδώ</string>
+    <string name="keep_playing_after_window_close">Συνέχιση αναπαραγωγής αφού το παράθυρο κλείσει</string>
+    <string name="unknown_play_error">Άγνωστο σφάλμα αναπαραγωγής</string>
+    <string name="equalizer">Ισοσταθμιστής(Εκουαλάιζερ)</string>
+    <string name="system_equalizer">Ισοσταθμιστής συστήματος</string>
+    <string name="no_equalizer">Κανένα</string>
+    <string name="external_equalizer_description">Η δουλειά του ισοσταθμιστή συστήματος εξαρτάται από μια εφαρμογή ισοσταθμιστή τρίτων και είναι πιθανό να μην λειτουργεί με κάποιες εφαρμογές</string>
+    <string name="external_equalizer_not_found">Δεν βρέθηκε εφαρμογή ισοσταθμιστή τρίτων</string>
+    <string name="open">Άνοιγμα</string>
+    <string name="cover">Εξώφυλλο</string>
+    <string name="change_cover">Αλλαγή εξωφύλλου</string>
+    <string name="pick_from_gallery">Επιλογή από την συλλογή</string>
+    <string name="remove_cover">Διαγραφή εξωφύλλου</string>
+    <string name="editor_timeout_error">Ο επεξεργαστής ετικετών δεν εκκινείτε. Πιθανών ο τύπος αρχείου να μην υποστηρίζεται</string>
+    <string name="change_lyrics">Αλλαγή στίχων</string>
+    <string name="lyrics">Στίχοι</string>
+    <string name="check_tags_error">Αδυναμία ελέγχου ετικετών κομματιού: %s</string>
+    <string name="changing_file_progress">Αλλαγή αρχείου…</string>
+    <string name="android_r_edit_file_permission_denied">
+        Από το Android 11 η επεξεργασία και διαγραφή αρχείων απαιτεί ρητή άδεια από τις ρυθμίσεις συστήματος
+    </string>
+    <string name="error_report">Αναφορά σφάλματος</string>
+    <string name="critical_error_report_message">Η εφαρμογή αντιμετώπισε ένα κρίσιμο σφάλμα και δεν μπόρεσε να ξεκινήσει. Αυτό το σφάλμα είναι εξαιρετικά ανεπιθύμητο. Η εφαρμογή δεν στέλνει καμία πληροφορία αυτόματα, αλλά μπορείτε να στείλετε με μήνυμα ηλεκτρονικού ταχυδρομείου, το αρχείο καταγραφής σφαλμάτων. Αυτό θα βοηθήσει να διορθωθεί το σφάλμα.</string>
+    <string name="error_report_message">Συνέβη ένα κρίσιμο σφάλμα. Η εφαρμογή δεν στέλνει καμία πληροφορία αυτόματα, αλλά μπορείτε να στείλετε με μήνυμα ηλεκτρονικού ταχυδρομείου, το αρχείο καταγραφής σφαλμάτων. Αυτό θα βοηθήσει να διορθωθεί το σφάλμα.</string>
+    <string name="show_error_report_dialog_on_start">Εμφάνιση διαλόγου αναφοράς σφάλματος κατά την εκκίνηση της εφαρμογής εφόσον η εφαρμογή έχει καταρρεύσει</string>
+    <string name="do_not_show_confirm_delete_dialog">Να μην εμφανίζεται ο διάλογος επιβεβαίωσης διαγραφής της εφαρμογής</string>
+    <string name="app_equalizer">Ισοσταθμιστής εφαρμογής</string>
+    <string name="presets">Προεπιλεγμένα</string>
+    <string name="playback_speed">Ταχύτητα αναπαραγωγής</string>
+    <string name="reset">Επαναφορά</string>
+    <string name="apply">Εφαρμογή</string>
+    <string name="sleep_timer">Χρονοδιακόπτης ύπνου</string>
+    <string name="start">Εκκίνηση</string>
+    <string name="resume">Συνέχεια</string>
+    <string name="sleep_timer_message">Η αναπαραγωγή θα σταματήσει σε:</string>
+    <string name="stop">Παύση</string>
+    <string name="exclude_compositions_with_duration_less_than">Εξαιρούμενα κομμάτια από την αναζήτηση</string>
+    <string name="with_duration_less_than">Με λειτουργία λιγότερη από %s</string>
+    <string name="pause_on_audiofocus_loss">Παύση αναπαραγωγής κατά τις κλείσεις, αναπαραγωγή μουσικής/βίντεο, κλπ.</string>
+    <string name="show_cover_stub_in_notification">Εμφάνιση εξώφυλλου-παράδειγμα στην ειδοποίηση όταν δεν βρίσκεται εξώφυλλο</string>
+    <string name="write_to_this_is_not_allowed">Δεν υπάρχει άδεια για την τροποποίηση αυτού του αρχείου. Προσπαθήστε από την εφαρμογή εμφάνισης αρχείων.</string>
+    <string name="shuffle_all_and_play">Ανακάτεμα και αναπαραγωγή όλων</string>
+    <string name="rewind">Επιστροφή στην αρχή</string>
+    <string name="fast_forward">Μπροστά</string>
+    <string name="show_covers_on_lock_screen">Εμφάνιση εξώφυλλων στην οθόνη κλειδώματος και στη λειτουργία αυτοκινήτου (Αndroid Αuto)</string>
+    <string name="equalizer_initialization_error">Αδυναμία αρχικοποίησης ισοσταθμιστή εφαρμογής. Προσπαθήστε να τον επανεκκινήσετε.</string>
+    <string name="restart">Επανεκκίνηση</string>
+    <string name="scan_storage_description">Συνήθως όλες οι αλλαγές στα αρχεία της συσκευής εμφανίζονται αυτόματα. Αλλά σε κάποιες συσκευές ή κατασκευές συστήματος αυτό δεν δουλεύει. Αυτό το κουμπί πραγματοποιεί χειροκίνητη αναζήτηση.</string>
+    <string name="scanning_completed">Η αναζήτηση ολοκληρώθηκε</string>
+    <string name="pause_on_zero_volume_level">Παύση αναπαραγωγής όταν το επίπεδο ήχου φτάσει στο μηδέν</string>
+    <string name="covers">Covers</string>
+    <string name="display_composition_file_name">Εμφάνιση ονόματος αρχείου αντί για τον τίτλο του κομματιού</string>
+    <string name="name_order">Κατά όνομα</string>
+    <string name="file_name_order">Κατά όνομα αρχείου</string>
+    <string name="play_list_is_empty">Η λίστα αναπαραγωγής είναι κενή. Τραγούδια μπορούνε να προστεθούνε στις λίστες αναπαραγωγής στην εμφάνιση βιβλιοθηκών.</string>
+    <string name="file_scanner_state">Αναζήτηση ετικετών αρχείου: %s</string>
+    <string name="show_all_audio_files">Εμφάνιση όλων των αρχείων ήχου</string>
+    <string name="enabled_media_players">Ενεργές εφαρμογές πολυμέσων</string>
+    <string name="advanced_settings">Για προχωρημένους</string>
+    <string name="media_players_setting_description">Η εφαρμογή χρησιμοποιεί ορισμένες εφαρμογές πολυμέσων για την αναπαραγωγή μουσικής. Εδώ μπορούνε να απενεργοποιηθούν ή να αλλαχθεί η προτεραιότητα χρήσης τους. όλες οι αλλαγές θα εφαρμοστούν μόνο μετά την επανεκκίνηση της εφαρμογής.</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s τραγούδι</item>
+        <item quantity="other">%1$s τραγούδια</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s τραγούδι</item>
+        <item quantity="other">%1$s τραγούδια</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s αρχείο</item>
+        <item quantity="other">%1$s αρχεία</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s δίσκος</item>
+        <item quantity="other">%1$s δίσκοι</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s τραγούδι θα παίξει μετά</item>
+        <item quantity="other">%s τραγούδια θα παίξουν μετά</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s τραγούδι προστέθηκε στο τέλος της τρέχουσας λίστας</item>
+        <item quantity="other">%s τραγούδια προστέθηκαν στο τέλος της τρέχουσας λίστας</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d τραγούδι προστέθηκε στη λίστα αναπαραγωγής \"%2$s\"</item>
+        <item quantity="other">%1$d τραγούδια προστέθηκαν στη λίστα αναπαραγωγής \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d τραγούδι διαγράφηκε από τη λίστα αναπαραγωγής \"%2$s\"</item>
+        <item quantity="other">%1$d τραγούδια διαγράφηκαν από τη λίστα αναπαραγωγής \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d τραγούδι διαγράφηκε</item>
+        <item quantity="other">%1$d τραγούδια διαγράφηκαν</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d δευτερόλεπτο</item>
+        <item quantity="other">%1$d δευτερόλεπτα</item>
+    </plurals>
+
+</resources>
