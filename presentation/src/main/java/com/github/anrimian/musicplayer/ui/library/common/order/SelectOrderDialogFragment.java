@@ -68,6 +68,10 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            presenter.setOrder(getOrder());
+        }
+
         viewBinding = DialogOrderBinding.inflate(LayoutInflater.from(requireContext()));
         RecyclerView rvOrder = viewBinding.rvOrder;
         View view = viewBinding.getRoot();
@@ -100,11 +104,6 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
         } else {
             viewBinding.cbUseFileName.setVisibility(View.GONE);
         }
-
-        if (savedInstanceState == null) {
-            presenter.setOrder(getOrder());
-        }
-
         return dialog;
 
     }
