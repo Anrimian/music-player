@@ -14,6 +14,7 @@ import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.bitmap_recycle.LruBitmapPool;
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
 import com.bumptech.glide.load.engine.cache.LruResourceCache;
+import com.bumptech.glide.load.engine.executor.GlideExecutor;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.anrimian.musicplayer.di.Components;
@@ -37,6 +38,11 @@ public final class MyAppGlideModule extends AppGlideModule {
         builder.setLogLevel(Log.ERROR);
 
         builder.setDefaultRequestOptions(new RequestOptions().format(DecodeFormat.PREFER_RGB_565));
+
+        //check how it will affect OOM errors statistic. Profiler shows >2x reducing RAM consumption
+        long threadTimeout = 1000;
+        builder.setSourceExecutor(GlideExecutor.newSourceBuilder().setThreadTimeoutMillis(threadTimeout).build());
+        builder.setDiskCacheExecutor(GlideExecutor.newDiskCacheBuilder().setThreadTimeoutMillis(threadTimeout).build());
 
         int memoryCacheSizeBytes = 6 * 1024 * 1024;//6 MB
         builder.setMemoryCache(new LruResourceCache(memoryCacheSizeBytes));
