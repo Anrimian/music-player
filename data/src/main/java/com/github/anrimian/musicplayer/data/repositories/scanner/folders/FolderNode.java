@@ -104,7 +104,7 @@ public class FolderNode<V> {
     }
 
     private void clearEmptyNodeIfNeed(FolderNode<V> node) {
-        if (node.getFolders().isEmpty()) {
+        if (node.getFolders().isEmpty() && node.files.isEmpty()) {
             FolderNode<V> parent = node.getParentFolder();
             if (parent != null) {
                 parent.removeFolder(node.getKeyPath());
