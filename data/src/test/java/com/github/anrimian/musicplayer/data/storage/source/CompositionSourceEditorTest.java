@@ -139,6 +139,16 @@ public class CompositionSourceEditorTest {
         assertEquals(testName, newArtist);
     }
 
+    @Test
+    public void testFileWithWrongEncoding() throws IOException {
+        ResourceFile res = new ResourceFile("/Back In Black.mp3");
+        String filePath = res.getFile().getPath();
+        System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
+        System.out.println("author: " + sourceEditor.getCompositionAuthor(filePath).blockingGet());
+        System.out.println("album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());
+        System.out.println("album artist: " + sourceEditor.getCompositionAlbumArtist(filePath).blockingGet());
+    }
+
     private FullComposition anyFullComposition() {
         return new FullComposition(
                 null,
