@@ -57,7 +57,8 @@ dependencies {
     implementation deps.roomRx
     annotationProcessor deps.roomCompiler
 
-    implementation deps.jAudioTagger
+    //TODO update jaudiotagger dependency to 2.2.6 and remove package
+//    implementation deps.jAudioTagger
 
     testImplementation deps.junit
     testImplementation deps.mockito
