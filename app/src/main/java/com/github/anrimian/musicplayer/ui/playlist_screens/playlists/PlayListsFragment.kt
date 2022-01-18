@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.Pla
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.google.android.material.snackbar.Snackbar
 import moxy.MvpAppCompatFragment
@@ -123,7 +124,7 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
 
     override fun showEditPlayListNameDialog(playList: PlayList) {
         val fragment = RenamePlayListDialogFragment.newInstance(playList.id)
-        fragment.show(childFragmentManager, null)
+        fragment.safeShow(childFragmentManager)
     }
 
     private fun onPlaylistMenuClicked(playList: PlayList, view: View) {
@@ -141,7 +142,7 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
 
     private fun onCreatePlayListButtonClicked() {
         val fragment = CreatePlayListDialogFragment()
-        fragment.show(childFragmentManager, null)
+        fragment.safeShow(childFragmentManager)
     }
 
     private fun goToPlayListScreen(playList: PlayList) {

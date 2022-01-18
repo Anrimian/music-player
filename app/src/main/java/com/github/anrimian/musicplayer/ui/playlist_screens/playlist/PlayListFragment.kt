@@ -34,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.google.android.material.snackbar.Snackbar
@@ -275,8 +276,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, FragmentLayerList
     }
 
     override fun showEditPlayListNameDialog(playList: PlayList) {
-        val fragment = RenamePlayListDialogFragment.newInstance(playList.id)
-        fragment.show(childFragmentManager, null)
+        RenamePlayListDialogFragment.newInstance(playList.id).safeShow(childFragmentManager)
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {

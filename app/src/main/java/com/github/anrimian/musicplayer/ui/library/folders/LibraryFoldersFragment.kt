@@ -52,6 +52,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRun
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback
@@ -333,13 +334,13 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
             OrderType.SIZE
         )
         fragment.setOnCompleteListener(presenter::onOrderSelected)
-        fragment.show(childFragmentManager, Tags.ORDER_TAG)
+        fragment.safeShow(childFragmentManager, Tags.ORDER_TAG)
     }
 
     override fun showSelectPlayListDialog() {
         val dialog = ChoosePlayListDialogFragment()
         dialog.setOnCompleteListener(presenter::onPlayListToAddingSelected)
-        dialog.show(childFragmentManager, Tags.SELECT_PLAYLIST_TAG)
+        dialog.safeShow(childFragmentManager, Tags.SELECT_PLAYLIST_TAG)
     }
 
     override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {
@@ -577,8 +578,8 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
                         .addNewFragment(ExcludedFoldersFragment())
                 }
             }
-            R.id.menu_sleep_timer -> SleepTimerDialogFragment().show(childFragmentManager, null)
-            R.id.menu_equalizer -> EqualizerDialogFragment().show(childFragmentManager, null)
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(childFragmentManager)
+            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(childFragmentManager)
             R.id.menu_search -> presenter.onSearchButtonClicked()
         }
     }

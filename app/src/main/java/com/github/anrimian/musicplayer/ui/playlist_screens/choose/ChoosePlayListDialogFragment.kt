@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayList
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.*
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
@@ -150,7 +151,7 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
 
     override fun showEditPlayListNameDialog(playList: PlayList) {
         val fragment = RenamePlayListDialogFragment.newInstance(playList.id)
-        fragment.show(childFragmentManager, null)
+        fragment.safeShow(childFragmentManager)
     }
 
     override fun showPlayListDeleteSuccess(playList: PlayList) {
@@ -203,7 +204,7 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
 
     private fun onCreatePlayListButtonClicked() {
         val fragment = CreatePlayListDialogFragment()
-        fragment.show(childFragmentManager, null)
+        fragment.safeShow(childFragmentManager)
     }
 
     private fun buildSlideDelegate(): SlideDelegate {

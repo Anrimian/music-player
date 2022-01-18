@@ -26,6 +26,7 @@ import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
+import com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtilsKt;
 import com.github.anrimian.musicplayer.utils.Permissions;
 import com.github.anrimian.musicplayer.utils.logger.AppLogger;
 import com.github.anrimian.musicplayer.utils.logger.FileLog;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             LoggerRepository loggerRepository = Components.getAppComponent().loggerRepository();
             if ((loggerRepository.wasFatalError() && loggerRepository.isReportDialogOnStartEnabled())
                     || loggerRepository.wasCriticalFatalError()) {
-                new ErrorReportDialogFragment().show(getSupportFragmentManager(), null);
+                FragmentUtilsKt.safeShow(new ErrorReportDialogFragment(), getSupportFragmentManager(), null);
                 if (loggerRepository.wasCriticalFatalError()) {
                     return;
                 }

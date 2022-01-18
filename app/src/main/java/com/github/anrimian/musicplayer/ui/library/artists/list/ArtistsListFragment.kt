@@ -34,6 +34,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRun
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.google.android.material.snackbar.Snackbar
 import moxy.ktx.moxyPresenter
@@ -207,8 +208,8 @@ class ArtistsListFragment : LibraryFragment(), ArtistsListView, FragmentLayerLis
         when (item.itemId) {
             R.id.menu_order -> presenter.onOrderMenuItemClicked()
             R.id.menu_search -> toolbar.setSearchModeEnabled(true)
-            R.id.menu_sleep_timer -> SleepTimerDialogFragment().show(childFragmentManager, null)
-            R.id.menu_equalizer -> EqualizerDialogFragment().show(childFragmentManager, null)
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(childFragmentManager)
+            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(childFragmentManager)
         }
     }
 

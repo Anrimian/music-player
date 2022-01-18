@@ -20,12 +20,4 @@ public class FragmentUtils {
         }
     }
 
-    public static void safeShow(DialogFragment dialogFragment,
-                                FragmentManager fragmentManager,
-                                String tag) {
-        try {
-            dialogFragment.show(fragmentManager, tag);
-        } catch (IllegalStateException ignored) {} //we don't have showAllowingStateLoss, so just consume error
-
-    }
 }

@@ -39,6 +39,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
+import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback
 import com.google.android.material.snackbar.Snackbar
@@ -300,8 +301,8 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         when (item.itemId) {
             R.id.menu_order -> presenter.onOrderMenuItemClicked()
             R.id.menu_search -> toolbar.setSearchModeEnabled(true)
-            R.id.menu_sleep_timer -> FragmentUtils.safeShow(SleepTimerDialogFragment(), childFragmentManager, null)
-            R.id.menu_equalizer -> EqualizerDialogFragment().show(childFragmentManager, null)
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(childFragmentManager)
+            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(childFragmentManager)
         }
     }
 

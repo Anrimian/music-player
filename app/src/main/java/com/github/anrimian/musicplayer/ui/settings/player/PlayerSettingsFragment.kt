@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
+import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
@@ -96,7 +97,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
     }
 
     private fun showEqualizerDialog() {
-        EqualizerDialogFragment().show(childFragmentManager, null)
+        EqualizerDialogFragment().safeShow(childFragmentManager)
     }
 
     private fun showMediaPlayersSettingScreen() {

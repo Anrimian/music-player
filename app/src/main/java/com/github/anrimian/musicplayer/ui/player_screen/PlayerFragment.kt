@@ -71,6 +71,7 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.drawer.SimpleDrawerListener
 import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
@@ -565,7 +566,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     override fun showSelectPlayListDialog() {
         val dialog = ChoosePlayListDialogFragment()
         dialog.setOnCompleteListener(presenter::onPlayListForAddingSelected)
-        dialog.show(childFragmentManager, Tags.SELECT_PLAYLIST_TAG)
+        dialog.safeShow(childFragmentManager, Tags.SELECT_PLAYLIST_TAG)
     }
 
     override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {
@@ -630,7 +631,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             panelBinding.tvSleepTime.compoundDrawablePadding = iconPadding
             panelBinding.tvSleepTime.setBackgroundResource(R.drawable.bg_outline_text_button)
             panelBinding.tvSleepTime.setOnClickListener {
-                SleepTimerDialogFragment().show(childFragmentManager, null)
+                SleepTimerDialogFragment().safeShow(childFragmentManager)
             }
         }
         panelBinding.tvSleepTime.text = FormatUtils.formatMilliseconds(remainingMillis)
@@ -656,10 +657,10 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             R.id.menu_save_as_playlist -> {
                 val fragment = CreatePlayListDialogFragment()
                 fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated)
-                fragment.show(childFragmentManager, Tags.CREATE_PLAYLIST_TAG)
+                fragment.safeShow(childFragmentManager, Tags.CREATE_PLAYLIST_TAG)
             }
-            R.id.menu_sleep_timer -> SleepTimerDialogFragment().show(childFragmentManager, null)
-            R.id.menu_equalizer -> EqualizerDialogFragment().show(childFragmentManager, null)
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(childFragmentManager)
+            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(childFragmentManager)
             R.id.menu_clear_play_queue -> presenter.onClearPlayQueueClicked()
         }
     }
