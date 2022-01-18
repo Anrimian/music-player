@@ -113,7 +113,8 @@ class MediaSessionHandler(private val context: Context,
                 musicServiceInteractor.repeatModeObservable,
                 musicServiceInteractor.randomModeObservable,
                 playbackState::set
-        ).subscribe(this::onPlayBackStateReceived))
+        ).observeOn(uiScheduler)
+            .subscribe(this::onPlayBackStateReceived))
     }
 
     private fun onPlayBackStateReceived(playbackState: PlaybackState) {
