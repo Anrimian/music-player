@@ -83,6 +83,7 @@
             android:theme="@style/SlidrActivityTheme"/>
 
         <service android:name=".infrastructure.service.music.MusicService"
+            android:foregroundServiceType="mediaPlayback"
             android:exported="false">
 <!--            <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
