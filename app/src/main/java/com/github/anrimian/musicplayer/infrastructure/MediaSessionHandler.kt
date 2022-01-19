@@ -27,6 +27,7 @@ import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotific
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
+import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.*
 import com.github.anrimian.musicplayer.infrastructure.service.music.CompositionSourceModelHelper
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
@@ -354,7 +355,7 @@ class MediaSessionHandler(private val context: Context,
     private inner class AppMediaSessionCallback : MediaSessionCompat.Callback() {
 
         override fun onPlay() {
-            playerInteractor.play()
+            SystemServiceControllerImpl.startPlayForegroundService(context)
         }
 
         override fun onPause() {
