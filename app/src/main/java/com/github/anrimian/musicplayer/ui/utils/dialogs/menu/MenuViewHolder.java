@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
 
 class MenuViewHolder extends RecyclerView.ViewHolder {
@@ -43,6 +44,7 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
             tvTitle.setTextColor(getColorFromAttr(itemView.getContext(), R.attr.colorAccent));
         } else {
             tvTitle.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.color_text_primary));
+            CompatUtils.setColorTextPrimaryColor(tvTitle);
         }
 
         Drawable icon = menuItem.getIcon();

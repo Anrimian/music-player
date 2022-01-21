@@ -51,6 +51,24 @@ public class CompatUtils {
         }
     }
 
+    public static void setColorTextPrimaryColor(TextView button) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            Context context = button.getContext();
+            int[][] states = new int[][]{
+                    new int[]{-android.R.attr.state_enabled},
+                    new int[]{}
+            };
+
+            int[] colors = new int[]{
+                    getColorFromAttr(context, R.attr.disabledColor),
+                    getColorFromAttr(context, android.R.attr.textColorPrimary)
+            };
+
+            ColorStateList textColorList = new ColorStateList(states, colors);
+            button.setTextColor(textColorList);
+        }
+    }
+
     public static void setSliderStyle(Slider rangeSlider) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             Context context = rangeSlider.getContext();
