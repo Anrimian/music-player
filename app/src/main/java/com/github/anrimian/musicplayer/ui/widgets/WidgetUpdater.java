@@ -1,18 +1,5 @@
 package com.github.anrimian.musicplayer.ui.widgets;
 
-import android.content.Context;
-import android.content.Intent;
-
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
@@ -24,6 +11,22 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.RANDOM_PLAY_AR
 import static com.github.anrimian.musicplayer.Constants.Arguments.REPEAT_ARG;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+
+import android.content.Context;
+import android.content.Intent;
+
+import com.github.anrimian.musicplayer.data.utils.rx.RxUtilsKt;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class WidgetUpdater {
 
@@ -52,7 +55,7 @@ public class WidgetUpdater {
         if (updateDisposable.size() > 0) {
             return;
         }
-        updateDisposable.add(Observable.combineLatest(
+        updateDisposable.add(RxUtilsKt.retryWithDelay(Observable.combineLatest(
                 musicPlayerInteractor.getCurrentQueueItemObservable(),
                 musicPlayerInteractor.getPlayQueueSizeObservable(),
                 musicPlayerInteractor.getPlayerStateObservable(),
@@ -60,7 +63,7 @@ public class WidgetUpdater {
                 musicPlayerInteractor.getRepeatModeObservable(),
                 musicPlayerInteractor.getRandomPlayingObservable(),
                 widgetState::set)
-                .observeOn(scheduler)
+                .observeOn(scheduler), 10, 1, TimeUnit.SECONDS)
                 .subscribe(this::onWidgetStateReceived));
     }
 
