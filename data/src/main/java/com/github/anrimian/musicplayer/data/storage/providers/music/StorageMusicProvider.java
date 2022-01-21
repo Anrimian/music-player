@@ -193,7 +193,7 @@ public class StorageMusicProvider {
                 int dateAddedIndex = getColumnIndex(cursor, Media.DATE_ADDED);
                 int dateModifiedIndex = getColumnIndex(cursor, Media.DATE_MODIFIED);
 
-                while (cursor.moveToNext()) {
+                while (MediaStoreUtils.moveToNext(cursor)) {
                     StorageFullComposition composition = buildStorageComposition(
                             artistIndex,
                             titleIndex,

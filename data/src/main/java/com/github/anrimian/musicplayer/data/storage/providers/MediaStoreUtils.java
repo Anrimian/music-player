@@ -44,4 +44,12 @@ public class MediaStoreUtils {
         }
     }
 
+    public static boolean moveToNext(Cursor cursor) {
+        try {
+            return cursor.moveToNext();
+        } catch (Exception e) {
+            throw new ContentResolverQueryException(e);
+        }
+    }
+
 }
