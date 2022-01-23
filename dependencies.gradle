@@ -32,7 +32,7 @@ ext {
     slidrVersion = "2.1.0"
     exoPlayerVersion = "2.16.1"
     roomVersion = "2.3.0"
-    jTaggerVersion = '2.2.6b'
+    jTaggerVersion = '2.2.6c'
     chipsLayoutManagerVersion = "0.3.7"
     glideVersion = "4.12.0"
 
