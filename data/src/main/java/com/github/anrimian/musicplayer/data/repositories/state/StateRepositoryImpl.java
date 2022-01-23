@@ -48,7 +48,7 @@ public class StateRepositoryImpl implements StateRepository {
 
     @Override
     public int getCurrentFileScannerVersion() {
-        return 2;
+        return 3;
     }
 
     @Override
