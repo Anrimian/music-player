@@ -23,4 +23,8 @@
     <dimen name="dialog_button_margin_vertical">4dp</dimen>
     <dimen name="dialog_button_margin_horizontal">6dp</dimen>
 
+    <!--swipe panel-->
+    <dimen name="swipe_panel_padding_end">4dp</dimen>
+    <dimen name="swipe_panel_text_top_padding">1dp</dimen>
+
 </resources>

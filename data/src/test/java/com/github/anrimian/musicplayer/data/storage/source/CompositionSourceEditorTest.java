@@ -1,32 +1,36 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
-import com.github.anrimian.musicplayer.data.utils.files.ResourceFile;
-import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
-
-import org.junit.Rule;
-import org.junit.Test;
-
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
+import static com.github.anrimian.musicplayer.data.utils.files.TestFileUtils.createTempCopy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.File;
+
 public class CompositionSourceEditorTest {
 
-    @Rule
-    public ResourceFile res = new ResourceFile("/Кот Леопольд - Неприятность эту мы переживем.mp3");
+    private String filePath;
 
     private final StorageMusicProvider musicProvider = mock(StorageMusicProvider.class);
     private final FileSourceProvider fileSourceProvider = mock(FileSourceProvider.class);
 
     private final CompositionSourceEditor sourceEditor = new CompositionSourceEditor(musicProvider, fileSourceProvider);
 
+    @BeforeEach
+    void setUp(@TempDir File dir) {
+        filePath = createTempCopy(dir, "src/test/resources/Кот Леопольд - Неприятность эту мы переживем.mp3").getPath();
+    }
+
     @Test
-    public void testEditor() throws IOException {
-        String filePath = res.getFile().getPath();
+    public void testEditor() {
         System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
         System.out.println("author: " + sourceEditor.getCompositionAuthor(filePath).blockingGet());
         System.out.println("album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());
@@ -35,8 +39,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void changeTitleTest() throws IOException {
-        String filePath = res.getFile().getPath();
+    public void changeTitleTest() {
         when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
 
@@ -48,8 +51,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void changeAlbumTest() throws IOException {
-        String filePath = res.getFile().getPath();
+    public void changeAlbumTest() {
         when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         System.out.println("album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());
 
@@ -61,8 +63,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void addGenreTest() throws IOException {
-        String filePath = res.getFile().getPath();
+    public void addGenreTest() {
         when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("genres: " + genres);
@@ -77,8 +78,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void removeGenreTest() throws IOException {
-        String filePath = res.getFile().getPath();
+    public void removeGenreTest() {
         when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("genres: " + genres);
@@ -94,8 +94,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void removeLastTest() throws IOException {
-        String filePath = res.getFile().getPath();
+    public void removeLastTest() {
         when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("genres: " + genres);
@@ -109,8 +108,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void changeGenreTest() throws IOException {
-        String filePath = res.getFile().getPath();
+    public void changeGenreTest() {
         when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         String genres = sourceEditor.getCompositionGenre(filePath).blockingGet();
         System.out.println("genres: " + genres);
@@ -127,8 +125,7 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void changeAlbumArtistTest() throws IOException {
-        String filePath = res.getFile().getPath();
+    public void changeAlbumArtistTest() {
         when(musicProvider.getCompositionFilePath(anyLong())).thenReturn(filePath);
         System.out.println("album artist: " + sourceEditor.getCompositionAlbumArtist(filePath).blockingGet());
 
@@ -140,9 +137,8 @@ public class CompositionSourceEditorTest {
     }
 
     @Test
-    public void testFileWithWrongEncoding() throws IOException {
-        ResourceFile res = new ResourceFile("/Back In Black.mp3");
-        String filePath = res.getFile().getPath();
+    public void testFileWithWrongEncoding() {
+        String filePath = new File("src/test/resources/Back In Black.mp3").getPath();
         System.out.println("title: " + sourceEditor.getCompositionTitle(filePath).blockingGet());
         System.out.println("author: " + sourceEditor.getCompositionAuthor(filePath).blockingGet());
         System.out.println("album: " + sourceEditor.getCompositionAlbum(filePath).blockingGet());

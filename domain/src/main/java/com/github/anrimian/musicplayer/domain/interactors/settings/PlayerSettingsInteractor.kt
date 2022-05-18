@@ -1,9 +1,14 @@
 package com.github.anrimian.musicplayer.domain.interactors.settings
 
+import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
 import io.reactivex.rxjava3.core.Observable
 
-class PlayerSettingsInteractor(private val settingsRepository: SettingsRepository) {
+class PlayerSettingsInteractor(
+    private val settingsRepository: SettingsRepository,
+    private val mediaPlayerController: MusicPlayerController
+) {
 
     fun isDecreaseVolumeOnAudioFocusLossEnabled() = settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled
 
@@ -23,6 +28,17 @@ class PlayerSettingsInteractor(private val settingsRepository: SettingsRepositor
         settingsRepository.isPauseOnZeroVolumeLevelEnabled = enabled
     }
 
+    fun getSoundBalance(): SoundBalance = settingsRepository.soundBalance
+
+    fun setSoundBalance(soundBalance: SoundBalance) {
+        mediaPlayerController.setSoundBalance(soundBalance)
+    }
+
+    fun saveSoundBalance(soundBalance: SoundBalance) {
+        mediaPlayerController.setSoundBalance(soundBalance)
+        settingsRepository.soundBalance = soundBalance
+    }
+
     fun getSelectedEqualizerTypeObservable(): Observable<Int> = settingsRepository.selectedEqualizerTypeObservable
 
     fun getEnabledMediaPlayers(): IntArray = settingsRepository.enabledMediaPlayers
@@ -33,4 +49,5 @@ class PlayerSettingsInteractor(private val settingsRepository: SettingsRepositor
         }
         settingsRepository.enabledMediaPlayers = players
     }
+
 }

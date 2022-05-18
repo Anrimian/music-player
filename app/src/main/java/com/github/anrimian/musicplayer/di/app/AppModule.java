@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.infrastructure.analytics.AnalyticsImpl;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
+import com.github.anrimian.musicplayer.ui.common.locale.LocaleController;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
@@ -119,6 +120,13 @@ public class AppModule {
     @Singleton
     ThemeController themeController(Context context) {
         return new ThemeController(context);
+    }
+
+    @Provides
+    @NonNull
+    @Singleton
+    LocaleController localeController(Context context) {
+        return new LocaleController(context);
     }
 
     @Provides

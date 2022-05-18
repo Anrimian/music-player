@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.data.utils.rx.RxUtils;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
@@ -64,6 +65,10 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Nullable
     private ErrorType previousErrorType;
+
+    private float volume = 1f;
+    private float leftVolume = 1f;
+    private float rightVolume = 1f;
 
     //problem with error case(file not found), multiple error events
     public AndroidMediaPlayer(Context context,
@@ -165,9 +170,8 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
 
     @Override
     public void setVolume(float volume) {
-        try {
-            mediaPlayer.setVolume(volume, volume);
-        } catch (IllegalStateException ignored) {}
+        this.volume = volume;
+        applyVolume();
     }
 
     @Override
@@ -229,6 +233,21 @@ public class AndroidMediaPlayer implements AppMediaPlayer {
     @Override
     public Observable<Boolean> getSpeedChangeAvailableObservable() {
         return Observable.fromCallable(() -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
+    }
+
+    @Override
+    public void setSoundBalance(SoundBalance soundBalance) {
+        leftVolume = soundBalance.getLeft();
+        rightVolume = soundBalance.getRight();
+        applyVolume();
+    }
+
+    private void applyVolume() {
+        float leftOutput = volume*leftVolume;
+        float rightOutput = volume*rightVolume;
+        try {
+            mediaPlayer.setVolume(leftOutput, rightOutput);
+        } catch (IllegalStateException ignored) {}
     }
 
     private void startTracingTrackPosition() {

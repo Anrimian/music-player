@@ -242,6 +242,10 @@
     <string name="enabled_media_players">Lecteurs multimédias activés</string>
     <string name="advanced_settings">Advancé</string>
     <string name="media_players_setting_description">L\'application utilise plusieurs lecteurs multimédia pour la lecture de la musique. Il est possible de les désactiver ou de modifier la priorité d\'utilisation. Tous les changements ne prendront effet qu\'après le redémarrage de l\'application.</string>
+    <string name="sound_balance">Ajuster le son</string>
+    <string name="sound_balance_state">Gauche: %1$d%%, Droite: %2$d%%</string>
+    <string name="language">Langue</string>
+    <string name="follow_system_language">Respecter la langue du système</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s morceau</item>

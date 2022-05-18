@@ -180,10 +180,6 @@ public class PlayerInteractor {
         musicPlayerController.setPlaybackSpeed(speed);
     }
 
-    public float getPlaybackSpeed() {
-        return musicPlayerController.getCurrentPlaybackSpeed();
-    }
-
     public Observable<PlayerEvent> getPlayerEventsObservable() {
         return playerEventsSubject;
     }

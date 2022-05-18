@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.utils.fragments
 
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import java.lang.IllegalStateException
 
 fun DialogFragment.safeShow(
     fragmentManager: FragmentManager,
@@ -10,6 +9,7 @@ fun DialogFragment.safeShow(
 ) {
     try {
         //we don't have showAllowingStateLoss, so just consume error
+        //https://issuetracker.google.com/issues/37133130
         show(fragmentManager, tag)
     } catch (ignored: IllegalStateException) {}
 }

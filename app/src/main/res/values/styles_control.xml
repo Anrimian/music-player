@@ -3,17 +3,14 @@
     <style name="BaseCheckboxStyle">
         <item name="android:gravity">center_vertical</item>
         <item name="android:textColor">@color/color_text_primary</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingTop">@dimen/checkbox_text_vertical_padding</item>
+        <item name="android:paddingBottom">@dimen/checkbox_text_vertical_padding</item>
+        <item name="android:textAlignment">viewStart</item>
     </style>
 
     <style name="CheckboxStyle" parent="@style/BaseCheckboxStyle">
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
         <item name="android:paddingStart">24dp</item>
         <item name="android:textSize">@dimen/text_size_small_2</item>
-        <item name="android:textColor">@color/color_text_primary</item>
     </style>
 
     <style name="SeekBarStyle" parent="@style/Widget.AppCompat.SeekBar"/>

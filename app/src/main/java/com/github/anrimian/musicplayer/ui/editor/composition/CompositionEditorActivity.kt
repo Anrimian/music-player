@@ -180,6 +180,12 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         viewBinding.rvGenres.visibility = View.GONE
     }
 
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(
+            Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
+        )
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true

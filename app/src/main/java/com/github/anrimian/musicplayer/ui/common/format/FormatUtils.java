@@ -11,6 +11,7 @@ import android.content.Context;
 import android.text.SpannableStringBuilder;
 import android.text.format.Formatter;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
@@ -288,5 +289,11 @@ public class FormatUtils {
 
     public static String formatSize(Context context, long bytes) {
         return Formatter.formatShortFileSize(context, bytes);
+    }
+
+    public static void formatPlayAllButton(ImageView button, boolean isRandomEnabled) {
+        button.setImageResource(isRandomEnabled? R.drawable.ic_shuffle: R.drawable.ic_play);
+        int description = isRandomEnabled? R.string.shuffle_all_and_play: R.string.play_all;
+        button.setContentDescription(button.getContext().getString(description));
     }
 }

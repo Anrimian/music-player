@@ -106,6 +106,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, FragmentLayerList
         viewBinding.recyclerView.adapter = adapter
 
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        ViewUtils.onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
 
         SlidrPanel.simpleSwipeBack(
             viewBinding.listContainer,
@@ -292,6 +293,10 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, FragmentLayerList
     override fun onCompositionsAddedToQueue(compositions: List<Composition>) {
         val message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions)
         MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
+    }
+
+    override fun showRandomMode(isRandomModeEnabled: Boolean) {
+        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
     }
 
     private fun onCompositionActionSelected(

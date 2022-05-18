@@ -4,8 +4,6 @@ import android.app.RecoverableSecurityException;
 import android.content.Context;
 import android.os.Build;
 
-import androidx.annotation.StringRes;
-
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.EqInitializationException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
@@ -37,13 +35,12 @@ import java.util.List;
  * Created on 29.10.2017.
  */
 
-public class DefaultErrorParser implements ErrorParser {
+public class DefaultErrorParser extends ErrorParser {
 
-    private final Context context;
     private final Analytics analytics;
 
     public DefaultErrorParser(Context context, Analytics analytics) {
-        this.context = context;
+        super(context);
         this.analytics = analytics;
     }
 
@@ -131,15 +128,4 @@ public class DefaultErrorParser implements ErrorParser {
         analytics.processNonFatalError(throwable);
     }
 
-    private String getString(@StringRes int resId) {
-        return context.getString(resId);
-    }
-
-    private String getString(@StringRes int resId, Object... formatArgs) {
-        return context.getString(resId, formatArgs);
-    }
-
-    private ErrorCommand error(@StringRes int resId) {
-        return new ErrorCommand(getString(resId));
-    }
 }

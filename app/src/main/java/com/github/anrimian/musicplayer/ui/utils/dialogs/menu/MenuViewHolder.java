@@ -30,7 +30,7 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
                    @LayoutRes int menuViewRes,
                    OnItemClickListener<MenuItem> onItemClickListener) {
         super(inflater.inflate(menuViewRes, parent, false));
-        tvTitle = itemView.findViewById(R.id.tv_title);
+        tvTitle = itemView.findViewById(R.id.tvTitle);
         ivIcon = itemView.findViewById(R.id.iv_icon);
 
         itemView.setOnClickListener(v -> onItemClickListener.onItemClick(menuItem));

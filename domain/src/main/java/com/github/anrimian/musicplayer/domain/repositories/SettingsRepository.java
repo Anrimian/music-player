@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
 
 import io.reactivex.rxjava3.core.Observable;
 
@@ -147,4 +148,8 @@ public interface SettingsRepository {
     int[] getEnabledMediaPlayers();
 
     void setEnabledMediaPlayers(int[] mediaPlayersIds);
+
+    SoundBalance getSoundBalance();
+
+    void setSoundBalance(SoundBalance soundBalance);
 }

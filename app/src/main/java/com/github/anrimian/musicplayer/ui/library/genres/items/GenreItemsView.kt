@@ -2,7 +2,7 @@ package com.github.anrimian.musicplayer.ui.library.genres.items
 
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsView
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
+import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
@@ -21,10 +21,10 @@ interface GenreItemsView : BaseLibraryCompositionsView {
     @Skip
     fun showRenameGenreDialog(genre: Genre)
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = RENAME_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = RENAME_STATE)
     fun showRenameProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = RENAME_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = RENAME_STATE)
     fun hideRenameProgress()
 
 }

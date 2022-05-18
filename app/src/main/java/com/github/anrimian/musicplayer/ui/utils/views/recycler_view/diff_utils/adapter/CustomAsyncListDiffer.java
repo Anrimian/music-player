@@ -382,11 +382,12 @@ public class CustomAsyncListDiffer<T> {
         if (llm != null
                 && position == 0
                 && !previousList.isEmpty() // should prevent crash in convertOldPositionToNew
+                && previousList.size() != newList.size()
                 && diffResult.convertOldPositionToNew(0) != 0) {
             RecyclerViewUtils.scrollToPosition(recyclerView,
                     llm,
                     0,
-                    true);
+                    false);
         }
     }
 

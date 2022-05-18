@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsDisplayBinding
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.ui.common.locale.showLocaleChooserDialog
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked
@@ -50,6 +51,9 @@ class DisplaySettingsFragment : MvpAppCompatFragment(), DisplaySettingsView {
         onCheckChanged(viewBinding.cbColoredNotification, presenter::onColoredNotificationChecked)
         onCheckChanged(viewBinding.cbShowCoverStubInNotification, presenter::onNotificationCoverStubChecked)
         onCheckChanged(viewBinding.cbNotificationOnLockScreen, presenter::onCoversOnLockScreenChecked)
+
+        viewBinding.tvLocale.text = Components.getAppComponent().localeController().getCurrentLocaleName()
+        viewBinding.tvLocaleClickableArea.setOnClickListener { onLocaleButtonClicked() }
     }
 
     override fun showFileNameEnabled(enabled: Boolean) {
@@ -90,6 +94,14 @@ class DisplaySettingsFragment : MvpAppCompatFragment(), DisplaySettingsView {
 
     override fun showNotificationCoverStubEnabled(enabled: Boolean) {
         viewBinding.cbShowCoverStubInNotification.isEnabled = enabled
+    }
+
+    private fun onLocaleButtonClicked() {
+        showLocaleChooserDialog(requireContext()) { locale ->
+            Components.getAppComponent()
+                .localeController()
+                .setCurrentLocale(locale, requireActivity())
+        }
     }
 
 }

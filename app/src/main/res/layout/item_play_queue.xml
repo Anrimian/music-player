@@ -4,16 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/listItemBackground">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/tv_composition_name"
         style="@style/TextStyleItemPrimary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/content_internal_margin"
-        android:layout_marginStart="@dimen/content_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginTop="@dimen/list_vertical_margin"
         app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
         app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
@@ -44,7 +43,6 @@
         android:id="@+id/clickable_item"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:foreground="?selectableItemBackground"
         app:layout_constraintBottom_toTopOf="@id/divider"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -61,7 +59,7 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_music_icon"
-        style="@style/ImageStyle.ItemImage"
+        style="@style/ImageStyle.QueueItemImage"
         android:scaleType="centerCrop"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"

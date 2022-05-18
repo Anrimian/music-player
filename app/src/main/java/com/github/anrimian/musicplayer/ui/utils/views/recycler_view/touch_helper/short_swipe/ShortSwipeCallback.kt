@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helpe
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.text.Layout
 import android.text.TextPaint
 import android.view.animation.AccelerateInterpolator
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.ui.utils.*
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -23,19 +25,19 @@ private const val APPEAR_ANIM_SCALE_START = 0f
 private const val APPEAR_ANIM_SCALE_END = 1f
 private const val ANIMATION_DURATION = 120L
 
-//remove annotation after refactoring fragments to kotlin
-class ShortSwipeCallback @JvmOverloads constructor(
-        context: Context,
-        @DrawableRes iconRes: Int,
-        @StringRes textResId: Int,
-        private val textColor: Int = context.colorFromAttr(android.R.attr.textColorPrimary),
-        @DimenRes panelWidthRes: Int = R.dimen.swipe_panel_width,
-        @DimenRes panelEndPaddingRes: Int = R.dimen.swipe_panel_padding_end,
-        @DimenRes textTopPaddingRes: Int = R.dimen.swipe_panel_text_top_padding,
-        @DimenRes iconSizeRes: Int = R.dimen.swipe_panel_icon_size,
-        @DimenRes textSizeRes: Int = R.dimen.swipe_panel_text_size,
-        private val shouldNotSwipeViewHolder: (RecyclerView.ViewHolder) -> Boolean = { false },
-        private val swipeCallback: (Int) -> Unit
+class ShortSwipeCallback(
+    context: Context,
+    @DrawableRes iconRes: Int,
+    @StringRes textResId: Int,
+    backgroundColor: Int = context.colorFromAttr(R.attr.listItemBottomBackground),
+    textColor: Int = AndroidUtils.getContrastColor(backgroundColor),
+    @DimenRes panelWidthRes: Int = R.dimen.swipe_panel_width,
+    @DimenRes panelEndPaddingRes: Int = R.dimen.swipe_panel_padding_end,
+    @DimenRes textTopPaddingRes: Int = R.dimen.swipe_panel_text_top_padding,
+    @DimenRes iconSizeRes: Int = R.dimen.swipe_panel_icon_size,
+    @DimenRes textSizeRes: Int = R.dimen.swipe_panel_text_size,
+    private val shouldNotSwipeViewHolder: (RecyclerView.ViewHolder) -> Boolean = { false },
+    private val swipeCallback: (Int) -> Unit,
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START) {
 
     private val panelWidth = context.getDimensionPixelSize(panelWidthRes)
@@ -52,6 +54,10 @@ class ShortSwipeCallback @JvmOverloads constructor(
         color = textColor
         isAntiAlias = true
         textSize = context.resources.getDimension(textSizeRes)
+    }
+
+    private val bgPaint = Paint().apply {
+        color = backgroundColor
     }
 
     private val textStaticLayout = createStaticLayout(
@@ -86,19 +92,26 @@ class ShortSwipeCallback @JvmOverloads constructor(
         return super.getSwipeDirs(recyclerView, viewHolder)
     }
 
-    override fun onChildDraw(c: Canvas,
-                             recyclerView: RecyclerView,
-                             viewHolder: RecyclerView.ViewHolder,
-                             dX: Float,
-                             dY: Float,
-                             actionState: Int,
-                             isCurrentlyActive: Boolean) {
+    override fun onChildDraw(
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean,
+    ) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+            setIsSwiping(viewHolder, abs(dX))
+
             val itemView = viewHolder.itemView
 
             val contentHeight = iconSize + textStaticLayout.height
             val contentMarginTop = (itemView.height - contentHeight) / 2f
+            val left = itemView.left.toFloat()
             val top = itemView.top.toFloat()
+            val right = itemView.right.toFloat()
+            val bottom = itemView.bottom.toFloat()
 
             val panelWidth = max(textStaticLayout.width, iconSize) + panelHorizontalPadding*2
 
@@ -139,6 +152,9 @@ class ShortSwipeCallback @JvmOverloads constructor(
                 }
             }
 
+            //draw bg
+            c.drawRect(left, top, right, bottom, bgPaint)
+
             //draw icon
             c.save()
 
@@ -167,4 +183,14 @@ class ShortSwipeCallback @JvmOverloads constructor(
     override fun getSwipeEscapeVelocity(defaultValue: Float) = defaultValue * 8f
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder) = 2f//so we can't call onSwiped()
+
+    private fun setIsSwiping(viewHolder: RecyclerView.ViewHolder?, swipeOffset: Float) {
+        if (viewHolder == null) {
+            return
+        }
+        if (viewHolder is SwipeListener) {
+            viewHolder.onSwipeStateChanged(swipeOffset)
+        }
+    }
+
 }

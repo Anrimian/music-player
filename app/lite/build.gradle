@@ -60,11 +60,18 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
     packagingOptions {
-        exclude "/META-INF/*.kotlin_module"
-        exclude "**/kotlin/**"
-        exclude "**/*.txt"
-        exclude "**/*.xml"
-        exclude "**/*.properties"
+        jniLibs {
+            excludes += ['**/kotlin/**']
+        }
+        resources {
+            excludes += [
+                    '/META-INF/*.kotlin_module',
+                    '**/kotlin/**',
+                    '**/*.txt',
+                    '**/*.xml',
+                    '**/*.properties'
+            ]
+        }
     }
 }
 

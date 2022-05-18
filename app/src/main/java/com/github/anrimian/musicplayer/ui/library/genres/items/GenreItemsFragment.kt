@@ -25,6 +25,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
@@ -112,6 +113,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
 
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        ViewUtils.onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
 
         SlidrPanel.simpleSwipeBack(
             viewBinding.listContainer,
@@ -269,6 +271,10 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
 
     override fun setDisplayCoversEnabled(isCoversEnabled: Boolean) {
         adapter.setCoversEnabled(isCoversEnabled)
+    }
+
+    override fun showRandomMode(isRandomModeEnabled: Boolean) {
+        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
     }
 
     override fun showCompositionActionDialog(composition: Composition, position: Int) {

@@ -32,9 +32,9 @@ class AlbumEditorPresenter(
         }
         editorInteractor.authorNames
                 .observeOn(uiScheduler)
-                .doOnSuccess { artists -> viewState.showEnterAuthorDialog(album, artists) }
+                .doOnSuccess { artists -> viewState.showEnterAuthorDialog(album!!, artists) }
                 .doOnError { throwable ->
-                    viewState.showEnterAuthorDialog(album, null)
+                    viewState.showEnterAuthorDialog(album!!, null)
                     onDefaultError(throwable)
                 }
                 .ignoreElement()
@@ -46,7 +46,7 @@ class AlbumEditorPresenter(
         if (album == null) {
             return
         }
-        viewState.showEnterNameDialog(album)
+        viewState.showEnterNameDialog(album!!)
     }
 
     fun onNewAuthorEntered(author: String?) {

@@ -239,6 +239,10 @@
     <string name="enabled_media_players">Etkin medya oynatıcılar</string>
     <string name="advanced_settings">Gelişmiş</string>
     <string name="media_players_setting_description">Uygulama, müzik çalmak için birkaç medya oynatıcı kullanır.  Burada devre dışı bırakılabilir veya kullanım önceliği değiştirilebilir.  Tüm değişiklikler yalnızca uygulama yeniden başlatıldıktan sonra yürürlüğe girecek.</string>
+    <string name="sound_balance">Ses dengesi</string>
+    <string name="sound_balance_state">Sol: %1$d%%, Sağ: %2$d%%</string>
+    <string name="language">Dil</string>
+    <string name="follow_system_language">Sistem dilini takip et</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s şarkı</item>

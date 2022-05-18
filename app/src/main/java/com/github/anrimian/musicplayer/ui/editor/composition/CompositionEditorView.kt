@@ -3,8 +3,8 @@ package com.github.anrimian.musicplayer.ui.editor.composition
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
 import moxy.MvpView
+import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
@@ -18,16 +18,16 @@ interface CompositionEditorView : MvpView {
     @OneExecution
     fun closeScreen()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = DISPLAY_COMPOSITION_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = DISPLAY_COMPOSITION_STATE)
     fun showCompositionLoadingError(errorCommand: ErrorCommand)
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = DISPLAY_COMPOSITION_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = DISPLAY_COMPOSITION_STATE)
     fun showComposition(composition: FullComposition)
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = CHANGE_FILE_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = CHANGE_FILE_STATE)
     fun showChangeFileProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = CHANGE_FILE_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = CHANGE_FILE_STATE)
     fun hideChangeFileProgress()
 
     @AddToEndSingle

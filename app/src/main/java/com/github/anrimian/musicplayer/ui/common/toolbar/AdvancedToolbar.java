@@ -1,5 +1,15 @@
 package com.github.anrimian.musicplayer.ui.common.toolbar;
 
+import static android.animation.ObjectAnimator.ofFloat;
+import static android.text.TextUtils.isEmpty;
+import static com.github.anrimian.musicplayer.Constants.Animation.TOOLBAR_ARROW_ANIMATION_TIME;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setStatusBarColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getBackgroundAnimator;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getColorAnimator;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getVisibilityAnimator;
+import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
+
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
@@ -41,16 +51,6 @@ import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
-
-import static android.animation.ObjectAnimator.ofFloat;
-import static android.text.TextUtils.isEmpty;
-import static com.github.anrimian.musicplayer.Constants.Animation.TOOLBAR_ARROW_ANIMATION_TIME;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setStatusBarColor;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getBackgroundAnimator;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getColorAnimator;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.getVisibilityAnimator;
-import static com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil.setupMenu;
 
 public class AdvancedToolbar extends FrameLayout {
 
@@ -116,17 +116,17 @@ public class AdvancedToolbar extends FrameLayout {
 
     public void initializeViews(Window window) {
         this.window = window;
-        toolbar = findViewById(R.id.toolbar_internal);
-        actionMenuView = findViewById(R.id.acv_main);
-        clTitleContainer = findViewById(R.id.title_container);
-        tvTitle = findViewById(R.id.tv_title);
-        tvSubtitle = findViewById(R.id.tv_subtitle);
-        actionIcon = findViewById(R.id.action_icon);
-        etSearch = findViewById(R.id.et_search);
-        flTitleArea = findViewById(R.id.fl_title_area);
-        selectionModeContainer = findViewById(R.id.selection_mode_container);
-        tvSelectionCount = findViewById(R.id.tv_selection_count);
-        acvSelection = findViewById(R.id.acv_selection);
+        toolbar = findViewById(R.id.toolbarInternal);
+        actionMenuView = findViewById(R.id.acvMain);
+        clTitleContainer = findViewById(R.id.titleContainer);
+        tvTitle = findViewById(R.id.tvTitle);
+        tvSubtitle = findViewById(R.id.tvSubtitle);
+        actionIcon = findViewById(R.id.ivActionIcon);
+        etSearch = findViewById(R.id.etSearch);
+        flTitleArea = findViewById(R.id.flTitleArea);
+        selectionModeContainer = findViewById(R.id.selectionModeContainer);
+        tvSelectionCount = findViewById(R.id.tvSelectionCount);
+        acvSelection = findViewById(R.id.acvSelection);
         etSearch.addTextChangedListener(new SimpleTextWatcher(this::onSearchTextChanged));
         etSearch.setOnEditorActionListener(this::onSearchTextViewAction);
         etSearch.setVisibility(INVISIBLE);

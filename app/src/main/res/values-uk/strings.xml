@@ -235,7 +235,10 @@
     <string name="enabled_media_players">Активні медіа плеєри</string>
     <string name="advanced_settings">Розширені налаштування</string>
     <string name="media_players_setting_description">Додаток використовує для програвання музики декілька музичних програвачів. Тут їх можна відключити чи змінити пріоритети використання. Всі зміни набудуть чинності лише після перезапуску додатка.</string>
-
+    <string name="sound_balance">Баланс звуку</string>
+    <string name="sound_balance_state">Лівий: %1$d%%, Правий: %2$d%%</string>
+    <string name="language">Мова</string>
+    <string name="follow_system_language">Використовувати мову системи</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиція</item>
@@ -256,6 +259,13 @@
         <item quantity="few">%1$s файлів</item>
         <item quantity="many">%1$s файлів</item>
         <item quantity="other">%1$s файлів</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s альбом</item>
+        <item quantity="few">%1$s альбому</item>
+        <item quantity="many">%1$s альбомів</item>
+        <item quantity="other">%1$s альбомів</item>
     </plurals>
 
     <plurals name="play_next_message">

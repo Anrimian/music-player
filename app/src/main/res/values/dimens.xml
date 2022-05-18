@@ -31,16 +31,16 @@
     <dimen name="top_control_button_size">48dp</dimen>
 
     <!--content margins-->
-    <dimen name="content_spacing_margin">8dp</dimen>
+    <dimen name="content_spacing_margin">4dp</dimen>
     <dimen name="content_spacing_vertical_margin">6dp</dimen>
-    <dimen name="content_internal_margin">8dp</dimen>
+    <dimen name="content_internal_margin">4dp</dimen>
     <dimen name="content_horizontal_margin">16dp</dimen>
-    <dimen name="content_vertical_margin">16dp</dimen>
+    <dimen name="content_vertical_margin">8dp</dimen>
     <dimen name="content_margin">16dp</dimen>
 
     <dimen name="drawer_content_margin">14dp</dimen>
     <!--list margins-->
-    <dimen name="list_vertical_margin">14dp</dimen>
+    <dimen name="list_vertical_margin">8dp</dimen>
     <dimen name="content_vertical_spacing_margin">4dp</dimen>
    <!--content_vertical_margin*2(32) + fab size(56) -->
     <dimen name="list_bottom_padding_with_fab">88dp</dimen>
@@ -48,6 +48,7 @@
 
     <!--dialogs-->
     <dimen name="dialog_content_margin_start">20dp</dimen>
+    <dimen name="dialog_content_margin_start_text">24dp</dimen>
     <item name="dialog_min_width_major" type="dimen">65%</item>
     <item name="dialog_min_width_minor" type="dimen">95%</item>
     <dimen name="floating_window_z">16dp</dimen>
@@ -65,9 +66,12 @@
     <dimen name="dialog_margin_content_vertical">12dp</dimen>
     <dimen name="dialog_margin_content_horizontal">8dp</dimen>
 
+    <!--checkbox-->
+    <dimen name="checkbox_text_vertical_padding">12dp</dimen>
+
     <!--radio button-->
     <dimen name="radio_button_text_margin_start">16dp</dimen>
-    <dimen name="radio_button_text_vertical_padding">15dp</dimen>
+    <dimen name="radio_button_text_vertical_padding">11dp</dimen>
     <dimen name="radio_button_description_padding">48dp</dimen>
 
     <!--player bottom sheet-->
@@ -102,10 +106,11 @@
     <dimen name="widget_content_spacing_margin">0dp</dimen>
     <dimen name="widget_content_margin_horizontal">8dp</dimen>
 
-    <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
-    <dimen name="widget_medium_content_margin_horizontal">8dp</dimen>
-    <dimen name="widget_medium_content_spacing_margin_vertical">4dp</dimen>
-    <dimen name="widget_medium_content_spacing_margin_horizontal">2dp</dimen>
+    <dimen name="widget_medium_content_margin_vertical">4dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">4dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_vertical">2dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_horizontal">3dp</dimen>
+    <dimen name="widget_medium_controls_bottom_margin">0dp</dimen>
 
     <!--swipe panel-->
     <dimen name="swipe_panel_width">90dp</dimen>
@@ -113,6 +118,8 @@
     <dimen name="swipe_panel_text_top_padding">4dp</dimen>
     <dimen name="swipe_panel_icon_size">24dp</dimen>
     <dimen name="swipe_panel_text_size">11sp</dimen>
+    <dimen name="swiped_item_corners">8dp</dimen>
+    <integer name="swiped_item_animation_time">200</integer>
 
     <!--chips-->
     <dimen name="chip_corner_radius">22dp</dimen>

@@ -185,7 +185,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/tv_played_time"
+        app:layout_constraintStart_toStartOf="@id/tv_played_time"
         app:layout_constraintBottom_toTopOf="@id/group_time">
 
         <com.google.android.material.imageview.ShapeableImageView

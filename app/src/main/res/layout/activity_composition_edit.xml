@@ -19,7 +19,7 @@
             android:minHeight="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:elevation="8dp"
-            app:theme="@style/ToolbarStyle"
+            android:theme="@style/ToolbarStyle"
             app:titleTextColor="?attr/toolbarTextColorPrimary"
             app:subtitleTextColor="?attr/toolbarTextColorSecondary"
             tools:title="Title"/>
@@ -152,7 +152,7 @@
                     app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
 
                 <TextView
-                    android:id="@+id/tv_title"
+                    android:id="@+id/tvTitle"
                     style="@style/TextStyle.Medium"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -178,7 +178,7 @@
                     android:layout_marginStart="@dimen/toolbar_content_start"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_title"
+                    app:layout_constraintTop_toBottomOf="@+id/tvTitle"
                     app:layout_constraintBottom_toTopOf="@id/tv_author_hint"/>
 
                 <FrameLayout

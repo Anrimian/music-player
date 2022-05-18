@@ -5,86 +5,93 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_appwidget"
-    tools:layout_width="280dp"
-    tools:layout_height="140dp">
+    tools:layout_width="400dp"
+    tools:layout_height="100dp">
 
     <ImageView
         android:id="@+id/iv_cover"
-        style="@style/ImageStyle"
-        android:scaleType="fitCenter"
+        style="@style/WidgetImageStyle"
         android:layout_marginStart="@dimen/widget_medium_content_margin_horizontal"
-        android:layout_marginEnd="@dimen/widget_medium_content_margin_horizontal"
         android:layout_marginTop="@dimen/widget_medium_content_margin_vertical"
-        android:src="@drawable/ic_music_placeholder"
-        android:contentDescription="@null" />
+        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_music_placeholder" />
 
     <TextView
         android:id="@+id/tv_composition"
-        style="@style/AppWidget.Text.Primary.Medium"
+        style="@style/AppWidget.Text.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_marginStart="@dimen/widget_medium_content_spacing_margin_horizontal"
-        android:layout_marginEnd="@dimen/widget_medium_content_margin_horizontal"
-        android:layout_marginTop="@dimen/widget_medium_content_margin_vertical"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/iv_cover"
         android:layout_alignParentTop="true"
-        android:layout_alignBottom="@+id/iv_cover"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="@dimen/widget_medium_content_spacing_margin_horizontal"
+        android:layout_marginTop="@dimen/widget_medium_content_margin_vertical"
+        android:layout_marginEnd="@dimen/widget_medium_content_margin_vertical"
+        android:layout_toEndOf="@id/iv_cover"
         tools:text="Composition name" />
 
     <TextView
         android:id="@+id/tv_composition_author"
-        style="@style/AppWidget.Text.Secondary.Medium"
+        style="@style/AppWidget.Text.Secondary"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
-        android:layout_alignStart="@+id/iv_cover"
-        android:layout_below="@id/iv_cover"
-        android:layout_above="@+id/iv_skip_to_next"
-        android:layout_alignEnd="@id/tv_composition"
+        android:layout_alignStart="@id/tv_composition"
+        android:layout_below="@id/tv_composition"
+        android:layout_alignEnd="@+id/tv_composition"
         tools:text="Composition artist" />
 
     <ImageView
         android:id="@+id/iv_shuffle_mode"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
+        android:layout_alignStart="@id/iv_cover"
         android:layout_alignTop="@id/iv_play_pause"
         android:layout_alignBottom="@+id/iv_skip_to_next"
-        android:layout_alignStart="@id/iv_cover"
-        android:src="@drawable/ic_shuffle"
-        android:contentDescription="@string/previous_track"/>
+        android:contentDescription="@string/previous_track"
+        android:src="@drawable/ic_shuffle" />
 
     <ImageView
         android:id="@+id/iv_skip_to_previous"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
-        android:layout_alignTop="@id/iv_play_pause"
+        android:layout_alignBottom="@+id/iv_skip_to_next"
+        android:layout_toStartOf="@+id/iv_rewind"
+        android:contentDescription="@string/previous_track"
+        android:src="@drawable/ic_skip_previous" />
+
+    <ImageView
+        android:id="@+id/iv_rewind"
+        style="@style/AppWidget_ImageButton"
         android:layout_alignBottom="@+id/iv_skip_to_next"
         android:layout_toStartOf="@+id/iv_play_pause"
-        android:src="@drawable/ic_skip_previous"
-        android:contentDescription="@string/previous_track"/>
+        android:contentDescription="@string/rewind"
+        android:src="@drawable/ic_rewind" />
 
     <ImageView
         android:id="@+id/iv_play_pause"
         style="@style/AppWidget_ImageButton"
-        android:layout_centerHorizontal="true"
         android:layout_alignTop="@+id/iv_skip_to_next"
         android:layout_alignBottom="@+id/iv_skip_to_next"
-        android:src="@drawable/ic_play"
-        android:contentDescription="@string/play"/>
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/play"
+        android:src="@drawable/ic_play" />
 
     <ImageView
         android:id="@+id/iv_skip_to_next"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
-        android:layout_marginStart="@dimen/widget_medium_content_spacing_margin_horizontal"
+        android:layout_marginBottom="@dimen/widget_medium_controls_bottom_margin"
         android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@id/iv_fast_forward"
+        android:contentDescription="@string/next_track"
+        android:src="@drawable/ic_skip_next" />
+
+    <ImageView
+        android:id="@+id/iv_fast_forward"
+        style="@style/AppWidget_ImageButton"
+        android:layout_alignBottom="@+id/iv_skip_to_next"
         android:layout_toEndOf="@id/iv_play_pause"
-        android:layout_marginEnd="@dimen/widget_medium_content_margin_horizontal"
-        android:layout_marginBottom="@dimen/widget_medium_content_margin_vertical"
-        android:src="@drawable/ic_skip_next"
-        android:contentDescription="@string/next_track"/>
+        android:contentDescription="@string/fast_forward"
+        android:src="@drawable/ic_fast_forward" />
 
     <ImageView
         android:id="@+id/iv_repeat_mode"

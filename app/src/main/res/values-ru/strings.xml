@@ -268,7 +268,10 @@
     <string name="enabled_media_players">Активные медиа плееры</string>
     <string name="advanced_settings">Расширенные настройки</string>
     <string name="media_players_setting_description">Приложение использует для проигрывания музыки несколько музыкальных проигрывателей. Здесь их можно отключить или изменить приоритет использования. Все изменения вступят в силу только после перезапуска приложения.</string>
-
+    <string name="sound_balance">Баланс звука</string>
+    <string name="sound_balance_state">Левый: %1$d%%, Правый: %2$d%%</string>
+    <string name="language">Язык</string>
+    <string name="follow_system_language">Использовать язык системы</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
@@ -289,6 +292,13 @@
         <item quantity="few">%1$s файла</item>
         <item quantity="many">%1$s файлов</item>
         <item quantity="other">%1$s файлов</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s альбом</item>
+        <item quantity="few">%1$s альбома</item>
+        <item quantity="many">%1$s альбомов</item>
+        <item quantity="other">%1$s альбомов</item>
     </plurals>
 
     <plurals name="play_next_message">

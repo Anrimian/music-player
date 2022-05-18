@@ -30,19 +30,20 @@ ext {
     moxyVersion = "2.2.2"
     daggerVersion = "2.40"
     slidrVersion = "2.1.0"
-    exoPlayerVersion = "2.16.1"
-    roomVersion = "2.3.0"
+    exoPlayerVersion = "2.17.1"
+    roomVersion = "2.4.2"
     jTaggerVersion = '2.2.6c'
     chipsLayoutManagerVersion = "0.3.7"
     glideVersion = "4.12.0"
 
     //Testing
-    jUnitVersion = '4.13.2'
+    jUnit5Version = '5.8.1'
+    jUnit5PluginVersion = '1.3.0'
     espressoVersion = '3.3.0'
     mockitoVersion = '3.7.7'
     mockitoKtVersion = '2.2.11'
     dexmakerVersion = '2.28.1'
-    androidXTestVersion = "1.3.0"
+    androidXTestVersion = "1.4.0"
 
     //developing
     javaxAnnotationVersion = "3.0.2"
@@ -100,10 +101,14 @@ ext {
     //tests
     dexmaker = "com.google.dexmaker:dexmaker:${dexmakerVersion}"
     dexmakerMockito = "com.google.dexmaker:dexmaker-mockito:${dexmakerVersion}"
-    junit = "junit:junit:${jUnitVersion}"
+    junit5 = "org.junit.jupiter:junit-jupiter-api:${jUnit5Version}"
+    junit5Engine = "org.junit.jupiter:junit-jupiter-engine:${jUnit5Version}"
+    junit5Params = "org.junit.jupiter:junit-jupiter-params:${jUnit5Version}"
+    junit5PluginCore = "de.mannodermaus.junit5:android-test-core:${jUnit5PluginVersion}"
+    junit5PluginRunner = "de.mannodermaus.junit5:android-test-runner:${jUnit5PluginVersion}"
     espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
     mockito = "org.mockito:mockito-core:${mockitoVersion}"
     mockitoKt = "org.mockito.kotlin:mockito-kotlin:$mockitoKtVersion"
     rules = "androidx.test:rules:$androidXTestVersion"
-    supportTest = "androidx.test:runner:$androidXTestVersion"
+    androidXTestRunner = "androidx.test:runner:$androidXTestVersion"
 }

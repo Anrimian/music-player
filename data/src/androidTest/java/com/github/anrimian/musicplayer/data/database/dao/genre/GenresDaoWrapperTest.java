@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.data.database.dao.genre;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static utils.TestDataProvider.composition;
+
 import android.content.Context;
 
 import androidx.room.Room;
@@ -10,14 +15,9 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static utils.TestDataProvider.composition;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class GenresDaoWrapperTest {
 
@@ -27,7 +27,7 @@ public class GenresDaoWrapperTest {
 
     private GenresDaoWrapper daoWrapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
@@ -37,7 +37,7 @@ public class GenresDaoWrapperTest {
         daoWrapper = new GenresDaoWrapper(db, genreDao, compositionsDao);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         db.close();
     }

@@ -1,32 +1,26 @@
 package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import android.Manifest;
 import android.content.Context;
 import android.util.Log;
 
 import androidx.collection.LongSparseArray;
-import androidx.test.rule.GrantPermissionRule;
 
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import hu.akarnokd.rxjava3.math.MathObservable;
 import io.reactivex.rxjava3.core.Observable;
 
 public class StorageMusicProviderTest {
 
-    @Rule
-    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
-
     private StorageMusicProvider storageMusicProvider;
 
-    @Before
+    @BeforeEach
     public void before() {
         Context appContext = getInstrumentation().getTargetContext();
         StorageAlbumsProvider storageAlbumsProvider = new StorageAlbumsProvider(appContext);
@@ -42,7 +36,7 @@ public class StorageMusicProviderTest {
         for(int i = 0, size = map.size(); i < size; i++) {
             StorageFullComposition composition = map.valueAt(i);
             System.out.println(composition);
-            Assert.assertNotNull(composition.getRelativePath());
+            assertNotNull(composition.getRelativePath());
         }
     }
 

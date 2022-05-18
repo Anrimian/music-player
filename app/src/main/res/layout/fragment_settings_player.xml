@@ -62,6 +62,52 @@
 
             <TextView
                 style="@style/TextStyle.Medium"
+                android:id="@+id/tvSoundBalance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/toolbar_content_start"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_vertical_margin"
+                android:text="@string/sound_balance"
+                app:layout_constraintTop_toBottomOf="@id/dividerDecreaseVolume"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                style="@style/TextStyle.Subtitle"
+                android:id="@+id/tvSoundBalanceState"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/toolbar_content_start"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_spacing_vertical_margin"
+                android:paddingBottom="@dimen/content_vertical_margin"
+                tools:text="@string/sound_balance_state"
+                app:layout_constraintTop_toBottomOf="@id/tvSoundBalance"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <FrameLayout
+                android:id="@+id/flSoundBalanceClickableArea"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:foreground="?selectableItemBackground"
+                android:contentDescription="@string/equalizer"
+                app:layout_constraintTop_toTopOf="@id/tvSoundBalance"
+                app:layout_constraintBottom_toBottomOf="@id/tvSoundBalanceState"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+
+            <View style="@style/Divider.Horizontal.Constraint"
+                android:id="@+id/dividerSoundBalance"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/flSoundBalanceClickableArea" />
+
+            <TextView
+                style="@style/TextStyle.Medium"
                 android:id="@+id/tvEqualizer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -69,7 +115,7 @@
                 android:paddingEnd="@dimen/content_horizontal_margin"
                 android:paddingTop="@dimen/content_vertical_margin"
                 android:text="@string/equalizer"
-                app:layout_constraintTop_toBottomOf="@id/dividerDecreaseVolume"
+                app:layout_constraintTop_toBottomOf="@id/dividerSoundBalance"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 

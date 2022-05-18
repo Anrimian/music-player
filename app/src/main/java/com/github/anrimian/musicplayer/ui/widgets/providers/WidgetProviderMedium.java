@@ -1,9 +1,8 @@
 package com.github.anrimian.musicplayer.ui.widgets.providers;
 
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_SHUFFLE_NODE;
+import static com.github.anrimian.musicplayer.Constants.Actions.FAST_FORWARD;
+import static com.github.anrimian.musicplayer.Constants.Actions.REWIND;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -11,16 +10,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
-import androidx.annotation.DrawableRes;
-import androidx.core.content.ContextCompat;
-
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
 
+public class WidgetProviderMedium extends WidgetProviderSmallExt {
 
-public class WidgetProviderMedium extends BaseWidgetProvider {
+    @Override
+    protected int getRemoteViewId() {
+        return R.layout.widget_medium;
+    }
 
     @Override
     protected void applyViewLogic(RemoteViews widgetView,
@@ -49,18 +49,6 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
                 showCovers,
                 randomPlayModeEnabled,
                 repeatMode);
-        widgetView.setBoolean(R.id.iv_shuffle_mode, "setEnabled", enabled);
-        widgetView.setBoolean(R.id.iv_repeat_mode, "setEnabled", enabled);
-
-        if (enabled) {
-            int color = ContextCompat.getColor(context,
-                    randomPlayModeEnabled? getWidgetAccentColorRes(): R.color.primary_button_color);
-            widgetView.setInt(R.id.iv_shuffle_mode, "setColorFilter", color);
-        }
-
-        @DrawableRes int iconRes = getRepeatModeIcon(repeatMode);
-        widgetView.setImageViewResource(R.id.iv_repeat_mode, iconRes);
-
         if (showCovers) {
             Components.getAppComponent().imageLoader()
                     .displayImage(widgetView,
@@ -73,25 +61,20 @@ public class WidgetProviderMedium extends BaseWidgetProvider {
             widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);
         }
 
-        Intent intentChangeShuffleMode = new Intent(context, WidgetActionsReceiver.class);
-        intentChangeShuffleMode.putExtra(REQUEST_CODE, CHANGE_SHUFFLE_NODE);
-        PendingIntent pIntentChangeShuffleMode = PendingIntent.getBroadcast(context,
-                CHANGE_SHUFFLE_NODE,
-                intentChangeShuffleMode,
+        Intent intentRewind = new Intent(context, WidgetActionsReceiver.class);
+        intentRewind.putExtra(REQUEST_CODE, REWIND);
+        PendingIntent pIntentRewind = PendingIntent.getBroadcast(context,
+                REWIND,
+                intentRewind,
                 AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-        widgetView.setOnClickPendingIntent(R.id.iv_shuffle_mode, pIntentChangeShuffleMode);
+        widgetView.setOnClickPendingIntent(R.id.iv_rewind, pIntentRewind);
 
-        Intent intentChangeRepeatMode = new Intent(context, WidgetActionsReceiver.class);
-        intentChangeRepeatMode.putExtra(REQUEST_CODE, CHANGE_REPEAT_MODE);
-        PendingIntent pIntentChangeRepeatMode = PendingIntent.getBroadcast(context,
-                CHANGE_REPEAT_MODE,
-                intentChangeRepeatMode,
+        Intent intentFastForward = new Intent(context, WidgetActionsReceiver.class);
+        intentFastForward.putExtra(REQUEST_CODE, FAST_FORWARD);
+        PendingIntent pIntentFastForward = PendingIntent.getBroadcast(context,
+                FAST_FORWARD,
+                intentFastForward,
                 AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-        widgetView.setOnClickPendingIntent(R.id.iv_repeat_mode, pIntentChangeRepeatMode);
-    }
-
-    @Override
-    protected int getRemoteViewId() {
-        return R.layout.widget_medium;
+        widgetView.setOnClickPendingIntent(R.id.iv_fast_forward, pIntentFastForward);
     }
 }

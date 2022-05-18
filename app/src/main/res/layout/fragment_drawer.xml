@@ -25,9 +25,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <include
-                android:id="@+id/toolbar_play_queue"
-                layout="@layout/partial_queue_toolbar"
+            <include layout="@layout/partial_queue_toolbar"
+                android:id="@+id/toolbarPlayQueue"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/toolbar_content_start"
@@ -55,7 +54,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.navigation.NavigationView
-            android:id="@+id/navigation_view"
+            android:id="@+id/navigationView"
             android:theme="@style/NavigationViewStyle"
             android:layout_width="280dp"
             android:layout_height="match_parent"

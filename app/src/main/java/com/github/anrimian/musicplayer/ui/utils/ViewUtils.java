@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils;
 
+import static android.view.View.VISIBLE;
+import static androidx.core.view.ViewCompat.isLaidOut;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -27,16 +31,14 @@ import androidx.annotation.ColorInt;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.view.ViewCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
-
-import static android.view.View.VISIBLE;
-import static androidx.core.view.ViewCompat.isLaidOut;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 @SuppressWarnings("WeakerAccess")
 public class ViewUtils {
@@ -144,6 +146,13 @@ public class ViewUtils {
         }
     }
 
+    public static void animateItemDrawableColor(ItemDrawable itemDrawable, @ColorInt int color) {
+        int startColor = itemDrawable.getColor();
+        if (startColor != color) {
+            animateColor(startColor, color, itemDrawable::setColor);
+        }
+    }
+
     public static Animator getBackgroundAnimatorAttr(View view,
                                                      @AttrRes int from,
                                                      @AttrRes int to) {
@@ -239,6 +248,10 @@ public class ViewUtils {
                 insertMenuItemIcon(context, menu.getItem(i));
             }
         }
+    }
+
+    public static boolean isRtl(View view) {
+        return view.getResources().getConfiguration().getLayoutDirection() == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
 
     /**

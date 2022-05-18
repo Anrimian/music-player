@@ -81,7 +81,6 @@ import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
-import java.util.*
 import kotlin.math.abs
 
 /**
@@ -481,7 +480,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
                     false
                 )
             }
-        }, 300)
+        }, 1600)
     }
 
     override fun updatePlayQueue(items: List<PlayQueueItem>) {

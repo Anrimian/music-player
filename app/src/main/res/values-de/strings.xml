@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="open_drawer">Navigation öffnen</string>
+    <string name="close_drawer">Navigation schließen</string>
+    <string name="try_again">Nochmal versuchen</string>
+    <string name="can_not_work_without_file_permission">App funktioniert nur mit Zugriff auf den Speicher</string>
+    <string name="close">Schließen</string>
+    <string name="library">Sammlung</string>
+    <string name="settings">Einstellungen</string>
+    <string name="internal_app_error">Interner Softwarefehler</string>
+    <string name="unexpected_error">Fehler: %s</string>
+    <string name="file_not_found">Datei nicht gefunden</string>
+    <string name="compositions_on_device_not_found">Keine Musik auf dem Gerät gefunden</string>
+    <string name="compositions_and_folders_for_search_not_found">Keine passenden Titel oder Ordner gefunden</string>
+    <string name="compositions_for_search_not_found">Keine passenden Suchergebnisse gefunden</string>
+    <string name="foreground_channel_description">Musikwiedergabe</string>
+    <string name="previous_track">Voriger Titel</string>
+    <string name="next_track">Nächster Titel</string>
+    <string name="folder">Ordner</string>
+    <string name="content_description_menu">Menü zum aktuellen Titel öffnen</string>
+    <string name="content_description_menu_template">Titelmenü öffnen: %s</string>
+    <string name="share">Teilen</string>
+    <string name="content_description_repeat_mode">Wiederholmodus</string>
+    <string name="content_description_shuffle">Zufallswiedergabe</string>
+    <string name="unknown_author">Unbekannter Autor</string>
+    <string name="delete">Löschen</string>
+    <string name="delete_folder">Ordner löschen</string>
+    <string name="add_date_order">Nach Hinzufügedatum</string>
+    <string name="order">Sortierung</string>
+    <string name="folders">Ordner</string>
+    <string name="compositions">Titel</string>
+    <string name="play_lists">Playlists</string>
+    <string name="play_lists_on_device_not_found">Keine Playlist auf dem Gerät gefunden</string>
+    <string name="name">Name</string>
+    <string name="create">Erstellen</string>
+    <string name="create_playlist">Playlist erstellen</string>
+    <string name="create_playlist_error_template">Konnte Playlist nicht anlegen: %1$s</string>
+    <string name="change_playlist_name_error_template">Kann Playlist nicht umbenennen: %1$s</string>
+    <string name="name_can_not_be_empty">Name darf nicht leer sein</string>
+    <string name="create_progress">Erstellen …</string>
+    <string name="play_list_with_this_name_already_exists">Es gibt bereits eine Playlist mit diesem Namen</string>
+    <string name="add_to_playlist">Zur Playlist hinzufügen</string>
+    <string name="select_play_list">Playlist auswählen</string>
+    <string name="add_to_playlist_error_template">Kann Titel nicht zur Playlist hinzufügen: %1$s</string>
+    <string name="delete_composition_error_template">Kann den Titel nicht löschen: %1$s</string>
+    <string name="add_to_playlist_success_template">„%1$s“ zur Playlist „%2$s“ hinzugefügt</string>
+    <string name="save_as_play_list">Als Playlist speichern</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="deleting">Löschen</string>
+    <string name="delete_composition_template">„%1$s“ löschen? Kann nicht rückgängig gemacht werden!</string>
+    <string name="delete_empty_folder">Ordner „%s“ löschen? Kann nicht rückgängig gemacht werden!</string>
+    <string name="delete_folder_template">%2$s aus dem Ordner „%1$s“ löschen? Kann nicht rückgängig gemacht werden!</string>
+    <string name="delete_template">„%1$s“ löschen? Kann nicht rückgängig gemacht werden!</string>
+    <string name="delete_composition_success">„%1$s“ gelöscht</string>
+    <string name="search">Suche</string>
+    <string name="play_queue">Wiedergabeliste</string>
+    <string name="pause">Pause</string>
+    <string name="play">Abspielen</string>
+    <string name="play_all">Auswahl wiedergeben</string>
+    <string name="repeat_playlist">Liste wiederholen</string>
+    <string name="repeat_composition">Titel wiederholen</string>
+    <string name="do_not_repeat">Nicht wiederholen</string>
+    <string name="delete_from_queue">Von Wiedergabe entfernen</string>
+    <string name="delete_from_play_list">Von Playlist entfernen</string>
+    <string name="add_item_to_playlist_error_template">Kann Titel nicht zur Playlist hinzufügen: %1$s</string>
+    <string name="delete_from_playlist_success_template">„%1$s“ von der Playlist „%2$s“ entfernt</string>
+    <string name="delete_playlist_template">Playlist „%1$s“ löschen?</string>
+    <string name="play_list_delete_error">Kann Playlist nicht löschen: %1$s</string>
+    <string name="play_not_exists">Playlist existiert nicht</string>
+    <string name="play_list_deleted">Playlist „%1$s“ wurde gelöscht</string>
+    <string name="can_not_receive_file_for_send">Datei zum Senden nicht gefunden: %1$s</string>
+    <string name="position_template">Aktuelle Abspielposition: %1$s</string>
+    <string name="now_playing_template">Jetzt läuft: %1$s. Liste öffnen.</string>
+    <string name="play_all_in_folder">Ganzen Ordner abspielen</string>
+    <string name="delete_playlist">Playlist löschen</string>
+    <string name="storage_timeout_error_message">
+        Der Medienspeicher des Geräts antwortet nicht.
+        Das ist ein seltsamer und sehr seltener Fehler.
+        Vielleicht verschwindet das Problem mit einem Neustart des Geräts.
+    </string>
+    <string name="select_all">Alle auswählen</string>
+    <string name="file_uri_extract_error">
+        Kann den Dateipfad nicht finden, um „%s“ zu senden.
+        Vielleicht liegt die Datei in einem geschützten Systemordner.
+    </string>
+    <string name="loading_progress">Lädt …</string>
+    <string name="alphabetical_order_desc_title">Z–A</string>
+    <string name="add_date_order_desc_title">Neustes zuerst</string>
+    <string name="play_action">Abspielen</string>
+    <string name="play_next">als nächstes</string>
+    <string name="add_to_play_queue">Zur Wiedergabe hinzufügen</string>
+    <string name="edit_name">Umbenennen</string>
+    <string name="change">Ändern</string>
+    <string name="no_current_composition">Kein Titel ausgewählt</string>
+    <string name="show_covers">Cover anzeigen</string>
+    <string name="show_covers_in_notification">Cover in Benachrichtigung anzeigen</string>
+    <string name="colored_notification">Benachrichtigung in den Farben des Covers einfärben</string>
+    <string name="display">Ansicht</string>
+    <string name="decrease_volume_on_notification">Lautstärke verringern, wenn eine Benachrichtigung erscheint</string>
+    <string name="playing">Wiedergabe</string>
+    <string name="error_channel_description">Wiedergabefehler</string>
+    <string name="playing_error">Wiedergabefehler</string>
+    <string name="no_file_permission">Kein Dateizugriff</string>
+    <string name="about_app">Über die App</string>
+    <string name="version_template">Version %1$s(Build %2$d)</string>
+    <string name="theme">Design</string>
+    <string name="dark_theme">Dunkel</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="edit_tags">Tags bearbeiten</string>
+    <string name="change_author_name">Interpret ändern</string>
+    <string name="change_title">Titel ändern</string>
+    <string name="title">Titel</string>
+    <string name="filename">Dateiname</string>
+    <string name="artist">Interpret</string>
+    <string name="change_file_name">Dateiname ändern</string>
+    <string name="copied_message">Text kopiert</string>
+    <string name="folder_name">Ordnername</string>
+    <string name="rename_folder">Ordner umbenennen</string>
+    <string name="cut">Ausschneiden</string>
+    <string name="copy">Kopieren</string>
+    <string name="paste">Einfügen</string>
+    <string name="paste_in_new_folder">In neuen Ordner einfügen</string>
+    <string name="move_in_the_same_folder_error">Ziel- und Ausgangsordner sind identisch</string>
+    <string name="file_already_exists">Es gibt bereits eine Datei mit diesem Namen</string>
+    <string name="new_folder">Neuer Ordner</string>
+    <string name="play_on_connect_bluetooth_device">Wiedergabe starten, sobald Bluetooth-Gerät verbunden ist</string>
+    <string name="headset">Kopfhörer</string>
+    <string name="scan_storage">Medienspeicher neu einlesen</string>
+    <string name="auto_night_mode">Automatischer Nachtmodus</string>
+    <string name="unsupported_format_hint">Nicht unterstützes Format</string>
+    <string name="artists">Interpreten</string>
+    <string name="no_artists_in_library">Kein Interpret in der Sammlung</string>
+    <string name="albums">Alben</string>
+    <string name="no_albums_in_library">Kein Album in der Sammlung</string>
+    <string name="genres">Genres</string>
+    <string name="no_genres_in_library">Kein Genre in der Sammlung</string>
+    <string name="no_items_in_genre">Keine Titel im ausgewählten Genre</string>
+    <string name="no_compositions">Keine Titel</string>
+    <string name="change_album_name">Album ändern</string>
+    <string name="album">Album</string>
+    <string name="genre">Genre</string>
+    <string name="change_composition_genre">Genre des Titels ändern</string>
+    <string name="change_name">Name ändern</string>
+    <string name="rename_progress">Umbenennen …</string>
+    <string name="album_artist">Herausgeber</string>
+    <string name="change_album_artist">Herausgeber ändern</string>
+    <string name="edit_album_tags">Albumdetails ändern</string>
+    <string name="by_composition_count">Nach Titelanzahl</string>
+    <string name="by_duration">Nach Spieldauer</string>
+    <string name="longest_first">Längstes zuerst</string>
+    <string name="more_first">Meiste zuerst</string>
+    <string name="artist_already_exists">Es gibt bereits einen Interpreten dieses Namens</string>
+    <string name="album_already_exists">Es gibt bereits ein Album mit diesem Namen</string>
+    <string name="genre_already_exists">Es gibt bereits ein Genre mit diesem Namen</string>
+    <string name="remove_genre">Genre entfernen</string>
+    <string name="add_composition_genre">Genre hinzufügen</string>
+    <string name="add">Hinzufügen</string>
+    <string name="edit_genre">Genre bearbeiten</string>
+    <string name="genre_removed_message">Genre „%s“ wurde entfernt</string>
+    <string name="exclude_from_scanning">Ignorieren</string>
+    <string name="ignored_folder_added">„%s“ wurde zur Liste der ignorierten Ordner hinzugefügt</string>
+    <string name="excluded_folders">Ignorierte Ordner</string>
+    <string name="remove_excluded_folder">Von Ignorier-Liste entfernen</string>
+    <string name="ignored_folder_removed">Der Ordner wird jetzt wieder berücksichtigt</string>
+    <string name="moving_and_destination_folders_matches">Zielordner ist identisch mit dem zu verschiebenden Ordner</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Im Zielordner gibt es bereits einen Ordner dieses Namens</string>
+    <string name="move_progress">Verschieben …</string>
+    <string name="delete_progress">Löschen …</string>
+    <string name="play_next_message_single">„%s“ wird als nächstes abgespielt</string>
+    <string name="added_to_queue_message_single">„%s“ wurde am Ende der Wiedergabeliste hinzugefügt</string>
+    <string name="queue_item_removed">Titel entfernt</string>
+    <string name="by_size">Nach Größe</string>
+    <string name="largest_first">Größtes zuerst</string>
+    <string name="log_info_text">Kleinere Fehler sind aufgetreten und wurden in der Logdatei protokolliert. Die Anwendung sendet die Logdatei nicht automatisch an den Entwickler, sie kann aber manuell verschickt werden. Das hilft, die Qualität der App zu verbessern. Aktuelle Größe der Logdatei: %d kB</string>
+    <string name="view_file">Datei ansehen</string>
+    <string name="send_file">Datei senden</string>
+    <string name="delete_file">Datei löschen</string>
+    <string name="log_file_deleted">Logdatei gelöscht</string>
+    <string name="pick_email_app_to_send">E-Mail-Programm zum Verschicken auswählen</string>
+    <string name="clear_play_queue">Wiedergabeliste leeren</string>
+    <string name="no_excluded_folders">Hier erscheinen Ordner, die bei der Suche nach Musikdateien ignoriert werden</string>
+    <string name="keep_playing_after_window_close">Weiterspielen, auch wenn Fenster geschlossen wurde</string>
+    <string name="unknown_play_error">Unbekannter Abspielfehler</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="system_equalizer">System-Equalizer</string>
+    <string name="no_equalizer">Keiner</string>
+    <string name="external_equalizer_description">Die Funktion hängt von einer externen Equalizer-Anwendung ab, die einige Apps möglicherweise nicht unterstützt</string>
+    <string name="external_equalizer_not_found">Externe Equalizer-App nicht gefunden</string>
+    <string name="open">Öffnen</string>
+    <string name="cover">Cover</string>
+    <string name="change_cover">Cover ändern</string>
+    <string name="pick_from_gallery">Aus Galerie wählen</string>
+    <string name="remove_cover">Cover entfernen</string>
+    <string name="editor_timeout_error">Tag-Bearbeitung abgebrochen. Vielleicht wird das Dateiformat nicht unterstützt</string>
+    <string name="change_lyrics">Lyrics ändern</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="check_tags_error">Überprüfung des Tags fehlgeschlagen: %s</string>
+    <string name="changing_file_progress">Datei ändern …</string>
+    <string name="android_r_edit_file_permission_denied">
+        Um Dateien zu bearbeiten oder zu löschen, ist seit Android 11 eine ausdrückliche Systemberechtigung notwendig
+    </string>
+    <string name="error_report">Fehlerbericht</string>
+    <string name="critical_error_report_message">Ein schwerwiegender Fehler ist aufgetreten, darum kann diese App nicht starten. Solche Fehler sollten nicht passieren. Die App verschickt Fehlerberichte nicht automatisch, aber eine Logdatei über den Fehler kann manuell per E-Mail versendet werden. Das hilft, den Fehler zu beseitigen.</string>
+    <string name="error_report_message">Ein schwerwiegender Fehler ist aufgetreten. Die App verschickt Fehlerberichte nicht automatisch, aber eine Logdatei über den Fehler kann manuell per E-Mail versendet werden. Das hilft, den Fehler zu beseitigen.</string>
+    <string name="show_error_report_dialog_on_start">Fehlerbericht anzeigen, wenn die App nach einem Absturz neu gestartet wird</string>
+    <string name="do_not_show_confirm_delete_dialog">Beim Löschen keinen Bestätigungsdialog anzeigen</string>
+    <string name="app_equalizer">App-Equalizer</string>
+    <string name="presets">Vorauswahl</string>
+    <string name="playback_speed">Abspielgeschwindigkeit</string>
+    <string name="reset">Zurücksetzen</string>
+    <string name="apply">Anwenden</string>
+    <string name="sleep_timer">Schlummerfunktion</string>
+    <string name="start">Starten</string>
+    <string name="resume">Fortsetzen</string>
+    <string name="sleep_timer_message">Wiedergabe endet in:</string>
+    <string name="stop">Stoppen</string>
+    <string name="exclude_compositions_with_duration_less_than">Musikdateien bei der Suche ignorieren</string>
+    <string name="with_duration_less_than">kürzer als %s</string>
+    <string name="pause_on_audiofocus_loss">Wiedergabe pausieren bei Anruf, Ton-/Video-Wiedergabe, etc.</string>
+    <string name="show_cover_stub_in_notification">Einen Platzhalter anzeigen, wenn kein Cover gefunden wird</string>
+    <string name="write_to_this_is_not_allowed">Keine Berechtigung, um diese Datei zu verändern. Vielleicht klappt es mit dem Dateimanager.</string>
+    <string name="shuffle_all_and_play">Alle durchmischen und abspielen</string>
+    <string name="rewind">Zurückspulen</string>
+    <string name="fast_forward">Schneller Vorlauf</string>
+    <string name="show_covers_on_lock_screen">Cover auf Sperrbildschirm und bei Android Auto anzeigen</string>
+    <string name="equalizer_initialization_error">App-Equalizer konnte nicht geladen werden. Bitte neu starten.</string>
+    <string name="restart">Neu starten</string>
+    <string name="scan_storage_description">In der Regel erscheinen alle Änderungen bei Dateien auf dem Gerät automatisch. Auf manchen Geräten oder Systemen funktioniert das aber nicht. Diese Schaltfläche startet die Dateisuche manuell.</string>
+    <string name="scanning_completed">Durchsuchen abgeschlossen</string>
+    <string name="pause_on_zero_volume_level">Wiedergabe pausieren wenn Lautstärke auf Null gesetzt wird</string>
+    <string name="covers">Cover</string>
+    <string name="display_composition_file_name">Statt des Titels den Dateinamen anzeigen</string>
+    <string name="name_order">Nach Name</string>
+    <string name="file_name_order">Nach Dateiname</string>
+    <string name="play_list_is_empty">Playlist ist leer. Titel können im Bereich „Sammlung“ hinzugefügt werden.</string>
+    <string name="file_scanner_state">Durchsuche Datei-Infos: %s</string>
+    <string name="show_all_audio_files">Alle Audiodateien anzeigen</string>
+    <string name="enabled_media_players">Aktivierte Mediaplayer</string>
+    <string name="advanced_settings">Erweiterte Einstellungen</string>
+    <string name="media_players_setting_description">Die App verwendet verschiedene Mediaplayer um Musik abzuspielen. Hier können sie deaktiviert oder anders gewichtet werden. Alle Änderungen werden erst nach einem Neustart der App wirksam.</string>
+    <string name="sound_balance">Audio-Balance</string>
+    <string name="sound_balance_state">Links: %1$d%%, Rechts: %2$d%%</string>
+    <string name="language">Sprache</string>
+    <string name="follow_system_language">Nach Systemsprache richten</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s Titel</item>
+        <item quantity="other">%1$s Titel</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s Titel</item>
+        <item quantity="other">%1$s Titel</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s Datei</item>
+        <item quantity="other">%1$s Dateien</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s Album</item>
+        <item quantity="other">%1$s Alben</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s Titel wird als nächstes abgespielt</item>
+        <item quantity="other">%s Titel werden als nächstes abgespielt</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s Titel zur Wiedergabeliste hinzugefügt</item>
+        <item quantity="other">%s Titel zur Wiedergabeliste hinzugefügt</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d Titel zu „%2$s“ hinzugefügt</item>
+        <item quantity="other">%1$d Titel zu „%2$s“ hinzugefügt</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d Titel aus „%2$s“ entfernt</item>
+        <item quantity="other">%1$d Titel aus „%2$s“ entfernt</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d Titel gelöscht</item>
+        <item quantity="other">%1$d Titel gelöscht</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d Sekunde</item>
+        <item quantity="other">%1$d Sekunden</item>
+    </plurals>
+
+</resources>

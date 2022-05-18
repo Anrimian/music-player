@@ -5,6 +5,7 @@ sourceCompatibility = 11
 //noinspection GroovyUnusedAssignment
 targetCompatibility = 11
 
+
 dependencies {
     def deps = rootProject.ext
 
@@ -12,7 +13,10 @@ dependencies {
 
     compileOnly deps.javaxAnnotation
 
-    testImplementation deps.junit
+    testImplementation deps.junit5
+    testImplementation deps.junit5Params
+    testRuntimeOnly deps.junit5Engine
+    test.useJUnitPlatform()
     testImplementation deps.mockito
 }
 

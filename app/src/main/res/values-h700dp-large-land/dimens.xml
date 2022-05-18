@@ -3,6 +3,7 @@
     <!--widgets-->
     <dimen name="widget_content_margin_vertical">4dp</dimen>
 
-    <dimen name="widget_medium_content_margin_vertical">4dp</dimen>
+    <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
+    <dimen name="widget_medium_controls_bottom_margin">4dp</dimen>
 
 </resources>

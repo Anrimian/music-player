@@ -1,5 +1,15 @@
 package com.github.anrimian.musicplayer.ui.widgets;
 
+import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
+import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_SHUFFLE_NODE;
+import static com.github.anrimian.musicplayer.Constants.Actions.FAST_FORWARD;
+import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
+import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
+import static com.github.anrimian.musicplayer.Constants.Actions.REWIND;
+import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
+import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
+import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,14 +20,6 @@ import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 import com.github.anrimian.musicplayer.utils.Permissions;
-
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_SHUFFLE_NODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
-import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
 
 
 public class WidgetActionsReceiver extends BroadcastReceiver {
@@ -60,6 +62,15 @@ public class WidgetActionsReceiver extends BroadcastReceiver {
             }
             case CHANGE_SHUFFLE_NODE: {
                 interactor.setRandomPlayingEnabled(!interactor.isRandomPlayingEnabled());
+                break;
+            }
+            case REWIND: {
+                interactor.fastSeekBackward();
+                break;
+            }
+            case FAST_FORWARD: {
+                interactor.fastSeekForward();
+                break;
             }
         }
     }

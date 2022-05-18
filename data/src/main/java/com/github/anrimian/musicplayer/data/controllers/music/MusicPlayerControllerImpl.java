@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers;
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
@@ -72,6 +73,9 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
 
 //        mediaPlayer = new AndroidMediaPlayer(context, uiScheduler, sourceRepository, playerErrorParser, analytics, equalizerController);
 //        mediaPlayer = new ExoMediaPlayer(context, sourceRepository, uiScheduler, playerErrorParser, equalizerController);
+
+        //volume reducing by notification: exo player - check, media player - impl, check
+        mediaPlayer.setSoundBalance(settingsRepository.getSoundBalance());
     }
 
     @Override
@@ -111,6 +115,11 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     }
 
     @Override
+    public void setSoundBalance(SoundBalance soundBalance) {
+        mediaPlayer.setSoundBalance(soundBalance);
+    }
+
+    @Override
     public void resume() {
         mediaPlayer.resume();
     }
@@ -144,11 +153,6 @@ public class MusicPlayerControllerImpl implements MusicPlayerController {
     public void setPlaybackSpeed(float speed) {
         mediaPlayer.setPlaySpeed(speed);
         currentSpeedSubject.onNext(speed);
-    }
-
-    @Override
-    public float getCurrentPlaybackSpeed() {
-        return currentSpeedSubject.getValue();
     }
 
     @Override

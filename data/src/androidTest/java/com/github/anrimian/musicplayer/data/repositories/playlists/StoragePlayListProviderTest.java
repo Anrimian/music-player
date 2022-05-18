@@ -1,37 +1,30 @@
 package com.github.anrimian.musicplayer.data.repositories.playlists;
 
-import android.Manifest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import android.content.Context;
 import android.util.Log;
 
 import androidx.collection.LongSparseArray;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.GrantPermissionRule;
 
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import io.reactivex.rxjava3.observers.TestObserver;
 
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-
 public class StoragePlayListProviderTest {
-
-    @Rule
-    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE);
 
     private StoragePlayListsProvider storagePlayListsProvider;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         storagePlayListsProvider = new StoragePlayListsProvider(appContext);

@@ -36,4 +36,9 @@
         <item name="android:enabled">false</item>
     </style>
 
+    <style name="WidgetImageStyle">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+    </style>
+
 </resources>

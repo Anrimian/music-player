@@ -6,12 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
-    app:theme="@style/ToolbarStyle">
-
+    android:theme="@style/ToolbarStyle">
 
     <!--margin end fixes offset on tablets-->
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_internal"
+        android:id="@+id/toolbarInternal"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:paddingEnd="0dp"
@@ -19,47 +18,47 @@
         tools:ignore="RtlSymmetry">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/title_container"
+            android:id="@+id/titleContainer"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize">
 
             <TextView
-                android:id="@+id/tv_title"
+                android:id="@+id/tvTitle"
                 style="@style/ToolbarTitleStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:importantForAccessibility="no"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/tv_subtitle"
-                app:layout_constraintEnd_toStartOf="@id/acv_main"
+                app:layout_constraintBottom_toTopOf="@id/tvSubtitle"
+                app:layout_constraintEnd_toStartOf="@id/acvMain"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constrainedWidth="true"
                 tools:text="ffhjgffhjgffhjgffhjgfkssfffkssfffkssfffkssff"/>
 
             <TextView
-                android:id="@+id/tv_subtitle"
+                android:id="@+id/tvSubtitle"
                 style="@style/ToolbarSubtitleStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:importantForAccessibility="no"
-                app:layout_constraintTop_toBottomOf="@id/tv_title"
-                app:layout_constraintStart_toStartOf="@id/tv_title"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle"
+                app:layout_constraintStart_toStartOf="@id/tvTitle"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/acv_main"
+                app:layout_constraintEnd_toStartOf="@id/acvMain"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintHorizontal_bias="0.0"
                 tools:text="dfffhjgfkssffffhjgfkssffffhjgfkssffflkfssffd"/>
 
             <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/titles_barrier"
+                android:id="@+id/barrierTitles"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="end"
-                app:constraint_referenced_ids="tv_title, tv_subtitle"/>
+                app:constraint_referenced_ids="tvTitle, tvSubtitle"/>
 
             <ImageView
-                android:id="@+id/action_icon"
+                android:id="@+id/ivActionIcon"
                 android:layout_width="@dimen/toolbar_title_menu_button_size"
                 android:layout_height="@dimen/toolbar_title_menu_button_size"
                 android:src="@drawable/ic_arrow_drop_down"
@@ -67,24 +66,24 @@
                 android:contentDescription="@null"
                 app:tint="?attr/toolbarTextColorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/acv_main"
+                app:layout_constraintEnd_toStartOf="@id/acvMain"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@id/titles_barrier"
+                app:layout_constraintStart_toStartOf="@id/barrierTitles"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.6"/>
 
             <FrameLayout
-                android:id="@+id/fl_title_area"
+                android:id="@+id/flTitleArea"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="?selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/action_icon"
+                app:layout_constraintEnd_toEndOf="@id/ivActionIcon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.ActionMenuView
-                android:id="@+id/acv_main"
+                android:id="@+id/acvMain"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginEnd="@dimen/toolbar_control_offset_2"
@@ -98,13 +97,13 @@
     </androidx.appcompat.widget.Toolbar>
 
     <FrameLayout
-        android:id="@+id/toolbar_content_container"
+        android:id="@+id/flToolbarContentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/toolbar_content_start">
 
         <EditText
-            android:id="@+id/et_search"
+            android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="@string/search"
@@ -118,23 +117,23 @@
             tools:ignore="UnusedAttribute" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/selection_mode_container"
+            android:id="@+id/selectionModeContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/tv_selection_count"
+                android:id="@+id/tvSelectionCount"
                 style="@style/ToolbarTitleStyle.Selection"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/acv_selection"
+                app:layout_constraintEnd_toStartOf="@id/acvSelection"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="23" />
 
             <androidx.appcompat.widget.ActionMenuView
-                android:id="@+id/acv_selection"
+                android:id="@+id/acvSelection"
                 android:theme="@style/SelectionOverflowButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"

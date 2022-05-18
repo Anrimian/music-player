@@ -29,6 +29,10 @@ public class SharedPreferencesHelper {
         this.preferences = preferences;
     }
 
+    public SharedPreferences.Editor edit() {
+        return preferences.edit();
+    }
+
     public void putInt(String key, int val) {
         preferences.edit().putInt(key, val).apply();
     }
@@ -191,4 +195,5 @@ public class SharedPreferencesHelper {
     public Set<String> getStringSet(String key) {
         return preferences.getStringSet(key, null);
     }
+
 }

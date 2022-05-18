@@ -171,7 +171,7 @@
         android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/sb_track_state"
-        app:layout_constraintLeft_toLeftOf="@id/tv_played_time">
+        app:layout_constraintStart_toStartOf="@id/tv_played_time">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_music_icon"

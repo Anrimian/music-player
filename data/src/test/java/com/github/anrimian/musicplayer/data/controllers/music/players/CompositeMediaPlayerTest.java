@@ -10,8 +10,8 @@ import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -37,7 +37,7 @@ public class CompositeMediaPlayerTest {
     private final PublishSubject<Long> player1PositionSubject = PublishSubject.create();
     private final PublishSubject<Long> player2PositionSubject = PublishSubject.create();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(player1.getTrackPositionObservable()).thenReturn(player1PositionSubject);
         when(player1.getEventsObservable()).thenReturn(player1EventSubject);

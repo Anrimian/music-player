@@ -28,8 +28,8 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -56,7 +56,7 @@ public class PlayerInteractorTest {
             musicPlayerController,
             systemServiceController);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(musicPlayerController.getEventsObservable()).thenReturn(playerEventSubject);
 

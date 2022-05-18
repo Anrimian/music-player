@@ -1,12 +1,13 @@
 package com.github.anrimian.musicplayer.data.utils.folders;
 
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import io.reactivex.rxjava3.observers.TestObserver;
-
-import static org.junit.Assert.assertEquals;
 
 public class RxNodeTest {
 

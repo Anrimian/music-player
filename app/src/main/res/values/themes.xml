@@ -16,7 +16,7 @@
         <!--<item name="android:windowBackground">@color/dark_background_level_1</item>-->
         <item name="android:colorBackground">@color/dark_background_level_1</item>
         <item name="listBackground">@color/dark_background_level_0</item>
-        <item name="listItemBottomBackground">@color/dark_background_level_0</item>
+        <item name="listItemBottomBackground">@color/popup_menu_background_color_dark</item>
         <item name="listItemBackground">@color/dark_background_level_1</item>
         <item name="popupMenuBackgroundColor">@color/popup_menu_background_color_dark</item>
         <item name="dialogBackground">@color/dialog_background_color_dark</item>
@@ -140,7 +140,6 @@
         <!--background-->
         <item name="android:colorBackground">@android:color/black</item>
         <item name="listBackground">@android:color/black</item>
-        <item name="listItemBottomBackground">@android:color/black</item>
         <item name="listItemBackground">@android:color/black</item>
         <item name="popupMenuBackgroundColor">@color/dark_background_level_0</item>
         <item name="dialogBackground">@color/dark_background_level_0</item>

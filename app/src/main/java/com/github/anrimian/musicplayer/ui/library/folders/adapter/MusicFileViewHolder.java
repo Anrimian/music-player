@@ -3,11 +3,9 @@ package com.github.anrimian.musicplayer.ui.library.folders.adapter;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 
 import android.graphics.Color;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
@@ -21,6 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener;
 
 import java.util.List;
 
@@ -30,10 +29,9 @@ import javax.annotation.Nonnull;
  * Created on 31.10.2017.
  */
 
-public class MusicFileViewHolder extends FileViewHolder {
+public class MusicFileViewHolder extends FileViewHolder implements SwipeListener {
 
     private final CompositionItemWrapper compositionItemWrapper;
-    private final FrameLayout clickableItem;
 
     private CompositionFileSource fileSource;
 
@@ -48,7 +46,6 @@ public class MusicFileViewHolder extends FileViewHolder {
                                OnPositionItemClickListener<CompositionFileSource> menuClickListener) {
         super(parent, R.layout.item_storage_music);
         ItemStorageMusicBinding binding = ItemStorageMusicBinding.bind(itemView);
-        clickableItem = binding.clickableItem;
 
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 iconClickListener,
@@ -59,7 +56,7 @@ public class MusicFileViewHolder extends FileViewHolder {
         );
 
         if (onLongClickListener != null) {
-            clickableItem.setOnLongClickListener(v -> {
+            binding.clickableItem.setOnLongClickListener(v -> {
                 if (selected) {
                     return false;
                 }
@@ -106,7 +103,7 @@ public class MusicFileViewHolder extends FileViewHolder {
             int unselectedColor = (!selected && isCurrent)? getPlaySelectionColor(): Color.TRANSPARENT;
             int selectedColor = getSelectionColor();
             int endColor = selected ? selectedColor : unselectedColor;
-            animateBackgroundColor(clickableItem, endColor);
+            compositionItemWrapper.showStateColor(endColor, true);
         }
     }
 
@@ -117,13 +114,18 @@ public class MusicFileViewHolder extends FileViewHolder {
             int unselectedColor = Color.TRANSPARENT;
             int selectedColor = getMoveSelectionColor();
             int endColor = selected ? selectedColor : unselectedColor;
-            animateBackgroundColor(itemView, endColor);
+            compositionItemWrapper.showStateColor(endColor, true);
         }
     }
 
     @Override
     public FileSource getFileSource() {
         return fileSource;
+    }
+
+    @Override
+    public void onSwipeStateChanged(float swipeOffset) {
+        compositionItemWrapper.showAsSwipingItem(swipeOffset);
     }
 
     public void showCurrentComposition(@Nullable CurrentComposition currentComposition,
@@ -142,16 +144,13 @@ public class MusicFileViewHolder extends FileViewHolder {
         if (this.isCurrent != isCurrent) {
             this.isCurrent = isCurrent;
             if (!selected) {
-                int unselectedColor = Color.TRANSPARENT;
-                int selectedColor = getPlaySelectionColor();
-                int endColor = isCurrent ? selectedColor : unselectedColor;
-                animateBackgroundColor(clickableItem, endColor);
+                compositionItemWrapper.showAsCurrentComposition(isCurrent);
             }
         }
     }
 
     private void selectImmediate() {
-        clickableItem.setBackgroundColor(getSelectionColor());
+        compositionItemWrapper.showStateColor(getSelectionColor(), false);
         selected = true;
     }
 

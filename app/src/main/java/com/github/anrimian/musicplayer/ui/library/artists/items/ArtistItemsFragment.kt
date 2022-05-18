@@ -50,7 +50,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper
 import com.google.android.material.snackbar.Snackbar
 import com.r0adkll.slidr.model.SlidrInterface
 import moxy.ktx.moxyPresenter
-import java.util.*
 
 fun newInstance(artistId: Long): ArtistItemsFragment {
     val args = Bundle()
@@ -128,6 +127,8 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
 
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        ViewUtils.onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
+
         slidrInterface = SlidrPanel.simpleSwipeBack(
             viewBinding.listContainer,
             this,
@@ -309,6 +310,10 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     override fun setDisplayCoversEnabled(isCoversEnabled: Boolean) {
         adapter.setCoversEnabled(isCoversEnabled)
+    }
+
+    override fun showRandomMode(isRandomModeEnabled: Boolean) {
+        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
     }
 
     override fun showCompositionActionDialog(composition: Composition, position: Int) {

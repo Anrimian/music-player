@@ -1,18 +1,19 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
 import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.LocalFolderNode;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class FolderMergerTest {
 

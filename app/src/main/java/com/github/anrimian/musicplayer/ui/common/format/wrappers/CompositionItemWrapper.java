@@ -11,12 +11,16 @@ import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.animateItemDrawableCorners;
 import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateItemDrawableColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.RippleDrawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -25,7 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
@@ -35,6 +39,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable;
 
 import java.util.List;
 
@@ -44,20 +49,21 @@ public class CompositionItemWrapper {
     private final TextView tvAdditionalInfo;
     private final FrameLayout clickableItem;
     private final View divider;
-    @Nullable
     private final ImageView ivPlay;
-    @Nullable
     private final ImageView ivMusicIcon;
-    @Nullable
     private final ImageView btnActionsMenu;
-    @Nullable
     private final View iconClickableArea;
+
+    private final ItemDrawable backgroundDrawable = new ItemDrawable();
+    private final ItemDrawable stateDrawable = new ItemDrawable();
+    private final ItemDrawable rippleMaskDrawable = new ItemDrawable();
 
     private Composition composition;
     private boolean showCovers;
 
     private boolean isCurrent;
     private boolean isDragging;
+    private boolean isSwiping;
 
     public CompositionItemWrapper(View itemView,
                                   Callback<Composition> onIconClickListener,
@@ -71,10 +77,17 @@ public class CompositionItemWrapper {
         btnActionsMenu = itemView.findViewById(R.id.btn_actions_menu);
         iconClickableArea = itemView.findViewById(R.id.icon_clickable_area);
 
-        if (iconClickableArea != null) {
-            iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
-        }
+        iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
         clickableItem.setOnClickListener(v -> onClickListener.call(composition));
+
+        backgroundDrawable.setColor(getColorFromAttr(getContext(), R.attr.listItemBackground));
+        itemView.setBackground(backgroundDrawable);
+        stateDrawable.setColor(Color.TRANSPARENT);
+        clickableItem.setBackground(stateDrawable);
+        clickableItem.setForeground(new RippleDrawable(
+                ColorStateList.valueOf(getColorFromAttr(getContext(), android.R.attr.colorControlHighlight)),
+                null,
+                rippleMaskDrawable));
     }
 
     public void bind(Composition composition, boolean showCovers) {
@@ -94,7 +107,7 @@ public class CompositionItemWrapper {
         for (Object payload: payloads) {
             if (payload instanceof List) {
                 //noinspection SingleStatementInBlock,unchecked
-                update(composition, (List) payload);
+                update(composition, (List<Object>) payload);
             }
             if (payload == FILE_NAME || payload == TITLE) {
                 showCompositionName();
@@ -113,22 +126,18 @@ public class CompositionItemWrapper {
     }
 
     public void showCompositionImage(boolean showCovers) {
-        if (ivMusicIcon != null) {
-            if (showCovers) {
-                Components.getAppComponent().imageLoader().displayImage(ivMusicIcon,
-                        composition,
-                        this::onCoverImageLoadFinished);
-            } else {
-                ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder_simple);
-                ivMusicIcon.setColorFilter(Color.TRANSPARENT);
-            }
+        if (showCovers) {
+            Components.getAppComponent().imageLoader().displayImage(ivMusicIcon,
+                    composition,
+                    this::onCoverImageLoadFinished);
+        } else {
+            ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder_simple);
+            ivMusicIcon.setColorFilter(Color.TRANSPARENT);
         }
     }
 
     public void release() {
-        if (ivMusicIcon != null) {
-            Components.getAppComponent().imageLoader().clearImage(ivMusicIcon);
-        }
+        Components.getAppComponent().imageLoader().clearImage(ivMusicIcon);
     }
 
     public void showAsDraggingItem(boolean dragging) {
@@ -144,6 +153,20 @@ public class CompositionItemWrapper {
         }
     }
 
+    public void showAsSwipingItem(float swipeOffset) {
+        boolean swiping = swipeOffset > 0.0f;
+
+        if (this.isSwiping != swiping) {
+            this.isSwiping = swiping;
+
+            float swipedCorners = getContext().getResources().getDimension(R.dimen.swiped_item_corners);
+            float from = swiping? 0: swipedCorners;
+            float to = swiping? swipedCorners: 0;
+            int duration = getResources().getInteger(R.integer.swiped_item_animation_time);
+            animateItemDrawableCorners(from, to, duration, backgroundDrawable, stateDrawable, rippleMaskDrawable);
+        }
+    }
+
     public void showAsCurrentComposition(boolean isCurrent) {
         if (this.isCurrent != isCurrent) {
             this.isCurrent = isCurrent;
@@ -152,21 +175,25 @@ public class CompositionItemWrapper {
     }
 
     public void showAsPlaying(boolean isPlaying, boolean animate) {
-        if (ivPlay != null) {
-            AndroidUtils.setAnimatedVectorDrawable(ivPlay,
-                    isPlaying? R.drawable.anim_play_to_pause: R.drawable.anim_pause_to_play,
-                    animate);
+        AndroidUtils.setAnimatedVectorDrawable(ivPlay,
+                isPlaying? R.drawable.anim_play_to_pause: R.drawable.anim_pause_to_play,
+                animate);
+    }
+
+    public void showStateColor(@ColorInt int color, boolean animate) {
+        if (animate) {
+            stateDrawable.setColor(color);
+        } else {
+            animateItemDrawableColor(stateDrawable, color);
         }
     }
 
     private void onCoverImageLoadFinished(boolean loaded) {
-        if (ivMusicIcon != null) {
-            int tint = Color.TRANSPARENT;
-            if (loaded) {
-                tint = ContextCompat.getColor(getContext(), R.color.cover_dark_foreground);
-            }
-            ivMusicIcon.setColorFilter(tint);
+        int tint = Color.TRANSPARENT;
+        if (loaded) {
+            tint = ContextCompat.getColor(getContext(), R.color.cover_dark_foreground);
         }
+        ivMusicIcon.setColorFilter(tint);
     }
 
     private void showAsCurrentCompositionInternal(boolean isPlaying) {
@@ -175,36 +202,28 @@ public class CompositionItemWrapper {
             return;
         }
         int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
-        animateBackgroundColor(clickableItem, endColor);
+        animateItemDrawableColor(stateDrawable, endColor);
     }
 
     private void showCompositionName() {
         String compositionName = formatCompositionName(composition);
         tvMusicName.setText(compositionName);
         clickableItem.setContentDescription(compositionName);
-        if (iconClickableArea != null) {
-            iconClickableArea.setContentDescription(compositionName);
-        }
+        iconClickableArea.setContentDescription(compositionName);
     }
 
     private void showCorrupted() {
         float alpha = composition.getCorruptionType() == null? 1f: 0.5f;
         tvMusicName.setAlpha(alpha);
         tvAdditionalInfo.setAlpha(alpha);
-        if (ivMusicIcon != null) {
-            ivMusicIcon.setAlpha(alpha);
-        }
-        if (ivPlay != null) {
-            ivPlay.setAlpha(alpha);
-        }
-        if (btnActionsMenu != null) {
-            btnActionsMenu.setAlpha(alpha);
-        }
+        ivMusicIcon.setAlpha(alpha);
+        ivPlay.setAlpha(alpha);
+        btnActionsMenu.setAlpha(alpha);
     }
 
     private void showAsDragging(boolean dragging) {
         int endColor = getItemDragColor(getContext(), dragging? 20: 0);
-        animateBackgroundColor(clickableItem, endColor);
+        animateItemDrawableColor(stateDrawable, endColor);
     }
 
     private void showAdditionalInfo() {
@@ -237,5 +256,9 @@ public class CompositionItemWrapper {
 
     private Context getContext() {
         return clickableItem.getContext();
+    }
+
+    private Resources getResources() {
+        return getContext().getResources();
     }
 }

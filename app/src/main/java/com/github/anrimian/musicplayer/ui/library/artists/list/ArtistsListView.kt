@@ -4,8 +4,8 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
 import moxy.MvpView
+import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
@@ -15,25 +15,25 @@ const val RENAME_STATE = "rename_state"
 
 interface ArtistsListView : MvpView {
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showEmptyList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showEmptySearchResult()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showLoading()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showLoadingError(errorCommand: ErrorCommand)
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = RENAME_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = RENAME_STATE)
     fun showRenameProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = RENAME_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = RENAME_STATE)
     fun hideRenameProgress()
 
     @AddToEndSingle

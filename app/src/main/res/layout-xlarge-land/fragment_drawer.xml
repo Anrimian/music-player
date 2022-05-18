@@ -55,7 +55,7 @@
 
                 <include
                     layout="@layout/partial_queue_toolbar"
-                    android:id="@+id/toolbar_play_queue"
+                    android:id="@+id/toolbarPlayQueue"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:layout_marginStart="@dimen/content_horizontal_margin" />
@@ -116,7 +116,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.navigation.NavigationView
-            android:id="@+id/navigation_view"
+            android:id="@+id/navigationView"
             android:theme="@style/NavigationViewStyle"
             android:layout_width="280dp"
             android:layout_height="match_parent"

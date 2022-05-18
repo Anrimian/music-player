@@ -5,11 +5,13 @@ import android.net.Uri;
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController;
 import com.github.anrimian.musicplayer.data.controllers.music.error.PlayerErrorParser;
+import com.github.anrimian.musicplayer.data.controllers.music.players.exoplayer.StereoVolumeProcessor;
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceProvider;
 import com.github.anrimian.musicplayer.data.utils.exo_player.PlayerEventListener;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.FinishedEvent;
@@ -17,9 +19,17 @@ import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PreparedEvent;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.RenderersFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.audio.AudioCapabilities;
+import com.google.android.exoplayer2.audio.AudioProcessor;
+import com.google.android.exoplayer2.audio.AudioSink;
+import com.google.android.exoplayer2.audio.DefaultAudioSink;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -50,6 +60,8 @@ public class ExoMediaPlayer implements AppMediaPlayer {
     private final PlayerErrorParser playerErrorParser;
     private final EqualizerController equalizerController;
 
+    private final StereoVolumeProcessor stereoVolumeProcessor = new StereoVolumeProcessor();
+
     private volatile ExoPlayer player;
 
     @Nullable
@@ -72,6 +84,8 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         this.uiScheduler = uiScheduler;
         this.ioScheduler = ioScheduler;
         this.equalizerController = equalizerController;
+
+        stereoVolumeProcessor.setChannelMap(new int[] { 0, 1 } );
     }
 
     @Override
@@ -190,6 +204,11 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         return Observable.fromCallable(() -> true);
     }
 
+    @Override
+    public void setSoundBalance(SoundBalance soundBalance) {
+        stereoVolumeProcessor.setVolume(soundBalance.getLeft(), soundBalance.getRight());
+    }
+
     private void startPlayWhenReady() {
         Completable.fromRunnable(() -> {
             getPlayer().setPlayWhenReady(true);
@@ -299,8 +318,9 @@ public class ExoMediaPlayer implements AppMediaPlayer {
         if (player == null) {
             synchronized (this) {
                 if (player == null) {
+                    RenderersFactory factory = createSimpleRenderersFactory(context, stereoVolumeProcessor);
 
-                    player = new ExoPlayer.Builder(context)
+                    player = new ExoPlayer.Builder(context, factory)
                             .build();
 
                     PlayerEventListener playerEventListener = new PlayerEventListener(
@@ -322,6 +342,27 @@ public class ExoMediaPlayer implements AppMediaPlayer {
             }
         }
         return player;
+    }
+
+    private RenderersFactory createSimpleRenderersFactory(Context context,
+                                                          AudioProcessor... audioProcessors) {
+        return new DefaultRenderersFactory(context) {
+
+            @Override
+            protected AudioSink buildAudioSink(Context context1,
+                                               boolean enableFloatOutput,
+                                               boolean enableAudioTrackPlaybackParams,
+                                               boolean enableOffload) {
+                return new DefaultAudioSink(
+                        AudioCapabilities.getCapabilities(context1),
+                        new DefaultAudioSink.DefaultAudioProcessorChain(audioProcessors),
+                        enableFloatOutput,
+                        enableAudioTrackPlaybackParams,
+                        enableOffload
+                                ? DefaultAudioSink.OFFLOAD_MODE_ENABLED_GAPLESS_REQUIRED
+                                : DefaultAudioSink.OFFLOAD_MODE_DISABLED);
+            }
+        };
     }
 
 }

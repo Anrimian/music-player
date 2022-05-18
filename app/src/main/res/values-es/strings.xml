@@ -203,7 +203,7 @@
     <string name="critical_error_report_message">Se produjo un error grave y debido a esto la aplicación no puede iniciarse. La aparición de estos errores es altamente indeseable. La aplicación no envía ningún dato automaticamente, pero se puede enviar el archivo de registro de errores manualmente por correo electrónico.</string>
     <string name="error_report_message">Se produjo un error grave. La app no envía ningún dato automaticamente, pero se puede enviar el archivo de registro de errores manualmente por correo electrónico. Eso ayudará a corregir este error.</string>
     <string name="show_error_report_dialog_on_start">Mostrar el diálogo de informe de errores al iniciar la aplicación una vez que la app se bloquee</string>
-    <!-- not verified-->
+    <!--not verified-->
     <string name="do_not_show_confirm_delete_dialog">No mostrar el cuadro de diálogo de confirmación de eliminación de la aplicación</string>
     <string name="app_equalizer">Ecualizador de aplicaciones</string>
     <!---->
@@ -216,7 +216,7 @@
     <string name="resume">Reiniciar</string>
     <string name="sleep_timer_message">Reproducción se detendrá en:</string>
     <string name="stop">Parar</string>
-    <!-- not verified-->
+    <!--not verified-->
     <string name="exclude_compositions_with_duration_less_than">Excluir composiciones del escaneo</string>
     <string name="with_duration_less_than">Con duración inferior a %s</string>
     <string name="pause_on_audiofocus_loss">Deje de jugar en llamadas, reproducción de música / video, etc.</string>
@@ -241,6 +241,12 @@
     <string name="enabled_media_players">Reproductores multimedia habilitados</string>
     <string name="advanced_settings">Ajustes avanzados</string>
     <string name="media_players_setting_description">La aplicación utiliza varios reproductores multimedia para reproducir música. Aquí se pueden desactivar o cambiar la prioridad de uso. Todos los cambios entrarán en vigor solo después de reiniciar la aplicación.</string>
+    <!---->
+    <!--not verified-->
+    <string name="sound_balance">Balance de sonido</string>
+    <string name="sound_balance_state">Izquierda: %1$d%%, Derecha: %2$d%%</string>
+    <string name="language">Idioma</string>
+    <string name="follow_system_language">Seguir el idioma del sistema</string>
     <!---->
 
     <plurals name="compositions_count">

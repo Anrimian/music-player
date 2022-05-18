@@ -24,6 +24,14 @@ public class ViewUtils {
                 runnable));
     }
 
+    public static void onLongVibrationClick(View view, Runnable onClick) {
+        view.setOnLongClickListener(v -> {
+            AndroidUtils.playShortVibration(view.getContext());
+            onClick.run();
+            return true;
+        });
+    }
+
     public static ListPosition getListPosition(LinearLayoutManager layoutManager) {
         int position = layoutManager.findFirstVisibleItemPosition();
         View v = layoutManager.findViewByPosition(position);

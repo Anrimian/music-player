@@ -56,6 +56,7 @@ public class LibraryFoldersScreenInteractor {
 
     public Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
                                                             @Nullable String searchQuery) {
+        //on receive remove files from move/copy of they are not present in list
         return foldersInteractor.getFoldersInFolder(folderId, searchQuery);
     }
 
@@ -155,7 +156,7 @@ public class LibraryFoldersScreenInteractor {
         } else if (!filesToCopy.isEmpty()) {
             completable = Completable.error(new Exception("not implemented"));
         } else {
-            throw new IllegalStateException("unexpected state");
+            completable = Completable.complete();
         }
         return completable.doOnComplete(this::stopMoveMode);
     }
@@ -170,7 +171,7 @@ public class LibraryFoldersScreenInteractor {
         } else if (!filesToCopy.isEmpty()) {
             completable = Completable.error(new Exception("not implemented"));
         } else {
-            throw new IllegalStateException("unexpected state");
+            completable = Completable.complete();
         }
         return completable.doOnComplete(this::stopMoveMode);
     }

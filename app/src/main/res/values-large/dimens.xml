@@ -29,8 +29,8 @@
     <!--widgets-->
     <dimen name="widget_content_spacing_margin">8dp</dimen>
 
-    <dimen name="widget_medium_content_margin_vertical">16dp</dimen>
-    <dimen name="widget_medium_content_margin_horizontal">16dp</dimen>
-    <dimen name="widget_medium_content_spacing_margin_vertical">8dp</dimen>
-    <dimen name="widget_medium_content_spacing_margin_horizontal">4dp</dimen>
+    <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">8dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_vertical">4dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_horizontal">6dp</dimen>
 </resources>

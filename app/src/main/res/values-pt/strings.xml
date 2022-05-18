@@ -203,9 +203,9 @@
     <string name="critical_error_report_message">Ocorreu um erro fatal e, devido a este aplicativo, não é possível iniciar. O aparecimento desses erros é altamente indesejado. O aplicativo não envia nenhuma informação automaticamente, mas você pode enviar o arquivo com o log de erros manualmente por e-mail. Isso ajudará a corrigir esse erro.</string>
     <string name="error_report_message">Ocorreu um erro fatal. O aplicativo não envia nenhuma informação automaticamente, mas você pode enviar o arquivo com o log de erros manualmente por e-mail. Isso ajudará a corrigir esse erro.</string>
     <string name="show_error_report_dialog_on_start">Mostrar caixa de diálogo de relatório de erro ao iniciar o aplicativo após o travamento do aplicativo</string>
-    <!-- not verified-->
+    <!--not verified-->
     <string name="do_not_show_confirm_delete_dialog">Não mostrar a caixa de diálogo de confirmação de exclusão do aplicativo</string>
-    <!--    -->
+    <!---->
     <string name="app_equalizer">Equalizador de aplicativo</string>
     <string name="presets">Predefinidos</string>
     <string name="playback_speed">Velocidade de reprodução</string>
@@ -216,7 +216,7 @@
     <string name="resume">Retomar</string>
     <string name="sleep_timer_message">O reprodutor será interrompido em:</string>
     <string name="stop">Pare</string>
-    <!-- not verified-->
+    <!--not verified-->
     <string name="exclude_compositions_with_duration_less_than">Excluir composições da digitalização</string>
     <string name="with_duration_less_than">Com duração menor que %s</string>
     <string name="pause_on_audiofocus_loss">Pare de tocar na chamada, reprodução de música / vídeo, etc.</string>
@@ -241,7 +241,13 @@
     <string name="enabled_media_players">Reproductores multimedia habilitados</string>
     <string name="advanced_settings">Ajustes avanzados</string>
     <string name="media_players_setting_description">La aplicación utiliza vários reproductores multimedia para reproducir música. Aquí se pueden desactivar o cambiar la prioridad de uso. Todos los cambios entrarán en vigor solo después del reinicio de la aplicación.</string>
-    <!--    -->
+    <!---->
+    <!--not verified-->
+    <string name="sound_balance">Equilíbrio de som</string>
+    <string name="sound_balance_state">Esquerda: %1$d%%, Direita: %2$d%%</string>
+    <string name="language">Idioma</string>
+    <string name="follow_system_language">Siga o idioma do sistema</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s música</item>

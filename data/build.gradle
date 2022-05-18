@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: "de.mannodermaus.android-junit5"
 
 android {
     def config = rootProject.ext
@@ -10,7 +11,9 @@ android {
     defaultConfig {
         minSdkVersion config.androidMinSdkVersion
         targetSdkVersion config.androidTargetSdkVersion
+
         testInstrumentationRunner config.testInstrumentationRunner
+        testInstrumentationRunnerArguments["runnerBuilder"] = config.testJunit5Builder
 
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_11
@@ -59,12 +62,16 @@ dependencies {
 
     implementation deps.jAudioTagger
 
-    testImplementation deps.junit
+    testImplementation deps.junit5
+    testImplementation deps.junit5Params
+    testRuntimeOnly deps.junit5Engine
     testImplementation deps.mockito
     testImplementation deps.mockitoKt
 
-    androidTestImplementation deps.junit
-    androidTestImplementation deps.supportTest
+    androidTestImplementation deps.androidXTestRunner
+    androidTestImplementation deps.junit5
+    androidTestImplementation deps.junit5PluginCore
+    androidTestRuntimeOnly deps.junit5PluginRunner
     androidTestImplementation deps.espresso
     androidTestImplementation deps.rules
     androidTestImplementation deps.rxJavaExt

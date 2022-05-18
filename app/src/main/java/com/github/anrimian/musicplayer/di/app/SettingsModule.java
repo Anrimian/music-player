@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl;
+import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
@@ -73,8 +74,11 @@ public class SettingsModule {
 
     @Provides
     @Nonnull
-    PlayerSettingsInteractor playerSettingsInteractor(SettingsRepository settingsRepository) {
-        return new PlayerSettingsInteractor(settingsRepository);
+    PlayerSettingsInteractor playerSettingsInteractor(
+            SettingsRepository settingsRepository,
+            MusicPlayerController musicPlayerController
+    ) {
+        return new PlayerSettingsInteractor(settingsRepository, musicPlayerController);
     }
 
     @Provides

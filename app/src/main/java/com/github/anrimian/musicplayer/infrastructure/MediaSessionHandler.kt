@@ -14,6 +14,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.widget.Toast
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource
+import com.github.anrimian.musicplayer.data.utils.rx.retryWithDelay
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
@@ -40,6 +41,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
+import java.util.concurrent.TimeUnit
 
 private const val REPEAT_ACTION_ID = "repeat_action_id"
 private const val SHUFFLE_ACTION_ID = "shuffle_action_id"
@@ -273,7 +275,8 @@ class MediaSessionHandler(private val context: Context,
                 libraryPlayerInteractor.playQueueObservable.toObservable(),
                 playerInteractor.currentSourceObservable,
                 ::toSessionQueueItems
-        ).subscribe(this::onPlayQueueReceived))
+        ).retryWithDelay(10, 10, TimeUnit.SECONDS)
+            .subscribe(this::onPlayQueueReceived))
     }
 
     private fun onPlayQueueReceived(playQueue: List<MediaSessionCompat.QueueItem>) {

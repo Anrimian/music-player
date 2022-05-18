@@ -239,6 +239,12 @@
     <string name="enabled_media_players">Ενεργές εφαρμογές πολυμέσων</string>
     <string name="advanced_settings">Για προχωρημένους</string>
     <string name="media_players_setting_description">Η εφαρμογή χρησιμοποιεί ορισμένες εφαρμογές πολυμέσων για την αναπαραγωγή μουσικής. Εδώ μπορούνε να απενεργοποιηθούν ή να αλλαχθεί η προτεραιότητα χρήσης τους. όλες οι αλλαγές θα εφαρμοστούν μόνο μετά την επανεκκίνηση της εφαρμογής.</string>
+    <!--not verified-->
+    <string name="sound_balance">Υπόλοιπο ήχου</string>
+    <string name="sound_balance_state">Αριστερά: %1$d%%, Δεξιά: %2$d%%</string>
+    <string name="language">Γλώσσα</string>
+    <string name="follow_system_language">Ακολουθήστε τη γλώσσα συστήματος</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s τραγούδι</item>

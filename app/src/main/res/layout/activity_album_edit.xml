@@ -18,7 +18,7 @@
             android:minHeight="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:elevation="8dp"
-            app:theme="@style/ToolbarStyle"
+            android:theme="@style/ToolbarStyle"
             app:titleTextColor="?attr/toolbarTextColorPrimary"
             app:subtitleTextColor="?attr/toolbarTextColorSecondary"
             tools:title="Title"/>

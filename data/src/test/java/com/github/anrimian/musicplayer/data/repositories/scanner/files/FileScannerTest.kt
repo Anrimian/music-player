@@ -12,8 +12,8 @@ import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.schedulers.TestScheduler
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.*
 import java.util.concurrent.TimeUnit
@@ -36,7 +36,7 @@ class FileScannerTest {
 
     private val testStateObserver = fileScanner.getStateObservable().test()
 
-    @Before
+    @BeforeEach
     fun setUp() {
         whenever(stateRepository.currentFileScannerVersion).thenReturn(1)
         whenever(stateRepository.lastFileScannerVersion).thenReturn(1)

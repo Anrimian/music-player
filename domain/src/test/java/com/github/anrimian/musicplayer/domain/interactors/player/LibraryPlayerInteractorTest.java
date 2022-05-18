@@ -27,8 +27,8 @@ import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -55,7 +55,7 @@ public class LibraryPlayerInteractorTest {
             playerCoordinatorInteractor,
             musicProviderRepository);
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(playQueueRepository.setPlayQueue(any())).thenReturn(Completable.complete());
         when(playQueueRepository.setPlayQueue(any(), anyInt())).thenReturn(Completable.complete());

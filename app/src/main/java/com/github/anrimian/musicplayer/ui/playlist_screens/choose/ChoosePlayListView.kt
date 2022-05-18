@@ -2,8 +2,8 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.choose
 
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
 import moxy.MvpView
+import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
@@ -12,13 +12,13 @@ private const val LIST_STATE = "list_state"
 
 interface ChoosePlayListView : MvpView {
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showEmptyList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showLoading()
 
     @AddToEndSingle

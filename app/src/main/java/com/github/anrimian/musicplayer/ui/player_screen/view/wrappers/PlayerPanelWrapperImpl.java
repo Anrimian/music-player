@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.wrappers;
 
+import static android.view.View.INVISIBLE;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getResourceIdFromAttr;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -32,11 +37,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
-import static android.view.View.INVISIBLE;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getResourceIdFromAttr;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
 
 public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
 
@@ -179,7 +179,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         boundDelegateManager
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(queueToolbarBinding.getRoot())))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarVisibilityDelegate(toolbar))))
-                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(toolbarBinding.toolbarContentContainer))))
+                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(toolbarBinding.flToolbarContentContainer))))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
                 .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(viewBinding.drawerFragmentContainer))))
@@ -223,7 +223,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     private void setViewStartState() {
         clPlayQueueContainer.setVisibility(INVISIBLE);
         queueToolbarBinding.getRoot().setVisibility(INVISIBLE);
-        toolbarBinding.toolbarContentContainer.setVisibility(INVISIBLE);
+        toolbarBinding.flToolbarContentContainer.setVisibility(INVISIBLE);
         toolbarBinding.titleContainer.setVisibility(INVISIBLE);
     }
 

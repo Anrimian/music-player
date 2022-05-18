@@ -50,6 +50,7 @@ class PlayListPresenter(private val playListId: Long,
         subscribeOnCompositions()
         subscribePlayList()
         subscribeOnCurrentComposition()
+        subscribeOnRepeatMode()
     }
 
     override fun onDestroy() {
@@ -174,6 +175,10 @@ class PlayListPresenter(private val playListId: Long,
                 .doFinally { lastDeleteAction = null }
                 .justSubscribe(this::onDeleteCompositionsError)
         }
+    }
+
+    fun onChangeRandomModePressed() {
+        playerInteractor.isRandomPlayingEnabled = !playerInteractor.isRandomPlayingEnabled
     }
 
     fun isCoversEnabled() = displaySettingsInteractor.isCoversEnabled()
@@ -314,6 +319,11 @@ class PlayListPresenter(private val playListId: Long,
 
     private fun onCurrentCompositionReceived(playQueueEvent: PlayQueueEvent) {
         currentItem = playQueueEvent.playQueueItem
+    }
+
+    private fun subscribeOnRepeatMode() {
+        playerInteractor.randomPlayingObservable
+            .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
     }
 
 }

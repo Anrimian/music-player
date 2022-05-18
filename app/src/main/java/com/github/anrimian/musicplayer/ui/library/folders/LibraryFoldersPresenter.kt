@@ -59,6 +59,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         subscribeOnFolder()
         subscribeOnChildFolders()
         subscribeOnUiSettings()
+        subscribeOnRepeatMode()
         subscribeOnMoveEnabledState()
     }
 
@@ -385,6 +386,10 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
     }
 
+    fun onChangeRandomModePressed() {
+        playerInteractor.isRandomPlayingEnabled = !playerInteractor.isRandomPlayingEnabled
+    }
+
     fun getSelectedMoveFiles(): LinkedHashSet<FileSource> = interactor.filesToMove
 
     fun getSelectedFiles() = selectedFiles
@@ -565,5 +570,10 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     private fun subscribeOnMoveEnabledState() {
         interactor.moveModeObservable.unsafeSubscribeOnUi(viewState::showMoveFileMenu)
+    }
+
+    private fun subscribeOnRepeatMode() {
+        playerInteractor.randomPlayingObservable
+            .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
     }
 }

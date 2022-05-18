@@ -9,6 +9,7 @@ import static com.github.anrimian.musicplayer.ui.common.view.ViewUtils.setOnHold
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
@@ -89,6 +90,11 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
             Uri uriToPlay = getIntent().getData();
             createCompositionSource(uriToPlay);
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(Components.getAppComponent().localeController().dispatchAttachBaseContext(base));
     }
 
     @Override

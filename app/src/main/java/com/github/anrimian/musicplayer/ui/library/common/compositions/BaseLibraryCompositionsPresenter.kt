@@ -18,8 +18,6 @@ import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashSet
 
 abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>(
         private val playerInteractor: LibraryPlayerInteractor,
@@ -49,6 +47,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         subscribeOnUiSettings()
+        subscribeOnRepeatMode()
         subscribeOnCompositions()
     }
 
@@ -213,6 +212,10 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         }
     }
 
+    fun onChangeRandomModePressed() {
+        playerInteractor.isRandomPlayingEnabled = !playerInteractor.isRandomPlayingEnabled
+    }
+
     fun getSelectedCompositions(): HashSet<Composition> = selectedCompositions
 
     fun getSearchText() = searchText
@@ -334,6 +337,11 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     private fun subscribeOnUiSettings() {
         displaySettingsInteractor.getCoversEnabledObservable()
             .subscribeOnUi(viewState::setDisplayCoversEnabled, errorParser::logError)
+    }
+
+    private fun subscribeOnRepeatMode() {
+        playerInteractor.randomPlayingObservable
+            .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
     }
 
     protected abstract fun getCompositionsObservable(searchText: String?): Observable<List<Composition>>

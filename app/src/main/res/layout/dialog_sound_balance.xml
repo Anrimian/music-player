@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/tvLeftValue"
+        style="@style/TextStyle.Subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/content_margin"
+        android:layout_marginTop="@dimen/content_vertical_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/sbSoundBalance"
+        tools:text="0.00"/>
+
+    <TextView
+        android:id="@+id/tvRightValue"
+        style="@style/TextStyle.Subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/content_margin"
+        app:layout_constraintBottom_toBottomOf="@id/tvLeftValue"
+        app:layout_constraintEnd_toEndOf="@id/sbSoundBalance"
+        tools:text="2.00"/>
+
+    <SeekBar
+        style="@style/SeekBarStyle"
+        android:id="@+id/sbSoundBalance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/content_spacing_margin"
+        android:paddingBottom="@dimen/content_spacing_margin"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        app:layout_constraintTop_toBottomOf="@id/tvLeftValue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

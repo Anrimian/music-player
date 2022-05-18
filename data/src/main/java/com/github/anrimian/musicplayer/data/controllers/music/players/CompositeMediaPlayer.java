@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players;
 
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
 import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.domain.models.player.events.ErrorEvent;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
@@ -32,6 +33,7 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
     private long currentTrackPosition;
 
     private float currentPlaySpeed = 1f;
+    private SoundBalance currentSoundBalance;
 
     public CompositeMediaPlayer(ArrayList<Function<AppMediaPlayer>> mediaPlayers) {
         this.mediaPlayers = mediaPlayers;
@@ -112,6 +114,12 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         return speedChangeAvailableSubject;
     }
 
+    @Override
+    public void setSoundBalance(SoundBalance soundBalance) {
+        this.currentSoundBalance = soundBalance;
+        currentPlayer.setSoundBalance(currentSoundBalance);
+    }
+
     private void setPlayer(int index) {
         currentPlayerIndex = index;
         if (currentPlayer != null) {
@@ -119,6 +127,9 @@ public class CompositeMediaPlayer implements AppMediaPlayer {
         }
         currentPlayer = mediaPlayers.get(index).call();
         currentPlayer.setPlaySpeed(currentPlaySpeed);
+        if (currentSoundBalance != null) {
+            currentPlayer.setSoundBalance(currentSoundBalance);
+        }
 
         playerDisposable.clear();
         playerDisposable.add(currentPlayer.getEventsObservable()

@@ -239,6 +239,12 @@
     <string name="enabled_media_players">Povolené přehrávače médií</string>
     <string name="advanced_settings">Pokročilé</string>
     <string name="media_players_setting_description">Aplikace používá mnoho přehrávačů médií pro přehrávání. Zde je můžete zakázat nebo jim změnit prioritu. Změny se projeví po restartování aplikace.</string>
+    <!--not verified-->
+    <string name="sound_balance">Vyvážení zvuku</string>
+    <string name="sound_balance_state">Vlevo: %1$d%%, vpravo: %2$d%%</string>
+    <string name="language">Jazyk</string>
+    <string name="follow_system_language">Postupujte v jazyce systému</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s píseň</item>

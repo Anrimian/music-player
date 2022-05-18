@@ -4,6 +4,7 @@ import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEU
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -51,6 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
             startScreens();
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(Components.getAppComponent().localeController().dispatchAttachBaseContext(base));
     }
 
     @Override

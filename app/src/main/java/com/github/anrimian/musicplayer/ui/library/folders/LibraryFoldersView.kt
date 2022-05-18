@@ -9,8 +9,8 @@ import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleStateByTagStrategy
 import moxy.MvpView
+import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
@@ -26,37 +26,37 @@ private const val PROGRESS_DIALOG_STATE = "progress_dialog_state"
 
 interface LibraryFoldersView : MvpView {
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showEmptyList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showEmptySearchResult()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showList()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showLoading()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = LIST_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showError(errorCommand: ErrorCommand)
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = FOLDER_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = FOLDER_STATE)
     fun showFolderInfo(folder: FolderFileSource)
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = FOLDER_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = FOLDER_STATE)
     fun hideFolderInfo()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
     fun hideProgressDialog()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
     fun showMoveProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
     fun showDeleteProgress()
 
-    @StateStrategyType(value = SingleStateByTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
     fun showRenameProgress()
 
     @OneExecution
@@ -112,6 +112,9 @@ interface LibraryFoldersView : MvpView {
 
     @AddToEndSingle
     fun setDisplayCoversEnabled(isCoversEnabled: Boolean)
+
+    @AddToEndSingle
+    fun showRandomMode(isRandomModeEnabled: Boolean)
 
     @Skip
     fun showInputFolderNameDialog(folder: FolderFileSource)

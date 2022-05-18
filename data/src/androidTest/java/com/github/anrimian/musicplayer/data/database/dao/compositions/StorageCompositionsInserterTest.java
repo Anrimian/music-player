@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static utils.TestDataProvider.composition;
+
 import android.content.Context;
 
 import androidx.collection.LongSparseArray;
@@ -19,17 +22,14 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageCompo
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import utils.TestDataProvider;
-
-import static org.junit.Assert.assertEquals;
-import static utils.TestDataProvider.composition;
 
 public class StorageCompositionsInserterTest {
 
@@ -42,7 +42,7 @@ public class StorageCompositionsInserterTest {
 
     private StorageCompositionsInserter inserter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();

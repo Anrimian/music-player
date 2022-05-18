@@ -9,6 +9,8 @@ public interface Constants {
         int SKIP_TO_PREVIOUS = 4;
         int CHANGE_SHUFFLE_NODE = 5;
         int CHANGE_REPEAT_MODE = 6;
+        int REWIND = 7;
+        int FAST_FORWARD = 8;
     }
 
     interface Arguments {

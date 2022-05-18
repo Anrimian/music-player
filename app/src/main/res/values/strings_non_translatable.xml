@@ -17,10 +17,11 @@
     <string name="system_media_store_system_error" translatable="false">Android system can\'t find the system media storage. This is very strange and rare issue on android 10. Try to restart app or reboot the device, perhaps it will solve this problem.</string>
     <string name="empty_string" translatable="false"/>
 
-    <string name="widget_small_name" translatable="false">4x1: Small</string>
+    <string name="widget_small_name" translatable="false">3x1: Small</string>
     <string name="widget_small_ext_name" translatable="false">4x1: Small extended</string>
-    <string name="widget_medium_name" translatable="false">4x2: Medium</string>
-    <string name="playback_speed_template" translatable="false">%.2fX</string>
+    <string name="widget_medium_name" translatable="false">5x1: Medium</string>
+    <string name="playback_speed_template" translatable="false">%.2fx</string>
+    <string name="percent_template" translatable="false">%d%%</string>
 
     <string name="android_media_player" translatable="false">Android media player</string>
     <string name="exo_media_player" translatable="false">Google exo player</string>

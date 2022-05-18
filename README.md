@@ -17,5 +17,6 @@ SiltyNiKE - Ukrainian localization\
 Petr Knyttl - Czech localization\
 By Burhan 2010 - Turkish localization\
 Emmanuel Yaro - French localization\
-Frantzis Orestis - Greek localization
+Frantzis Orestis - Greek localization\
+Gerhard Großmann - German localization
 

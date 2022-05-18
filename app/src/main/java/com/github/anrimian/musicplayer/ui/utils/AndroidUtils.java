@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.ui.utils;
 
+import static android.text.TextUtils.isEmpty;
+import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+import static androidx.core.content.ContextCompat.getColor;
+
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -12,6 +17,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -37,7 +43,6 @@ import android.widget.Toast;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
 import androidx.annotation.DimenRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
@@ -50,12 +55,10 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.text.TextUtils.isEmpty;
-import static android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
-import static androidx.core.content.ContextCompat.getColor;
 
 /**
  * Created on 16.02.2017.
@@ -341,13 +344,29 @@ public class AndroidUtils {
         }
     }
 
-    public static int getContrastColor(Context context,
-                                       @ColorInt int color,
-                                       @ColorRes int resultColorDark,
-                                       @ColorRes int resultColorLight) {
-        return isContrastColorDark(color)?
-                getColor(context, resultColorDark)
-                : getColor(context, resultColorLight);
+    public static void animateItemDrawableCorners(float from,
+                                                  float to,
+                                                  int duration,
+                                                  ItemDrawable... drawables) {
+        ValueAnimator animator = ValueAnimator.ofFloat(from, to);
+        animator.setDuration(duration);
+        animator.addUpdateListener(animation -> {
+            float corners = (Float) animation.getAnimatedValue();
+            for (ItemDrawable drawable: drawables) {
+                drawable.setCornerRadius(0, corners, corners, 0);
+            }
+        });
+        animator.start();
+    }
+
+    public static int getContrastColor(@ColorInt int color,
+                                       @ColorInt int resultColorDark,
+                                       @ColorInt int resultColorLight) {
+        return isContrastColorDark(color)? resultColorDark : resultColorLight;
+    }
+
+    public static int getContrastColor(@ColorInt int color) {
+        return getContrastColor(color, Color.BLACK, Color.WHITE);
     }
 
     public static boolean isContrastColorDark(@ColorInt int color) {

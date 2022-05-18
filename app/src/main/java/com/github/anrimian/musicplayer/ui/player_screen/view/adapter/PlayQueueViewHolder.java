@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import javax.annotation.Nonnull;
  * Created on 31.10.2017.
  */
 
-class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListener {
+class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListener, SwipeListener {
 
     private final CompositionItemWrapper compositionItemWrapper;
 
@@ -49,11 +50,15 @@ class PlayQueueViewHolder extends RecyclerView.ViewHolder implements DragListene
         compositionItemWrapper.showAsDraggingItem(dragging);
     }
 
+    @Override
+    public void onSwipeStateChanged(float swipeOffset) {
+        compositionItemWrapper.showAsSwipingItem(swipeOffset);
+    }
+
     void bind(@Nonnull PlayQueueItem item, boolean showCovers) {
         this.playQueueItem = item;
         Composition composition = item.getComposition();
         compositionItemWrapper.bind(composition, showCovers);
-//        compositionItemWrapper.showNumber(getAdapterPosition());
     }
 
     void update(PlayQueueItem item, List<Object> payloads) {

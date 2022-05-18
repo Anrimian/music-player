@@ -1,5 +1,11 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static utils.TestDataProvider.composition;
+
 import android.content.Context;
 
 import androidx.room.Room;
@@ -11,15 +17,9 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static utils.TestDataProvider.composition;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CompositionsDaoWrapperTest {
 
@@ -30,7 +30,7 @@ public class CompositionsDaoWrapperTest {
 
     private CompositionsDaoWrapper daoWrapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
@@ -41,7 +41,7 @@ public class CompositionsDaoWrapperTest {
         daoWrapper = new CompositionsDaoWrapper(db, artistsDao, compositionsDao, albumsDao);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         db.close();
     }

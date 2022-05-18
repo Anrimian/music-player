@@ -54,6 +54,9 @@ interface BaseLibraryCompositionsView : ListMvpView<Composition> {
     @AddToEndSingle
     fun setDisplayCoversEnabled(isCoversEnabled: Boolean)
 
+    @AddToEndSingle
+    fun showRandomMode(isRandomModeEnabled: Boolean)
+
     @OneExecution
     fun onCompositionsAddedToPlayNext(compositions: List<Composition>)
 

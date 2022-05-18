@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--content margins-->
+    <dimen name="content_spacing_margin">8dp</dimen>
+    <dimen name="content_internal_margin">8dp</dimen>
+    <dimen name="content_vertical_margin">16dp</dimen>
+
+    <!--list margins-->
+    <dimen name="list_vertical_margin">14dp</dimen>
+
+    <!--checkbox-->
+    <dimen name="checkbox_text_vertical_padding">16dp</dimen>
+
+    <!--radio button-->
+    <dimen name="radio_button_text_vertical_padding">15dp</dimen>
+
+</resources>

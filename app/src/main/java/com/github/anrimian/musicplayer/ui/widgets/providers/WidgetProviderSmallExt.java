@@ -22,6 +22,11 @@ import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
 public class WidgetProviderSmallExt extends BaseWidgetProvider {
 
     @Override
+    protected int getRemoteViewId() {
+        return R.layout.widget_small_ext;
+    }
+
+    @Override
     protected void applyViewLogic(RemoteViews widgetView,
                                   AppWidgetManager appWidgetManager,
                                   int widgetId,
@@ -76,10 +81,5 @@ public class WidgetProviderSmallExt extends BaseWidgetProvider {
                 intentChangeRepeatMode,
                 AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
         widgetView.setOnClickPendingIntent(R.id.iv_repeat_mode, pIntentChangeRepeatMode);
-    }
-
-    @Override
-    protected int getRemoteViewId() {
-        return R.layout.widget_small_ext;
     }
 }

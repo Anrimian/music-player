@@ -47,10 +47,13 @@
     <style name="ButtonOutlineStyle" parent="@style/Widget.AppCompat.Button">
         <item name="android:background">@drawable/bg_outline_button</item>
         <item name="android:textColor">@color/color_accent_state</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
     </style>
 
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/color_text_primary</item>
+        <item name="android:textAlignment">viewStart</item>
     </style>
 
     <style name="TextStyleItemPrimary" parent="TextStyle">
@@ -75,6 +78,7 @@
         <item name="android:paddingStart">@dimen/toolbar_content_start</item>
         <item name="android:paddingEnd">@dimen/content_horizontal_margin</item>
         <item name="android:textSize">17sp</item>
+        <item name="android:textAlignment">viewStart</item>
     </style>
 
     <style name="TextStyleButtonSingle" parent="@style/Base.TextAppearance.AppCompat.Body1">
@@ -92,7 +96,7 @@
     </style>
 
     <style name="Content.SecondaryText" parent="@style/Base.TextAppearance.AppCompat.Caption">
-
+        <item name="android:textAlignment">viewStart</item>
     </style>
 
     <style name="TextStyleContentSubtitle" parent="Content.SecondaryText">
@@ -169,6 +173,8 @@
         <item name="android:layout_height">40dp</item>
         <item name="shapeAppearance">@style/ShapeAppearance.CircleImageView</item>
     </style>
+
+    <style name="ImageStyle.QueueItemImage" parent="ImageStyle.ItemImage"/>
 
     <style name="ShapeAppearance.CircleImageView" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>

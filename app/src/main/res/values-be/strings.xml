@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="open_drawer">Адкрыць бакавое меню</string>
+    <string name="close_drawer">Закрыць блокавае меню</string>
+    <string name="try_again">Паспрабаваць зноў</string>
+    <string name="can_not_work_without_file_permission">Прыкладанне не можа працаваць без дазволу на доступ да файлаў</string>
+    <string name="close">Закрыць</string>
+    <string name="library">Бібліятэка</string>
+    <string name="settings">Налады</string>
+    <string name="internal_app_error">Унутраная памылка прыкладання</string>
+    <string name="unexpected_error">Памылка: %s</string>
+    <string name="file_not_found">Файл не знойдзены</string>
+    <string name="compositions_on_device_not_found">Кампазіцый на прыладзе не знойдзена</string>
+    <string name="compositions_and_folders_for_search_not_found">Кампазіцый і тэчак, якія падыходзяць пад вынікі пошуку, не знойдзена</string>
+    <string name="compositions_for_search_not_found">Кампазіцый, якія падыходзяць пад вынікі пошуку, не знойдзена</string>
+    <string name="foreground_channel_description">Апавяшчэнне аб прайграванні музыкі</string>
+    <string name="previous_track">Папярэдні трэк</string>
+    <string name="next_track">Наступны трэк</string>
+    <string name="folder">Тэчка</string>
+    <string name="content_description_menu">Адкрыць меню бягучай кампазіцыі</string>
+    <string name="content_description_menu_template">Адкрыць меню кампазіцыі: %s</string>
+    <string name="share">Адправіць</string>
+    <string name="content_description_repeat_mode">Меню рэжыму паўтору</string>
+    <string name="content_description_shuffle">Змяшаць кампазіцыі</string>
+    <string name="unknown_author">Невядомы выканаўца</string>
+    <string name="delete">Выдаліць</string>
+    <string name="delete_folder">Выдаліць тэчку</string>
+    <string name="add_date_order">Па даце дадання</string>
+    <string name="order">Сартаванне</string>
+    <string name="folders">Тэчкі</string>
+    <string name="compositions">Кампазіцыі</string>
+    <string name="play_lists">Плейлісты</string>
+    <string name="play_lists_on_device_not_found">Плэйлістоў на прыладзе не знойдзена</string>
+    <string name="name">Назва</string>
+    <string name="create">Стварыць</string>
+    <string name="create_playlist">Стварэнне плэйліста</string>
+    <string name="create_playlist_error_template">Немагчыма стварыць плэйліст: %1$s</string>
+    <string name="change_playlist_name_error_template">Немагчыма змяніць імя плэйліста: %1$s</string>
+    <string name="name_can_not_be_empty">імя не можа быць пустым</string>
+    <string name="create_progress">Стварэнне…</string>
+    <string name="play_list_with_this_name_already_exists">плэйліст з такім імем ужо існуе</string>
+    <string name="add_to_playlist">Дадаць у плэйліст</string>
+    <string name="select_play_list">Абярыце плэйліст</string>
+    <string name="add_to_playlist_error_template">Немагчыма дадаць кампазіцыю ў плэйліст: %1$s</string>
+    <string name="delete_composition_error_template">Немагчыма выдаліць кампазіцыю: %1$s</string>
+    <string name="add_to_playlist_success_template">Кампазіцыя \"%1$s\" дададзена ў плэйліст \"%2$s\"</string>
+    <string name="save_as_play_list">Захаваць як плэйліст</string>
+    <string name="cancel">Адмена</string>
+    <string name="deleting">Выдаленне</string>
+    <string name="delete_composition_template">
+        Выдаліць кампазіцыю \"%1$s\"?
+        Гэтае дзеянне нельга будзе адмяніць.
+    </string>
+    <string name="delete_folder_template">Выдаліць %2$s з тэчкі \"%1$s\"? Гэтае дзеянне нельга будзе адмяніць.</string>
+    <string name="delete_empty_folder">Выдаліць тэчку \"%s\"? Гэтае дзеянне нельга будзе адмяніць.</string>
+    <string name="delete_template">Выдаліць %1$s? Гэтае дзеянне нельга будзе адмяніць.</string>
+    <string name="delete_composition_success">Кампазіцыя \"%1$s\" выдалена</string>
+    <string name="search">Пошук</string>
+    <string name="play_queue">Чарга прайгравання</string>
+    <string name="pause">Паўза</string>
+    <string name="play">Гуляць</string>
+    <string name="play_all">Гуляць усё</string>
+    <string name="repeat_playlist">Паўтараць плэйліст</string>
+    <string name="repeat_composition">Паўтараць кампазіцыю</string>
+    <string name="do_not_repeat">Не паўтараць</string>
+    <string name="delete_from_queue">Выдаліць з чаргі</string>
+    <string name="delete_from_play_list">Выдаліць з плэйліста</string>
+    <string name="add_item_to_playlist_error_template">Немагчыма дадаць кампазіцыю ў плэйліст: %1$s</string>
+    <string name="delete_from_playlist_success_template">Кампазіцыя \"%1$s\" выдалена з плэйліста \"%2$s\"</string>
+    <string name="delete_playlist_template">Выдаліць плэйліст \"%1$s\"?</string>
+    <string name="play_list_delete_error">Немагчыма выдаліць плэйліст: %1$s</string>
+    <string name="play_not_exists">плэйліст не існуе</string>
+    <string name="play_list_deleted">Плейліст \"%1$s\" выдалены</string>
+    <string name="can_not_receive_file_for_send">Немагчыма атрымаць файлы для адпраўкі: %1$s</string>
+    <string name="position_template">Бягучы час прайгравання: %1$s</string>
+    <string name="now_playing_template">Цяпер прайграе: %1$s. Адкрыць чаргу прайгравання.</string>
+    <string name="play_all_in_folder">Прайграць усё ў тэчцы</string>
+    <string name="delete_playlist">Выдаліць плэйліст</string>
+    <string name="storage_timeout_error_message">Медыя сховішча прылады не адказвае. Гэта вельмі дзіўная і рэдкая памылка. Паспрабуйце перазагрузіць прыладу, магчыма, гэта вырашыць гэтую праблему.</string>
+    <string name="select_all">Вылучыць усё</string>
+    <string name="file_uri_extract_error">Не атрымалася атрымаць сістэмны шлях да кампазіцыі \"%s\" для адпраўкі. Магчыма, яна ў зачыненай сістэмнай тэчцы.</string>
+    <string name="loading_progress">Загрузка…</string>
+    <string name="alphabetical_order_desc_title">Я - А</string>
+    <string name="add_date_order_desc_title">Спачатку познія</string>
+    <string name="play_action">Прайграць</string>
+    <string name="play_next">Прайграць наступным</string>
+    <string name="add_to_play_queue">Дадаць у чаргу</string>
+    <string name="edit_name">Перайменаваць</string>
+    <string name="change">Змяніць</string>
+    <string name="no_current_composition">Няма бягучай кампазіцыі</string>
+    <string name="show_covers">Паказваць вокладкі</string>
+    <string name="show_covers_in_notification">Паказваць вокладку ў апавяшчэнні</string>
+    <string name="colored_notification">Афарбоўваць апавяшчэнне ў колеры вокладкі</string>
+    <string name="display">Адлюстраванне</string>
+    <string name="decrease_volume_on_notification">Змяншаць гучнасць пры атрыманні апавяшчэння</string>
+    <string name="playing">Прайграванне</string>
+    <string name="error_channel_description">Апавяшчэнні пра памылкі</string>
+    <string name="playing_error">Памылка прайгравання</string>
+    <string name="no_file_permission">Няма дазволу на доступ да файлаў</string>
+    <string name="about_app">Аб дадатку</string>
+    <string name="version_template">Версія %1$s(Зборка %2$d)</string>
+    <string name="theme">Тэма афармлення</string>
+    <string name="dark_theme">Цёмная</string>
+    <string name="edit">Рэдагаваць</string>
+    <string name="edit_tags">Рэдагаваць тэгі</string>
+    <string name="change_author_name">Змяніць імя выканаўцы</string>
+    <string name="change_title">Змяніць назву</string>
+    <string name="title">Назва</string>
+    <string name="filename">Імя файла</string>
+    <string name="artist">Выканаўца</string>
+    <string name="change_file_name">Змяніць імя файла</string>
+    <string name="copied_message">Тэкст скапіяваны</string>
+    <string name="folder_name">Імя тэчкі</string>
+    <string name="rename_folder">Перайменаваць тэчку</string>
+    <string name="cut">Выразаць</string>
+    <string name="copy">Капіяваць</string>
+    <string name="paste">Уставіць</string>
+    <string name="paste_in_new_folder">Уставіць у новую тэчку</string>
+    <string name="move_in_the_same_folder_error">Мэтавая і зыходная тэчка супадаюць</string>
+    <string name="file_already_exists">Файл з такім імем ужо існуе</string>
+    <string name="new_folder">Новая тэчка</string>
+    <string name="play_on_connect_bluetooth_device">Пачынаць прайграванне пры падключэнні bluetooth гарнітуры</string>
+    <string name="headset">Гарнітура</string>
+    <string name="scan_storage">Перасканаваць сістэмную бібліятэку</string>
+    <string name="auto_night_mode">Аўтаматычная цёмная тэма</string>
+    <string name="unsupported_format_hint">Непадтрымліваемы фармат</string>
+    <string name="artists">Выканаўцы</string>
+    <string name="no_artists_in_library">Няма выканаўцаў у бібліятэцы</string>
+    <string name="albums">Альбомы</string>
+    <string name="no_albums_in_library">Няма альбомаў у бібліятэцы</string>
+    <string name="genres">Жанры</string>
+    <string name="no_genres_in_library">Няма жанраў у бібліятэцы</string>
+    <string name="no_items_in_genre">Няма кампазіцый у абраным жанры</string>
+    <string name="no_compositions">Няма кампазіцый</string>
+    <string name="change_album_name">Змяніць альбом</string>
+    <string name="album">Альбом</string>
+    <string name="genre">Жарн</string>
+    <string name="change_composition_genre">Змяніць жанр кампазіцыі</string>
+    <string name="change_name">Змяніць імя</string>
+    <string name="rename_progress">Перайменаванне…</string>
+    <string name="album_artist">Аўтар альбома</string>
+    <string name="change_album_artist">Змяніць аўтара альбома</string>
+    <string name="edit_album_tags">Рэдагаваць тэгі альбома</string>
+    <string name="by_composition_count">Па колькасці кампазіцый</string>
+    <string name="by_duration">Па працягласці</string>
+    <string name="longest_first">Спачатку доўгія</string>
+    <string name="more_first">Спачатку больш</string>
+    <string name="artist_already_exists">Выканаўца з такім імем ужо існуе</string>
+    <string name="album_already_exists">Альбом з такім імем ужо існуе</string>
+    <string name="genre_already_exists">Жанр з такім імем ужо існуе</string>
+    <string name="remove_genre">Выдаліць жанр</string>
+    <string name="add_composition_genre">Дадаць жанр</string>
+    <string name="add">Дадаць</string>
+    <string name="edit_genre">Змяніць жанр</string>
+    <string name="genre_removed_message">Жанр \"%s\" прыбраны</string>
+    <string name="exclude_from_scanning">Схаваць</string>
+    <string name="ignored_folder_added">Тэчка \'%s\' дададзена ў спіс ігнараваных тэчак</string>
+    <string name="excluded_folders">Ігнаруемыя тэчкі</string>
+    <string name="remove_excluded_folder">Прыбраць ігнараваную тэчку</string>
+    <string name="ignored_folder_removed">Ігнаруемая тэчка прыбрана</string>
+    <string name="moving_and_destination_folders_matches">Перамяшчаная і мэтавая тэчка супадае</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Тэчка з такім імем ужо існуе ў мэтавай тэчцы</string>
+    <string name="move_progress">Перамяшчэнне…</string>
+    <string name="delete_progress">Выдаленне…</string>
+    <string name="play_next_message_single">Кампазіцыя \"%s\" будзе прайграна наступнай</string>
+    <string name="added_to_queue_message_single">Кампазіцыя \"%s\" дададзена ў канец чаргі прайгравання</string>
+    <string name="queue_item_removed">Элемент чаргі выдалены</string>
+    <string name="by_size">Па памеры</string>
+    <string name="largest_first">Спачатку вялікія</string>
+    <string name="log_info_text">Адбыліся некаторыя нефатальныя памылкі і інфармацыя пра іх была запісаная ў файл логаў. Прыкладанне не адсылае логі аўтаматычна, але вы можаце адправіць іх самі. Гэта дапаможа палепшыць якасць прыкладання. Бягучы памер файла логаў: %d KB</string>
+    <string name="view_file">Прагледзець файл</string>
+    <string name="send_file">Адправіць файл</string>
+    <string name="delete_file">Выдаліць файл</string>
+    <string name="log_file_deleted">Файл выдалены</string>
+    <string name="pick_email_app_to_send">Абярыце прыкладанне email для адпраўкі</string>
+    <string name="clear_play_queue">Ачысціць чаргу прайгравання</string>
+    <string name="no_excluded_folders">Тэчкі, выключаныя з медыя сканара, будуць з\'яўляцца тут</string>
+    <string name="keep_playing_after_window_close">Працягваць прайграванне пасьле зачынення акна</string>
+    <string name="unknown_play_error">Невядомая памылка прайгравання</string>
+    <string name="equalizer">Эквалайзер</string>
+    <string name="system_equalizer">Сістэмны эквалайзер</string>
+    <string name="no_equalizer">Не выкарыстоўваць</string>
+    <string name="external_equalizer_description">Праца сістэмнага эквалайзера залежыць ад знешняга дадатку-эквалайзера і можа не працаваць з некаторымі праграмамі</string>
+    <string name="external_equalizer_not_found">Вонкавы дадатак-эквалайзер не знойдзены</string>
+    <string name="open">Адкрыць</string>
+    <string name="cover">Выкладка</string>
+    <string name="change_cover">Змяніць вокладку</string>
+    <string name="pick_from_gallery">Выбраць з галерэі</string>
+    <string name="remove_cover">Прыбраць вокладку</string>
+    <string name="editor_timeout_error">Час чакання рэдактара тэгаў скончыўся. Магчыма, фармат файла не падтрымліваецца</string>
+    <string name="change_lyrics">Змяніць тэкст кампазіцыі</string>
+    <string name="lyrics">Тэкст кампазіцыі</string>
+    <string name="check_tags_error">Немагчыма праверыць тэгі кампазіцыі: %s</string>
+    <string name="changing_file_progress">Змена файла…</string>
+    <string name="android_r_edit_file_permission_denied">
+        Пачынаючы з Android 11 рэдагаванне і выдаленне файлаў патрабуе прамога дазволу ад сістэмы
+    </string>
+    <string name="error_report">Справаздача пра памылку</string>
+    <string name="critical_error_report_message">Адбылася фатальная памылка і з-за гэтага прыкладанне не можа запусціцца. З\'яўленне такіх памылак вельмі непажадана. Прыкладанне не адсылае ніякай інфармацыі аўтаматычна, але вы можаце адправіць файл са справаздачай аб памылцы ўручную па пошце. Гэта дапаможа выправіць гэтую памылку.</string>
+    <string name="error_report_message">Адбылася фатальная памылка. Прыкладанне не адсылае ніякай інфармацыі аўтаматычна, але вы можаце адправіць файл са справаздачай аб памылцы ўручную па пошце. Гэта дапаможа выправіць гэтую памылку.</string>
+    <string name="show_error_report_dialog_on_start">Паказваць справаздачу аб памылцы пры запуску прыкладання пасля збояў</string>
+    <string name="do_not_show_confirm_delete_dialog">Не паказваць дыялогавае акно пацверджання выдалення</string>
+    <string name="app_equalizer">Экалайзер прыкладання</string>
+    <string name="presets">Прэсеты</string>
+    <string name="playback_speed">Хуткасць прайгравання</string>
+    <string name="reset">Скінуць</string>
+    <string name="apply">Ужыць</string>
+    <string name="sleep_timer">Таймер сну</string>
+    <string name="start">Старт</string>
+    <string name="resume">Аднавіць</string>
+    <string name="sleep_timer_message">Прайграванне будзе спынена праз:</string>
+    <string name="stop">Стоп</string>
+    <string name="exclude_compositions_with_duration_less_than">Не сканаваць кампазіцыі</string>
+    <string name="with_duration_less_than">З працягласць меншай за %s</string>
+    <string name="pause_on_audiofocus_loss">Спыняць прайграванне пры званку, прайграванні музыкі/відэа і да т.п.</string>
+    <string name="show_cover_stub_in_notification">Паказваць заглушку вокладкі ў апавяшчэнні калі вокладка не знойдзена</string>
+    <string name="write_to_this_is_not_allowed">Няма дазволу на змяненне гэтага файла. Паспрабуйце праз сістэмны менеджэр файлаў.</string>
+    <string name="shuffle_all_and_play">Змяшаць усё і пачаць прайграванне</string>
+    <string name="rewind">Перамотка назад</string>
+    <string name="fast_forward">Перамотка наперад</string>
+    <string name="show_covers_on_lock_screen">Паказваць вокладку на экране блакавання і ў android auto</string>
+    <string name="equalizer_initialization_error">Немагчыма запусціць эквалайзер. Паспрабуйце зноў.</string>
+    <string name="restart">Перазапусціць</string>
+    <string name="scan_storage_description">Звычайна ўсе змены з файламі на прыладзе адлюстроўваюцца аўтаматычна. Але на некаторых прыладах ці версіях сістэмы гэта не працуе. Гэтая кнопка запускае сканіраванне файлаў уручную.</string>
+    <string name="scanning_completed">Сканіраванне завершана</string>
+    <string name="pause_on_zero_volume_level">Спыняць прайграванне калі ўзровень гучнасці апускаецца да нуля</string>
+    <string name="covers">Вокладкі</string>
+    <string name="display_composition_file_name">Адлюстроўваць імя файла замест назвы кампазіцыі</string>
+    <string name="name_order">Па імені</string>
+    <string name="file_name_order">Па імені файла</string>
+    <string name="play_list_is_empty">Плейліст пусты. Кампазіцыі могуць быць дададзены ў плэйліст на экранах бібліятэкі</string>
+    <string name="file_scanner_state">Сканаванне тэгаў файла: %s</string>
+    <string name="show_all_audio_files">Паказваць усе аўдыё файлы</string>
+    <string name="enabled_media_players">Актыўныя медыя плэеры</string>
+    <string name="advanced_settings">Пашыраныя налады</string>
+    <string name="media_players_setting_description">Дадатак іскарыстае для прайгравання музыкі некалькі музычных прайгравальнікаў. Тут іх можна адключыць ці змяніць прыярытэт выкарыстання. Усе змены набудуць моц толькі пасля перазапуску прыкладання.</string>
+    <string name="sound_balance">Баланс гуку</string>
+    <string name="sound_balance_state">Левы: %1$d%%, Правы: %2$d%%</string>
+    <string name="language">Мова</string>
+    <string name="follow_system_language">Выкарыстоўваць мову сістэмы</string>
+
+    <plurals name="compositions_count">
+        <item quantity="one">%1$s кампазіцыя</item>
+        <item quantity="few">%1$s кампазіцыі</item>
+        <item quantity="many">%1$s кампазіцый</item>
+        <item quantity="other">%1$s кампазіцый</item>
+    </plurals>
+
+    <plurals name="compositions_count_dativ">
+        <item quantity="one">%1$s кампазіцыю</item>
+        <item quantity="few">%1$s кампазіцыі</item>
+        <item quantity="many">%1$s кампазіцый</item>
+        <item quantity="other">%1$s кампазіцый</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="one">%1$s файл</item>
+        <item quantity="few">%1$s файла</item>
+        <item quantity="many">%1$s файлаў</item>
+        <item quantity="other">%1$s файлаў</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="one">%1$s альбом</item>
+        <item quantity="few">%1$s альбома</item>
+        <item quantity="many">%1$s альбомаў</item>
+        <item quantity="other">%1$s альбомаў</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="one">%s кампазіцыя будзе прайграна наступнай</item>
+        <item quantity="few">%s кампазіцыі будуць прайграныя наступнымі</item>
+        <item quantity="many">%s кампазіцый будуць прайграныя наступнымі</item>
+        <item quantity="other">%s кампазіцый будуць прайграныя наступнымі</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="one">%s кампазіцыя дададзена ў канец чаргі прайгравання</item>
+        <item quantity="few">%s кампазіцыі дададзены ў канец чаргі прайгравання</item>
+        <item quantity="many">%s кампазіцый дададзены ў канец чаргі прайгравання</item>
+        <item quantity="other">%s кампазіцый дададзены ў канец чаргі прайгравання</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="one">%1$d кампазіцыя дададзены ў плэйліст \"%2$s\"</item>
+        <item quantity="few">%1$d кампазіцыі дададзены ў плэйліст \"%2$s\"</item>
+        <item quantity="many">%1$d кампазіцый дададзены ў плэйліст \"%2$s\"</item>
+        <item quantity="other">%1$d кампазіцый дададзены ў плэйліст \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="one">%1$d кампазіцыя выдалена з плэйліста \"%2$s\"</item>
+        <item quantity="few">%1$d кампазіцыі выдалена з плэйліста \"%2$s\"</item>
+        <item quantity="many">%1$d кампазіцый выдалена з плэйліста \"%2$s\"</item>
+        <item quantity="other">%1$d кампазіцый выдалена з плэйліста \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="one">%1$d кампазіцыя выдаленая</item>
+        <item quantity="few">%1$d кампазіцыі выдалена</item>
+        <item quantity="many">%1$d кампазіцый выдалена</item>
+        <item quantity="other">%1$d кампазіцый выдалена</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="one">%1$d секунда</item>
+        <item quantity="few">%1$d секунды</item>
+        <item quantity="many">%1$d секунд</item>
+        <item quantity="other">%1$d секунд</item>
+    </plurals>
+
+</resources>

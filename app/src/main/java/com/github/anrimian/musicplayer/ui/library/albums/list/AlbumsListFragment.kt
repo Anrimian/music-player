@@ -19,7 +19,7 @@ import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
-import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity
+import com.github.anrimian.musicplayer.ui.editor.album.newAlbumEditorIntent
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment
 import com.github.anrimian.musicplayer.ui.library.albums.items.newAlbumItemsFragment
@@ -159,9 +159,7 @@ class AlbumsListFragment : LibraryFragment(), AlbumsListView, FragmentLayerListe
     private fun onAlbumMenuClicked(view: View, album: Album) {
         PopupMenuWindow.showPopup(view, R.menu.album_menu) { menuItem ->
             when (menuItem.itemId) {
-                R.id.menu_edit -> {
-                    startActivity(AlbumEditorActivity.newIntent(requireContext(), album.id))
-                }
+                R.id.menu_edit -> startActivity(newAlbumEditorIntent(requireContext(), album.id))
             }
         }
     }

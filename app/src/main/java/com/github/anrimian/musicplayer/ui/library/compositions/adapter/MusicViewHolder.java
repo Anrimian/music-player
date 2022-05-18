@@ -1,11 +1,9 @@
 package com.github.anrimian.musicplayer.ui.library.compositions.adapter;
 
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getPlayingCompositionColor;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
 
 import android.graphics.Color;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
@@ -17,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposit
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener;
 
 import java.util.List;
 
@@ -26,10 +25,9 @@ import javax.annotation.Nonnull;
  * Created on 31.10.2017.
  */
 
-public class MusicViewHolder extends SelectableViewHolder {
+public class MusicViewHolder extends SelectableViewHolder implements SwipeListener {
 
     private final CompositionItemWrapper compositionItemWrapper;
-    private final FrameLayout clickableItem;
 
     private Composition composition;
 
@@ -43,7 +41,6 @@ public class MusicViewHolder extends SelectableViewHolder {
                            OnPositionItemClickListener<Composition> menuClickListener) {
         super(parent, R.layout.item_storage_music);
         ItemStorageMusicBinding binding = ItemStorageMusicBinding.bind(itemView);
-        clickableItem = binding.clickableItem;
 
         compositionItemWrapper = new CompositionItemWrapper(itemView,
                 o -> iconClickListener.onItemClick(getBindingAdapterPosition(), composition),
@@ -54,7 +51,7 @@ public class MusicViewHolder extends SelectableViewHolder {
         );
 
         if (onLongClickListener != null) {
-            clickableItem.setOnLongClickListener(v -> {
+            binding.clickableItem.setOnLongClickListener(v -> {
                 if (selected) {
                     return false;
                 }
@@ -90,8 +87,13 @@ public class MusicViewHolder extends SelectableViewHolder {
             int unselectedColor = (!selected && isCurrent)? getPlaySelectionColor(): Color.TRANSPARENT;
             int selectedColor = getSelectionColor();
             int endColor = selected ? selectedColor : unselectedColor;
-            animateBackgroundColor(clickableItem, endColor);
+            compositionItemWrapper.showStateColor(endColor, true);
         }
+    }
+
+    @Override
+    public void onSwipeStateChanged(float swipeOffset) {
+        compositionItemWrapper.showAsSwipingItem(swipeOffset);
     }
 
     public void showCurrentComposition(@Nullable CurrentComposition currentComposition,
@@ -114,16 +116,13 @@ public class MusicViewHolder extends SelectableViewHolder {
         if (this.isCurrent != isCurrent) {
             this.isCurrent = isCurrent;
             if (!selected) {
-                int unselectedColor = Color.TRANSPARENT;
-                int selectedColor = getPlaySelectionColor();
-                int endColor = isCurrent ? selectedColor : unselectedColor;
-                animateBackgroundColor(clickableItem, endColor);
+                compositionItemWrapper.showAsCurrentComposition(isCurrent);
             }
         }
     }
 
     private void selectImmediate() {
-        clickableItem.setBackgroundColor(getSelectionColor());
+        compositionItemWrapper.showStateColor(getSelectionColor(), false);
         selected = true;
     }
 

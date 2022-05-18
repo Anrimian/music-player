@@ -171,7 +171,7 @@
     <string name="queue_item_removed">Queue item removed</string>
     <string name="by_size">By size</string>
     <string name="largest_first">Largest first</string>
-    <string name="log_info_text">Some non-fatal errors occurred and info about them recorded into log file. Application doesn\'t send logs automatically, but you can send them manually. That will help improve app quality. Current log file size: %d KB</string>
+    <string name="log_info_text">Some non-fatal errors occurred and info about them recorded into log file. Application doesn\'t send logs automatically, but you can send them manually. That will help improve app quality. Current log file size: %d kB</string>
     <string name="view_file">View file</string>
     <string name="send_file">Send file</string>
     <string name="delete_file">Delete file</string>
@@ -238,6 +238,10 @@
     <string name="enabled_media_players">Enabled media players</string>
     <string name="advanced_settings">Advanced</string>
     <string name="media_players_setting_description">App uses several media players for music playing. Here they can be disabled or changed use priority. All changes will take effect only after application restart.</string>
+    <string name="sound_balance">Sound balance</string>
+    <string name="sound_balance_state">Left: %1$d%%, Right: %2$d%%</string>
+    <string name="language">Language</string>
+    <string name="follow_system_language">Follow system language</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>

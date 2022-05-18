@@ -17,9 +17,9 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
@@ -32,7 +32,7 @@ public class PlayListsDaoWrapperTest {
 
     private PlayListsDaoWrapper daoWrapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
@@ -42,7 +42,7 @@ public class PlayListsDaoWrapperTest {
         daoWrapper = new PlayListsDaoWrapper(playListDao, compositionsDao, db);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         db.close();
     }

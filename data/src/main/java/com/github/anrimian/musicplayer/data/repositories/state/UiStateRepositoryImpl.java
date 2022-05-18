@@ -1,20 +1,5 @@
 package com.github.anrimian.musicplayer.data.repositories.state;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import androidx.collection.LruCache;
-
-import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
-import com.github.anrimian.musicplayer.domain.models.Screens;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
-
-import javax.annotation.Nullable;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.subjects.BehaviorSubject;
-
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_ID;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.CURRENT_QUEUE_ITEM_LAST_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.IS_PLAYER_PANEL_OPEN;
@@ -37,6 +22,21 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_PLAYLIST_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.TRACK_POSITION;
 import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import androidx.collection.LruCache;
+
+import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
+import com.github.anrimian.musicplayer.domain.models.Screens;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+
+import javax.annotation.Nullable;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 /**
  * Created on 16.11.2017.

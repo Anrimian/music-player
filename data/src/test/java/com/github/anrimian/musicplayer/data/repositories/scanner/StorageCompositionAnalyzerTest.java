@@ -25,8 +25,8 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageCompo
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,7 +44,7 @@ public class StorageCompositionAnalyzerTest {
 
     private StorageCompositionAnalyzer analyzer;
     
-    @Before
+    @BeforeEach
     public void setUp() {
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());
 

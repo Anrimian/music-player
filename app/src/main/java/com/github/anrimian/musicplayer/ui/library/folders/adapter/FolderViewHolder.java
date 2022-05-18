@@ -5,10 +5,14 @@ import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_SELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.ITEM_UNSELECTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateBackgroundColor;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.animateItemDrawableCorners;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateItemDrawableColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.RippleDrawable;
 import android.view.ViewGroup;
 
 import com.github.anrimian.musicplayer.R;
@@ -17,6 +21,8 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.ui.utils.OnPositionItemClickListener;
 import com.github.anrimian.musicplayer.ui.utils.OnViewItemClickListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener;
 
 import java.util.List;
 
@@ -27,14 +33,19 @@ import javax.annotation.Nonnull;
  * Created on 31.10.2017.
  */
 
-class FolderViewHolder extends FileViewHolder {
+class FolderViewHolder extends FileViewHolder implements SwipeListener {
 
     private final ItemStorageFolderBinding viewBinding;
 
     private FolderFileSource folder;
-    private String path;
 
-    private boolean selected = false;
+    private final ItemDrawable backgroundDrawable = new ItemDrawable();
+    private final ItemDrawable stateDrawable = new ItemDrawable();
+    private final ItemDrawable rippleMaskDrawable = new ItemDrawable();
+
+    private boolean isSelected;
+    private boolean isSelectedForMove;
+    private boolean isSwiping;
 
     FolderViewHolder(ViewGroup parent,
                      OnPositionItemClickListener<FolderFileSource> onFolderClickListener,
@@ -50,7 +61,7 @@ class FolderViewHolder extends FileViewHolder {
         }
         if (onLongClickListener != null) {
             onLongClick(viewBinding.clickableItem,  () -> {
-                if (selected) {
+                if (isSelected) {
                     return;
                 }
                 selectImmediate();
@@ -58,25 +69,31 @@ class FolderViewHolder extends FileViewHolder {
             });
         }
         viewBinding.btnActionsMenu.setOnClickListener(v -> onMenuClickListener.onItemClick(v, folder));
+
+        backgroundDrawable.setColor(getColorFromAttr(getContext(), R.attr.listItemBackground));
+        itemView.setBackground(backgroundDrawable);
+        stateDrawable.setColor(Color.TRANSPARENT);
+        viewBinding.clickableItem.setBackground(stateDrawable);
+        viewBinding.clickableItem.setForeground(new RippleDrawable(
+                ColorStateList.valueOf(getColorFromAttr(getContext(), android.R.attr.colorControlHighlight)),
+                null,
+                rippleMaskDrawable));
     }
 
     @Override
     public void setSelected(boolean selected) {
-        if (this.selected != selected) {
-            this.selected = selected;
-            int unselectedColor = Color.TRANSPARENT;
-            int selectedColor = getSelectionColor();
-            int endColor = selected ? selectedColor : unselectedColor;
-            animateBackgroundColor(viewBinding.clickableItem, endColor);
+        if (this.isSelected != selected) {
+            this.isSelected = selected;
+            updateSelectionState();
         }
     }
 
     @Override
     public void setSelectedToMove(boolean selected) {
-        int unselectedColor = Color.TRANSPARENT;
-        int selectedColor = getMoveSelectionColor();
-        int endColor = selected ? selectedColor : unselectedColor;
-        animateBackgroundColor(itemView, endColor);
+        if (this.isSelectedForMove != selected) {
+            this.isSelectedForMove = selected;
+            updateSelectionState();
+        }
     }
 
     @Override
@@ -84,21 +101,34 @@ class FolderViewHolder extends FileViewHolder {
         return folder;
     }
 
+    @Override
+    public void onSwipeStateChanged(float swipeOffset) {
+        boolean swiping = swipeOffset > 0.0f;
+
+        if (this.isSwiping != swiping) {
+            this.isSwiping = swiping;
+
+            float swipedCorners = getContext().getResources().getDimension(R.dimen.swiped_item_corners);
+            float from = swiping? 0: swipedCorners;
+            float to = swiping? swipedCorners: 0;
+            int duration = getContext().getResources().getInteger(R.integer.swiped_item_animation_time);
+            animateItemDrawableCorners(from, to, duration, backgroundDrawable, stateDrawable, rippleMaskDrawable);
+        }
+    }
+
     void bind(@Nonnull FolderFileSource folderFileSource) {
         this.folder = folderFileSource;
-        this.path = folderFileSource.getName();
         showFolderName();
         showFilesCount();
     }
 
     public void update(FolderFileSource folderFileSource, List<Object> payloads) {
         this.folder = folderFileSource;
-        this.path = folderFileSource.getName();
         bind(folderFileSource);
         for (Object payload: payloads) {
             if (payload instanceof List) {
                 //noinspection SingleStatementInBlock,unchecked
-                update(folderFileSource, (List) payload);
+                update(folderFileSource, (List<Object>) payload);
             }
             if (payload == ITEM_SELECTED) {
                 setSelected(true);
@@ -123,12 +153,17 @@ class FolderViewHolder extends FileViewHolder {
     }
 
     private void showFolderName() {
-//        String displayPath = getFileName(path);
-        viewBinding.tvFolderName.setText(path);
+        viewBinding.tvFolderName.setText(folder.getName());
+    }
+
+    private void updateSelectionState() {
+        int stateColor = isSelected? getSelectionColor()
+                : (isSelectedForMove? getMoveSelectionColor() : Color.TRANSPARENT);
+        animateItemDrawableColor(stateDrawable, stateColor);
     }
 
     private void selectImmediate() {
-        viewBinding.clickableItem.setBackgroundColor(getSelectionColor());
-        selected = true;
+        stateDrawable.setColor(getSelectionColor());
+        isSelected = true;
     }
 }

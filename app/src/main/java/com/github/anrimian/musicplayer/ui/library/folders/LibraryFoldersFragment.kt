@@ -142,6 +142,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         headerViewWrapper.setOnClickListener { presenter.onBackPathButtonClicked() }
 
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        ViewUtils.onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
 
         viewBinding.vgFileMenu.visibility = View.INVISIBLE
         viewBinding.vgMoveFileMenu.visibility = View.INVISIBLE
@@ -413,6 +414,10 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun setDisplayCoversEnabled(isCoversEnabled: Boolean) {
         adapter.setCoversEnabled(isCoversEnabled)
+    }
+
+    override fun showRandomMode(isRandomModeEnabled: Boolean) {
+        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
     }
 
     override fun showInputFolderNameDialog(folder: FolderFileSource) {

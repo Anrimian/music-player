@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.folders;
 
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
 
 import io.reactivex.rxjava3.core.Observable;
 
-import static org.junit.Assert.assertNotNull;
 
 public class FolderTreeBuilderTest {
 

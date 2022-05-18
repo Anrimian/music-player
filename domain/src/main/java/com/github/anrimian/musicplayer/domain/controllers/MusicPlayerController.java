@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.controllers;
 
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -28,6 +29,8 @@ public interface MusicPlayerController {
 
     void setVolume(float volume);
 
+    void setSoundBalance(SoundBalance soundBalance);
+
     Observable<Long> getTrackPositionObservable();
 
     void seekBy(long millis);
@@ -35,8 +38,6 @@ public interface MusicPlayerController {
     Single<Long> getTrackPosition();
 
     void setPlaybackSpeed(float speed);
-
-    float getCurrentPlaybackSpeed();
 
     Observable<Float> getCurrentPlaybackSpeedObservable();
 

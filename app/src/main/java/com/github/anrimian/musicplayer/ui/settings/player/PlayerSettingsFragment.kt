@@ -10,6 +10,8 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
+import com.github.anrimian.musicplayer.ui.common.dialogs.showSoundBalanceSelectorDialog
 import com.github.anrimian.musicplayer.ui.common.format.getMediaPlayerName
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
@@ -51,6 +53,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
         viewBinding.flEqualizerClickableArea.setOnClickListener { showEqualizerDialog() }
         viewBinding.flMediaPlayersClickableArea.setOnClickListener { showMediaPlayersSettingScreen() }
+        viewBinding.flSoundBalanceClickableArea.setOnClickListener { presenter.onSoundBalanceClicked() }
 
         SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided)
 
@@ -72,6 +75,12 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         ViewUtils.setChecked(viewBinding.cbPauseOnZeroVolumeLevel, enabled)
     }
 
+    override fun showSoundBalance(soundBalance: SoundBalance) {
+        val left = (soundBalance.left * 100).toInt()
+        val right = (soundBalance.right * 100).toInt()
+        viewBinding.tvSoundBalanceState.text = getString(R.string.sound_balance_state, left, right)
+    }
+
     override fun showSelectedEqualizerType(type: Int) {
         viewBinding.tvEqualizerState.setText(getEqualizerTypeDescription(type))
     }
@@ -85,6 +94,16 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
             }
         }
         viewBinding.tvMediaPlayersState.text = sb.toString()
+    }
+
+    override fun showSoundBalanceDialog(soundBalance: SoundBalance) {
+        showSoundBalanceSelectorDialog(
+            requireContext(),
+            soundBalance,
+            presenter::onSoundBalancePicked,
+            presenter::onSoundBalanceSelected,
+            presenter::onResetSoundBalanceClick
+        )
     }
 
     @StringRes
@@ -103,4 +122,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
     private fun showMediaPlayersSettingScreen() {
         enabledMediaPlayersDialogFragmentRunner.show(EnabledMediaPlayersDialogFragment())
     }
+
+
+
 }

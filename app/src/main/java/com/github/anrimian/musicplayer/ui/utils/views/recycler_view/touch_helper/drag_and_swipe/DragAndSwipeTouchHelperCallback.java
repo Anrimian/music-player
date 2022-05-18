@@ -1,6 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe;
 
 
+import static androidx.recyclerview.widget.ItemTouchHelper.DOWN;
+import static androidx.recyclerview.widget.ItemTouchHelper.UP;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -31,9 +34,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
-
-import static androidx.recyclerview.widget.ItemTouchHelper.DOWN;
-import static androidx.recyclerview.widget.ItemTouchHelper.UP;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener;
 
 public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
@@ -249,12 +250,14 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                             int actionState,
                             boolean isCurrentlyActive) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+            setIsSwiping(viewHolder, Math.abs(dX));
+
             View itemView = viewHolder.itemView;
             float contentHeight = iconSize + textStaticLayout.getHeight();
             float contentMarginTop = (itemView.getHeight() - contentHeight) / 2f;
             float top = itemView.getTop();
             float bottom = itemView.getBottom();
-            float left = dX > 0? itemView.getLeft() : itemView.getRight() + dX;
+            float left = itemView.getLeft();
             float right = dX > 0? dX : itemView.getRight();
             float contentCenterY = top + contentMarginTop + contentHeight/2;
             float centerX = panelWidth >> 1;
@@ -348,6 +351,15 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                 dragElevation);
         elevationAnimator.setDuration(DEFAULT_DRAG_ANIMATION_DURATION);
         elevationAnimator.start();
+    }
+
+    private void setIsSwiping(RecyclerView.ViewHolder viewHolder, float swipeOffset) {
+        if (viewHolder == null) {
+            return;
+        }
+        if (viewHolder instanceof SwipeListener) {
+            ((SwipeListener) viewHolder).onSwipeStateChanged(swipeOffset);
+        }
     }
 
     public interface OnMovedListener {

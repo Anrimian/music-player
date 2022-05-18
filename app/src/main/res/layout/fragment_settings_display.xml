@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nsvContainer"
@@ -16,6 +17,44 @@
             android:layout_height="wrap_content">
 
             <TextView
+                style="@style/TextStyle.Medium"
+                android:id="@+id/tvLocaleTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/toolbar_content_start"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_vertical_margin"
+                android:text="@string/language"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                style="@style/TextStyle.Subtitle"
+                android:id="@+id/tvLocale"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/toolbar_content_start"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_spacing_vertical_margin"
+                android:paddingBottom="@dimen/content_vertical_margin"
+                tools:text="@string/follow_system_language"
+                app:layout_constraintTop_toBottomOf="@id/tvLocaleTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <FrameLayout
+                android:id="@+id/tvLocaleClickableArea"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:foreground="?selectableItemBackground"
+                android:contentDescription="@string/language"
+                app:layout_constraintTop_toTopOf="@id/tvLocaleTitle"
+                app:layout_constraintBottom_toBottomOf="@id/tvLocale"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
                 style="@style/TextStyle.ContentTitle"
                 android:id="@+id/tvCoversTitle"
                 android:layout_width="0dp"
@@ -26,7 +65,7 @@
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@id/tvLocale"/>
 
             <CheckBox
                 style="@style/CheckboxStyle"

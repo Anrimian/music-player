@@ -4,4 +4,8 @@
     <dimen name="widget_content_margin_vertical">16dp</dimen>
     <dimen name="widget_content_margin_horizontal">16dp</dimen>
 
+    <dimen name="widget_medium_content_margin_vertical">16dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">16dp</dimen>
+    <dimen name="widget_medium_controls_bottom_margin">8dp</dimen>
+
 </resources>

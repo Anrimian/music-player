@@ -1,14 +1,14 @@
 package com.github.anrimian.musicplayer.utils.views.bottom_sheet;
 
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created on 21.01.2018.
@@ -19,7 +19,7 @@ public class BoundValuesDelegateTest {
 
     private BoundValuesDelegate boundValuesDelegate;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         boundValuesDelegate = new BoundValuesDelegate(0.3f, 0.5f, mockDelegate);
     }

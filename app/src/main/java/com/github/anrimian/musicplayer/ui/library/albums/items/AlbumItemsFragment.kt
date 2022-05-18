@@ -25,7 +25,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
-import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity
+import com.github.anrimian.musicplayer.ui.editor.album.newAlbumEditorIntent
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
@@ -99,6 +99,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         )
         viewBinding.recyclerView.adapter = adapter
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        ViewUtils.onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
 
         layoutManager = LinearLayoutManager(context)
         viewBinding.recyclerView.layoutManager = layoutManager
@@ -272,6 +273,10 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
         adapter.setCoversEnabled(isCoversEnabled)
     }
 
+    override fun showRandomMode(isRandomModeEnabled: Boolean) {
+        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
+    }
+
     override fun showCompositionActionDialog(composition: Composition, position: Int) {
         val extra = Bundle()
         extra.putInt(Constants.Arguments.POSITION_ARG, position)
@@ -305,7 +310,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
     }
 
     override fun showEditAlbumScreen(album: Album) {
-        startActivity(AlbumEditorActivity.newIntent(requireContext(), album.id))
+        startActivity(newAlbumEditorIntent(requireContext(), album.id))
     }
 
     override fun closeScreen() {

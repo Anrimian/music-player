@@ -22,9 +22,11 @@ import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils.onLongVibrationClick
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
@@ -37,7 +39,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayL
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
-import com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
@@ -101,6 +102,8 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
 
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
+
         val fm = childFragmentManager
         deletingErrorHandler = DeleteErrorHandler(
             fm,
@@ -263,6 +266,10 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
 
     override fun setDisplayCoversEnabled(isCoversEnabled: Boolean) {
         adapter.setCoversEnabled(isCoversEnabled)
+    }
+
+    override fun showRandomMode(isRandomModeEnabled: Boolean) {
+        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
     }
 
     override fun showCompositionActionDialog(composition: Composition, position: Int) {

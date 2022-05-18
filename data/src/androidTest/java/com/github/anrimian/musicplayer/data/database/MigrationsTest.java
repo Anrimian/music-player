@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.data.database;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import android.app.Instrumentation;
 import android.content.ContentValues;
@@ -14,10 +12,8 @@ import androidx.room.testing.MigrationTestHelper;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.GrantPermissionRule;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -25,18 +21,14 @@ public class MigrationsTest {
 
     private static final String TEST_DB_NAME = "music_player_database";
 
-    @Rule
-    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE);
-
     private final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
     private final Context context = instrumentation.getContext();
 
-    @Rule
-    public MigrationTestHelper testHelper =
-            new MigrationTestHelper(
+    public MigrationTestHelper testHelper = new MigrationTestHelper(
                     instrumentation,
                     AppDatabase.class.getCanonicalName(),
-                    new FrameworkSQLiteOpenHelperFactory());
+                    new FrameworkSQLiteOpenHelperFactory()
+    );
 
     @Test
     public void testMigrationFrom7To8() throws Exception {

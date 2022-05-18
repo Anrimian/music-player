@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesH
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers;
+import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 
@@ -49,6 +50,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String PAUSE_ON_AUDIO_FOCUS_LOSS = "pause_on_audio_focus_loss";
     private static final String PAUSE_ON_ZERO_VOLUME_LEVEL = "pause_on_zero_volume_level";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
+    private static final String VOLUME_LEFT = "volume_left";
+    private static final String VOLUME_RIGHT = "volume_right";
 
     private static final String EXTERNAL_PLAYER_REPEAT_MODE = "external_player_repeat_mode";
     private static final String EXTERNAL_PLAYER_KEEP_IN_BACKGROUND = "external_player_keep_in_background";
@@ -473,6 +476,22 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setEnabledMediaPlayers(int[] mediaPlayersIds) {
         preferences.putIntArray(ENABLED_MEDIA_PLAYERS, mediaPlayersIds);
+    }
+
+    @Override
+    public SoundBalance getSoundBalance() {
+        return new SoundBalance(
+                preferences.getFloat(VOLUME_LEFT, 1f),
+                preferences.getFloat(VOLUME_RIGHT, 1f)
+        );
+    }
+
+    @Override
+    public void setSoundBalance(SoundBalance soundBalance) {
+        preferences.edit()
+                .putFloat(VOLUME_LEFT, soundBalance.getLeft())
+                .putFloat(VOLUME_RIGHT, soundBalance.getRight())
+                .apply();
     }
 
     private Order orderFromInt(int order) {
