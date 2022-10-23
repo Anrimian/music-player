@@ -1,8 +1,7 @@
 package com.github.anrimian.musicplayer.ui.main.external_player;
 
-import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource;
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 
 import javax.annotation.Nullable;
 
@@ -11,10 +10,10 @@ import moxy.viewstate.strategy.alias.AddToEndSingle;
 public interface ExternalPlayerView extends MvpView {
 
     @AddToEndSingle
-    void showPlayerState(PlayerState state);
+    void showPlayerState(boolean isPlaying);
 
     @AddToEndSingle
-    void displayComposition(UriCompositionSource source);
+    void displayComposition(ExternalCompositionSource source);
 
     @AddToEndSingle
     void showTrackState(long currentPosition, long duration);
@@ -23,7 +22,7 @@ public interface ExternalPlayerView extends MvpView {
     void showRepeatMode(int mode);
 
     @AddToEndSingle
-    void showPlayErrorEvent(@Nullable ErrorType errorType);
+    void showPlayErrorState(@Nullable ErrorCommand errorCommand);
 
     @AddToEndSingle
     void showKeepPlayerInBackground(boolean externalPlayerKeepInBackground);

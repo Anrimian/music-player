@@ -56,7 +56,7 @@ public final class MyAppGlideModule extends AppGlideModule {
     public void registerComponents(@NonNull Context context,
                                    @NonNull Glide glide,
                                    @NonNull Registry registry) {
-        AppModelLoader.addModelLoader(registry, CompositionImage.class, Bitmap.class, new CompositionModelLoader(context, Components.getAppComponent().sourceRepository()));
+        AppModelLoader.addModelLoader(registry, CompositionImage.class, Bitmap.class, new CompositionModelLoader(context, Components.getAppComponent().storageSourceRepository()));
         AppModelLoader.addModelLoader(registry, UriCompositionImage.class, Bitmap.class, new ExternalCompositionModelLoader(context));
         AppModelLoader.addModelLoader(registry, Album.class, InputStream.class, new AlbumModelLoader(Components.getAppComponent().storageAlbumsProvider()));
     }

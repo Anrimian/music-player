@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.rename;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setSoftInputVisible;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setEditableText;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -22,10 +26,6 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import moxy.MvpAppCompatDialogFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_LIST_ID_ARG;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setSoftInputVisible;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setEditableText;
 
 public class RenamePlayListDialogFragment extends MvpAppCompatDialogFragment
         implements RenamePlayListView {
@@ -59,7 +59,7 @@ public class RenamePlayListDialogFragment extends MvpAppCompatDialogFragment
         DialogCommonInputBinding viewBinding = DialogCommonInputBinding.inflate(
                 LayoutInflater.from(getContext())
         );
-        etPlayListName = viewBinding.etPlaylistName;
+        etPlayListName = viewBinding.etInput;
         tvError = viewBinding.tvError;
         tvProgress = viewBinding.tvProgress;
         progressBar = viewBinding.progressBar;

@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource;
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.AppModelLoader;
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage;
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
@@ -31,7 +31,7 @@ public class ExternalCompositionModelLoader extends AppModelLoader<UriCompositio
                             @NonNull Priority priority,
                             @NonNull DataFetcher.DataCallback<? super Bitmap> callback) {
         try {
-            UriCompositionSource source = uriCompositionImage.getSource();
+            ExternalCompositionSource source = uriCompositionImage.getSource();
             byte[] imageBytes = source.getImageBytes();
             Bitmap bitmap = null;
             if (imageBytes != null) {

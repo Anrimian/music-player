@@ -16,6 +16,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
@@ -25,9 +26,10 @@ import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtilsKt;
 import com.github.anrimian.musicplayer.ui.common.theme.AppTheme;
+import com.github.anrimian.musicplayer.ui.notifications.MediaNotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
-import com.github.anrimian.musicplayer.utils.Permissions;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -48,7 +50,8 @@ public class MusicService extends Service {
 
     private final CompositeDisposable serviceDisposable = new CompositeDisposable();
 
-    private PlayerState playerState = PlayerState.IDLE;
+    private PlayerState playerState = PlayerState.IDLE.INSTANCE;
+    private int isPlayingState;
     @Nullable
     private CompositionSource currentSource;
     private int repeatMode = RepeatMode.NONE;
@@ -75,9 +78,9 @@ public class MusicService extends Service {
             return START_NOT_STICKY;
         }
         if (intent.getBooleanExtra(START_FOREGROUND_SIGNAL, false)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerState == PlayerState.IDLE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerState == PlayerState.IDLE.INSTANCE) {
                 //should reduce chance of RemoteServiceException
-                notificationsDisplayer().startStubForegroundNotification(this, mediaSession());
+                mediaNotificationsDisplayer().startStubForegroundNotification(this, mediaSession());
             }
             startForeground();
         }
@@ -109,8 +112,8 @@ public class MusicService extends Service {
             currentSource = playerInteractor().getCurrentSource();
             notificationSetting = musicServiceInteractor().getNotificationSettings();
         }
-        notificationsDisplayer().startForegroundNotification(this,
-                playerState == PlayerState.PLAY,
+        mediaNotificationsDisplayer().startForegroundNotification(this,
+                isPlayingState,
                 currentSource,
                 mediaSession(),
                 repeatMode,
@@ -150,7 +153,8 @@ public class MusicService extends Service {
         if (serviceDisposable.size() != 0) {
             return;
         }
-        serviceDisposable.add(Observable.combineLatest(playerInteractor().getPlayerStateObservable(),
+        serviceDisposable.add(Observable.combineLatest(playerInteractor().getIsPlayingStateObservable(),
+                playerInteractor().getPlayerStateObservable(),
                 playerInteractor().getCurrentSourceObservable(),
                 musicServiceInteractor().getRepeatModeObservable(),
                 musicServiceInteractor().getNotificationSettingObservable(),
@@ -176,6 +180,11 @@ public class MusicService extends Service {
 
         if (this.playerState != serviceState.playerState) {
             this.playerState = serviceState.playerState;
+        }
+
+        int isPlayingState = FormatUtilsKt.getRemoteViewPlayerState(serviceState.isPlaying, serviceState.playerState);
+        if (this.isPlayingState != isPlayingState) {
+            this.isPlayingState = isPlayingState;
             updateNotification = true;
         }
 
@@ -192,7 +201,7 @@ public class MusicService extends Service {
             updateNotification = true;
         }
 
-        if (newCompositionSource == null || newPlayerState == PlayerState.IDLE) {
+        if (newCompositionSource == null || newPlayerState == PlayerState.IDLE.INSTANCE) {
             stopService = true;
         }
 
@@ -203,6 +212,7 @@ public class MusicService extends Service {
                     || notificationSetting.isColoredNotification() != newSettings.isColoredNotification()
                     || notificationSetting.isShowNotificationCoverStub() != newSettings.isShowNotificationCoverStub()) {
                 updateNotification = true;
+                updateCover = true;
             }
             this.notificationSetting = newSettings;
         }
@@ -217,7 +227,7 @@ public class MusicService extends Service {
         }
 
         if (stopService) {
-            notificationsDisplayer().cancelCoverLoadingForForegroundNotification();
+            mediaNotificationsDisplayer().cancelCoverLoadingForForegroundNotification();
             stopForeground(true);
             stopSelf();
         } else {
@@ -228,8 +238,8 @@ public class MusicService extends Service {
     }
 
     private void updateForegroundNotification(boolean reloadCover) {
-        notificationsDisplayer().updateForegroundNotification(
-                playerState == PlayerState.PLAY,
+        mediaNotificationsDisplayer().updateForegroundNotification(
+                isPlayingState,
                 currentSource,
                 mediaSession(),
                 repeatMode,
@@ -249,22 +259,29 @@ public class MusicService extends Service {
         return Components.getAppComponent().musicServiceInteractor();
     }
 
+    private MediaNotificationsDisplayer mediaNotificationsDisplayer() {
+        return Components.getAppComponent().mediaNotificationsDisplayer();
+    }
+
     private NotificationsDisplayer notificationsDisplayer() {
-        return Components.getAppComponent().notificationDisplayer();
+        return Components.getAppComponent().notificationsDisplayer();
     }
 
     private static class ServiceState {
+        boolean isPlaying;
         PlayerState playerState;
         Optional<CompositionSource> compositionSource;
         int repeatMode;
         MusicNotificationSetting settings;
         AppTheme appTheme;
 
-        private ServiceState set(PlayerState playerState,
+        private ServiceState set(boolean isPlaying,
+                                 PlayerState playerState,
                                  Optional<CompositionSource> compositionSource,
                                  int repeatMode,
                                  MusicNotificationSetting settings,
                                  AppTheme appTheme) {
+            this.isPlaying = isPlaying;
             this.playerState = playerState;
             this.compositionSource = compositionSource;
             this.repeatMode = repeatMode;

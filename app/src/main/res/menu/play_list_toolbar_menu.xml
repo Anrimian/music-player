@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_search"
+        android:title="@string/search"
+        android:icon="@drawable/ic_magnify"
+        app:iconTint="?attr/toolbarTextColorPrimary"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menu_change_play_list_name"
+        android:title="@string/edit_name"
+        android:icon="@drawable/ic_playlist_edit"
+        app:iconTint="?attr/toolbarTextColorPrimary"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_delete_play_list"
+        android:title="@string/delete_playlist"
+        android:icon="@drawable/ic_delete_outline"
+        app:iconTint="?attr/toolbarTextColorPrimary"
+        app:showAsAction="never"/>
+
+</menu>

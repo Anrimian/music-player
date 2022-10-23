@@ -28,11 +28,20 @@
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
 
+    <style name="ImageButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:tint">@android:color/white</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
     <style name="BaseButtonBorderlessStyle" parent="@style/Widget.AppCompat.Button.Borderless">
         <item name="android:background">@drawable/bg_button_outline</item>
         <item name="android:textColor">@color/color_accent_state</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
     </style>
 
     <style name="ButtonBorderlessStyle" parent="@style/BaseButtonBorderlessStyle"/>
@@ -51,8 +60,21 @@
         <item name="android:paddingEnd">12dp</item>
     </style>
 
+    <style name="ButtonStyle.Drawer">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+    </style>
+
+    <style name="ButtonStyle.Drawer.Header">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="tint">@color/color_drawer_header_button</item>
+    </style>
+
     <style name="TextStyle" parent="@style/Base.TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/color_text_primary</item>
+        <item name="drawableTint">@color/color_text_primary</item>
+        <item name="android:drawablePadding">@dimen/content_spacing_margin</item>
         <item name="android:textAlignment">viewStart</item>
     </style>
 
@@ -158,6 +180,14 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TextStyle.ButtonHint">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
     <style name="ButtonStyle.Main.Expanded">
         <item name="android:layout_width">@dimen/play_button_expand_size</item>
         <item name="android:layout_height">@dimen/play_button_expand_size</item>
@@ -191,6 +221,12 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <style name="TextStyle.Error.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
     <style name="TextStyle.Snackbar">
         <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
         <item name="android:textSize">14sp</item>
@@ -213,5 +249,9 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="CircularProgressIndicatorStyle">
+        <item name="indicatorColor">?attr/colorAccent</item>
+        <item name="trackCornerRadius">@dimen/seekbar_corner_radius</item>
+    </style>
 
 </resources>

@@ -4,6 +4,7 @@
     <attr name="actionModeTextColor" format="color"/>
     <attr name="colorPrimaryDarkSecondary" format="color"/>
     <attr name="colorPrimaryVariant" format="color"/>
+    <attr name="colorAccentContrast" format="color"/>
 
     <!--action mode-->
     <attr name="actionModeBackgroundColor" format="color"/>

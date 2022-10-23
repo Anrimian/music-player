@@ -1,16 +1,15 @@
 package com.github.anrimian.musicplayer.ui.library.albums.list
 
-import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
-import java.util.*
 
 class AlbumsListPresenter(private val interactor: LibraryAlbumsInteractor,
                           errorParser: ErrorParser,

@@ -4,3 +4,5 @@ include ':app'
 include ':app:lite'
 include ':data'
 include ':domain'
+
+include ':libs:filesync:core'

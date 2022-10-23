@@ -4,13 +4,13 @@
     <item android:id="@+id/menu_repeat_playlist"
         android:title="@string/repeat_playlist"
         android:icon="@drawable/ic_repeat"
-        app:iconTint="?attr/android:textColorPrimary"/>
+        app:iconTint="?android:attr/textColorPrimary"/>
     <item android:id="@+id/menu_repeat_composition"
         android:title="@string/repeat_composition"
         android:icon="@drawable/ic_repeat_once"
-        app:iconTint="?attr/android:textColorPrimary"/>
+        app:iconTint="?android:attr/textColorPrimary"/>
     <item android:id="@+id/menu_do_not_repeat"
         android:title="@string/do_not_repeat"
         android:icon="@drawable/ic_repeat_off"
-        app:iconTint="?attr/android:textColorPrimary"/>
+        app:iconTint="?android:attr/textColorPrimary"/>
 </menu>

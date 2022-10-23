@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.library.common.compositions
 
-import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
@@ -10,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Completable
@@ -20,11 +20,11 @@ import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
 
 abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>(
-        private val playerInteractor: LibraryPlayerInteractor,
-        private val playListsInteractor: PlayListsInteractor,
-        private val displaySettingsInteractor: DisplaySettingsInteractor,
-        errorParser: ErrorParser,
-        uiScheduler: Scheduler,
+    private val playerInteractor: LibraryPlayerInteractor,
+    private val playListsInteractor: PlayListsInteractor,
+    private val displaySettingsInteractor: DisplaySettingsInteractor,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler,
 ) : AppPresenter<T>(uiScheduler, errorParser) {
 
     private val presenterBatterySafeDisposable = CompositeDisposable()
@@ -84,10 +84,6 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
             viewState.onCompositionSelected(composition, position)
         }
         viewState.showSelectionMode(selectedCompositions.size)
-    }
-
-    fun onCompositionMenuClicked(position: Int, composition: Composition) {
-        viewState.showCompositionActionDialog(composition, position)
     }
 
     fun onCompositionIconClicked(position: Int, composition: Composition) {
@@ -213,7 +209,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     fun onChangeRandomModePressed() {
-        playerInteractor.isRandomPlayingEnabled = !playerInteractor.isRandomPlayingEnabled
+        playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
     }
 
     fun getSelectedCompositions(): HashSet<Composition> = selectedCompositions
@@ -292,7 +288,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     private fun subscribeOnCurrentComposition() {
-        currentCompositionDisposable = playerInteractor.currentCompositionObservable
+        currentCompositionDisposable = playerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
         presenterBatterySafeDisposable.add(currentCompositionDisposable!!)
@@ -340,7 +336,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     private fun subscribeOnRepeatMode() {
-        playerInteractor.randomPlayingObservable
+        playerInteractor.getRandomPlayingObservable()
             .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
     }
 

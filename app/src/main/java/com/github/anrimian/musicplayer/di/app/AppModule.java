@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.di.app;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 
@@ -19,8 +20,13 @@ import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceContr
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.locale.LocaleController;
+import com.github.anrimian.musicplayer.ui.common.locale.LocaleControllerApi33;
+import com.github.anrimian.musicplayer.ui.common.locale.LocaleControllerImpl;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
+import com.github.anrimian.musicplayer.ui.notifications.MediaNotificationsDisplayer;
+import com.github.anrimian.musicplayer.ui.notifications.NotificationDisplayerApi33;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
+import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayerImpl;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerPresenter;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
@@ -57,10 +63,20 @@ public class AppModule {
     @Provides
     @Nonnull
     @Singleton
-    NotificationsDisplayer provideNotificationsController(Context context,
-                                                          AppNotificationBuilder notificationBuilder,
-                                                          CoverImageLoader coverImageLoader) {
-        return new NotificationsDisplayer(context, notificationBuilder, coverImageLoader);
+    MediaNotificationsDisplayer mediaNotificationsDisplayer(Context context,
+                                                             AppNotificationBuilder notificationBuilder,
+                                                             CoverImageLoader coverImageLoader) {
+        return new MediaNotificationsDisplayer(context, notificationBuilder, coverImageLoader);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    NotificationsDisplayer notificationsDisplayer(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return new NotificationDisplayerApi33();
+        }
+        return new NotificationsDisplayerImpl(context);
     }
 
     @Provides
@@ -126,7 +142,10 @@ public class AppModule {
     @NonNull
     @Singleton
     LocaleController localeController(Context context) {
-        return new LocaleController(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return new LocaleControllerApi33();
+        }
+        return new LocaleControllerImpl(context);
     }
 
     @Provides

@@ -4,7 +4,9 @@ import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
+import static com.github.anrimian.musicplayer.domain.Payloads.FILE_EXISTS;
 import static com.github.anrimian.musicplayer.domain.Payloads.FILE_NAME;
+import static com.github.anrimian.musicplayer.domain.Payloads.SIZE;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils.getItemDragColor;
@@ -16,6 +18,7 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFrom
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateItemDrawableColor;
 import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -32,16 +35,23 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
 
+import com.github.anrimian.filesync.models.state.file.FileSyncState;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtilsKt;
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
+import com.github.anrimian.musicplayer.ui.utils.ViewUtilsKt;
+import com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressView;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable;
 
 import java.util.List;
+
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class CompositionItemWrapper {
 
@@ -53,6 +63,7 @@ public class CompositionItemWrapper {
     private final ImageView ivMusicIcon;
     private final ImageView btnActionsMenu;
     private final View iconClickableArea;
+    private final ProgressView pvFileState;
 
     private final ItemDrawable backgroundDrawable = new ItemDrawable();
     private final ItemDrawable stateDrawable = new ItemDrawable();
@@ -65,6 +76,9 @@ public class CompositionItemWrapper {
     private boolean isDragging;
     private boolean isSwiping;
 
+    private Disposable syncStateDisposable;
+    private FileSyncState fileSyncState;
+
     public CompositionItemWrapper(View itemView,
                                   Callback<Composition> onIconClickListener,
                                   Callback<Composition> onClickListener) {
@@ -72,10 +86,11 @@ public class CompositionItemWrapper {
         tvAdditionalInfo = itemView.findViewById(R.id.tv_additional_info);
         clickableItem = itemView.findViewById(R.id.clickable_item);
         ivPlay = itemView.findViewById(R.id.iv_play);
-        ivMusicIcon = itemView.findViewById(R.id.iv_music_icon);
+        ivMusicIcon = itemView.findViewById(R.id.ivMusicIcon);
         divider = itemView.findViewById(R.id.divider);
-        btnActionsMenu = itemView.findViewById(R.id.btn_actions_menu);
+        btnActionsMenu = itemView.findViewById(R.id.btnActionsMenu);
         iconClickableArea = itemView.findViewById(R.id.icon_clickable_area);
+        pvFileState = itemView.findViewById(R.id.pvFileState);
 
         iconClickableArea.setOnClickListener(v -> onIconClickListener.call(composition));
         clickableItem.setOnClickListener(v -> onClickListener.call(composition));
@@ -100,14 +115,16 @@ public class CompositionItemWrapper {
         showCompositionImage(showCovers);
 
         showAsPlaying(false, false);
+
+        showFileSyncState();
+        subscribeOnFileSyncState();
     }
 
-    public void update(Composition composition, List<Object> payloads) {
+    public void update(Composition composition, List<?> payloads) {
         this.composition = composition;
         for (Object payload: payloads) {
             if (payload instanceof List) {
-                //noinspection SingleStatementInBlock,unchecked
-                update(composition, (List<Object>) payload);
+                update(composition, (List<?>) payload);
             }
             if (payload == FILE_NAME || payload == TITLE) {
                 showCompositionName();
@@ -115,12 +132,17 @@ public class CompositionItemWrapper {
             if (payload == ARTIST || payload == DURATION) {
                 showAdditionalInfo();
             }
-            if (payload == DATE_MODIFIED) {
+            if (payload == DATE_MODIFIED
+                    || payload == SIZE
+                    || payload == FILE_EXISTS) {
                 showCompositionImage(showCovers);
             }
             if (payload == CORRUPTED) {
                 showCorrupted();
                 showAdditionalInfo();
+            }
+            if (payload == FILE_EXISTS) {
+                showFileSyncState();
             }
         }
     }
@@ -138,6 +160,10 @@ public class CompositionItemWrapper {
 
     public void release() {
         Components.getAppComponent().imageLoader().clearImage(ivMusicIcon);
+        if (syncStateDisposable != null) {
+            syncStateDisposable.dispose();
+            syncStateDisposable = null;
+        }
     }
 
     public void showAsDraggingItem(boolean dragging) {
@@ -188,6 +214,16 @@ public class CompositionItemWrapper {
         }
     }
 
+    public void runHighlightAnimation() {
+        ValueAnimator colorAnimator = ViewUtilsKt.getHighlightAnimator(
+                getColorFromAttr(getContext(), R.attr.listItemBackground),
+                FormatUtilsKt.getHighlightColor(getContext()));
+        colorAnimator.addUpdateListener(animator ->
+                backgroundDrawable.setColor((int) animator.getAnimatedValue())
+        );
+        colorAnimator.start();
+    }
+
     private void onCoverImageLoadFinished(boolean loaded) {
         int tint = Color.TRANSPARENT;
         if (loaded) {
@@ -201,7 +237,7 @@ public class CompositionItemWrapper {
             showAsDragging(true);
             return;
         }
-        int endColor = getPlayingCompositionColor(getContext(), isPlaying? 20: 0);
+        int endColor = getPlayingCompositionColor(getContext(), isPlaying? 25: 0);
         animateItemDrawableColor(stateDrawable, endColor);
     }
 
@@ -219,6 +255,7 @@ public class CompositionItemWrapper {
         ivMusicIcon.setAlpha(alpha);
         ivPlay.setAlpha(alpha);
         btnActionsMenu.setAlpha(alpha);
+        pvFileState.setAlpha(alpha);
     }
 
     private void showAsDragging(boolean dragging) {
@@ -250,8 +287,34 @@ public class CompositionItemWrapper {
         switch (composition.getCorruptionType()) {
             case UNSUPPORTED: return getContext().getString(R.string.unsupported_format_hint);
             case NOT_FOUND: return getContext().getString(R.string.file_not_found);
+            case SOURCE_NOT_FOUND: return getContext().getString(R.string.file_source_not_found);
+            case TOO_LARGE_SOURCE: return getContext().getString(R.string.file_is_too_large);
             default: return null;
         }
+    }
+
+    private void subscribeOnFileSyncState() {
+        if (syncStateDisposable != null) {
+            syncStateDisposable.dispose();
+        }
+        syncStateDisposable = FormatUtilsKt.getFileSyncStateObservable(composition.getId())
+                .doOnDispose(() -> {
+                    pvFileState.clearIcon();
+                    pvFileState.clearProgress();
+                })
+                .subscribe(this::showFileSyncState);
+    }
+
+    private void showFileSyncState(FileSyncState fileSyncState) {
+        this.fileSyncState = fileSyncState;
+        showFileSyncState();
+    }
+
+    private void showFileSyncState() {
+        //TODO play queue small-land placement
+        FormatUtilsKt.showFileSyncState(fileSyncState,
+                CompositionHelper.isCompositionFileRemote(composition),
+                pvFileState);
     }
 
     private Context getContext() {

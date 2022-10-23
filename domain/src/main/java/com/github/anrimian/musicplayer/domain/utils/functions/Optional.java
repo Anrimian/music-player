@@ -11,6 +11,10 @@ public class Optional<T> {
         this.value = value;
     }
 
+    public Optional() {
+        this.value = null;
+    }
+
     @Nullable
     public T getValue() {
         return value;

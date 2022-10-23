@@ -38,12 +38,15 @@ class MenuViewHolder extends RecyclerView.ViewHolder {
 
     void bind(MenuItem menuItem) {
         this.menuItem = menuItem;
-        tvTitle.setText(menuItem.getTitle());
 
+        itemView.setEnabled(menuItem.isEnabled());
+
+        tvTitle.setText(menuItem.getTitle());
+        tvTitle.setEnabled(menuItem.isEnabled());
         if (menuItem.isChecked()) {
             tvTitle.setTextColor(getColorFromAttr(itemView.getContext(), R.attr.colorAccent));
         } else {
-            tvTitle.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.color_text_primary));
+            tvTitle.setTextColor(ContextCompat.getColorStateList(itemView.getContext(), R.color.color_text_primary));
             CompatUtils.setColorTextPrimaryColor(tvTitle);
         }
 

@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.library.genres.items
 
-import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
@@ -8,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettin
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
 import io.reactivex.rxjava3.core.Observable

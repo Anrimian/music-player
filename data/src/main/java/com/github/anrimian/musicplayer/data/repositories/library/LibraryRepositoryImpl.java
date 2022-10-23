@@ -80,6 +80,11 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
+    public Observable<String> getLyricsObservable(long id) {
+        return compositionsDao.getLyricsObservable(id);
+    }
+
+    @Override
     public Observable<List<Artist>> getArtistsObservable(@Nullable String searchText) {
         return settingsPreferences.getArtistsOrderObservable()
                 .switchMap(order -> artistsDao.getAllObservable(order, searchText));
@@ -112,6 +117,24 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     public Observable<List<Composition>> getAlbumItemsObservable(long albumId) {
         return settingsPreferences.getDisplayFileNameObservable()
                 .switchMap(useFileName -> albumsDao.getCompositionsInAlbumObservable(albumId, useFileName));
+    }
+
+    @Override
+    public Single<List<Long>> getCompositionIdsInAlbum(long albumId) {
+        return albumsDao.getCompositionIdsInAlbum(albumId)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Long>> getAllCompositionsByArtist(long artistId) {
+        return artistsDao.getAllCompositionsByArtist(artistId)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Long>> getAllCompositionsByGenre(long genreId) {
+        return genresDao.getAllCompositionsByGenre(genreId)
+                .subscribeOn(scheduler);
     }
 
     @Override
@@ -214,14 +237,15 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
         return Single.fromCallable(() -> foldersDao.getFullFolderPath(folder.getId()))
-                .map(foldersDao::insert)
+                .map(foldersDao::insertIgnoredFolder)
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable addFolderToIgnore(IgnoredFolder folder) {
-        return Completable.fromAction(() -> foldersDao.insert(folder))
-                .subscribeOn(scheduler);
+        return Completable.fromAction(() ->
+                foldersDao.insertIgnoredFolder(folder.getRelativePath(), folder.getAddDate())
+        ).subscribeOn(scheduler);
     }
 
     @Override
@@ -238,9 +262,9 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
         return Single.fromCallable(() -> compositionsDao.getAllCompositionsInFolder(
-                folder.getId(),
-                settingsPreferences.isDisplayFileNameEnabled()
-        )).map(compositions -> storageFilesDataSource.deleteCompositionFiles(compositions, folder))
+                        folder.getId(),
+                        settingsPreferences.isDisplayFileNameEnabled()
+                )).map(compositions -> storageFilesDataSource.deleteCompositionFiles(compositions, folder))
                 .doOnSuccess(compositions -> foldersDao.deleteFolder(folder.getId(), compositions))
                 .subscribeOn(scheduler);
     }
@@ -254,9 +278,17 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder) {
-        return Single.fromCallable(() -> foldersDao.getAllParentFoldersId(currentFolder))
+    public Single<List<Long>> getAllParentFolders(@Nullable Long folderId) {
+        return Single.fromCallable(() -> foldersDao.getAllParentFoldersId(folderId))
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Long>> getAllParentFoldersForComposition(long id) {
+        return Single.fromCallable(() -> {
+            Long folderId = compositionsDao.getFolderId(id);
+            return foldersDao.getAllParentFoldersId(folderId);
+        }).subscribeOn(scheduler);
     }
 
     private List<Long> extractFolderIds(List<FileSource> sources) {

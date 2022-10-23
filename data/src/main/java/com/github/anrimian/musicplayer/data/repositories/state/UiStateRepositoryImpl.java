@@ -12,6 +12,7 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_COMPOSITIONS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_FOLDERS_POSITIONS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYER_CONTENT_PAGE;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYLISTS_COMPOSITIONS_POSITIONS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYLISTS_COMPOSITIONS_POSITIONS_MAX_CACHE_SIZE;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYLISTS_POSITION;
@@ -21,7 +22,22 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_LIBRARY_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_PLAYLIST_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.TRACK_POSITION;
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.musicplayer.domain.utils.rx.RxUtils.withDefaultValue;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import androidx.collection.LruCache;
+
+import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
+import com.github.anrimian.musicplayer.domain.models.Screens;
+import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
+
+import javax.annotation.Nullable;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -54,6 +70,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String CURRENT_QUEUE_ITEM_LAST_POSITION = "current_queue_item_last_position";
         String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
         String SELECTED_LIBRARY_SCREEN = "selected_library_screen";
+        String PLAYER_CONTENT_PAGE = "player_content_page";
         String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
         String SELECTED_FOLDER_SCREEN = "selected_folder_screen_id";
         String SELECTED_PLAYLIST_SCREEN = "selected_playlist_screen";
@@ -157,6 +174,16 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     @Override
     public int getSelectedLibraryScreen() {
         return preferences.getInt(SELECTED_LIBRARY_SCREEN, Screens.LIBRARY_COMPOSITIONS);
+    }
+
+    @Override
+    public void setPlayerContentPage(int position) {
+        preferences.putInt(PLAYER_CONTENT_PAGE, position);
+    }
+
+    @Override
+    public int getPlayerContentPage() {
+        return preferences.getInt(PLAYER_CONTENT_PAGE, 1);
     }
 
     @Override

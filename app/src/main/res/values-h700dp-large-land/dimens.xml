@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--widgets-->
-    <dimen name="widget_content_margin_vertical">4dp</dimen>
+    <dimen name="widget_content_margin_vertical">1dp</dimen>
+    <dimen name="widget_controls_bottom_margin">0dp</dimen>
+    <dimen name="widget_content_spacing_margin">1dp</dimen>
 
-    <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
-    <dimen name="widget_medium_controls_bottom_margin">4dp</dimen>
+    <dimen name="widget_medium_content_margin_vertical">1dp</dimen>
+    <dimen name="widget_medium_controls_bottom_margin">0dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_vertical">1dp</dimen>
+
 
 </resources>

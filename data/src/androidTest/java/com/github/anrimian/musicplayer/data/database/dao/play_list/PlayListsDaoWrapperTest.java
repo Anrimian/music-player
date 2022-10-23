@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.composition;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 import static java.util.Collections.emptyList;
-import static utils.TestDataProvider.composition;
 
 import android.content.Context;
 import android.util.Log;
@@ -83,13 +83,13 @@ public class PlayListsDaoWrapperTest {
             )));
         }
 
-        List<PlayListItem> items = daoWrapper.getPlayListItemsObservable(playlistId, false)
+        List<PlayListItem> items = daoWrapper.getPlayListItemsObservable(playlistId, false, null)
                 .blockingFirst();
         displayItems("testMoveItems, items: ", items);
 
         daoWrapper.moveItems(playlistId, 0, 7);
 
-        items = daoWrapper.getPlayListItemsObservable(playlistId, false)
+        items = daoWrapper.getPlayListItemsObservable(playlistId, false, null)
                 .blockingFirst();
         displayItems("testMoveItems, moved items: ", items);
 

@@ -8,7 +8,7 @@
     android:background="@drawable/bg_selectable_round_shape">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/iv_music_icon"
+        android:id="@+id/ivMusicIcon"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:scaleType="centerCrop"
@@ -35,7 +35,7 @@
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_music_icon"
+        app:layout_constraintTop_toBottomOf="@+id/ivMusicIcon"
         tools:text="album"/>
 
     <TextView

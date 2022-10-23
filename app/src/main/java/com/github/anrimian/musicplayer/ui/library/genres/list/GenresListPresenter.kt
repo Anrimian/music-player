@@ -1,15 +1,14 @@
 package com.github.anrimian.musicplayer.ui.library.genres.list
 
-import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
-import java.util.*
 
 class GenresListPresenter(private val interactor: LibraryGenresInteractor,
                           errorParser: ErrorParser,
@@ -66,7 +65,7 @@ class GenresListPresenter(private val interactor: LibraryGenresInteractor,
         listDisposable = interactor.getGenresObservable(searchText)
                 .observeOn(uiScheduler)
                 .subscribe(this::onGenresReceived, this::onGenresReceivingError)
-        presenterDisposable.add(listDisposable)
+        presenterDisposable.add(listDisposable!!)
     }
 
     private fun onGenresReceivingError(throwable: Throwable) {

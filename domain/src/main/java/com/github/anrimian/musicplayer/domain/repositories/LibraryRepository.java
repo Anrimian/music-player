@@ -29,6 +29,8 @@ public interface LibraryRepository {
 
     Observable<FullComposition> getCompositionObservable(long id);
 
+    Observable<String> getLyricsObservable(long id);
+
     Observable<List<Artist>> getArtistsObservable(@Nullable String searchText);
 
     Observable<List<Album>> getAlbumsObservable(@Nullable String searchText);
@@ -40,6 +42,12 @@ public interface LibraryRepository {
     Observable<List<Composition>> getGenreItemsObservable(long genreId);
 
     Observable<List<Composition>> getAlbumItemsObservable(long albumId);
+
+    Single<List<Long>> getCompositionIdsInAlbum(long albumId);
+
+    Single<List<Long>> getAllCompositionsByArtist(long artistId);
+
+    Single<List<Long>> getAllCompositionsByGenre(long genreId);
 
     Observable<Album> getAlbumObservable(long albumId);
 
@@ -84,5 +92,7 @@ public interface LibraryRepository {
 
     Single<List<Composition>> deleteFolders(List<FileSource> folders);
 
-    Single<List<Long>> getAllParentFolders(@Nullable Long currentFolder);
+    Single<List<Long>> getAllParentFolders(@Nullable Long folder);
+
+    Single<List<Long>> getAllParentFoldersForComposition(long id);
 }

@@ -3,6 +3,8 @@ package com.github.anrimian.musicplayer.data.database.converters;
 import androidx.room.TypeConverter;
 
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSourceKt;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 
 import javax.annotation.Nullable;
@@ -40,4 +42,15 @@ public class EnumConverter {
         }
         return value.name();
     }
+
+    @TypeConverter
+    public InitialSource toInitialSource(int value) {
+        return InitialSourceKt.fromId(value);
+    }
+
+    @TypeConverter
+    public int toInt(InitialSource value) {
+        return value.getId();
+    }
+
 }

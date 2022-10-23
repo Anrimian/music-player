@@ -16,4 +16,5 @@ public interface Payloads {
     Object ITEM_UNSELECTED = new Object();
     Object NAME = new Object();
     Object COMPOSITIONS_COUNT = new Object();
+    Object FILE_EXISTS = new Object();
 }

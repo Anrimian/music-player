@@ -1,5 +1,12 @@
 package com.github.anrimian.musicplayer.ui.library.genres.list.adapter;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
+import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
+import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
+
 import android.text.SpannableStringBuilder;
 import android.view.ViewGroup;
 
@@ -13,13 +20,6 @@ import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionS
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.COMPOSITIONS_COUNT;
-import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
-import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 public class GenreViewHolder extends BaseViewHolder {
 
@@ -43,12 +43,11 @@ public class GenreViewHolder extends BaseViewHolder {
         showAdditionalInfo();
     }
 
-    public void update(Genre album, List<Object> payloads) {
+    public void update(Genre album, List<?> payloads) {
         this.genre = album;
         for (Object payload: payloads) {
             if (payload instanceof List) {
-                //noinspection SingleStatementInBlock,unchecked
-                update(album, (List) payload);
+                update(album, (List<?>) payload);
             }
             if (payload == NAME) {
                 showGenreName();

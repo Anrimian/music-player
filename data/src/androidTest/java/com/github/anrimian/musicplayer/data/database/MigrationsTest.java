@@ -31,6 +31,15 @@ public class MigrationsTest {
     );
 
     @Test
+    public void testMigrationFrom8To9() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 8);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                9,
+                false,
+                Migrations.getMigration8_9(context));
+    }
+
+    @Test
     public void testMigrationFrom7To8() throws Exception {
         testHelper.createDatabase(TEST_DB_NAME, 7);
         testHelper.runMigrationsAndValidate(TEST_DB_NAME,

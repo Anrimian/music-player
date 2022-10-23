@@ -48,10 +48,6 @@
     <string name="save_as_play_list">Αποθήκευση ως λίστα αναπαραγωγής</string>
     <string name="cancel">Ακύρωση</string>
     <string name="deleting">Διαγραφή</string>
-    <string name="delete_composition_template">Διαγραφή τραγουδιού \"%1$s\"; Αυτό δεν μπορεί να αναιρεθεί.</string>
-    <string name="delete_empty_folder">Διαγραφή φακέλου \"%s\"; Αυτό δεν μπορεί να αναιρεθεί.</string>
-    <string name="delete_folder_template">Διαγραφή %2$s από το φάκελο \"%1$s\"; Αυτό δεν μπορεί να αναιρεθεί.</string>
-    <string name="delete_template">Διαγραφή \"%1$s\"; Αυτό δεν μπορεί να αναιρεθεί.</string>
     <string name="delete_composition_success">Το τραγούδι \"%1$s\" διαγράφηκε</string>
     <string name="search">Αναζήτηση</string>
     <string name="play_queue">Αναπαραγωγή λίστας</string>
@@ -117,7 +113,6 @@
     <string name="copied_message">Κείμενο αντιγράφηκε</string>
     <string name="folder_name">Όνομα φακέλου</string>
     <string name="rename_folder">Μετονομασία φακέλου</string>
-    <string name="cut">Αποκοπή</string>
     <string name="copy">Αντιγραφή</string>
     <string name="paste">Επικόλληση</string>
     <string name="paste_in_new_folder">Επικόλληση σε νέο φάκελο</string>
@@ -181,7 +176,6 @@
     <string name="clear_play_queue">Καθαρισμός τρέχουσας λίστας</string>
     <string name="no_excluded_folders">Οι φάκελοι που εξαιρούνται από την αναζήτηση θα εμφανίζονται εδώ</string>
     <string name="keep_playing_after_window_close">Συνέχιση αναπαραγωγής αφού το παράθυρο κλείσει</string>
-    <string name="unknown_play_error">Άγνωστο σφάλμα αναπαραγωγής</string>
     <string name="equalizer">Ισοσταθμιστής(Εκουαλάιζερ)</string>
     <string name="system_equalizer">Ισοσταθμιστής συστήματος</string>
     <string name="no_equalizer">Κανένα</string>
@@ -193,7 +187,6 @@
     <string name="pick_from_gallery">Επιλογή από την συλλογή</string>
     <string name="remove_cover">Διαγραφή εξωφύλλου</string>
     <string name="editor_timeout_error">Ο επεξεργαστής ετικετών δεν εκκινείτε. Πιθανών ο τύπος αρχείου να μην υποστηρίζεται</string>
-    <string name="change_lyrics">Αλλαγή στίχων</string>
     <string name="lyrics">Στίχοι</string>
     <string name="check_tags_error">Αδυναμία ελέγχου ετικετών κομματιού: %s</string>
     <string name="changing_file_progress">Αλλαγή αρχείου…</string>
@@ -204,7 +197,7 @@
     <string name="critical_error_report_message">Η εφαρμογή αντιμετώπισε ένα κρίσιμο σφάλμα και δεν μπόρεσε να ξεκινήσει. Αυτό το σφάλμα είναι εξαιρετικά ανεπιθύμητο. Η εφαρμογή δεν στέλνει καμία πληροφορία αυτόματα, αλλά μπορείτε να στείλετε με μήνυμα ηλεκτρονικού ταχυδρομείου, το αρχείο καταγραφής σφαλμάτων. Αυτό θα βοηθήσει να διορθωθεί το σφάλμα.</string>
     <string name="error_report_message">Συνέβη ένα κρίσιμο σφάλμα. Η εφαρμογή δεν στέλνει καμία πληροφορία αυτόματα, αλλά μπορείτε να στείλετε με μήνυμα ηλεκτρονικού ταχυδρομείου, το αρχείο καταγραφής σφαλμάτων. Αυτό θα βοηθήσει να διορθωθεί το σφάλμα.</string>
     <string name="show_error_report_dialog_on_start">Εμφάνιση διαλόγου αναφοράς σφάλματος κατά την εκκίνηση της εφαρμογής εφόσον η εφαρμογή έχει καταρρεύσει</string>
-    <string name="do_not_show_confirm_delete_dialog">Να μην εμφανίζεται ο διάλογος επιβεβαίωσης διαγραφής της εφαρμογής</string>
+    <string name="do_not_show_confirm_delete_dialog">Να μην εμφανίζεται ο διάλογος επιβεβαίωσης διαγραφής πολυμέσων</string>
     <string name="app_equalizer">Ισοσταθμιστής εφαρμογής</string>
     <string name="presets">Προεπιλεγμένα</string>
     <string name="playback_speed">Ταχύτητα αναπαραγωγής</string>
@@ -216,9 +209,9 @@
     <string name="sleep_timer_message">Η αναπαραγωγή θα σταματήσει σε:</string>
     <string name="stop">Παύση</string>
     <string name="exclude_compositions_with_duration_less_than">Εξαιρούμενα κομμάτια από την αναζήτηση</string>
-    <string name="with_duration_less_than">Με λειτουργία λιγότερη από %s</string>
-    <string name="pause_on_audiofocus_loss">Παύση αναπαραγωγής κατά τις κλείσεις, αναπαραγωγή μουσικής/βίντεο, κλπ.</string>
-    <string name="show_cover_stub_in_notification">Εμφάνιση εξώφυλλου-παράδειγμα στην ειδοποίηση όταν δεν βρίσκεται εξώφυλλο</string>
+    <string name="with_duration_less_than">Με διάρκεια λιγότερη από %s</string>
+    <string name="pause_on_audiofocus_loss">Παύση αναπαραγωγής κατά τις κλήσεις, αναπαραγωγή μουσικής/βίντεο, κλπ.</string>
+    <string name="show_cover_stub_in_notification">Εμφάνιση προκαθορισμένου εξώφυλλου στην ειδοποίηση όταν δεν βρίσκεται εξώφυλλο</string>
     <string name="write_to_this_is_not_allowed">Δεν υπάρχει άδεια για την τροποποίηση αυτού του αρχείου. Προσπαθήστε από την εφαρμογή εμφάνισης αρχείων.</string>
     <string name="shuffle_all_and_play">Ανακάτεμα και αναπαραγωγή όλων</string>
     <string name="rewind">Επιστροφή στην αρχή</string>
@@ -239,19 +232,33 @@
     <string name="enabled_media_players">Ενεργές εφαρμογές πολυμέσων</string>
     <string name="advanced_settings">Για προχωρημένους</string>
     <string name="media_players_setting_description">Η εφαρμογή χρησιμοποιεί ορισμένες εφαρμογές πολυμέσων για την αναπαραγωγή μουσικής. Εδώ μπορούνε να απενεργοποιηθούν ή να αλλαχθεί η προτεραιότητα χρήσης τους. όλες οι αλλαγές θα εφαρμοστούν μόνο μετά την επανεκκίνηση της εφαρμογής.</string>
-    <!--not verified-->
-    <string name="sound_balance">Υπόλοιπο ήχου</string>
+    <string name="sound_balance">Ισορροπία ήχου</string>
     <string name="sound_balance_state">Αριστερά: %1$d%%, Δεξιά: %2$d%%</string>
     <string name="language">Γλώσσα</string>
     <string name="follow_system_language">Ακολουθήστε τη γλώσσα συστήματος</string>
-    <!---->
+    <string name="move">Μετακίνηση</string>
+    <string name="no_compositions_in_folder">Δεν βρέθηκαν τραγούδια σε αυτό το φάκελο</string>
+    <string name="follow_system_theme">Χρήση του θέματος συστήματος</string>
+    <string name="play_queue_is_empty">Η λίστα αναπαραγωγής είναι κενή</string>
+    <string name="no_lyrics_for_current_composition">Δεν βρέθηκαν στίχοι για το τρέχων τραγούδι</string>
+    <string name="edit_lyrics">Επεξεργασία στίχων</string>
+    <string name="show_in_folders">Εμφάνηση στους φακέλους</string>
+    <string name="file_source_not_found">Το απομακρυσμένο αρχείο δεν βρέθηκε</string>
+    <string name="file_is_too_large">Πολύ μεγάλο αρχείο</string>
+    <string name="preparing_files">Προετοιμασία αρχείων</string>
+    <string name="downloading">Λήψη: %1$d/%2$d</string>
+    <string name="downloading_progress">Λήψη(%d%%)</string>
+    <string name="rename_progress_count">Μετονομασία(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.</string>
+    <string name="delete_composition_template">Διαγραφή τραγουδιού \"%1$s\"</string>
+    <string name="delete_empty_folder">Διαγραφή φακέλου \"%s\"</string>
+    <string name="delete_folder_template">%2$s από φάκελο \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">Από το Android 11 και έπειτα, η αντιγραφή/μετακίνηση/μετονομασία αρχείων επιτρέπεται μόνο στους φακέλους: \"%s\".
+        Τοποθετήστε τα αρχεία ήχου σε αυτούς τους φακέλους και η εργασία αυτή θα λειτουργήσει σωστά.
+    </string>
+    <string name="folder_already_excluded_from_scanning">Αυτός ο φάκελος εξαιρείται ήδη από την αναζήτηση</string>
 
     <plurals name="compositions_count">
-        <item quantity="one">%1$s τραγούδι</item>
-        <item quantity="other">%1$s τραγούδια</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
         <item quantity="one">%1$s τραγούδι</item>
         <item quantity="other">%1$s τραγούδια</item>
     </plurals>
@@ -294,6 +301,11 @@
     <plurals name="seconds_template">
         <item quantity="one">%1$d δευτερόλεπτο</item>
         <item quantity="other">%1$d δευτερόλεπτα</item>
+    </plurals>
+
+    <plurals name="delete_compositions_template">
+        <item quantity="one">Διαγραφή %d τραγουδιού</item>
+        <item quantity="other">Διαγραφή %d τραγιυδιών</item>
     </plurals>
 
 </resources>

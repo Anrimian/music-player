@@ -1,39 +1,35 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner;
 
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageComposition;
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.fakeStorageFullComposition;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static java.util.Collections.emptyList;
-import static utils.TestDataProvider.fakeStorageComposition;
-import static utils.TestDataProvider.fakeStorageFullComposition;
 
 import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
-import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode;
-import com.github.anrimian.musicplayer.data.repositories.scanner.nodes.AddedNode;
+import com.github.anrimian.musicplayer.data.models.composition.AudioFileType;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
+import com.github.anrimian.musicplayer.data.utils.TestDataProvider.StorageCompositionBuilder;
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
-import utils.TestDataProvider.StorageCompositionBuilder;
 
 public class StorageCompositionAnalyzerTest {
 
@@ -42,15 +38,19 @@ public class StorageCompositionAnalyzerTest {
     private final StateRepository stateRepository = mock(StateRepository.class);
     private final StorageCompositionsInserter compositionsInserter = mock(StorageCompositionsInserter.class);
 
-    private StorageCompositionAnalyzer analyzer;
-    
+    private final StorageCompositionAnalyzer analyzer = new StorageCompositionAnalyzer(
+            compositionsDao,
+            foldersDao,
+            stateRepository,
+            compositionsInserter,
+            ""
+    );
+
     @BeforeEach
     public void setUp() {
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(new LongSparseArray<>());
 
         when(foldersDao.getIgnoredFolders()).thenReturn(new String[0]);
-
-        analyzer = new StorageCompositionAnalyzer(compositionsDao, foldersDao, stateRepository, compositionsInserter);
     }
 
     @Test
@@ -74,18 +74,16 @@ public class StorageCompositionAnalyzerTest {
 
         verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter).applyChanges(
-                any(),
                 eq(asList(fakeStorageFullComposition(4, "music-4"))),//new
                 eq(asList(fakeStorageComposition(2, "music-2"))),//removed
-                eq(asList(new Change<>(fakeStorageComposition(3, "music-3"), changedComposition))),
-                any(),
-                any());
+                eq(asList(new Change<>(fakeStorageComposition(3, "music-3"), changedComposition)))
+        );
     }
 
     @Test
     public void testUpdateTimeChange() {
         LongSparseArray<StorageComposition> map = new LongSparseArray<>();
-        map.put(1L, fakeStorageComposition(1L, "test", 1, 1000));
+        map.put(1L, fakeStorageComposition(1L, "test", 1, 1000L));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(map);
 
         LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
@@ -99,12 +97,10 @@ public class StorageCompositionAnalyzerTest {
 
         verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter, never()).applyChanges(
-                any(),
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1000), changedComposition))),
-                any(),
-                any());
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1000), changedComposition)))
+        );
     }
 
     @Test
@@ -123,19 +119,18 @@ public class StorageCompositionAnalyzerTest {
                 1L,
                 new Date(1),
                 new Date(1000),
-                null);
+                null,
+                AudioFileType.MUSIC);
         newCompositions.put(1L, changedComposition);
 
         analyzer.applyCompositionsData(newCompositions);
 
         verify(stateRepository).setRootFolderPath(eq("test"));
         verify(compositionsInserter).applyChanges(
-                any(),
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition))),
-                any(),
-                any());
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition)))
+        );
     }
 
     @Test
@@ -154,19 +149,17 @@ public class StorageCompositionAnalyzerTest {
                 1L,
                 new Date(1),
                 new Date(1000),
-                new StorageAlbum(1, "test album", null, 0, 1));
+                new StorageAlbum(1, "test album", null, 0, 1), AudioFileType.MUSIC);
         newCompositions.put(1L, changedComposition);
 
         analyzer.applyCompositionsData(newCompositions);
 
         verify(stateRepository).setRootFolderPath(eq("test"));
         verify(compositionsInserter).applyChanges(
-                any(),
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition))),
-                any(),
-                any());
+                eq(asList(new Change<>(fakeStorageComposition(1L, "test", 1, 1), changedComposition)))
+        );
     }
 
     @Test
@@ -182,6 +175,8 @@ public class StorageCompositionAnalyzerTest {
                 0,
                 1L,
                 1L,
+                AudioFileType.MUSIC,
+                InitialSource.LOCAL,
                 null,
                 new Date(1),
                 new Date(1),
@@ -199,19 +194,17 @@ public class StorageCompositionAnalyzerTest {
                 1L,
                 new Date(1),
                 new Date(1000),
-                new StorageAlbum(1, "test album", "new album artist", 0, 1));
+                new StorageAlbum(1, "test album", "new album artist", 0, 1), AudioFileType.MUSIC);
         newCompositions.put(1L, changedComposition);
 
         analyzer.applyCompositionsData(newCompositions);
 
         verify(stateRepository).setRootFolderPath(eq("test"));
         verify(compositionsInserter).applyChanges(
-                any(),
                 eq(emptyList()),
                 eq(emptyList()),
-                eq(asList(new Change<>(oldComposition, changedComposition))),
-                any(),
-                any());
+                eq(asList(new Change<>(oldComposition, changedComposition)))
+        );
     }
 
     @Test
@@ -235,56 +228,20 @@ public class StorageCompositionAnalyzerTest {
 
         verify(stateRepository).setRootFolderPath(eq("0/etc/sdcard"));
         verify(compositionsInserter).applyChanges(
-                any(),
                 eq(asList(expectedComposition)),
                 eq(emptyList()),
-                eq(emptyList()),
-                any(),
-                any());
-    }
-
-    @Test
-    public void insertFolderTest() {
-        LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
-
-        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
-        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("music/new").build();
-        StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
-        LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
-        newCompositions.put(1, c1);
-        newCompositions.put(2, c2);
-        newCompositions.put(3, c3);
-
-        analyzer.applyCompositionsData(newCompositions);
-
-        List<AddedNode> expectedNodesToInsert = new ArrayList<>();
-        FolderNode<Long> node = new FolderNode<>("music");
-        node.addFolder(new FolderNode<>("new"));
-        expectedNodesToInsert.add(new AddedNode(null, node));
-
-        verify(stateRepository).setRootFolderPath(eq(null));
-        verify(compositionsInserter).applyChanges(
-                eq(expectedNodesToInsert),
-                eq(asList(c1, c2, c3)),
-                eq(emptyList()),
-                eq(emptyList()),
-                any(),
-                eq(emptyList()));
+                eq(emptyList())
+        );
     }
 
     @Test
     public void mergeSameFoldersTest() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
-        currentCompositions.put(2, fakeStorageComposition(2, "music-2", 2L));
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1", "music"));
+        currentCompositions.put(2, fakeStorageComposition(2, "music-2", "music/new"));
         currentCompositions.put(3, fakeStorageComposition(3, "music-3"));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
 
-        List<StorageFolder> folders = new LinkedList<>();
-        folders.add(new StorageFolder(1L, null, "music"));
-        folders.add(new StorageFolder(2L, 1L, "new"));
-        when(foldersDao.getAllFolders()).thenReturn(folders);
 
         StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
         StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("music/new").build();
@@ -297,104 +254,21 @@ public class StorageCompositionAnalyzerTest {
         analyzer.applyCompositionsData(newCompositions);
 
         verify(stateRepository).setRootFolderPath(eq(null));
-        verify(compositionsInserter, never()).applyChanges(any(),
+        verify(compositionsInserter, never()).applyChanges(
                 any(),
                 any(),
-                any(),
-                any(),
-                any());
-    }
-
-    @Test
-    public void mergeMovedFoldersTest() {
-        LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
-        currentCompositions.put(2, composition2);
-        currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
-        when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
-
-        List<StorageFolder> folders = new LinkedList<>();
-        folders.add(new StorageFolder(1L, null, "music"));
-        folders.add(new StorageFolder(2L, 1L, "new"));
-        when(foldersDao.getAllFolders()).thenReturn(folders);
-
-        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
-        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("new").build();
-        StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
-        LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
-        newCompositions.put(1, c1);
-        newCompositions.put(2, c2);
-        newCompositions.put(3, c3);
-
-        analyzer.applyCompositionsData(newCompositions);
-
-        List<AddedNode> expectedNodesToInsert = new ArrayList<>();
-        FolderNode<Long> node = new FolderNode<>("new");
-        node.addFile(2L);
-        expectedNodesToInsert.add(new AddedNode(null, node));
-
-        verify(stateRepository).setRootFolderPath(eq(null));
-        verify(compositionsInserter).applyChanges(
-                eq(expectedNodesToInsert),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(asList(new Change<>(composition2, c2))),
-                any(),
-                eq(asList(2L)));
-    }
-
-    @Test
-    public void mergeMovedFilesTest() {
-        LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
-        currentCompositions.put(2, composition2);
-        currentCompositions.put(3, fakeStorageComposition(3, "music-3", null));
-        when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
-
-        List<StorageFolder> folders = new LinkedList<>();
-        folders.add(new StorageFolder(1L, null, "music"));
-        folders.add(new StorageFolder(2L, 1L, "new"));
-        when(foldersDao.getAllFolders()).thenReturn(folders);
-
-        StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
-        StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2").relativePath("new").build();
-        StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
-        LongSparseArray<StorageFullComposition> newCompositions = new LongSparseArray<>();
-        newCompositions.put(1, c1);
-        newCompositions.put(2, c2);
-        newCompositions.put(3, c3);
-
-        analyzer.applyCompositionsData(newCompositions);
-
-        List<AddedNode> expectedNodesToInsert = new ArrayList<>();
-        FolderNode<Long> node = new FolderNode<>("new");
-        expectedNodesToInsert.add(new AddedNode(null, node));
-
-        verify(stateRepository).setRootFolderPath(eq(null));
-        verify(compositionsInserter).applyChanges(
-                eq(expectedNodesToInsert),
-                eq(emptyList()),
-                eq(emptyList()),
-                eq(asList(new Change<>(composition2, c2))),
-                any(),
-                any());
+                any()
+        );
     }
 
     @Test
     public void mergeDeletedFoldersTest() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 2L);
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1", "music"));
+        StorageComposition composition2 = fakeStorageComposition(2, "music-2", "music/new");
         currentCompositions.put(2, composition2);
         currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
-
-        List<StorageFolder> folders = new LinkedList<>();
-        folders.add(new StorageFolder(1L, null, "music"));
-        folders.add(new StorageFolder(2L, 1L, "new"));
-        when(foldersDao.getAllFolders()).thenReturn(folders);
 
         StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
         StorageFullComposition c3 = new StorageCompositionBuilder(3, "music-3").relativePath("").build();
@@ -407,31 +281,18 @@ public class StorageCompositionAnalyzerTest {
         verify(stateRepository).setRootFolderPath(eq(null));
         verify(compositionsInserter).applyChanges(
                 eq(emptyList()),
-                eq(emptyList()),
                 eq(asList(composition2)),
-                eq(emptyList()),
-                any(),
-                eq(asList(2L)));
+                eq(emptyList())
+        );
     }
 
-    //check: can we put into compositionsFolderIdMap irrelevant folder id?
-    //check: can we have the same folder in list for insert/modify and delete?
-    //check: can we fail to insert folder but mapping compId=null causes replace?
-    //check: exists composition, move to new folder AND change other field - causes update to irrelevant folder id?
     @Test
     public void testDeleteFolderWithoutCompositionIssue() {
         LongSparseArray<StorageComposition> currentCompositions = new LongSparseArray<>();
-        currentCompositions.put(1, fakeStorageComposition(1, "music-1", 1L));
-        StorageComposition composition2 = fakeStorageComposition(2, "music-2", 1L);
+        currentCompositions.put(1, fakeStorageComposition(1, "music-1", "music"));
+        StorageComposition composition2 = fakeStorageComposition(2, "music-2", "music");
         currentCompositions.put(2, composition2);
-//        currentCompositions.put(3,  fakeStorageComposition(3, "music-3"));
         when(compositionsDao.selectAllAsStorageCompositions()).thenReturn(currentCompositions);
-
-        List<StorageFolder> folders = new LinkedList<>();
-        folders.add(new StorageFolder(1L, null, "music"));
-//        folders.add(new StorageFolder(2L, 1L, "new"));
-//        folders.add(new StorageFolder(3L, 2L, "newest"));
-        when(foldersDao.getAllFolders()).thenReturn(folders);
 
         StorageFullComposition c1 = new StorageCompositionBuilder(1, "music-1").relativePath("music").build();
         StorageFullComposition c2 = new StorageCompositionBuilder(2, "music-2 EDITED").relativePath("music/new").build();
@@ -440,15 +301,6 @@ public class StorageCompositionAnalyzerTest {
         newCompositions.put(2, c2);
 
         analyzer.applyCompositionsData(newCompositions);
-
-//        verify(stateRepository).setRootFolderPath(any());
-//        verify(compositionsInserter).applyChanges(
-//                eq(emptyList()),
-//                eq(emptyList()),
-//                eq(emptyList()),
-//                eq(asList(new Change<>(composition2, c2))),
-//                any(),
-//                eq(emptyList()));
     }
 
 }

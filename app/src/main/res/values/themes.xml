@@ -56,10 +56,15 @@
 
     </style>
 
+    <style name="PrimaryPurpleTheme" parent="PrimaryLightTheme">
+        <item name="colorAccentContrast">@color/colorAccentContrast</item>
+    </style>
+
     <style name="PrimaryBlueTheme" parent="PrimaryLightTheme">
         <item name="colorPrimary">@color/colorBluePrimary</item>
         <item name="colorPrimaryDark">@color/colorBluePrimaryDark</item>
         <item name="colorAccent">@color/colorGreenAccent</item>
+        <item name="colorAccentContrast">@color/colorGreenAccentContrast</item>
 
         <!--text-->
         <item name="dialogButtonColor">@color/colorGreenAccent</item>
@@ -72,6 +77,7 @@
         <item name="colorPrimary">@color/colorTealPrimary</item>
         <item name="colorPrimaryDark">@color/colorTealPrimaryDark</item>
         <item name="colorAccent">@color/colorPinkAccent</item>
+        <item name="colorAccentContrast">@color/colorPinkAccentContrast</item>
 
         <!--text-->
         <item name="dialogButtonColor">@color/colorPinkAccent</item>
@@ -84,6 +90,7 @@
         <item name="colorPrimary">@color/colorRedPrimary</item>
         <item name="colorPrimaryDark">@color/colorRedPrimaryDark</item>
         <item name="colorAccent">@color/colorRedPrimary</item>
+        <item name="colorAccentContrast">@color/colorRedAccentContrast</item>
 
         <!--text-->
         <item name="dialogButtonColor">@color/colorRedPrimary</item>
@@ -114,6 +121,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryWhiteGray</item>
         <item name="colorAccent">@color/colorAccentBlue</item>
         <item name="colorPrimaryVariant">@color/colorAccentBlue</item>
+        <item name="colorAccentContrast">@color/colorAccentBlueContrast</item>
 
         <!--text colors-->
         <item name="toolbarTextColorPrimary">@color/text_color_primary</item>

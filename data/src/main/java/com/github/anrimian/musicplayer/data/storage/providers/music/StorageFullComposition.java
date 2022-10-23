@@ -22,12 +22,9 @@ public class StorageFullComposition {
     @Nonnull
     private final String fileName;
 
-    @Nonnull
-    private final String relativePath;
-
     private final long duration;
     private final long size;
-    private final long id;
+    private final long storageId;
 
     @Nonnull
     private final Date dateAdded;
@@ -36,26 +33,38 @@ public class StorageFullComposition {
 
     private final StorageAlbum storageAlbum;
 
+    private final int audioFileType;
+
+    @Nonnull
+    private String relativePath;
+
+
     public StorageFullComposition(@Nullable String artist,
                                   @Nullable String title,
                                   @Nonnull String fileName,
                                   @Nonnull String relativePath,
                                   long duration,
                                   long size,
-                                  long id,
+                                  long storageId,
                                   @Nonnull Date dateAdded,
                                   @Nonnull Date dateModified,
-                                  StorageAlbum storageAlbum) {
+                                  StorageAlbum storageAlbum,
+                                  int audioFileType) {
         this.artist = artist;
         this.title = title;
         this.fileName = fileName;
         this.relativePath = relativePath;
         this.duration = duration;
         this.size = size;
-        this.id = id;
+        this.storageId = storageId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.storageAlbum = storageAlbum;
+        this.audioFileType = audioFileType;
+    }
+
+    public void setRelativePath(@Nonnull String relativePath) {
+        this.relativePath = relativePath;
     }
 
     @Nonnull
@@ -90,8 +99,8 @@ public class StorageFullComposition {
         return size;
     }
 
-    public long getId() {
-        return id;
+    public long getStorageId() {
+        return storageId;
     }
 
     @Nonnull
@@ -104,6 +113,10 @@ public class StorageFullComposition {
         return dateModified;
     }
 
+    public int getAudioFileType() {
+        return audioFileType;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -111,7 +124,7 @@ public class StorageFullComposition {
                 "\n artist='" + artist + '\'' +
                 ",\n title='" + title + '\'' +
                 ",\n relativePath='" + relativePath + '\'' +
-                ",\n id=" + id +
+                ",\n id=" + storageId +
                 "\n }";
     }
 
@@ -122,12 +135,12 @@ public class StorageFullComposition {
 
         StorageFullComposition that = (StorageFullComposition) o;
 
-        return id == that.id;
+        return storageId == that.storageId;
 
     }
 
     @Override
     public int hashCode() {
-        return (int) (id ^ (id >>> 32));
+        return (int) (storageId ^ (storageId >>> 32));
     }
 }

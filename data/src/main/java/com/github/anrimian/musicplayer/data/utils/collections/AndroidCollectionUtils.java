@@ -31,6 +31,12 @@ public class AndroidCollectionUtils {
         return to;
     }
 
+    public static <E> void forEach(LongSparseArray<E> sparseArray, Callback<E> func) {
+        for(int i = 0, size = sparseArray.size(); i < size; i++) {
+            E existValue = sparseArray.valueAt(i);
+            func.call(existValue);
+        }
+    }
 
     public static <V> boolean processChanges(LongSparseArray<V> oldMap,
                                              LongSparseArray<V> newMap,

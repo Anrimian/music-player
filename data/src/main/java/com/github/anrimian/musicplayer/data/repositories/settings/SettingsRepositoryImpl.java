@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.settings;
 
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
 import static com.github.anrimian.musicplayer.domain.models.order.OrderType.ADD_TIME;
 import static com.github.anrimian.musicplayer.domain.models.order.OrderType.COMPOSITION_COUNT;
+import static com.github.anrimian.musicplayer.domain.utils.rx.RxUtils.withDefaultValue;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -416,7 +416,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public boolean isNotificationCoverStubEnabled() {
-        return preferences.getBoolean(SHOW_NOTIFICATION_COVER_STUB, true);
+        boolean defaultValue = Build.VERSION.SDK_INT < Build.VERSION_CODES.R;
+        return preferences.getBoolean(SHOW_NOTIFICATION_COVER_STUB, defaultValue);
     }
 
     @Override
@@ -457,7 +458,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public boolean isShowAllAudioFilesEnabled() {
-        return preferences.getBoolean(SHOW_ALL_AUDIO_FILES, false);
+        return preferences.getBoolean(SHOW_ALL_AUDIO_FILES, true);
     }
 
     @Override

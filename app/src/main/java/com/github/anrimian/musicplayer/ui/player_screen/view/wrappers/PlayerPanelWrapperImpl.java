@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarDelegate;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarVisibilityDelegate;
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView;
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager;
@@ -54,7 +55,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     private final TextView tvCurrentComposition;
     private final CoordinatorLayout clPlayQueueContainer;
     private final AdvancedToolbar toolbar;
-    private final View titleContainer;
+    private final JugglerView contentViewContainer;
 
     private final Activity activity;
     private final Runnable onBottomSheetDragCollapsed;
@@ -63,6 +64,9 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
 
     private final BottomSheetBehavior<View> bottomSheetBehavior;
     private final SlideDelegate bottomSheetDelegate;
+
+    @Nullable
+    private Runnable collapseDelayedAction;
 
     public PlayerPanelWrapperImpl(View view,
                                   FragmentDrawerBinding viewBinding,
@@ -81,7 +85,6 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         this.onBottomSheetDragExpanded = onBottomSheetDragExpanded;
         this.bottomSheetStateListener = bottomSheetStateListener;
 
-        titleContainer = viewBinding.toolbar.titleContainer;
         queueToolbarBinding = viewBinding.toolbarPlayQueue;
         toolbarBinding = viewBinding.toolbar;
         clPlayQueueContainer = viewBinding.clPlayQueueContainer;
@@ -90,6 +93,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         toolbar = toolbarBinding.getRoot();
         bottomSheetLeftShadow = view.findViewById(R.id.bottom_sheet_left_shadow);
         bottomSheetTopLeftShadow = view.findViewById(R.id.bottom_sheet_top_left_shadow);
+        contentViewContainer = view.findViewById(R.id.drawer_fragment_container);
 
         setViewStartState();
         if (savedInstanceState == null) {
@@ -135,6 +139,12 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     }
 
     @Override
+    public void collapseBottomPanelSmoothly(Runnable doOnCollapse) {
+        collapseDelayedAction = doOnCollapse;
+        collapseBottomPanelSmoothly();
+    }
+
+    @Override
     public void expandBottomPanel() {
         bottomSheetStateListener.call(true);
 
@@ -148,7 +158,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     }
 
     @Override
-    public void openPlayQueue() {
+    public void openPlayerPanel() {
         setButtonsSelectableBackground(R.drawable.bg_selectable_round_shape);
         if (bottomSheetBehavior.getState() == STATE_COLLAPSED) {
             bottomSheetBehavior.setState(STATE_EXPANDED);
@@ -165,6 +175,10 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     private void onBottomSheetStateChanged(Integer newState) {
         switch (newState) {
             case STATE_COLLAPSED: {
+                if (collapseDelayedAction != null) {
+                    collapseDelayedAction.run();
+                    collapseDelayedAction = null;
+                }
                 onBottomSheetDragCollapsed.run();
                 return;
             }
@@ -180,13 +194,16 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(queueToolbarBinding.getRoot())))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarVisibilityDelegate(toolbar))))
                 .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(toolbarBinding.flToolbarContentContainer))))
+                .addDelegate(new BoundValuesDelegate(1f, 1f, new ReverseDelegate(new VisibilityDelegate(contentViewContainer))))
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
                 .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(viewBinding.drawerFragmentContainer))))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.icon_size, panelBinding.ivMusicIcon)))
+                .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(panelBinding.pvFileState)))
                 .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(panelBinding.tvCurrentCompositionAuthor)))
                 .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(panelBinding.btnActionsMenu)))
                 .addDelegate(new BoundValuesDelegate(0.93f, 1.0f, new VisibilityDelegate(panelBinding.sbTrackState)))
+                .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(panelBinding.tvError)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(panelBinding.btnInfinitePlay)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(panelBinding.btnRandomPlay)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvPlayedTime)))
@@ -223,8 +240,10 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     private void setViewStartState() {
         clPlayQueueContainer.setVisibility(INVISIBLE);
         queueToolbarBinding.getRoot().setVisibility(INVISIBLE);
+        queueToolbarBinding.getRoot().setAlpha(0f);
         toolbarBinding.flToolbarContentContainer.setVisibility(INVISIBLE);
-        toolbarBinding.titleContainer.setVisibility(INVISIBLE);
+        toolbar.setContentAlpha(0f);
+        contentViewContainer.setVisibility(INVISIBLE);
     }
 
     private boolean isInLandscapeOrientation() {

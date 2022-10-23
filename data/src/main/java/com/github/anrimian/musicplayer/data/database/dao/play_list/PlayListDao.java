@@ -161,7 +161,8 @@ public interface PlayListDao {
                 CompositionsDao.getCompositionSelectionQuery(useFileName) +
                 "FROM play_lists_entries " +
                 "INNER JOIN compositions ON play_lists_entries.audioId = compositions.id " +
-                "WHERE play_lists_entries.playListId = ? " +
+                "WHERE play_lists_entries.playListId = ? AND " +
+                CompositionsDao.getSearchQuery(useFileName) +
                 "ORDER BY orderPosition";
     }
 }

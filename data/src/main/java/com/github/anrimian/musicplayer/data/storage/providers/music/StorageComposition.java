@@ -2,6 +2,8 @@ package com.github.anrimian.musicplayer.data.storage.providers.music;
 
 import androidx.annotation.NonNull;
 
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
+
 import java.util.Date;
 
 import javax.annotation.Nonnull;
@@ -24,12 +26,15 @@ public class StorageComposition {
     @Nullable
     private final String album;
     @Nonnull
-    private final String filePath;
+    private final String parentPath;
 
     private final long duration;
     private final long size;
     private final long id;
     private final long storageId;
+
+    private final int audioFileType;
+    private final InitialSource initialSource;
 
     @Nullable
     private final Long folderId;
@@ -46,11 +51,13 @@ public class StorageComposition {
                               @Nullable String title,
                               @Nonnull String fileName,
                               @Nullable String album,
-                              @Nonnull String filePath,
+                              @Nonnull String parentPath,
                               long duration,
                               long size,
                               long id,
                               long storageId,
+                              int audioFileType,
+                              InitialSource initialSource,
                               @Nullable Long folderId,
                               @Nonnull Date dateAdded,
                               @Nonnull Date dateModified,
@@ -60,11 +67,13 @@ public class StorageComposition {
         this.title = title;
         this.fileName = fileName;
         this.album = album;
-        this.filePath = filePath;
+        this.parentPath = parentPath;
         this.duration = duration;
         this.size = size;
         this.id = id;
         this.storageId = storageId;
+        this.audioFileType = audioFileType;
+        this.initialSource = initialSource;
         this.folderId = folderId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
@@ -106,8 +115,8 @@ public class StorageComposition {
     }
 
     @Nonnull
-    public String getFilePath() {
-        return filePath;
+    public String getParentPath() {
+        return parentPath;
     }
 
     public long getDuration() {
@@ -120,6 +129,14 @@ public class StorageComposition {
 
     public long getId() {
         return id;
+    }
+
+    public int getAudioFileType() {
+        return audioFileType;
+    }
+
+    public InitialSource getInitialSource() {
+        return initialSource;
     }
 
     @Nonnull
@@ -142,7 +159,7 @@ public class StorageComposition {
     public String toString() {
         return "Composition{" +
                 "\n id=" + id +
-                "\n filePath='" + filePath + '\'' +
+                "\n parentPath='" + parentPath + '\'' +
                 "\n duration=" + duration +
                 "\n size=" + size +
                 "\n dateAdded=" + dateAdded +

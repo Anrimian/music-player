@@ -31,23 +31,29 @@ public class WidgetProviderSmallExt extends BaseWidgetProvider {
                                   AppWidgetManager appWidgetManager,
                                   int widgetId,
                                   Context context,
-                                  boolean play,
+                                  int playerState,
                                   String compositionName,
                                   String compositionAuthor,
                                   long compositionId,
                                   long compositionUpdateTime,
+                                  long compositionSize,
+                                  boolean isFileExists,
                                   int queueSize,
                                   boolean enabled,
                                   boolean showCovers,
                                   boolean randomPlayModeEnabled,
                                   int repeatMode) {
         super.applyViewLogic(widgetView,
-                appWidgetManager, widgetId, context,
-                play,
+                appWidgetManager,
+                widgetId,
+                context,
+                playerState,
                 compositionName,
                 compositionAuthor,
                 compositionId,
                 compositionUpdateTime,
+                compositionSize,
+                isFileExists,
                 queueSize,
                 enabled,
                 showCovers,
@@ -55,7 +61,7 @@ public class WidgetProviderSmallExt extends BaseWidgetProvider {
                 repeatMode);
 
         widgetView.setBoolean(R.id.iv_shuffle_mode, "setEnabled", enabled);
-        widgetView.setBoolean(R.id.iv_repeat_mode, "setEnabled", enabled);
+        widgetView.setBoolean(R.id.ivRepeatMode, "setEnabled", enabled);
 
         if (enabled) {
             int color = ContextCompat.getColor(context,
@@ -64,7 +70,7 @@ public class WidgetProviderSmallExt extends BaseWidgetProvider {
         }
 
         @DrawableRes int iconRes = getRepeatModeIcon(repeatMode);
-        widgetView.setImageViewResource(R.id.iv_repeat_mode, iconRes);
+        widgetView.setImageViewResource(R.id.ivRepeatMode, iconRes);
 
         Intent intentChangeShuffleMode = new Intent(context, WidgetActionsReceiver.class);
         intentChangeShuffleMode.putExtra(REQUEST_CODE, CHANGE_SHUFFLE_NODE);
@@ -80,6 +86,6 @@ public class WidgetProviderSmallExt extends BaseWidgetProvider {
                 CHANGE_REPEAT_MODE,
                 intentChangeRepeatMode,
                 AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-        widgetView.setOnClickPendingIntent(R.id.iv_repeat_mode, pIntentChangeRepeatMode);
+        widgetView.setOnClickPendingIntent(R.id.ivRepeatMode, pIntentChangeRepeatMode);
     }
 }

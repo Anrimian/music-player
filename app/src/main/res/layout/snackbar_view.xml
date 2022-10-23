@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_snackbar">
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        style="@style/CircularProgressIndicatorStyle"
         android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:indeterminate="false"
-        android:max="100"
-        android:progressDrawable="@drawable/bg_progress_circle"
         android:layout_gravity="center_vertical|start"
         android:layout_marginStart="@dimen/snackbar_padding_start"
         android:layout_marginTop="@dimen/snackbar_padding_button_vertical"
         android:layout_marginBottom="@dimen/snackbar_padding_button_vertical"
+        app:indicatorColor="?attr/colorAccentContrast"
+        app:indicatorSize="36dp"
+        app:trackThickness="3dp"
         tools:visibility="visible"
         tools:progress="60"/>
 
@@ -47,6 +48,7 @@
         android:layout_marginEnd="@dimen/snackbar_padding_end"
         android:layout_marginTop="@dimen/snackbar_padding_button_vertical"
         android:layout_marginBottom="@dimen/snackbar_padding_button_vertical"
+        android:textColor="@color/color_accent_contrast_state"
         tools:visibility="visible"
         tools:text="retry"/>
 

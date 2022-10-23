@@ -4,6 +4,7 @@
     <color name="colorPrimary">#673AB7</color>
     <color name="colorPrimaryDark">#512DA8</color>
     <color name="colorAccent">#009688</color>
+    <color name="colorAccentContrast">#4DB6AC</color>
 
     <color name="disabled_color">#757575</color>
 
@@ -90,19 +91,23 @@
     <color name="colorBluePrimary">#3F51B5</color>
     <color name="colorBluePrimaryDark">#303F9F</color>
     <color name="colorGreenAccent">#4CAF50</color>
+    <color name="colorGreenAccentContrast">#81C784</color>
 
     <!--light theme(teal)-->
     <color name="colorTealPrimary">#009688</color>
     <color name="colorTealPrimaryDark">#00796B</color>
     <color name="colorPinkAccent">#FF4081</color>
+    <color name="colorPinkAccentContrast">#FF80AB</color>
 
-    <!--light theme(read)-->
+    <!--light theme(red)-->
     <color name="colorRedPrimary">#d50000</color>
     <color name="colorRedPrimaryDark">#9b0000</color>
+    <color name="colorRedAccentContrast">#FF5252</color>
 
     <!--completely white theme-->
     <color name="colorPrimaryWhiteGray">#848282</color>
-    <color name="colorAccentBlue">#247bee</color>
+    <color name="colorAccentBlue">#2196F3</color>
+    <color name="colorAccentBlueContrast">#64B5F6</color>
 
     <!--dark theme(orange)-->
     <color name="colorOrangeAccent">#e65100</color>

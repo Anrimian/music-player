@@ -39,6 +39,7 @@ import android.view.WindowMetrics;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.AttrRes;
@@ -371,5 +372,13 @@ public class AndroidUtils {
 
     public static boolean isContrastColorDark(@ColorInt int color) {
         return ColorUtils.calculateLuminance(color) >= 0.5f;
+    }
+
+    public static void setProgress(ProgressBar pb, int progress) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            pb.setProgress(progress, true);
+        } else {
+            pb.setProgress(progress);
+        }
     }
 }

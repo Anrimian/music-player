@@ -23,11 +23,17 @@
 
 
     <!--toolbar-->
+
     <dimen name="toolbar_content_start">80dp</dimen>
+    <!--split toolbar_content_start    -->
+    <dimen name="toolbar_player_content_start">64dp</dimen>
+    <dimen name="toolbar_player_content_start_padding">16dp</dimen>
+    <!--    -->
     <dimen name="toolbar_control_offset">8dp</dimen>
 
     <!--widgets-->
     <dimen name="widget_content_spacing_margin">8dp</dimen>
+    <dimen name="widget_controls_bottom_margin">8dp</dimen>
 
     <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
     <dimen name="widget_medium_content_margin_horizontal">8dp</dimen>

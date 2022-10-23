@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.AttrRes
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.anrimian.musicplayer.Constants
@@ -18,8 +17,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
-import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
+import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
@@ -63,8 +62,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
     private lateinit var toolbar: AdvancedToolbar
     private lateinit var adapter: CompositionsAdapter
     private lateinit var layoutManager: LinearLayoutManager
-    
-    private lateinit var compositionActionDialogRunner: DialogFragmentRunner<CompositionActionDialogFragment>
+
     private lateinit var choosePlayListDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
     
     private lateinit var deletingErrorHandler: ErrorHandler
@@ -90,12 +88,13 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
 
         RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView, true)
         adapter = CompositionsAdapter(
+            this,
             viewBinding.recyclerView,
             presenter.getSelectedCompositions(),
             presenter::onCompositionClicked,
             presenter::onCompositionLongClick,
             presenter::onCompositionIconClicked,
-            presenter::onCompositionMenuClicked
+            this::onCompositionMenuClicked
         )
         viewBinding.recyclerView.adapter = adapter
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
@@ -119,15 +118,12 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
 
         val fm = childFragmentManager
         deletingErrorHandler = DeleteErrorHandler(
-            fm,
+            this,
             presenter::onRetryFailedDeleteActionClicked,
             this::showEditorRequestDeniedMessage
         )
         choosePlayListDialogRunner = DialogFragmentRunner(fm, Tags.SELECT_PLAYLIST_TAG) { f ->
             f.setOnCompleteListener(presenter::onPlayListToAddingSelected)
-        }
-        compositionActionDialogRunner = DialogFragmentRunner(fm, Tags.COMPOSITION_ACTION_TAG) { f ->
-            f.setOnTripleCompleteListener(this::onCompositionActionSelected)
         }
     }
 
@@ -239,7 +235,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
     }
 
     override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {
-        DialogUtils.showConfirmDeleteDialog(
+        showConfirmDeleteDialog(
             requireContext(),
             compositionsToDelete,
             presenter::onDeleteCompositionsDialogConfirmed
@@ -262,7 +258,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
     }
 
     override fun shareCompositions(selectedCompositions: Collection<Composition>) {
-        DialogUtils.shareCompositions(requireContext(), selectedCompositions)
+        shareCompositions(this, selectedCompositions)
     }
 
     override fun showCurrentComposition(currentComposition: CurrentComposition) {
@@ -275,23 +271,6 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView, Fr
 
     override fun showRandomMode(isRandomModeEnabled: Boolean) {
         FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
-    }
-
-    override fun showCompositionActionDialog(composition: Composition, position: Int) {
-        val extra = Bundle()
-        extra.putInt(Constants.Arguments.POSITION_ARG, position)
-        @AttrRes val statusBarColor = if (toolbar.isInActionMode) {
-            R.attr.actionModeStatusBarColor
-        } else {
-            android.R.attr.statusBarColor
-        }
-        val fragment = CompositionActionDialogFragment.newInstance(
-            composition,
-            R.menu.composition_actions_menu,
-            statusBarColor,
-            extra
-        )
-        compositionActionDialogRunner.show(fragment)
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {

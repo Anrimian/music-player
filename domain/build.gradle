@@ -1,12 +1,13 @@
 apply plugin: 'kotlin'
 
-//noinspection GroovyUnusedAssignment
-sourceCompatibility = 11
-//noinspection GroovyUnusedAssignment
-targetCompatibility = 11
-
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 dependencies {
+    implementation project(':libs:filesync:core')
+
     def deps = rootProject.ext
 
     implementation deps.rxJava
@@ -18,5 +19,6 @@ dependencies {
     testRuntimeOnly deps.junit5Engine
     test.useJUnitPlatform()
     testImplementation deps.mockito
+    testImplementation deps.mockitoKt
 }
 

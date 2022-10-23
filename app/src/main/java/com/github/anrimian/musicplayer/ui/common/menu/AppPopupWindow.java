@@ -16,7 +16,6 @@ import com.github.anrimian.musicplayer.R;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("WeakerAccess")
 public class AppPopupWindow {
 
     private static final long POPUP_OPEN_WINDOW_MILLIS = 200L;
@@ -90,6 +89,20 @@ public class AppPopupWindow {
                 break;
             }
         }
+
+        View.OnAttachStateChangeListener listener = new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View view) {}
+
+            @Override
+            public void onViewDetachedFromWindow(View view) {
+                popupWindow.dismiss();
+            }
+        };
+        anchorView.addOnAttachStateChangeListener(listener);
+        popupWindow.setOnDismissListener(() ->
+                anchorView.removeOnAttachStateChangeListener(listener)
+        );
 
         popupWindow.showAtLocation(anchorView, Gravity.START | Gravity.TOP, showX, showY);
 

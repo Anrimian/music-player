@@ -1,28 +1,31 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import static android.text.TextUtils.isEmpty;
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 import androidx.collection.LongSparseArray;
+import androidx.core.util.Pair;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
-import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
+import com.github.anrimian.musicplayer.data.models.composition.ExternalComposition;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotFoundException;
-import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -31,6 +34,7 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class CompositionsDaoWrapper {
@@ -39,17 +43,23 @@ public class CompositionsDaoWrapper {
     private final CompositionsDao compositionsDao;
     private final ArtistsDao artistsDao;
     private final AlbumsDao albumsDao;
+    private final GenreDao genreDao;
+    private final FoldersDao foldersDao;
 
     private final BehaviorSubject<Object> updateSubject = BehaviorSubject.createDefault(TRIGGER);
 
     public CompositionsDaoWrapper(AppDatabase appDatabase,
                                   ArtistsDao artistsDao,
                                   CompositionsDao compositionsDao,
-                                  AlbumsDao albumsDao) {
+                                  AlbumsDao albumsDao,
+                                  GenreDao genreDao,
+                                  FoldersDao foldersDao) {
         this.appDatabase = appDatabase;
         this.artistsDao = artistsDao;
         this.compositionsDao = compositionsDao;
         this.albumsDao = albumsDao;
+        this.genreDao = genreDao;
+        this.foldersDao = foldersDao;
     }
 
     public Observable<FullComposition> getCompositionObservable(long id) {
@@ -58,11 +68,19 @@ public class CompositionsDaoWrapper {
                 .map(list -> list.get(0));
     }
 
+    public Observable<String> getLyricsObservable(long id) {
+        return compositionsDao.getLyricsObservable(id);
+    }
+
+    public FullComposition getFullComposition(long id) {
+        return compositionsDao.getFullComposition(id);
+    }
+
     public Observable<List<Composition>> getAllObservable(Order order,
                                                           boolean useFileName,
                                                           @Nullable String searchText) {
         StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
-        query.append(getSearchQuery(useFileName));
+        query.append(CompositionsDao.getSearchWhereQuery(useFileName));
         query.append(getOrderQuery(order));
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 3));
         return updateSubject.switchMap(o -> compositionsDao.getAllObservable(sqlQuery));
@@ -77,7 +95,7 @@ public class CompositionsDaoWrapper {
                                                                            boolean useFileName,
                                                                            @Nullable String searchText) {
         StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
-        query.append(getSearchQuery(useFileName));
+        query.append(CompositionsDao.getSearchWhereQuery(useFileName));
         query.append(" AND ");
         query.append("folderId = ");
         query.append(folderId);
@@ -112,8 +130,19 @@ public class CompositionsDaoWrapper {
     }
 
     public LongSparseArray<StorageComposition> selectAllAsStorageCompositions() {
-        return AndroidCollectionUtils.mapToSparseArray(compositionsDao.selectAllAsStorageCompositions(),
-                StorageComposition::getStorageId);
+        LongSparseArray<StorageComposition> result = new LongSparseArray<>();
+        final int pageSize = 1000;
+        int index = 0;
+        LongSparseArray<StorageComposition> pageResult;
+        do {
+            pageResult = AndroidCollectionUtils.mapToSparseArray(
+                    compositionsDao.selectAllAsStorageCompositions(pageSize, index),
+                    StorageComposition::getStorageId
+            );
+            result.putAll(pageResult);
+            index++;
+        } while (pageResult.size() == pageSize);
+        return result;
     }
 
     public long getStorageId(long compositionId) {
@@ -124,28 +153,36 @@ public class CompositionsDaoWrapper {
         return storageId;
     }
 
+    public Maybe<Long> selectStorageId(long compositionId) {
+        return Maybe.fromCallable(() -> compositionsDao.getStorageId(compositionId));
+    }
+
     public void delete(long id) {
-        compositionsDao.delete(id);
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.delete(id);
+            albumsDao.deleteEmptyAlbums();
+            artistsDao.deleteEmptyArtists();
+            genreDao.deleteEmptyGenres();
+            foldersDao.deleteFoldersWithoutContainment();
+        });
     }
 
     public void deleteAll(List<Long> ids) {
-        compositionsDao.delete(ids);
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.delete(ids);
+            albumsDao.deleteEmptyAlbums();
+            artistsDao.deleteEmptyArtists();
+            genreDao.deleteEmptyGenres();
+            foldersDao.deleteFoldersWithoutContainment();
+        });
     }
 
     public void updateFolderId(long id, Long folderId) {
         compositionsDao.updateFolderId(id, folderId);
     }
 
-    public void updateFilePath(long id, String filePath) {
-        compositionsDao.updateFilePath(id, filePath);
-    }
-
-    public void updateFilesPath(List<FilePathComposition> compositions) {
-        appDatabase.runInTransaction(() -> {
-            for (FilePathComposition composition: compositions) {
-                compositionsDao.updateFilePath(composition.getId(), composition.getFilePath());
-            }
-        });
+    public void updateStorageId(long id, Long storageId) {
+        compositionsDao.updateStorageId(id, storageId);
     }
 
     public void updateAlbum(long compositionId, @Nullable String albumName) {
@@ -164,11 +201,7 @@ public class CompositionsDaoWrapper {
             Long albumId = albumsDao.findAlbum(artistId, albumName);
 
             // if album not exists - create album
-            if (albumId == null && albumName != null) {
-                //single crash here
-                //irrelevant artist id?
-                //already existing album? - no
-                //non unique albumName and artist id?
+            if (albumId == null && !TextUtils.isEmpty(albumName)) {
                 albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
             }
 
@@ -189,8 +222,8 @@ public class CompositionsDaoWrapper {
             Long artistId = artistsDao.findArtistIdByName(authorName);
 
             // 2) if artist not exists - create artist
-            if (artistId == null && authorName != null) {
-                artistId = artistsDao.insertArtist(new ArtistEntity(authorName));
+            if (artistId == null && !TextUtils.isEmpty(authorName)) {
+                artistId = artistsDao.insertArtist(authorName);
             }
             // 3) set new artistId
             Long oldArtistId = compositionsDao.getArtistId(id);
@@ -215,8 +248,8 @@ public class CompositionsDaoWrapper {
             Long artistId = artistsDao.findArtistIdByName(artistName);
 
             // 2) if artist not exists - create artist
-            if (artistId == null && artistName != null) {
-                artistId = artistsDao.insertArtist(new ArtistEntity(artistName));
+            if (artistId == null && !TextUtils.isEmpty(artistName)) {
+                artistId = artistsDao.insertArtist(artistName);
             }
 
             AlbumEntity albumEntity = albumsDao.getAlbumEntity(albumId);
@@ -322,6 +355,90 @@ public class CompositionsDaoWrapper {
         });
     }
 
+    @Nullable
+    public Long getFolderId(long id) {
+        return compositionsDao.getFolderId(id);
+    }
+
+    public Single<List<ExternalComposition>> getAllAsExternalCompositions() {
+        return compositionsDao.getAllAsExternalCompositions();
+    }
+
+    public Long findCompositionIdByFilePath(String parentPath, String fileName) {
+        Long folderId = findFolderId(parentPath);
+        long id = compositionsDao.findCompositionByFileName(fileName, folderId);
+        if (id == 0) {
+            throw new CompositionNotFoundException(fileName + " not found");
+        }
+        return id;
+    }
+
+    public Pair<String, String> getCompositionNameAndPath(long id) {
+        String fileName = compositionsDao.getCompositionFileName(id);
+        if (fileName == null) {
+            throw new CompositionNotFoundException("composition not found");
+        }
+        String parentPath = compositionsDao.getCompositionParentPath(id);
+        return new Pair<>(fileName, parentPath);
+    }
+
+    public long getCompositionSize(long id) {
+        return compositionsDao.getCompositionSize(id);
+    }
+
+    public void updateCompositionsInitialSource(List<Composition> compositions,
+                                                InitialSource initialSource,
+                                                InitialSource updateFrom) {
+        appDatabase.runInTransaction(() -> {
+            for (Composition composition: compositions) {
+                updateCompositionInitialSource(composition.getId(), initialSource, updateFrom);
+            }
+        });
+    }
+
+    public void updateCompositionIdsInitialSource(List<Long> compositionsIds,
+                                                  InitialSource initialSource,
+                                                  InitialSource updateFrom) {
+        appDatabase.runInTransaction(() -> {
+            for (long id: compositionsIds) {
+                updateCompositionInitialSource(id, initialSource, updateFrom);
+            }
+        });
+    }
+
+    public void updateCompositionInitialSource(long id,
+                                               InitialSource initialSource,
+                                               InitialSource updateFrom) {
+        compositionsDao.updateCompositionInitialSource(id, initialSource, updateFrom);
+    }
+
+    @Nullable
+    private Long findFolderId(String filePath) {
+        return findFolderId(filePath, null);
+    }
+
+    @Nullable
+    private Long findFolderId(String filePath, @Nullable Long parentId) {
+        if (filePath.isEmpty()) {
+            return parentId;
+        }
+
+        Long folderId;
+        int delimiterIndex = filePath.indexOf('/');
+        if (delimiterIndex == -1) {
+            folderId = foldersDao.getFolderByName(parentId, filePath);
+        } else {
+            String folderName = filePath.substring(0, delimiterIndex);
+            Long parentFolderId = foldersDao.getFolderByName(parentId, folderName);
+            if (parentFolderId == null) {
+                return null;
+            }
+            String folderPath = filePath.substring(delimiterIndex + 1);
+            folderId = findFolderId(folderPath, parentFolderId);
+        }
+        return folderId;
+    }
+
     private String getOrderQuery(Order order) {
         StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
         switch (order.getOrderType()) {
@@ -351,12 +468,4 @@ public class CompositionsDaoWrapper {
         orderQuery.append(order.isReversed()? "DESC" : "ASC");
         return orderQuery.toString();
     }
-
-    private StringBuilder getSearchQuery(boolean useFileName) {
-        StringBuilder sb = new StringBuilder(" WHERE (? IS NULL OR ");
-        sb.append(useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END");
-        sb.append(" LIKE ? OR (artist NOTNULL AND artist LIKE ?))");
-        return sb;
-    }
-
 }

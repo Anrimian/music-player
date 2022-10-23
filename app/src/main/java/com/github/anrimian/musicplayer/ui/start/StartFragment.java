@@ -10,12 +10,12 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.databinding.FragmentStartBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragmentKt;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
-import com.github.anrimian.musicplayer.utils.Permissions;
 import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import moxy.MvpAppCompatFragment;
@@ -78,7 +78,7 @@ public class StartFragment extends MvpAppCompatFragment implements StartView {
     public void startSystemServices() {
         AppComponent appComponent = Components.getAppComponent();
         appComponent.widgetUpdater().start();
-        appComponent.notificationDisplayer().removeErrorNotification();
+        appComponent.notificationsDisplayer().removeErrorNotification();
         appComponent.mediaScannerRepository().runStorageObserver();
     }
 

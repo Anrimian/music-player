@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.domain.models.utils;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.FILES_COUNT;
+import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
+
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
@@ -9,9 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.FILES_COUNT;
-import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
 
 public class FolderHelper {
 
@@ -45,16 +45,13 @@ public class FolderHelper {
     }
 
     public static boolean hasChanges(@Nonnull FolderFileSource first, @Nonnull FolderFileSource second) {
-        return /*!Objects.equals(first.getEarliestCreateDate(), second.getEarliestCreateDate())
-                || */first.getFilesCount() != second.getFilesCount()
+        return first.getFilesCount() != second.getFilesCount()
+                || first.hasAnyStorageFile() != second.hasAnyStorageFile()
                 || !Objects.equals(first.getName(), second.getName());
     }
 
     private static List<Object> getChangePayload(FolderFileSource first, FolderFileSource second) {
         List<Object> payloads = new LinkedList<>();
-//        if (!Objects.equals(first.getEarliestCreateDate(), second.getEarliestCreateDate())) {
-//            payloads.add(CREATE_DATE);
-//        }
         if (first.getFilesCount() != second.getFilesCount()) {
             payloads.add(FILES_COUNT);
         }

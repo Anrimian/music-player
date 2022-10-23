@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.views.progress_bar;
 
-import android.os.Build;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setProgress;
+
 import android.os.CountDownTimer;
 import android.widget.ProgressBar;
 
@@ -15,6 +16,7 @@ public class ProgressBarCountDownTimer extends CountDownTimer {
         super(millisInFuture, countDownInterval);
         this.totalTimeMs = millisInFuture;
         this.progressBar = progressBar;
+        this.progressBar.setProgress(100);
     }
 
     @Override
@@ -27,13 +29,4 @@ public class ProgressBarCountDownTimer extends CountDownTimer {
     public void onFinish() {
         setProgress(progressBar, 0);
     }
-
-    private void setProgress(ProgressBar pb, int progress) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            pb.setProgress(progress, true);
-        } else {
-            pb.setProgress(progress);
-        }
-    }
-
 }

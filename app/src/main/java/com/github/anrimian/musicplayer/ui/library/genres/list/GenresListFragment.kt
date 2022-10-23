@@ -27,6 +27,7 @@ import com.github.anrimian.musicplayer.ui.library.genres.list.adapter.GenresAdap
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -53,7 +54,7 @@ class GenresListFragment : LibraryFragment(), GenresListView, FragmentLayerListe
     private lateinit var editGenreNameDialogRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var selectOrderDialogRunner: DialogFragmentRunner<SelectOrderDialogFragment>
 
-    private lateinit var progressDialogRunner: DialogFragmentDelayRunner
+    private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -136,7 +137,7 @@ class GenresListFragment : LibraryFragment(), GenresListView, FragmentLayerListe
     }
 
     override fun showRenameProgress() {
-        val fragment = ProgressDialogFragment.newInstance(R.string.rename_progress)
+        val fragment = newProgressDialogFragment(R.string.rename_progress)
         progressDialogRunner.show(fragment)
     }
 

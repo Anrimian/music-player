@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit
 const val NO_TIMER = -1L
 
 class SleepTimerInteractor(
-        private val libraryPlayerInteractor: LibraryPlayerInteractor,
-        private val settingsRepository: SettingsRepository
+    private val libraryPlayerInteractor: LibraryPlayerInteractor,
+    private val settingsRepository: SettingsRepository
 ) {
 
     private val timerCountDownSubject = BehaviorSubject.createDefault(NO_TIMER)

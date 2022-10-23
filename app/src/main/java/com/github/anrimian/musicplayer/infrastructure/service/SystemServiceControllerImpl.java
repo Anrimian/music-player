@@ -14,10 +14,10 @@ import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.Constants;
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
-import com.github.anrimian.musicplayer.utils.Permissions;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -56,6 +56,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     @Override
     public void stopMusicService() {
+        handler.removeCallbacksAndMessages(null);
         stopForegroundSubject.onNext(TRIGGER);
     }
 
@@ -67,7 +68,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     private static void checkPermissionsAndStartServiceSafe(Context context, Intent intent) {
         if (!Permissions.hasFilePermission(context)) {
             Components.getAppComponent()
-                    .notificationDisplayer()
+                    .notificationsDisplayer()
                     .showErrorNotification(R.string.no_file_permission);
             return;
         }
@@ -77,7 +78,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     private static void checkPermissionsAndStartServiceFromBg(Context context, Intent intent) {
         if (!Permissions.hasFilePermission(context)) {
             Components.getAppComponent()
-                    .notificationDisplayer()
+                    .notificationsDisplayer()
                     .showErrorNotification(R.string.no_file_permission);
             return;
         }

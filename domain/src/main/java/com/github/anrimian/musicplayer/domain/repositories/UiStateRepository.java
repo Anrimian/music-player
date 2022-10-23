@@ -32,6 +32,10 @@ public interface UiStateRepository {
 
     int getSelectedLibraryScreen();
 
+    void setPlayerContentPage(int position);
+
+    int getPlayerContentPage();
+
     void setSelectedFolderScreen(@Nullable Long folderId);
 
     @Nullable

@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
-import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
@@ -11,6 +10,8 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
+import com.github.anrimian.musicplayer.domain.utils.TextUtils
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilter
@@ -34,6 +35,8 @@ class PlayListPresenter(private val playListId: Long,
     private val listDragFilter = ListDragFilter()
 
     private var currentItemDisposable: Disposable? = null
+    private var itemsDisposable: Disposable? = null
+
     private var items: List<PlayListItem> = ArrayList()
     private var playList = DeferredObject2<PlayList>()
 
@@ -44,6 +47,8 @@ class PlayListPresenter(private val playListId: Long,
     private var currentItem: PlayQueueItem? = null
 
     private var lastDeleteAction: Completable? = null
+
+    private var searchText: String? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -67,10 +72,6 @@ class PlayListPresenter(private val playListId: Long,
     fun onStop(listPosition: ListPosition) {
         playListsInteractor.saveListPosition(listPosition)
         presenterBatterySafeDisposable.clear()
-    }
-
-    fun onCompositionClicked(playListItem: PlayListItem, position: Int) {
-        viewState.showCompositionActionDialog(playListItem, position)
     }
 
     fun onItemIconClicked(position: Int) {
@@ -169,6 +170,14 @@ class PlayListPresenter(private val playListId: Long,
         playList.call(viewState::showEditPlayListNameDialog)
     }
 
+    fun onSearchTextChanged(text: String?) {
+        if (!TextUtils.equals(searchText, text)) {
+            searchText = text
+            viewState.setDragEnabled(searchText.isNullOrEmpty())
+            subscribeOnCompositions()
+        }
+    }
+
     fun onRetryFailedDeleteActionClicked() {
         if (lastDeleteAction != null) {
             lastDeleteAction!!
@@ -178,10 +187,12 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     fun onChangeRandomModePressed() {
-        playerInteractor.isRandomPlayingEnabled = !playerInteractor.isRandomPlayingEnabled
+        playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
     }
 
     fun isCoversEnabled() = displaySettingsInteractor.isCoversEnabled()
+
+    fun getSearchText() = searchText
 
     private fun addCompositionsToPlayNext(compositions: List<Composition>) {
         playerInteractor.addCompositionsToPlayNext(compositions)
@@ -263,14 +274,18 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun subscribeOnCompositions() {
-        viewState.showLoading()
-        playListsInteractor.getCompositionsObservable(playListId)
+        if (items.isEmpty()) {
+            viewState.showLoading()
+        }
+        RxUtils.dispose(itemsDisposable)
+        itemsDisposable = playListsInteractor.getCompositionsObservable(playListId, searchText)
             .observeOn(uiScheduler)
             .filter(listDragFilter::filterListEmitting)
-            .subscribeOnUi(
+            .subscribe(
                 this::onPlayListsReceived,
                 { viewState.closeScreen() },
-                viewState::closeScreen
+                viewState::closeScreen,
+                presenterDisposable
             )
     }
 
@@ -294,7 +309,11 @@ class PlayListPresenter(private val playListId: Long,
         items = list
         viewState.updateItemsList(list)
         if (items.isEmpty()) {
-            viewState.showEmptyList()
+            if (TextUtils.isEmpty(searchText)) {
+                viewState.showEmptyList()
+            } else {
+                viewState.showEmptySearchResult()
+            }
         } else {
             viewState.showList()
             if (firstReceive) {
@@ -311,7 +330,7 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun subscribeOnCurrentComposition() {
-        currentItemDisposable = playerInteractor.currentQueueItemObservable
+        currentItemDisposable = playerInteractor.getCurrentQueueItemObservable()
             .observeOn(uiScheduler)
             .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
         presenterBatterySafeDisposable.add(currentItemDisposable!!)
@@ -322,7 +341,7 @@ class PlayListPresenter(private val playListId: Long,
     }
 
     private fun subscribeOnRepeatMode() {
-        playerInteractor.randomPlayingObservable
+        playerInteractor.getRandomPlayingObservable()
             .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
     }
 

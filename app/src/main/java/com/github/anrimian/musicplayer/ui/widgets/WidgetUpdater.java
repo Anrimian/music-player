@@ -2,7 +2,9 @@ package com.github.anrimian.musicplayer.ui.widgets;
 
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_IS_FILE_EXISTS_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_SIZE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_UPDATE_TIME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COVERS_ENABLED_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
@@ -18,9 +20,11 @@ import android.content.Intent;
 import com.github.anrimian.musicplayer.data.utils.rx.RxUtilsKt;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtilsKt;
 
 import java.util.concurrent.TimeUnit;
 
@@ -58,12 +62,13 @@ public class WidgetUpdater {
         updateDisposable.add(RxUtilsKt.retryWithDelay(Observable.combineLatest(
                 musicPlayerInteractor.getCurrentQueueItemObservable(),
                 musicPlayerInteractor.getPlayQueueSizeObservable(),
+                musicPlayerInteractor.getIsPlayingStateObservable(),
                 musicPlayerInteractor.getPlayerStateObservable(),
                 displaySettingsInteractor.getCoversEnabledObservable(),
                 musicPlayerInteractor.getRepeatModeObservable(),
                 musicPlayerInteractor.getRandomPlayingObservable(),
                 widgetState::set)
-                .observeOn(scheduler), 10, 1, TimeUnit.SECONDS)
+                .observeOn(scheduler), 10, 10, TimeUnit.SECONDS)
                 .subscribe(this::onWidgetStateReceived));
     }
 
@@ -76,18 +81,25 @@ public class WidgetUpdater {
         String compositionAuthor = null;
         long compositionId = 0;
         long compositionUpdateTime = 0;
+        long compositionSize = 0;
+        boolean isFileExists = false;
         PlayQueueItem item = widgetState.playQueueEvent.getPlayQueueItem();
         if (item != null) {
-            compositionName = formatCompositionName(item.getComposition());
-            compositionAuthor = formatCompositionAuthor(item.getComposition(), context).toString();
-            compositionId = item.getComposition().getId();
-            compositionUpdateTime = item.getComposition().getDateModified().getTime();
+            Composition composition = item.getComposition();
+            compositionName = formatCompositionName(composition);
+            compositionAuthor = formatCompositionAuthor(composition, context).toString();
+            compositionId = composition.getId();
+            compositionUpdateTime = composition.getDateModified().getTime();
+            compositionSize = composition.getSize();
+            isFileExists = composition.isFileExists();
         }
         WidgetDataHolder.setWidgetInfo(context,
                 compositionName,
                 compositionAuthor,
                 compositionId,
                 compositionUpdateTime,
+                compositionSize,
+                isFileExists,
                 widgetState.playQueueSize,
                 widgetState.randomPlay,
                 widgetState.repeatMode,
@@ -97,11 +109,14 @@ public class WidgetUpdater {
         intent.putExtra(COMPOSITION_AUTHOR_ARG, compositionAuthor);
         intent.putExtra(COMPOSITION_ID_ARG, compositionId);
         intent.putExtra(COMPOSITION_UPDATE_TIME_ARG, compositionUpdateTime);
+        intent.putExtra(COMPOSITION_SIZE, compositionSize);
+        intent.putExtra(COMPOSITION_IS_FILE_EXISTS_ARG, isFileExists);
         intent.putExtra(QUEUE_SIZE_ARG, widgetState.playQueueSize);
         intent.putExtra(RANDOM_PLAY_ARG, widgetState.randomPlay);
         intent.putExtra(REPEAT_ARG, widgetState.repeatMode);
         intent.putExtra(COVERS_ENABLED_ARG, widgetState.isCoversEnabled);
-        intent.putExtra(PLAY_ARG, widgetState.playerState == PlayerState.PLAY);
+        int playerState = FormatUtilsKt.getRemoteViewPlayerState(widgetState.isPlaying, widgetState.playerState);
+        intent.putExtra(PLAY_ARG, playerState);
 
         context.sendBroadcast(intent);
     }
@@ -110,6 +125,7 @@ public class WidgetUpdater {
 
         PlayQueueEvent playQueueEvent;
         int playQueueSize;
+        boolean isPlaying;
         PlayerState playerState;
         boolean isCoversEnabled;
         int repeatMode;
@@ -117,12 +133,14 @@ public class WidgetUpdater {
 
         private WidgetState set(PlayQueueEvent playQueueEvent,
                                 int playQueueSize,
+                                boolean isPlaying,
                                 PlayerState playerState,
                                 boolean isCoversEnabled,
                                 int repeatMode,
                                 boolean randomPlay) {
             this.playQueueEvent = playQueueEvent;
             this.playQueueSize = playQueueSize;
+            this.isPlaying = isPlaying;
             this.playerState = playerState;
             this.isCoversEnabled = isCoversEnabled;
             this.repeatMode = repeatMode;

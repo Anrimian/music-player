@@ -17,6 +17,8 @@ android {
         testInstrumentationRunnerArguments["runnerBuilder"] = config.testJunit5Builder
 
         vectorDrawables.useSupportLibrary = true
+
+        resConfigs "en", "be", "cs", "de", "el", "es", "fr", "pt", "ru", "tr", "uk"
     }
     buildTypes {
         release {
@@ -63,6 +65,8 @@ dependencies {
     implementation project(':domain')
     implementation project(':data')
 
+    implementation project(':libs:filesync:core')
+
     def deps = rootProject.ext
 
     implementation kotlinStdLib
@@ -77,8 +81,6 @@ dependencies {
 
     implementation deps.rxAndroid
     implementation deps.rxPermissions
-
-    debugImplementation deps.acraReportDialog
 
     implementation deps.moxy
     implementation deps.moxyAppcompat

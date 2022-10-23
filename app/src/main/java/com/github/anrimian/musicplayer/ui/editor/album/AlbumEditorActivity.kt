@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
+import com.github.anrimian.filesync.models.ProgressInfo
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
@@ -14,12 +15,15 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFr
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.asInt
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
+import com.github.anrimian.musicplayer.ui.utils.setToolbar
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.google.android.material.snackbar.Snackbar
 import moxy.MvpAppCompatActivity
@@ -42,7 +46,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
     
     private lateinit var authorDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var nameDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
-    private lateinit var progressDialogRunner: DialogFragmentDelayRunner
+    private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
     
     private lateinit var errorHandler: ErrorHandler
 
@@ -52,13 +56,8 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
         viewBinding = ActivityAlbumEditBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground)
-        
-        setSupportActionBar(viewBinding.toolbar)
-        val actionBar = supportActionBar
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true)
-            actionBar.setTitle(R.string.edit_album_tags)
-        }
+
+        setToolbar(viewBinding.toolbar, R.string.edit_album_tags)
         
         viewBinding.changeAuthorClickableArea.setOnClickListener { presenter.onChangeAuthorClicked() }
         viewBinding.changeNameClickableArea.setOnClickListener { presenter.onChangeNameClicked() }
@@ -78,7 +77,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
         
         val fm = supportFragmentManager
         errorHandler = ErrorHandler(
-            fm,
+            this,
             presenter::onRetryFailedEditActionClicked,
             this::showEditorRequestDeniedMessage
         )
@@ -90,18 +89,19 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
             fm,
             Tags.NAME_TAG
         ) { fragment -> fragment.setOnCompleteListener(presenter::onNewNameEntered) }
-        progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG)
+        progressDialogRunner = DialogFragmentDelayRunner(
+            fm,
+            Tags.PROGRESS_DIALOG_TAG,
+            fragmentInitializer = { fragment -> fragment.setCancellationListener {
+                presenter.onEditActionCancelled()
+            } }
+        )
     }
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(
             Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
         )
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
     }
 
     override fun closeScreen() {
@@ -126,7 +126,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
     }
 
     override fun showRenameProgress() {
-        progressDialogRunner.show(ProgressDialogFragment.newInstance(R.string.rename_progress))
+        progressDialogRunner.show(newProgressDialogFragment(R.string.rename_progress))
     }
 
     override fun hideRenameProgress() {
@@ -155,6 +155,29 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
             false
         )
         nameDialogFragmentRunner.show(fragment)
+    }
+
+    override fun showPreparedFilesCount(processed: Int, total: Int) {
+        progressDialogRunner.runAction { dialog ->
+            dialog.setMessage(getString(R.string.downloading, processed, total))
+        }
+    }
+
+    override fun showDownloadingFileInfo(progressInfo: ProgressInfo) {
+        progressDialogRunner.runAction { dialog ->
+            dialog.setProgress(progressInfo.asInt())
+        }
+    }
+
+    override fun showEditedFilesCount(processed: Int, total: Int) {
+        progressDialogRunner.runAction { dialog ->
+            val message = if (total > 1) {
+                getString(R.string.rename_progress_count, processed, total)
+            } else {
+                getString(R.string.rename_progress)
+            }
+            dialog.setMessage(message)
+        }
     }
 
     private fun copyText(textView: TextView, tvLabel: TextView) {

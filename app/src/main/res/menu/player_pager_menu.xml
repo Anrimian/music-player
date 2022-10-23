@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_lyrics"
+        android:title="@string/lyrics"
+        android:icon="@drawable/ic_lyrics"/>
+    <item android:id="@+id/menu_queue"
+        android:title="@string/play_queue"
+        android:icon="@drawable/ic_play_queue"/>
+</menu>

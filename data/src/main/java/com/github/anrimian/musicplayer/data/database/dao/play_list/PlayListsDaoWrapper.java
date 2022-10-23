@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 import androidx.core.util.Pair;
@@ -24,6 +25,8 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 
@@ -150,9 +153,14 @@ public class PlayListsDaoWrapper {
     }
 
     public Observable<List<PlayListItem>> getPlayListItemsObservable(long playListId,
-                                                                     boolean useFileName) {
+                                                                     boolean useFileName,
+                                                                     @Nullable String searchText) {
         String query = PlayListDao.getPlaylistItemsQuery(useFileName);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] { playListId } );
+        Object[] args = new Object[4];
+        args[0] = playListId;
+        String[] searchArgs = getSearchArgs(searchText, 3);
+        System.arraycopy(searchArgs, 0, args, 1, 3);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, args);
         return playListDao.getPlayListItemsObservable(sqlQuery)
                 .map(entities -> mapList(entities, this::toItem));
     }

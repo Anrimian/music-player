@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.di.app.play_list;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
@@ -13,8 +15,6 @@ import javax.inject.Named;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 @Module
 public class PlayListModule {

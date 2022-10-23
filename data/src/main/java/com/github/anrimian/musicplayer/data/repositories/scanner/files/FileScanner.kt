@@ -11,6 +11,8 @@ import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.domain.models.scanner.Idle
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository
+import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository
+import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
@@ -29,6 +31,7 @@ class FileScanner(
     private val compositionsDao: CompositionsDaoWrapper,
     private val compositionSourceEditor: CompositionSourceEditor,
     private val stateRepository: StateRepository,
+    private val storageSourceRepository: StorageSourceRepository,
     private val analytics: Analytics,
     private val scheduler: Scheduler
 ) {
@@ -69,19 +72,20 @@ class FileScanner(
 
     private fun scanCompositionFile(composition: FullComposition): Single<*> {
         return Single.just(composition)
-            .flatMap(this::getFullTags)
-            .timeout(READ_FILE_TIMEOUT_SECONDS, TimeUnit.SECONDS, scheduler)
+            .flatMapMaybe(this::getFullTags)
             .doOnSuccess { tags -> compositionsDao.updateCompositionBySourceTags(composition, tags) }
             .retry(RETRY_TIMES)
             .doOnError(this::processError)
             .map { TRIGGER }
+            .defaultIfEmpty(TRIGGER)
             .onErrorReturnItem(TRIGGER)
             .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition, Date()) }
     }
 
-    private fun getFullTags(composition: FullComposition): Single<CompositionSourceTags> {
-        //scheduler is required to prevent timeout and handle it correctly
-        return compositionSourceEditor.getFullTags(composition).subscribeOn(scheduler)
+    private fun getFullTags(composition: FullComposition): Maybe<CompositionSourceTags> {
+        return storageSourceRepository.getStorageSource(composition.id)
+            .flatMapSingle(compositionSourceEditor::getFullTags)
+            .timeout(READ_FILE_TIMEOUT_SECONDS, TimeUnit.SECONDS, scheduler)
     }
 
     private fun processError(throwable: Throwable) {
@@ -90,5 +94,4 @@ class FileScanner(
         }
         analytics.processNonFatalError(throwable)
     }
-
 }

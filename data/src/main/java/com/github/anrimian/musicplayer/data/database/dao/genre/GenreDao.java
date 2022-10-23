@@ -15,15 +15,16 @@ import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntit
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
-import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 @Dao
 public interface GenreDao {
@@ -67,11 +68,10 @@ public interface GenreDao {
     }
 
     @Query("SELECT " +
-            "id as id, " +
-            "storageId as storageId " +
+            "id as id " +
             "FROM compositions " +
             "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
-    List<CompositionId> getCompositionsInGenre(long genreId);
+    Single<List<Long>> getAllCompositionsByGenre(long genreId);
 
     @Query("SELECT " +
             "id as dbId, " +
@@ -128,9 +128,14 @@ public interface GenreDao {
     @Query("SELECT name FROM genres WHERE id = :genreId")
     String getGenreName(long genreId);
 
-    @Query("SELECT EXISTS(SELECT 1 FROM genres WHERE name = :name)")
-    boolean isGenreExists(String name);
-
     @Query("SELECT EXISTS(SELECT 1 FROM genres WHERE id = :id)")
     boolean isGenreExists(long id);
+
+    @Query("UPDATE genre_entries SET genreId = :newGenreId WHERE genreId = :oldGenreId")
+    void changeCompositionsGenre(long oldGenreId, long newGenreId);
+
+    @Query("UPDATE compositions " +
+            "SET dateModified = :dateModified " +
+            "WHERE id IN (SELECT audioId FROM genre_entries WHERE genreId = :genreId)")
+    void updateGenreCompositionsModifyTime(long genreId, Date dateModified);
 }

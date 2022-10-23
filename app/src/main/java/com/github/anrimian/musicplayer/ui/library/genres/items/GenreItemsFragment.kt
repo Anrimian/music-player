@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.AttrRes
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.anrimian.musicplayer.Constants
@@ -18,9 +17,9 @@ import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposit
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
-import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
+import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
@@ -34,6 +33,7 @@ import com.github.anrimian.musicplayer.ui.library.compositions.adapter.Compositi
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -65,11 +65,10 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
 
     private lateinit var adapter: CompositionsAdapter
 
-    private lateinit var compositionActionDialogRunner: DialogFragmentRunner<CompositionActionDialogFragment>
     private lateinit var choosePlayListDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
     private lateinit var editGenreNameDialogRunner: DialogFragmentRunner<InputTextDialogFragment>
 
-    private lateinit var progressDialogRunner: DialogFragmentDelayRunner
+    private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
     private lateinit var deletingErrorHandler: ErrorHandler
 
     override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<GenreItemsView> {
@@ -93,12 +92,13 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
 
         RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView, true)
         adapter = CompositionsAdapter(
+            this,
             viewBinding.recyclerView,
             presenter.getSelectedCompositions(),
             presenter::onCompositionClicked,
             presenter::onCompositionLongClick,
             presenter::onCompositionIconClicked,
-            presenter::onCompositionMenuClicked
+            this::onCompositionMenuClicked
         )
         viewBinding.recyclerView.adapter = adapter
         val layoutManager = LinearLayoutManager(context)
@@ -123,15 +123,12 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
 
         val fm = childFragmentManager
         deletingErrorHandler = DeleteErrorHandler(
-            fm,
+            this,
             presenter::onRetryFailedDeleteActionClicked,
             this::showEditorRequestDeniedMessage
         )
         choosePlayListDialogRunner = DialogFragmentRunner(fm, Tags.SELECT_PLAYLIST_TAG) { f ->
             f.setOnCompleteListener(presenter::onPlayListToAddingSelected)
-        }
-        compositionActionDialogRunner = DialogFragmentRunner(fm, Tags.COMPOSITION_ACTION_TAG) { f ->
-            f.setOnTripleCompleteListener(this::onCompositionActionSelected)
         }
         editGenreNameDialogRunner = DialogFragmentRunner(fm, Tags.GENRE_NAME_TAG) { fragment ->
             fragment.setComplexCompleteListener { name, extra ->
@@ -239,7 +236,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
     }
 
     override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {
-        DialogUtils.showConfirmDeleteDialog(
+        showConfirmDeleteDialog(
             requireContext(),
             compositionsToDelete,
             presenter::onDeleteCompositionsDialogConfirmed
@@ -262,7 +259,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
     }
 
     override fun shareCompositions(selectedCompositions: Collection<Composition>) {
-        DialogUtils.shareCompositions(requireContext(), selectedCompositions)
+        shareCompositions(this, selectedCompositions)
     }
 
     override fun showCurrentComposition(currentComposition: CurrentComposition) {
@@ -275,23 +272,6 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
 
     override fun showRandomMode(isRandomModeEnabled: Boolean) {
         FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
-    }
-
-    override fun showCompositionActionDialog(composition: Composition, position: Int) {
-        val extra = Bundle()
-        extra.putInt(Constants.Arguments.POSITION_ARG, position)
-        @AttrRes val statusBarColor = if (toolbar.isInActionMode) {
-            R.attr.actionModeStatusBarColor
-        } else {
-            android.R.attr.statusBarColor
-        }
-        val fragment = CompositionActionDialogFragment.newInstance(
-            composition,
-            R.menu.composition_actions_menu,
-            statusBarColor,
-            extra
-        )
-        compositionActionDialogRunner.show(fragment)
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {
@@ -315,7 +295,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
     }
 
     override fun showRenameProgress() {
-        val fragment = ProgressDialogFragment.newInstance(R.string.rename_progress)
+        val fragment = newProgressDialogFragment(R.string.rename_progress)
         progressDialogRunner.show(fragment)
     }
 

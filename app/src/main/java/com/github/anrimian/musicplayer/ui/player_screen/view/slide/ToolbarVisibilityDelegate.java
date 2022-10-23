@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.ui.player_screen.view.slide;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+import static androidx.core.view.ViewCompat.isLaidOut;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+
 import android.animation.ArgbEvaluator;
 
 import androidx.appcompat.widget.ActionMenuView;
@@ -7,11 +12,6 @@ import androidx.appcompat.widget.ActionMenuView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate;
-
-import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
-import static androidx.core.view.ViewCompat.isLaidOut;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 /**
  * Created on 21.01.2018.
@@ -52,8 +52,9 @@ public class ToolbarVisibilityDelegate implements SlideDelegate {
             int contentVisibility = slideOffset == 0 ? INVISIBLE : VISIBLE;
             actionMenuView.setVisibility(contentVisibility);
             actionMenuView.setAlpha(slideOffset);
-            toolbar.setContentVisibility(contentVisibility);
             toolbar.setContentAlpha(slideOffset);
+        } else {
+            toolbar.setContentVisible(slideOffset == 1f);
         }
     }
 }

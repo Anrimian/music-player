@@ -6,6 +6,7 @@ import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.utils.MediaConstants
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.data.utils.Permissions
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.domain.models.albums.Album
@@ -15,13 +16,11 @@ import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSour
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.*
-import com.github.anrimian.musicplayer.utils.Permissions
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -149,7 +148,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         resultCallback.detach()
         currentRequestDisposable = Components.getAppComponent()
             .libraryPlayerInteractor()
-            .currentQueueItemObservable
+            .getCurrentQueueItemObservable()
             .firstOrError()
             .flatMap(this::toRecentItem)
             .onErrorReturn(this::processRecentItemError)
@@ -249,8 +248,8 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun loadRootItems(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
         val libraryPlayerInteractor = Components.getAppComponent().libraryPlayerInteractor()
         val observable = Observable.combineLatest(
-            libraryPlayerInteractor.playQueueSizeObservable,
-            libraryPlayerInteractor.playerStateObservable,
+            libraryPlayerInteractor.getPlayQueueSizeObservable(),
+            libraryPlayerInteractor.getIsPlayingStateObservable(),
             ::Pair
         )
 
@@ -258,10 +257,10 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             ROOT_ID,
             resultCallback,
             observable
-        ) { (playQueueSize, playerState) ->
+        ) { (playQueueSize, isPlaying) ->
             return@loadItems arrayListOf<MediaBrowserCompat.MediaItem>().apply {
                 if (playQueueSize > 0) {
-                    val item = if (playerState == PlayerState.PLAY) {
+                    val item = if (isPlaying) {
                         actionItem(PAUSE_ACTION_ID, R.string.pause)
                     } else {
                         actionItem(RESUME_ACTION_ID, R.string.resume)
@@ -278,7 +277,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         }
     }
 
-    private fun <T> loadItems(rootItemId: String,
+    private fun <T: Any> loadItems(rootItemId: String,
                               resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
                               valuesObservable: Observable<T>,
                               resultMapper: (T) -> List<MediaBrowserCompat.MediaItem>

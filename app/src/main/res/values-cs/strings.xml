@@ -48,10 +48,6 @@
     <string name="save_as_play_list">Uložit jako seznam skladeb</string>
     <string name="cancel">Zrušit</string>
     <string name="deleting">Mažu</string>
-    <string name="delete_composition_template">Smazat skladbu \"%1$s\"? Tuto akci nelze vrátit.</string>
-    <string name="delete_empty_folder">Smazat složku \"%s\"? Tuto akci nelze vrátit.</string>
-    <string name="delete_folder_template">Smazat %2$s ze složky \"%1$s\"? Tuto akci nelze vrátit.</string>
-    <string name="delete_template">Smazat \"%1$s\"? Tuto akci nelze vrátit.</string>
     <string name="delete_composition_success">Skladba \"%1$s\" byla smazána</string>
     <string name="search">Hledat</string>
     <string name="play_queue">Fronta přehrávání</string>
@@ -117,7 +113,6 @@
     <string name="copied_message">Text zkopírován</string>
     <string name="folder_name">Název složky</string>
     <string name="rename_folder">Přejmenovat složku</string>
-    <string name="cut">Vyjmout</string>
     <string name="copy">Kopírovat</string>
     <string name="paste">Vložit</string>
     <string name="paste_in_new_folder">Vložit do nového adresáře</string>
@@ -181,7 +176,6 @@
     <string name="clear_play_queue">Vyčistit frontu přehrávání</string>
     <string name="no_excluded_folders">Soubory vyloučené z prohledávání se zobrazí zde</string>
     <string name="keep_playing_after_window_close">Pokračovat v přehrávání i po zavření okna</string>
-    <string name="unknown_play_error">Neznámá chyba v přehrávání</string>
     <string name="equalizer">Ekvalizér</string>
     <string name="system_equalizer">Systémový ekvalizér</string>
     <string name="no_equalizer">Žádný</string>
@@ -193,7 +187,6 @@
     <string name="pick_from_gallery">Vybrat z galerie</string>
     <string name="remove_cover">Odstranit přebal</string>
     <string name="editor_timeout_error">Editor štítků nefunguje. Možná je formát souboru nepodporovaný</string>
-    <string name="change_lyrics">Změnit text písně</string>
     <string name="lyrics">Text písně</string>
     <string name="check_tags_error">Nešlo zkontrolovat štítky skladby: %s</string>
     <string name="changing_file_progress">Měním soubor…</string>
@@ -239,71 +232,104 @@
     <string name="enabled_media_players">Povolené přehrávače médií</string>
     <string name="advanced_settings">Pokročilé</string>
     <string name="media_players_setting_description">Aplikace používá mnoho přehrávačů médií pro přehrávání. Zde je můžete zakázat nebo jim změnit prioritu. Změny se projeví po restartování aplikace.</string>
-    <!--not verified-->
     <string name="sound_balance">Vyvážení zvuku</string>
-    <string name="sound_balance_state">Vlevo: %1$d%%, vpravo: %2$d%%</string>
+    <string name="sound_balance_state">Vlevo: %1$d%%, Vpravo: %2$d%%</string>
     <string name="language">Jazyk</string>
-    <string name="follow_system_language">Postupujte v jazyce systému</string>
+    <string name="follow_system_language">Použij systémový jazyk</string>
+    <!--not verified-->
+    <string name="move">Přesunout</string>
+    <string name="no_compositions_in_folder">Skladby ve složce nebyly nalezeny</string>
+    <string name="follow_system_theme">Následovat systémový motiv</string>
+    <string name="play_queue_is_empty">Fronta přehrávání je prázdná</string>
+    <string name="no_lyrics_for_current_composition">Žádný text pro aktuální skladbu</string>
+    <string name="edit_lyrics">Upravit text písně</string>
+    <string name="show_in_folders">Zobrazit ve složkách</string>
+    <string name="file_source_not_found">Vzdálený soubor nebyl nalezen</string>
+    <string name="file_is_too_large">Soubor je příliš velký</string>
+    <string name="preparing_files">Příprava souborů</string>
+    <string name="downloading">Stahování: %1$d/%2$d</string>
+    <string name="downloading_progress">Stahování (%d%%)</string>
+    <string name="rename_progress_count">Přejmenování (%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Tuto akci nelze vrátit.</string>
+    <string name="delete_composition_template">Smazat skladbu \"%1$s\"</string>
+    <string name="delete_empty_folder">Smazat složku \"%s\"</string>
+    <string name="delete_folder_template">%2$s ze složky \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">V systému Android 11 je kopírování/přesouvání/přejmenovávání souborů povoleno pouze ve složkách: \"%s\".
+        Umístěte zvukové soubory do těchto složek a operace by měla fungovat správně.
+    </string>
+    <string name="folder_already_excluded_from_scanning">Tato složka je již vyloučena z kontroly</string>
     <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s píseň</item>
         <item quantity="few">%1$s písně</item>
+        <item quantity="many">%1$s písně</item>
         <item quantity="other">%1$s písní</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
-        <item quantity="one">%1$s píseň</item>
-        <item quantity="few">%1$s písně</item>
-        <item quantity="other">%1$s písním</item>
     </plurals>
 
     <plurals name="files_count">
         <item quantity="one">%1$s soubor</item>
         <item quantity="few">%1$s soubory</item>
+        <item quantity="many">%1$s soubory</item>
         <item quantity="other">%1$s souborů</item>
     </plurals>
 
     <plurals name="albums_count">
         <item quantity="one">%1$s album</item>
         <item quantity="few">%1$s alba</item>
+        <item quantity="many">%1$s alba</item>
         <item quantity="other">%1$s alb</item>
     </plurals>
 
     <plurals name="play_next_message">
         <item quantity="one">%s píseň bude přehrána jako další</item>
         <item quantity="few">%s písně budou přehrány jako dalších</item>
+        <item quantity="many">%s písně budou přehrány jako dalších</item>
         <item quantity="other">%s písní bude přehráno jako dalších</item>
     </plurals>
 
     <plurals name="added_to_queue_message">
         <item quantity="one">%s píseň přidána na konec fronty přehrávání</item>
         <item quantity="few">%s písně přidány na konec fronty přehrávání</item>
+        <item quantity="many">%s písně přidány na konec fronty přehrávání</item>
         <item quantity="other">%s písní přidáno na konec fronty přehrávání</item>
     </plurals>
 
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d píseň přidána do seznamu skladeb \"%2$s\"</item>
         <item quantity="few">%1$d písně přidány do seznamu skladeb \"%2$s\"</item>
+        <item quantity="many">%1$d písně přidány do seznamu skladeb \"%2$s\"</item>
         <item quantity="other">%1$d písní přidáno do seznamu skladeb \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d píseň smazána ze seznamu skladeb \"%2$s\"</item>
         <item quantity="few">%1$d písně smazány ze seznamu skladeb \"%2$s\"</item>
+        <item quantity="many">%1$d písně smazány ze seznamu skladeb \"%2$s\"</item>
         <item quantity="other">%1$d písní smazáno ze seznamu skladeb \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d píseň vymazána</item>
         <item quantity="few">%1$d písně smazány</item>
+        <item quantity="many">%1$d písně smazány</item>
         <item quantity="other">%1$d písní smazáno</item>
     </plurals>
 
     <plurals name="seconds_template">
         <item quantity="one">%1$d sekunda</item>
         <item quantity="few">%1$d sekundy</item>
+        <item quantity="many">%1$d sekundy</item>
         <item quantity="other">%1$d sekund</item>
     </plurals>
+
+    <!--not verified-->
+    <plurals name="delete_compositions_template">
+        <item quantity="one">Smazat %d píseň</item>
+        <item quantity="few">Smazat %d písně</item>
+        <item quantity="many">Smazat %d písně</item>
+        <item quantity="other">Smazat %d písním</item>
+    </plurals>
+    <!---->
 
 </resources>

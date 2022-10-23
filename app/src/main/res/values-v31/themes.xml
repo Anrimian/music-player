@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="SystemLightTheme" parent="PrimaryLightTheme">
+        <!--primary colors-->
+        <item name="colorPrimary">@android:color/system_accent1_500</item>
+        <item name="colorPrimaryDark">@android:color/system_accent1_600</item>
+        <item name="colorPrimaryDarkSecondary">@android:color/system_accent1_200</item>
+        <item name="colorAccent">@android:color/system_accent1_500</item>
+        <item name="colorPrimaryVariant">@android:color/system_accent3_500</item>
+        <item name="colorAccentContrast">@android:color/system_accent1_300</item>
+
+        <!--background-->
+        <item name="android:colorBackground">@android:color/system_neutral1_10</item>
+        <item name="listBackground">@android:color/system_neutral1_100</item>
+        <item name="listItemBottomBackground">@android:color/system_neutral1_400</item>
+
+        <item name="listItemBackground">@android:color/system_neutral1_10</item>
+        <item name="dialogBackground">@android:color/system_neutral1_50</item>
+        <item name="popupMenuBackgroundColor">@android:color/system_neutral1_50</item>
+        <item name="subToolbarBackground">@android:color/system_neutral1_10</item>
+        <item name="actionModeBackgroundColor">@android:color/system_neutral2_10</item>
+        <item name="actionModeStatusBarColor">@android:color/system_neutral2_300</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@android:color/system_accent1_500</item>
+        <item name="android:textColorSecondary">@android:color/system_neutral1_500</item>
+        <item name="android:textColorSecondaryInverse">@android:color/system_neutral1_100</item>
+
+        <!--controls-->
+        <item name="colorControlThird">@android:color/system_neutral1_200</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@android:color/system_accent1_500</item>
+    </style>
+
+    <style name="SystemDarkTheme" parent="PrimaryDarkTheme">
+        <!--primary colors-->
+        <item name="colorPrimary">@android:color/system_neutral2_800</item>
+        <item name="colorPrimaryDark">@android:color/system_neutral2_700</item>
+        <item name="colorPrimaryDarkSecondary">@android:color/system_neutral2_500</item>
+        <item name="colorAccent">@android:color/system_accent1_300</item>
+        <item name="colorPrimaryVariant">@android:color/system_accent1_300</item>
+        <item name="navigationViewPrimaryColor">@android:color/system_accent1_300</item>
+        <item name="colorAccentContrast">@android:color/system_accent1_500</item>
+
+        <!--background-->
+        <item name="android:colorBackground">@android:color/system_neutral2_900</item>
+        <item name="listBackground">@android:color/system_neutral1_900</item>
+        <item name="listItemBottomBackground">@android:color/system_neutral1_600</item>
+        <item name="actionModeBackgroundColor">@android:color/system_neutral2_700</item>
+        <item name="actionModeStatusBarColor">@android:color/system_neutral2_600</item>
+
+        <item name="listItemBackground">@android:color/system_neutral2_900</item>
+        <item name="dialogBackground">@android:color/system_neutral2_800</item>
+        <item name="popupMenuBackgroundColor">@android:color/system_neutral2_700</item>
+        <item name="subToolbarBackground">@android:color/system_neutral2_800</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@android:color/system_accent1_300</item>
+        <item name="android:textColorSecondary">@android:color/system_neutral1_200</item>
+        <item name="android:textColorSecondaryInverse">@android:color/system_neutral1_200</item>
+
+        <!--controls-->
+        <item name="colorControlThird">@android:color/system_neutral2_700</item>
+    </style>
+</resources>

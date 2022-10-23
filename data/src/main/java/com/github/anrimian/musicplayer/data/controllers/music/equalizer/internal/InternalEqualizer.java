@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal;
 
 import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.NO_PRESET;
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.musicplayer.domain.utils.rx.RxUtils.withDefaultValue;
 
 import android.media.audiofx.Equalizer;
 

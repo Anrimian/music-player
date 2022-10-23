@@ -5,11 +5,13 @@ public class FolderFileSource implements FileSource {
     private final long id;
     private final String name;
     private final int filesCount;
+    private final boolean hasAnyStorageFile;
 
-    public FolderFileSource(long id, String name, int filesCount) {
+    public FolderFileSource(long id, String name, int filesCount, boolean hasAnyStorageFile) {
         this.id = id;
         this.name = name;
         this.filesCount = filesCount;
+        this.hasAnyStorageFile = hasAnyStorageFile;
     }
 
     public long getId() {
@@ -22,6 +24,10 @@ public class FolderFileSource implements FileSource {
 
     public int getFilesCount() {
         return filesCount;
+    }
+
+    public boolean hasAnyStorageFile() {
+        return hasAnyStorageFile;
     }
 
     @Override

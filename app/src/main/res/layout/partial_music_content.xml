@@ -18,10 +18,8 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/bound_with_bottom_sheet_behavior">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_playlist"
-            android:importantForAccessibility="no"
-            android:background="?attr/listBackground"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vpPlayContent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

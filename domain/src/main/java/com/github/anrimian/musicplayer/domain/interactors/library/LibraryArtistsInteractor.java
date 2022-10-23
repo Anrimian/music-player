@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 
 public class LibraryArtistsInteractor {
@@ -48,10 +47,6 @@ public class LibraryArtistsInteractor {
 
     public Observable<List<Album>> getAllAlbumsForArtist(long artistId) {
         return musicProviderRepository.getAllAlbumsForArtist(artistId);
-    }
-
-    public Completable updateArtistName(String name, long artistId) {
-        return editorRepository.updateArtistName(name, artistId);
     }
 
     public Order getOrder() {

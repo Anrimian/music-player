@@ -7,10 +7,12 @@ import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
 import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_AUTHOR_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_ID_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_IS_FILE_EXISTS_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_NAME_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_SIZE;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COMPOSITION_UPDATE_TIME_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.COVERS_ENABLED_ARG;
-import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAYER_PANEL_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.PLAY_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.QUEUE_SIZE_ARG;
 import static com.github.anrimian.musicplayer.Constants.Arguments.RANDOM_PLAY_ARG;
@@ -30,8 +32,10 @@ import android.widget.RemoteViews;
 import androidx.annotation.ColorRes;
 import androidx.annotation.LayoutRes;
 
+import com.github.anrimian.musicplayer.Constants.RemoteViewPlayerState;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtilsKt;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver;
@@ -53,8 +57,10 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         String compositionAuthor;
         long compositionId;
         long compositionUpdateTime;
+        long compositionSize;
+        boolean isFileExists;
         int queueSize;
-        boolean play = false;
+        int playerState = RemoteViewPlayerState.PAUSE;
         boolean randomPlayModeEnabled;
         int repeatMode;
         boolean showCovers;
@@ -63,8 +69,10 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
             compositionAuthor = intent.getStringExtra(COMPOSITION_AUTHOR_ARG);
             compositionId = intent.getLongExtra(COMPOSITION_ID_ARG, 0);
             compositionUpdateTime = intent.getLongExtra(COMPOSITION_UPDATE_TIME_ARG, 0);
+            compositionSize = intent.getLongExtra(COMPOSITION_SIZE, 0);
+            isFileExists = intent.getBooleanExtra(COMPOSITION_IS_FILE_EXISTS_ARG, false);
             queueSize = intent.getIntExtra(QUEUE_SIZE_ARG, 0);
-            play = intent.getBooleanExtra(PLAY_ARG, false);
+            playerState = intent.getIntExtra(PLAY_ARG, RemoteViewPlayerState.PAUSE);
             randomPlayModeEnabled = intent.getBooleanExtra(RANDOM_PLAY_ARG, false);
             repeatMode = intent.getIntExtra(REPEAT_ARG, RepeatMode.NONE);
             showCovers = intent.getBooleanExtra(COVERS_ENABLED_ARG, false);
@@ -73,6 +81,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
             compositionAuthor = WidgetDataHolder.getCompositionAuthor(context);
             compositionId = WidgetDataHolder.getCompositionId(context);
             compositionUpdateTime = WidgetDataHolder.getCompositionUpdateTime(context);
+            compositionSize = WidgetDataHolder.getCompositionSize(context);
+            isFileExists = WidgetDataHolder.getCompositionIsFileExists(context);
             queueSize = WidgetDataHolder.getCurrentQueueSize(context);
             randomPlayModeEnabled = WidgetDataHolder.isRandomPlayModeEnabled(context);
             repeatMode = WidgetDataHolder.getRepeatMode(context);
@@ -91,11 +101,13 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
             updateWidget(context,
                     appWidgetManager,
                     widgetId,
-                    play,
+                    playerState,
                     compositionName,
                     compositionAuthor,
                     compositionId,
                     compositionUpdateTime,
+                    compositionSize,
+                    isFileExists,
                     queueSize,
                     enabled,
                     showCovers,
@@ -108,32 +120,34 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                                   AppWidgetManager appWidgetManager,
                                   int widgetId,
                                   Context context,
-                                  boolean play,
+                                  int playerState,
                                   String compositionName,
                                   String compositionAuthor,
                                   long compositionId,
                                   long compositionUpdateTime,
+                                  long compositionSize,
+                                  boolean isFileExists,
                                   int queueSize,
                                   boolean enabled,
                                   boolean showCovers,
                                   boolean randomPlayModeEnabled,
                                   int repeatMode) {
-        widgetView.setBoolean(R.id.iv_skip_to_previous, "setEnabled", enabled);
-        widgetView.setBoolean(R.id.iv_play_pause, "setEnabled", enabled);
-        widgetView.setBoolean(R.id.iv_skip_to_next, "setEnabled", enabled && queueSize > 1);
-        widgetView.setTextViewText(R.id.tv_composition, compositionName);
-        widgetView.setTextViewText(R.id.tv_composition_author, compositionAuthor);
+        widgetView.setBoolean(R.id.ivSkipToPrevious, "setEnabled", enabled);
+        widgetView.setBoolean(R.id.ivPlayPause, "setEnabled", enabled);
+        widgetView.setBoolean(R.id.ivSkipToNext, "setEnabled", enabled && queueSize > 1);
+        widgetView.setTextViewText(R.id.tvComposition, compositionName);
+        widgetView.setTextViewText(R.id.tvCompositionAuthor, compositionAuthor);
 
-        widgetView.setImageViewResource(R.id.iv_play_pause, play? R.drawable.ic_pause: R.drawable.ic_play);
+        widgetView.setImageViewResource(R.id.ivPlayPause, FormatUtilsKt.getRemoteViewPlayerStateIcon(playerState));
 
-        int requestCode = play? PAUSE : PLAY;
+        int requestCode = playerState == RemoteViewPlayerState.PAUSE? PLAY: PAUSE;
         Intent intentPlayPause = new Intent(context, WidgetActionsReceiver.class);
         intentPlayPause.putExtra(REQUEST_CODE, requestCode);
         PendingIntent pIntentPlayPause = PendingIntent.getBroadcast(context,
                 requestCode,
                 intentPlayPause,
                 AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-        widgetView.setOnClickPendingIntent(R.id.iv_play_pause, pIntentPlayPause);
+        widgetView.setOnClickPendingIntent(R.id.ivPlayPause, pIntentPlayPause);
 
         Intent intentSkipToPrevious = new Intent(context, WidgetActionsReceiver.class);
         intentSkipToPrevious.putExtra(REQUEST_CODE, SKIP_TO_PREVIOUS);
@@ -141,7 +155,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 SKIP_TO_PREVIOUS,
                 intentSkipToPrevious,
                 AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-        widgetView.setOnClickPendingIntent(R.id.iv_skip_to_previous, pIntentSkipToPrevious);
+        widgetView.setOnClickPendingIntent(R.id.ivSkipToPrevious, pIntentSkipToPrevious);
 
         Intent intentSkipToNext = new Intent(context, WidgetActionsReceiver.class);
         intentSkipToNext.putExtra(REQUEST_CODE, SKIP_TO_NEXT);
@@ -149,10 +163,10 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 SKIP_TO_NEXT,
                 intentSkipToNext,
                 AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-        widgetView.setOnClickPendingIntent(R.id.iv_skip_to_next, pIntentSkipToNext);
+        widgetView.setOnClickPendingIntent(R.id.ivSkipToNext, pIntentSkipToNext);
 
         Intent intent = new Intent(context, MainActivity.class);
-        intent.putExtra(OPEN_PLAY_QUEUE_ARG, enabled);
+        intent.putExtra(OPEN_PLAYER_PANEL_ARG, enabled);
         PendingIntent pIntent = PendingIntent.getActivity(context,
                 0,
                 intent,
@@ -163,11 +177,13 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
     private void updateWidget(Context context,
                               AppWidgetManager appWidgetManager,
                               int widgetId,
-                              boolean play,
+                              int playerState,
                               String compositionName,
                               String compositionAuthor,
                               long compositionId,
                               long compositionUpdateTime,
+                              long compositionSize,
+                              boolean isFileExists,
                               int queueSize,
                               boolean enabled,
                               boolean showCovers,
@@ -179,11 +195,13 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 appWidgetManager,
                 widgetId,
                 context,
-                play,
+                playerState,
                 compositionName,
                 compositionAuthor,
                 compositionId,
                 compositionUpdateTime,
+                compositionSize,
+                isFileExists,
                 queueSize,
                 enabled,
                 showCovers,

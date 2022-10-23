@@ -49,6 +49,6 @@ public class LibraryGenresInteractor {
     }
 
     public Completable updateGenreName(String name, long genreId) {
-        return editorRepository.updateGenreName(name, genreId);
+        return Completable.error(new IllegalStateException("use update genre from editor interactor"));
     }
 }

@@ -144,7 +144,10 @@ public class FormatUtils {
                                                                     Artist artist,
                                                                     @DrawableRes int dividerDrawableRes) {
         SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context, dividerDrawableRes);
-        sb.append(formatCompositionsCount(context, artist.getCompositionsCount()));
+        int compositionsCount = artist.getCompositionsCount();
+        if (compositionsCount > 0) {
+            sb.append(formatCompositionsCount(context, compositionsCount));
+        }
         int albumsCount = artist.getAlbumsCount();
         if (albumsCount > 0) {
             sb.append(formatAlbumsCount(context, albumsCount));

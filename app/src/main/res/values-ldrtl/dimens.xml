@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--gradient-->
+    <integer name="gradient_angle_start">180</integer>
+
+</resources>

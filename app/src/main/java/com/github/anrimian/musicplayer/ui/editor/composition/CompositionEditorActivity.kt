@@ -7,20 +7,25 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
+import com.github.anrimian.filesync.models.state.file.Downloading
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants
-import com.github.anrimian.musicplayer.Constants.RequestCodes
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.models.image.UriImageSource
 import com.github.anrimian.musicplayer.databinding.ActivityCompositionEditBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.utils.FileUtils
+import com.github.anrimian.musicplayer.ui.common.activity.PickImageContract
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.asInt
+import com.github.anrimian.musicplayer.ui.common.format.showFileSyncState
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.composition.list.ShortGenresAdapter
@@ -28,8 +33,10 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
+import com.github.anrimian.musicplayer.ui.utils.setToolbar
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.google.android.material.snackbar.Snackbar
 import moxy.MvpAppCompatActivity
@@ -61,7 +68,13 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
     private lateinit var editGenreDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var lyricsDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var coverMenuDialogRunner: DialogFragmentRunner<MenuDialogFragment>
-    private lateinit var progressDialogRunner: DialogFragmentDelayRunner
+    private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
+
+    private val pickImageContract = registerForActivityResult(PickImageContract()) { uri ->
+        if (uri != null) {
+            presenter.onNewImageForCoverSelected(UriImageSource(uri))
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Components.getAppComponent().themeController().applyCurrentSlidrTheme(this)
@@ -70,13 +83,9 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         setContentView(viewBinding.root)
 
         AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground)
-        setSupportActionBar(viewBinding.toolbar)
 
-        val actionBar = supportActionBar
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true)
-            actionBar.setTitle(R.string.edit_tags)
-        }
+        setToolbar(viewBinding.toolbar, R.string.edit_tags)
+
         genresAdapter = ShortGenresAdapter(
             viewBinding.rvGenres,
             presenter::onGenreItemClicked,
@@ -122,7 +131,7 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
 
         val fm = supportFragmentManager
         errorHandler = ErrorHandler(
-            fm,
+            this,
             presenter::onRetryFailedEditActionClicked,
             this::showEditorRequestDeniedMessage
         )
@@ -170,7 +179,13 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
             fm,
             Tags.EDIT_COVER_TAG
         ) { fragment -> fragment.setOnCompleteListener(this::onCoverActionSelected) }
-        progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG)
+        progressDialogRunner = DialogFragmentDelayRunner(
+            fm,
+            Tags.PROGRESS_DIALOG_TAG,
+            fragmentInitializer = { fragment -> fragment.setCancellationListener {
+                presenter.onEditActionCancelled()
+            } }
+        )
 
         //<return genres after deep scan implementation>
         viewBinding.dividerLyrics.visibility = View.INVISIBLE
@@ -184,25 +199,6 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         super.attachBaseContext(
             Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
         )
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            RequestCodes.PICK_IMAGE_REQUEST_CODE -> {
-                if (data == null) {
-                    return
-                }
-                val uri = data.data ?: return
-                presenter.onNewImageForCoverSelected(UriImageSource(uri))
-                return
-            }
-            else -> super.onActivityResult(requestCode, resultCode, data)
-        }
     }
 
     override fun closeScreen() {
@@ -274,7 +270,7 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
 
     override fun showEnterLyricsDialog(composition: FullComposition) {
         val fragment = InputTextDialogFragment.Builder(
-            R.string.change_lyrics,
+            R.string.edit_lyrics,
             R.string.change,
             R.string.cancel,
             R.string.lyrics,
@@ -377,20 +373,33 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
     }
 
     override fun showSelectImageFromGalleryScreen() {
-        val intent = Intent()
-        intent.type = "image/*"
-        intent.action = Intent.ACTION_GET_CONTENT
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), RequestCodes.PICK_IMAGE_REQUEST_CODE)
+        pickImageContract.launch(null)
     }
 
     override fun showChangeFileProgress() {
-        val fragment = ProgressDialogFragment.newInstance(R.string.changing_file_progress)
+        val fragment = newProgressDialogFragment(R.string.changing_file_progress)
         progressDialogRunner.show(fragment)
     }
 
     override fun hideChangeFileProgress() {
         progressDialogRunner.cancel()
+    }
+
+    override fun showSyncState(fileSyncState: FileSyncState, composition: FullComposition) {
+        val isFileRemote = composition.storageId == null && composition.initialSource == InitialSource.REMOTE
+        showFileSyncState(fileSyncState, isFileRemote, viewBinding.pvFileState)
+        progressDialogRunner.runAction { dialog ->
+            val message = if (fileSyncState is Downloading) {
+                val progress = fileSyncState.getProgress()
+                val progressPercentage = progress.asInt()
+                dialog.setProgress(progressPercentage)
+                getString(R.string.downloading_progress, progressPercentage.coerceAtLeast(0))
+            } else {
+                dialog.setIndeterminate(true)
+                getString(R.string.changing_file_progress)
+            }
+            dialog.setMessage(message)
+        }
     }
 
     private fun onCoverActionSelected(menuItem: MenuItem) {

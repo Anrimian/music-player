@@ -48,10 +48,6 @@
     <string name="save_as_play_list">Oynatma listesi olarak kaydet</string>
     <string name="cancel">İptal</string>
     <string name="deleting">Siliniyor</string>
-    <string name="delete_composition_template">Şarkı \"%1$s\" silinsin mi?  Bu işlem geri alınamaz.</string>
-    <string name="delete_empty_folder">\"%s\" klasörü silinsin mi?  Bu işlem geri alınamaz.</string>
-    <string name="delete_folder_template">%2$s \"%1$s\" klasöründen silinsin mi?  Bu işlem geri alınamaz.</string>
-    <string name="delete_template">\"%1$s\" silinsin mi?  Bu işlem geri alınamaz.</string>
     <string name="delete_composition_success">Şarkı \"%1$s\" silindi</string>
     <string name="search">Ara</string>
     <string name="play_queue">Oynatma sırası</string>
@@ -117,7 +113,6 @@
     <string name="copied_message">Metin kopyalandı</string>
     <string name="folder_name">Klasör adı</string>
     <string name="rename_folder">Klasörü yeniden adlandır</string>
-    <string name="cut">Kes</string>
     <string name="copy">Kopyala</string>
     <string name="paste">Yapıştır</string>
     <string name="paste_in_new_folder">Yeni klasöre yapıştırın</string>
@@ -181,7 +176,6 @@
     <string name="clear_play_queue">Oynatma sırasını temizle</string>
     <string name="no_excluded_folders">Taramanın dışında bırakılan klasörler burada görünecek</string>
     <string name="keep_playing_after_window_close">Pencere kapandıktan sonra oynamaya devam et</string>
-    <string name="unknown_play_error">Bilinmeyen oynatma hatası</string>
     <string name="equalizer">Ekolayzır</string>
     <string name="system_equalizer">Sistem ekolayzır</string>
     <string name="no_equalizer">Hiçbiri</string>
@@ -193,7 +187,6 @@
     <string name="pick_from_gallery">Galeriden seç</string>
     <string name="remove_cover">Kapağı kaldır</string>
     <string name="editor_timeout_error">Etiket düzenleyici zaman aşımına uğradı.  Dosya biçimi desteklenmiyor olabilir</string>
-    <string name="change_lyrics">Şarkı sözlerini değiştir</string>
     <string name="lyrics">Şarkı Sözleri</string>
     <string name="check_tags_error">Kompozisyon etiketleri kontrol edilemedi: %s</string>
     <string name="changing_file_progress">Dosya değiştiriliyor…</string>
@@ -243,13 +236,30 @@
     <string name="sound_balance_state">Sol: %1$d%%, Sağ: %2$d%%</string>
     <string name="language">Dil</string>
     <string name="follow_system_language">Sistem dilini takip et</string>
+    <string name="move">Taşı</string>
+    <string name="no_compositions_in_folder">Klasördeki kompozisyonlar bulunamadı</string>
+    <string name="follow_system_theme">Sistem temasını takip et</string>
+    <string name="play_queue_is_empty">Oynatma sırası boş</string>
+    <string name="no_lyrics_for_current_composition">Mevcut beste için şarkı sözü yok</string>
+    <string name="edit_lyrics">Şarkı sözlerini düzenle</string>
+    <string name="show_in_folders">Klasörlerde göster</string>
+    <string name="file_source_not_found">Uzak dosya bulunamadı</string>
+    <string name="file_is_too_large">Dosya çok büyük</string>
+    <string name="preparing_files">Dosyalar hazırlanıyor</string>
+    <string name="downloading">İndiriliyor: %1$d/%2$d</string>
+    <string name="downloading_progress">İndiriliyor(%d%%)</string>
+    <string name="rename_progress_count">Yeniden adlandırılıyor(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s?  Bu işlem geri alınamaz.</string>
+    <string name="delete_composition_template">Şarkıyı \"%1$s\" sil</string>
+    <string name="delete_empty_folder">\"%s\" klasörünü sil</string>
+    <string name="delete_folder_template">%2$s \"%1$s\" klasöründen</string>
+    <string name="android_r_editor_restriction_error">Android 11\'den dosyaların kopyalanmasına/taşınmasına/yeniden adlandırılmasına yalnızca şu klasörlerde izin verilir: \"%s\".
+         Ses dosyalarını bu klasörlere yerleştirin ve işlemin doğru şekilde gerçekleştirilmesi gerekir.
+     </string>
+    <string name="folder_already_excluded_from_scanning">Bu klasör zaten tarama dışında bırakıldı</string>
+
 
     <plurals name="compositions_count">
-        <item quantity="one">%1$s şarkı</item>
-        <item quantity="other">Şarkılar %1$s</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
         <item quantity="one">%1$s şarkı</item>
         <item quantity="other">Şarkılar %1$s</item>
     </plurals>
@@ -292,6 +302,11 @@
     <plurals name="seconds_template">
         <item quantity="one">%1$d saniye</item>
         <item quantity="other">%1$d saniye</item>
+    </plurals>
+
+    <plurals name="delete_compositions_template">
+        <item quantity="one">%d şarkıyı sil</item>
+        <item quantity="other">Sil %d</item>
     </plurals>
 
 </resources>

@@ -1,12 +1,12 @@
 package com.github.anrimian.musicplayer.ui.about
 
 import android.os.Bundle
-import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentAboutBinding
@@ -50,6 +50,9 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
                 fileLog.fileSize / 1024
             )
         }
+        //TODO split descriptions for lite and sync apps
+        // Sync app text: "This is...   ... . With cloud sync feature (in early stages)"
+        // Linkify "cloud sync" and navigate to setup sync screen.
         val aboutText = getString(
             R.string.about_app_text,
             linkify("mailto:", R.string.about_app_text_write, R.string.feedback_email),
@@ -57,7 +60,7 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
             linkify("mailto:", R.string.about_app_text_here, R.string.feedback_email),
             linkify("", R.string.about_app_text_here_link, R.string.source_code_link)
         )
-        viewBinding.tvAbout.text = Html.fromHtml(aboutText)
+        viewBinding.tvAbout.text = HtmlCompat.fromHtml(aboutText, HtmlCompat.FROM_HTML_MODE_LEGACY)
         viewBinding.tvAbout.movementMethod = LinkMovementMethod.getInstance()
         viewBinding.btnDelete.setOnClickListener { deleteLogFile() }
         viewBinding.btnView.setOnClickListener { appLogger.startViewLogScreen(requireActivity()) }
@@ -70,16 +73,15 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
     }
 
     override fun onFragmentMovedOnTop() {
-        val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
-        toolbar.setTitle(R.string.app_name)
-        val appInfo = requireContext().getAppInfo()
-        toolbar.subtitle = getString(
-            R.string.version_template,
-            appInfo.versionName,
-            appInfo.versionCode
-        )
-        toolbar.setTitleClickListener(null)
-        toolbar.clearOptionsMenu()
+        requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar).setup { config ->
+            config.setTitle(R.string.app_name)
+            val appInfo = requireContext().getAppInfo()
+            config.setSubtitle(getString(
+                R.string.version_template,
+                appInfo.versionName,
+                appInfo.versionCode
+            ))
+        }
     }
 
     private fun deleteLogFile() {

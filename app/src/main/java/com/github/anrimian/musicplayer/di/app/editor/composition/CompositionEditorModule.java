@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.di.app.editor.composition;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
+import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorPresenter;
@@ -10,8 +13,6 @@ import javax.inject.Named;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 @Module
 public class CompositionEditorModule {
@@ -25,8 +26,9 @@ public class CompositionEditorModule {
     @Provides
     @Nonnull
     CompositionEditorPresenter compositionEditorPresenter(EditorInteractor interactor,
+                                                          SyncInteractor<?, ?,Long> syncInteractor,
                                                           @Named(UI_SCHEDULER) Scheduler uiScheduler,
                                                           ErrorParser errorParser) {
-        return new CompositionEditorPresenter(compositionId, interactor, uiScheduler, errorParser);
+        return new CompositionEditorPresenter(compositionId, interactor, syncInteractor, uiScheduler, errorParser);
     }
 }

@@ -11,7 +11,7 @@ import android.os.Build;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
-import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
@@ -36,7 +36,7 @@ public class CompositionSourceModelHelper {
                         ((LibraryCompositionSource) first).getComposition(),
                         ((LibraryCompositionSource) second).getComposition());
             }
-            if (first instanceof UriCompositionSource) {
+            if (first instanceof ExternalCompositionSource) {
                 return true;
             }
         }
@@ -74,10 +74,10 @@ public class CompositionSourceModelHelper {
                     mediaSession.setMetadata(metadataBuilder.build());
                 }
             }
-            if (source instanceof UriCompositionSource) {
+            if (source instanceof ExternalCompositionSource) {
                 Components.getAppComponent()
                         .imageLoader()
-                        .loadImage((UriCompositionSource) source, bitmap -> {
+                        .loadImage((ExternalCompositionSource) source, bitmap -> {
                             metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
                             metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
                             mediaSession.setMetadata(metadataBuilder.build());
@@ -104,8 +104,8 @@ public class CompositionSourceModelHelper {
             mediaSession.setMetadata(builder.build());
             return;
         }
-        if (source instanceof UriCompositionSource) {
-            UriCompositionSource uriSource = (UriCompositionSource) source;
+        if (source instanceof ExternalCompositionSource) {
+            ExternalCompositionSource uriSource = (ExternalCompositionSource) source;
 
             MediaMetadataCompat.Builder builder = metadataBuilder
                     .putString(MediaMetadataCompat.METADATA_KEY_TITLE, formatCompositionName(uriSource.getTitle(), uriSource.getDisplayName()))
@@ -127,7 +127,7 @@ public class CompositionSourceModelHelper {
         if (source instanceof LibraryCompositionSource) {
             return ((LibraryCompositionSource) source).getTrackPosition();
         }
-        if (source instanceof UriCompositionSource) {
+        if (source instanceof ExternalCompositionSource) {
             return 0;
         }
         return 0;
@@ -140,8 +140,8 @@ public class CompositionSourceModelHelper {
             Composition composition = ((LibraryCompositionSource) source).getComposition();
             return coverImageLoader.loadNotificationImage(composition, onCompleted);
         }
-        if (source instanceof UriCompositionSource) {
-            return coverImageLoader.loadNotificationImage((UriCompositionSource) source, onCompleted);
+        if (source instanceof ExternalCompositionSource) {
+            return coverImageLoader.loadNotificationImage((ExternalCompositionSource) source, onCompleted);
         }
         throw new IllegalStateException();
     }

@@ -6,6 +6,8 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
@@ -16,7 +18,7 @@ public interface PlayListsRepository {
 
     Observable<PlayList> getPlayListObservable(long playlistId);
 
-    Observable<List<PlayListItem>> getCompositionsObservable(long playlistId);
+    Observable<List<PlayListItem>> getCompositionsObservable(long playlistId, @Nullable String searchText);
 
     Single<PlayList> createPlayList(String name);
 

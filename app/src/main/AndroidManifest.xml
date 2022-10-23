@@ -3,10 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.github.anrimian.musicplayer">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"/>
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -16,9 +19,6 @@
 
     <!--prevent rare crash on some devices with notification display-->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-
-    <!--remove permission from glide because we don't use internet for covers-->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove"/>
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
 
@@ -37,6 +37,7 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:requestLegacyExternalStorage="true"
+        android:localeConfig="@xml/locales_config"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android:allowBackup">
 

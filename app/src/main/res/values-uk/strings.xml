@@ -48,13 +48,6 @@
     <string name="save_as_play_list">Зберегти як плейлист</string>
     <string name="cancel">Скасування</string>
     <string name="deleting">Видалення</string>
-    <string name="delete_composition_template">
-        Видалити композицію \"%1$s\"?
-        Цю дію буде неможливо відмінити.
-    </string>
-    <string name="delete_folder_template">Видалити %2$s з папки \"%1$s\"? Цю дію буде неможливо відмінити.</string>
-    <string name="delete_empty_folder">Видалити папку \"%s\"? Цю дію буде неможливо відмінити.</string>
-    <string name="delete_template">Видалити %1$s? Цю дію буде неможливо відмінити.</string>
     <string name="delete_composition_success">Композиція \"%1$s\" видалена</string>
     <string name="search">Пошук</string>
     <string name="play_queue">Чегра відтворення</string>
@@ -113,7 +106,6 @@
     <string name="copied_message">Текст скопійований</string>
     <string name="folder_name">Ім\'я папки</string>
     <string name="rename_folder">Перейменувати папку</string>
-    <string name="cut">Вирізати</string>
     <string name="copy">Копіювати</string>
     <string name="paste">Вставити</string>
     <string name="paste_in_new_folder">Вставити в нову папку</string>
@@ -177,7 +169,6 @@
     <string name="clear_play_queue">Очистити чергу відтворення</string>
     <string name="no_excluded_folders">Папки, виключені з медіа сканера, будут з\'являтися тут</string>
     <string name="keep_playing_after_window_close">Продовжувати відтворення після закриття вікна</string>
-    <string name="unknown_play_error">Невідома помилка відтворення</string>
     <string name="equalizer">Еквалайзер</string>
     <string name="system_equalizer">Системний еквалайзер</string>
     <string name="no_equalizer">Не використовувати</string>
@@ -189,7 +180,6 @@
     <string name="pick_from_gallery">Вибрати з галереї</string>
     <string name="remove_cover">Сховати обкладинку</string>
     <string name="editor_timeout_error">Час очікування редактора тегів вичерпано. Можливо, формат файлу не підтримується</string>
-    <string name="change_lyrics">Змінити текст композиції</string>
     <string name="lyrics">Текст композиції</string>
     <string name="check_tags_error">Не вдалось перевірити теги композиції: %s</string>
     <string name="changing_file_progress">Зміна файлу…</string>
@@ -239,31 +229,45 @@
     <string name="sound_balance_state">Лівий: %1$d%%, Правий: %2$d%%</string>
     <string name="language">Мова</string>
     <string name="follow_system_language">Використовувати мову системи</string>
+    <string name="move">Перемістити</string>
+    <string name="no_compositions_in_folder">Композицій в папці не знайдено</string>
+    <string name="follow_system_theme">Застосовувати тему системи</string>
+    <string name="play_queue_is_empty">Черга відтворення порожня</string>
+    <string name="no_lyrics_for_current_composition">Немає тексту поточної композиції</string>
+    <string name="edit_lyrics">Редагувати текст композиції</string>
+    <string name="show_in_folders">Показати в папках</string>
+    <string name="file_source_not_found">Видалений файл не знайдено</string>
+    <string name="file_is_too_large">Файл занадто великий</string>
+    <string name="preparing_files">Підготовка файлів</string>
+    <string name="downloading">Завантаження: %1$d/%2$d</string>
+    <string name="downloading_progress">Завантаження(%d%%)</string>
+    <string name="rename_progress_count">Перейменування(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Цю дію не можна буде скасувати.</string>
+    <string name="delete_composition_template">Видалити композицію \"%1$s\"</string>
+    <string name="delete_empty_folder">Видалити папку \"%s\"</string>
+    <string name="delete_folder_template">%2$s з папки \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">Починаючи з Android 11 копіювання/переміщення/перейменування файлів дозволено тільки в папках: \"%s\".
+        Перемістіть аудіо файли в ці папки і дія повинна працювати коректно.
+    </string>
+    <string name="folder_already_excluded_from_scanning">Цю папку вже виключено зі сканування</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиція</item>
-        <item quantity="few">%1$s композицій</item>
+        <item quantity="few">%1$s композиції</item>
         <item quantity="many">%1$s композицій</item>
         <item quantity="other">%1$s композиції</item>
     </plurals>
 
-    <plurals name="compositions_count_dativ">
-        <item quantity="one">%1$s композицію</item>
-        <item quantity="few">%1$s композицій</item>
-        <item quantity="many">%1$s композицій</item>
-        <item quantity="other">%1$s композицій</item>
-    </plurals>
-
     <plurals name="files_count">
         <item quantity="one">%1$s файл</item>
-        <item quantity="few">%1$s файлів</item>
+        <item quantity="few">%1$s файла</item>
         <item quantity="many">%1$s файлів</item>
         <item quantity="other">%1$s файлів</item>
     </plurals>
 
     <plurals name="albums_count">
         <item quantity="one">%1$s альбом</item>
-        <item quantity="few">%1$s альбому</item>
+        <item quantity="few">%1$s альбома</item>
         <item quantity="many">%1$s альбомів</item>
         <item quantity="other">%1$s альбомів</item>
     </plurals>
@@ -308,6 +312,13 @@
         <item quantity="few">%1$d секунди</item>
         <item quantity="many">%1$d секунд</item>
         <item quantity="other">%1$d секунд</item>
+    </plurals>
+
+    <plurals name="delete_compositions_template">
+        <item quantity="one">Видалити %d композицію</item>
+        <item quantity="few">Видалити %1$s композиції</item>
+        <item quantity="many">Видалити %1$s композицій</item>
+        <item quantity="other">Видалити %d композицій</item>
     </plurals>
 
 </resources>

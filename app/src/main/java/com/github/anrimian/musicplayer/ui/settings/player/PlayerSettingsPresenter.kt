@@ -35,7 +35,7 @@ class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
 
     fun onPauseOnZeroVolumeLevelChecked(checked: Boolean) {
         viewState.showPauseOnZeroVolumeLevelEnabled(checked)
-        interactor.setPauseOnAudioFocusLossEnabled(checked)
+        interactor.setPauseOnZeroVolumeLevelEnabled(checked)
     }
 
     fun onSoundBalanceClicked() {

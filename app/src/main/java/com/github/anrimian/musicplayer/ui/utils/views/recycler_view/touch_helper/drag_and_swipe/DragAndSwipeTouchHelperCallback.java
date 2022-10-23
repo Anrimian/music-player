@@ -33,8 +33,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener;
+import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.DragListener;
 
 public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
@@ -51,6 +51,8 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     private OnMovedListener onMovedListener;
     private OnStartDragListener onStartDragListener;
     private OnEndDragListener onEndDragListener;
+
+    private boolean isDragEnabled = true;
 
     private boolean dragging;
     private Boolean swipedFromSwipeEdge;
@@ -233,6 +235,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public int getMovementFlags(@NonNull RecyclerView recyclerView,
                                 @NonNull RecyclerView.ViewHolder viewHolder) {
+        int dragFlags = isDragEnabled? this.dragFlags: 0;
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
@@ -334,6 +337,10 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
 
     public void setOnEndDragListener(OnEndDragListener onEndDragListener) {
         this.onEndDragListener = onEndDragListener;
+    }
+
+    public void setDragEnabled(boolean enabled) {
+        this.isDragEnabled = enabled;
     }
 
     private void setIsDragging(RecyclerView.ViewHolder viewHolder, boolean dragging) {

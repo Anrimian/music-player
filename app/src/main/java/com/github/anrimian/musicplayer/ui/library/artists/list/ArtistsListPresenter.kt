@@ -1,30 +1,27 @@
 package com.github.anrimian.musicplayer.ui.library.artists.list
 
-import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor
 import com.github.anrimian.musicplayer.domain.models.artist.Artist
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
-import java.util.*
 
-class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
-                           errorParser: ErrorParser,
-                           uiScheduler: Scheduler) 
-    : AppPresenter<ArtistsListView>(uiScheduler, errorParser) {
-    
+class ArtistsListPresenter(
+    private val interactor: LibraryArtistsInteractor,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler
+): AppPresenter<ArtistsListView>(uiScheduler, errorParser) {
+
     private var artistsDisposable: Disposable? = null
 
     private var artists: List<Artist> = ArrayList()
-    
-    private var searchText: String? = null
 
-    private var lastEditAction: Completable? = null
+    private var searchText: String? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -54,20 +51,6 @@ class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
         }
     }
 
-    fun onNewArtistNameEntered(name: String?, artistId: Long) {
-        lastEditAction = interactor.updateArtistName(name, artistId)
-                .observeOn(uiScheduler)
-                .doOnSubscribe { viewState.showRenameProgress() }
-                .doFinally { viewState.hideRenameProgress() }
-        lastEditAction!!.justSubscribe(this::onDefaultError)
-    }
-
-    fun onRetryFailedEditActionClicked() {
-        if (lastEditAction != null) {
-            lastEditAction!!.doFinally { lastEditAction = null }.justSubscribe(this::onDefaultError)
-        }
-    }
-
     fun getSearchText() = searchText
 
     private fun subscribeOnArtistsList() {
@@ -76,8 +59,8 @@ class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
         }
         RxUtils.dispose(artistsDisposable, presenterDisposable)
         artistsDisposable = interactor.getArtistsObservable(searchText)
-                .observeOn(uiScheduler)
-                .subscribe(this::onArtistsReceived, this::onArtistsReceivingError)
+            .observeOn(uiScheduler)
+            .subscribe(this::onArtistsReceived, this::onArtistsReceivingError)
         presenterDisposable.add(artistsDisposable!!)
     }
 
@@ -106,11 +89,6 @@ class ArtistsListPresenter(private val interactor: LibraryArtistsInteractor,
                 }
             }
         }
-    }
-
-    private fun onDefaultError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showErrorMessage(errorCommand)
     }
 
 }

@@ -25,7 +25,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
@@ -69,7 +69,7 @@ public class CoverImageLoader {
 
         GlideApp.with(imageView)
                 .asBitmap()
-                .load(new CompositionImage(data.getId(), data.getDateModified()))
+                .load(toImageRequest(data))
                 .override(getCoverSize())
                 .placeholder(DEFAULT_PLACEHOLDER)
                 .error(DEFAULT_PLACEHOLDER)
@@ -105,7 +105,7 @@ public class CoverImageLoader {
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
-                                             @NonNull UriCompositionSource data,
+                                             @NonNull ExternalCompositionSource data,
                                              @DrawableRes int errorPlaceholder) {
         displayImageInReusableTarget(imageView, new UriCompositionImage(data), null, errorPlaceholder);
     }
@@ -113,7 +113,10 @@ public class CoverImageLoader {
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
                                              @NonNull FullComposition data,
                                              @DrawableRes int errorPlaceholder) {
-        displayImageInReusableTarget(imageView, new CompositionImage(data.getId(), data.getDateModified()), null, errorPlaceholder);
+        displayImageInReusableTarget(imageView,
+                new CompositionImage(data.getId(), data.getDateModified(), data.getSize(), data.getStorageId() != null),
+                null,
+                errorPlaceholder);
     }
 
     public void displayImageInReusableTarget(@NonNull ImageView imageView,
@@ -122,10 +125,10 @@ public class CoverImageLoader {
                                              @DrawableRes int errorPlaceholder) {
         CompositionImage oldComposition = null;
         if (oldData != null) {
-            oldComposition = new CompositionImage(oldData.getId(), oldData.getDateModified());
+            oldComposition = toImageRequest(data);
         }
         displayImageInReusableTarget(imageView,
-                new CompositionImage(data.getId(), data.getDateModified()),
+                toImageRequest(data),
                 oldComposition,
                 errorPlaceholder);
     }
@@ -150,11 +153,11 @@ public class CoverImageLoader {
     public Runnable loadNotificationImage(@Nonnull Composition data,
                                           Callback<Bitmap> onCompleted) {
         return loadNotificationImage(
-                new CompositionImage(data.getId(), data.getDateModified()),
+                toImageRequest(data),
                 onCompleted);
     }
 
-    public Runnable loadNotificationImage(@Nonnull UriCompositionSource source,
+    public Runnable loadNotificationImage(@Nonnull ExternalCompositionSource source,
                                           Callback<Bitmap> onCompleted) {
         return loadNotificationImage(
                 new UriCompositionImage(source),
@@ -178,12 +181,12 @@ public class CoverImageLoader {
         return defaultNotificationBitmap;
     }
 
-    public void loadImage(@Nonnull UriCompositionSource data, Callback<Bitmap> onCompleted) {
+    public void loadImage(@Nonnull ExternalCompositionSource data, Callback<Bitmap> onCompleted) {
         loadImage(new UriCompositionImage(data), onCompleted);
     }
 
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
-        loadImage(new CompositionImage(data.getId(), data.getDateModified()), onCompleted);
+        loadImage(toImageRequest(data), onCompleted);
     }
 
     public Single<Optional<Uri>> loadImageUri(@Nonnull Composition data) {
@@ -205,7 +208,7 @@ public class CoverImageLoader {
                     .build();
             onCompleted.call(uri);
         });
-        CompositionImage imageData = new CompositionImage(data.getId(), data.getDateModified());
+        CompositionImage imageData = toImageRequest(data);
         loadImage(imageData, bitmap ->
                 GlideApp.with(context)
                         .download(imageData)
@@ -220,6 +223,8 @@ public class CoverImageLoader {
                              int appWidgetId,
                              long compositionId,
                              long compositionUpdateTime,
+                             long compositionSize,
+                             boolean isFileExists,
                              @DrawableRes int placeholder) {
         CustomAppWidgetTarget widgetTarget = new CustomAppWidgetTarget(context,
                 viewId,
@@ -229,8 +234,12 @@ public class CoverImageLoader {
 
         GlideApp.with(context)
                 .asBitmap()
-                .load(new CompositionImage(compositionId, new Date(compositionUpdateTime)))
-                .override(getCoverSize())
+                .load(new CompositionImage(
+                        compositionId,
+                        new Date(compositionUpdateTime),
+                        compositionSize,
+                        isFileExists)
+                ).override(getCoverSize())
                 .downsample(DownsampleStrategy.AT_MOST)
                 .transform(new CircleCrop())
                 .timeout(TIMEOUT_MILLIS)
@@ -346,6 +355,15 @@ public class CoverImageLoader {
                 callback.call(null);
             }
         };
+    }
+
+    private CompositionImage toImageRequest(Composition composition) {
+        return new CompositionImage(
+                composition.getId(),
+                composition.getDateModified(),
+                composition.getSize(),
+                composition.isFileExists()
+        );
     }
 
 }

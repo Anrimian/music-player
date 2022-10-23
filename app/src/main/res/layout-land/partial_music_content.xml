@@ -27,10 +27,8 @@
             app:layout_constraintWidth_default="percent"
             app:layout_constraintWidth_percent="0.5">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_playlist"
-                android:importantForAccessibility="no"
-                android:background="?attr/listBackground"
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/vpPlayContent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 

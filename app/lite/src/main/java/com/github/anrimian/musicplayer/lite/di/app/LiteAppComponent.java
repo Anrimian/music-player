@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.lite.di.app;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.di.app.AppModule;
 import com.github.anrimian.musicplayer.di.app.DbModule;
-import com.github.anrimian.musicplayer.di.app.ErrorModule;
 import com.github.anrimian.musicplayer.di.app.MusicModule;
 import com.github.anrimian.musicplayer.di.app.PlayListsModule;
 import com.github.anrimian.musicplayer.di.app.SchedulerModule;
@@ -18,7 +17,6 @@ import dagger.Component;
 @Component(modules = {
         AppModule.class,
         SchedulerModule.class,
-        ErrorModule.class,
         MusicModule.class,
         DbModule.class,
         StorageModule.class,

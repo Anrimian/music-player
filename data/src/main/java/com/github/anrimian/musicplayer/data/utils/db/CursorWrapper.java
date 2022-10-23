@@ -64,4 +64,8 @@ public class CursorWrapper {
     public boolean getBoolean(String columnName) {
         return getInt(columnName) == 1;
     }
+
+    public boolean getBoolean(int columnIndex) {
+        return cursor.getInt(columnIndex) == 1;
+    }
 }

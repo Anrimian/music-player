@@ -93,15 +93,18 @@ public class DbModule {
     @Singleton
     AlbumsDaoWrapper albumsDaoWrapper(AppDatabase appDatabase,
                                       AlbumsDao albumsDao,
-                                      ArtistsDao artistsDao) {
-        return new AlbumsDaoWrapper(appDatabase, albumsDao, artistsDao);
+                                      ArtistsDao artistsDao,
+                                      ArtistsDaoWrapper artistsDaoWrapper) {
+        return new AlbumsDaoWrapper(appDatabase, albumsDao, artistsDao, artistsDaoWrapper);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    ArtistsDaoWrapper artistsDaoWrapper(ArtistsDao artistsDao) {
-        return new ArtistsDaoWrapper(artistsDao);
+    ArtistsDaoWrapper artistsDaoWrapper(AppDatabase appDatabase,
+                                        ArtistsDao artistsDao,
+                                        AlbumsDao albumsDao) {
+        return new ArtistsDaoWrapper(appDatabase, artistsDao, albumsDao);
     }
 
     @Provides
@@ -119,12 +122,15 @@ public class DbModule {
     CompositionsDaoWrapper compositionsDaoWrapper(AppDatabase appDatabase,
                                                   ArtistsDao artistsDao,
                                                   CompositionsDao compositionsDao,
-                                                  AlbumsDao albumsDao) {
+                                                  AlbumsDao albumsDao,
+                                                  GenreDao genreDao,
+                                                  FoldersDao foldersDao) {
         return new CompositionsDaoWrapper(appDatabase,
                 artistsDao,
                 compositionsDao,
-                albumsDao
-        );
+                albumsDao,
+                genreDao,
+                foldersDao);
     }
 
     @Provides

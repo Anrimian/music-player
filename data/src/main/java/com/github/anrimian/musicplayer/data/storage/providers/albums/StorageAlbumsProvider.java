@@ -108,7 +108,7 @@ public class StorageAlbumsProvider {
     @Nullable
     private StorageAlbum getAlbumFromCursor(CursorWrapper cursorWrapper) {
         String name = cursorWrapper.getString(Albums.ALBUM);
-        if (name == null) {
+        if (name == null || name.equals("<unknown>")) {
             return null;
         }
         String artist = cursorWrapper.getString(Albums.ARTIST);

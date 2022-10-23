@@ -104,9 +104,6 @@ interface LibraryFoldersView : MvpView {
     @Skip
     fun goToMusicStorageScreen(folderId: Long)
 
-    @Skip
-    fun showCompositionActionDialog(composition: Composition)
-
     @OneExecution
     fun showErrorMessage(errorCommand: ErrorCommand)
 

@@ -47,10 +47,6 @@
     <string name="save_as_play_list">Guardar como lista de reproducción</string>
     <string name="cancel">Cancelar</string>
     <string name="deleting">Eliminando</string>
-    <string name="delete_composition_template">Eliminar canción \"%1$s\"? Esta acción no se puede deshacer.</string>
-    <string name="delete_empty_folder">Eliminar carpeta \"%s\"? Esta acción no se puede deshacer.</string>
-    <string name="delete_folder_template">Eliminar %2$s de carpeta \"%1$s\"? Esta acción no se puede deshacer.</string>
-    <string name="delete_template">Eliminar \"%1$s\"? Esta acción no se puede deshacer.</string>
     <string name="delete_composition_success">Canción \"%1$s\" eliminada</string>
     <string name="search">Buscar</string>
     <string name="play_queue">Reproducir cola</string>
@@ -116,7 +112,6 @@
     <string name="copied_message">Texto copiado</string>
     <string name="folder_name">Nombre de la carpeta</string>
     <string name="rename_folder">Renombrar carpeta</string>
-    <string name="cut">Cortar</string>
     <string name="copy">Copiar</string>
     <string name="paste">Pegar</string>
     <string name="paste_in_new_folder">Pegar en nueva carpeta</string>
@@ -180,7 +175,6 @@
     <string name="clear_play_queue">Limpiar la cola de reproducción</string>
     <string name="no_excluded_folders">Las carpetas excluidas del escaneo aparecerán aquí</string>
     <string name="keep_playing_after_window_close">Continuar reproduciendo después de cerrar la ventana</string>
-    <string name="unknown_play_error">Error de reproducción desconocido</string>
     <string name="equalizer">Ecualizador</string>
     <string name="system_equalizer">Ecualizador del sistema</string>
     <string name="no_equalizer">Ninguno</string>
@@ -192,7 +186,6 @@
     <string name="pick_from_gallery">Seleccionar de galería</string>
     <string name="remove_cover">Eliminar carátula</string>
     <string name="editor_timeout_error">Se agotó el tiempo de espera del editor de etiquetas. Tal vez el formato de archivo no sea compatible</string>
-    <string name="change_lyrics">Cambiar letras</string>
     <string name="lyrics">Letras</string>
     <string name="check_tags_error">No se pudo verificar las etiquetas de composición: %s</string>
     <string name="changing_file_progress">Modificando archivo…</string>
@@ -248,13 +241,31 @@
     <string name="language">Idioma</string>
     <string name="follow_system_language">Seguir el idioma del sistema</string>
     <!---->
+    <!--not verified-->
+    <string name="move">Mover</string>
+    <string name="no_compositions_in_folder">Composiciones en carpeta no encontradas</string>
+    <string name="follow_system_theme">Seguir el tema del sistema</string>
+    <string name="play_queue_is_empty">La cola de reproducción está vacía</string>
+    <string name="no_lyrics_for_current_composition">No hay letras para la composición actual</string>
+    <string name="edit_lyrics">Editar letras</string>
+    <string name="show_in_folders">Mostrar en carpetas</string>
+    <string name="file_source_not_found">Archivo remoto no encontrado</string>
+    <string name="file_is_too_large">El archivo es demasiado grande</string>
+    <string name="preparing_files">Preparando archivos</string>
+    <string name="downloading">Descargando: %1$d/%2$d</string>
+    <string name="downloading_progress">Descargando(%d%%)</string>
+    <string name="rename_progress_count">Renombrando(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Esta acción no se puede deshacer.</string>
+    <string name="delete_composition_template">Eliminar canción \"%1$s\"</string>
+    <string name="delete_empty_folder">Eliminar carpeta \"%s\"</string>
+    <string name="delete_folder_template">%2$s de la carpeta \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">Desde Android 11, solo se permite copiar/mover/renombrar archivos en las carpetas: \"%s\".
+        Coloque los archivos de audio en estas carpetas y la operación debería funcionar correctamente.
+    </string>
+    <string name="folder_already_excluded_from_scanning">Esta carpeta ya está excluida del escaneo</string>
+    <!---->
 
     <plurals name="compositions_count">
-        <item quantity="one">%1$s canción</item>
-        <item quantity="other">%1$s canciones</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
         <item quantity="one">%1$s canción</item>
         <item quantity="other">%1$s canciones</item>
     </plurals>
@@ -298,6 +309,13 @@
     <plurals name="seconds_template">
         <item quantity="one">%1$d segunda</item>
         <item quantity="other">%1$d segundos</item>
+    </plurals>
+    <!---->
+
+    <!--not verified-->
+    <plurals name="delete_compositions_template">
+        <item quantity="one">Eliminar %d canción</item>
+        <item quantity="other">Eliminar %d canciones</item>
     </plurals>
     <!---->
 

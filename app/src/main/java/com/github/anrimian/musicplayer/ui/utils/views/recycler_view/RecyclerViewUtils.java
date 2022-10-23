@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
@@ -24,10 +28,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper
 
 import me.zhanghai.android.fastscroll.FastScrollerBuilder;
 import me.zhanghai.android.fastscroll.PublicRecyclerViewHelper;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility;
 
 public class RecyclerViewUtils {
 
@@ -54,16 +54,6 @@ public class RecyclerViewUtils {
                 lm.scrollToPositionWithOffset(position, 0);
             }
         });
-    }
-
-    public static <T extends RecyclerView.ViewHolder> void viewHolders(RecyclerView recyclerView,
-                                                                       Callback<T> callback) {
-        for (int childCount = recyclerView.getChildCount(), i = 0; i < childCount; ++i) {
-            View view = recyclerView.getChildAt(i);
-            RecyclerView.ViewHolder viewHolder = recyclerView.getChildViewHolder(view);
-            //noinspection unchecked
-            callback.call((T) viewHolder);
-        }
     }
 
     public static void smoothScrollToTop(int position,

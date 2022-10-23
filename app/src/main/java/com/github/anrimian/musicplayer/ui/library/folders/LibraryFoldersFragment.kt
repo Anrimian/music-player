@@ -6,18 +6,19 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.AttrRes
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.Constants.Arguments.HIGHLIGHT_COMPOSITION_ID
+import com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLibraryFoldersBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
@@ -25,9 +26,11 @@ import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
-import com.github.anrimian.musicplayer.ui.common.dialogs.composition.CompositionActionDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
+import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
+import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
@@ -47,6 +50,7 @@ import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragme
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -67,9 +71,10 @@ import moxy.ktx.moxyPresenter
  * Created on 23.10.2017.
  */
 
-fun newFolderFragment(folderId: Long?): LibraryFoldersFragment {
+fun newFolderFragment(folderId: Long?, highlightCompositionId: Long = 0): LibraryFoldersFragment {
     val args = Bundle()
-    args.putLong(Constants.Arguments.ID_ARG, folderId ?: 0)
+    args.putLong(ID_ARG, folderId ?: 0)
+    args.putLong(HIGHLIGHT_COMPOSITION_ID, highlightCompositionId)
     val fragment = LibraryFoldersFragment()
     fragment.arguments = args
     return fragment
@@ -81,6 +86,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     private val presenter by moxyPresenter {
         Components.getLibraryFolderComponent(getFolderId()).storageLibraryPresenter()
     }
+
     private lateinit var viewBinding: FragmentLibraryFoldersBinding
 
     private val fragmentDisposable = CompositeDisposable()
@@ -92,9 +98,8 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     private lateinit var filenameDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var newFolderDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
-    private lateinit var compositionActionDialogRunner: DialogFragmentRunner<CompositionActionDialogFragment>
     private lateinit var choosePlaylistForFolderDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
-    private lateinit var progressDialogRunner: DialogFragmentDelayRunner
+    private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
 
     private lateinit var editorErrorHandler: ErrorHandler
     private lateinit var deletingErrorHandler: ErrorHandler
@@ -119,15 +124,18 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         layoutManager = LinearLayoutManager(context)
         viewBinding.recyclerView.layoutManager = layoutManager
         RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView, true)
-        adapter = MusicFileSourceAdapter(viewBinding.recyclerView,
+        adapter = MusicFileSourceAdapter(
+            this,
+            viewBinding.recyclerView,
             presenter.getSelectedFiles(),
             presenter.getSelectedMoveFiles(),
             presenter::onCompositionClicked,
             presenter::onFolderClicked,
             presenter::onItemLongClick,
             this::onFolderMenuClicked,
-            presenter::onCompositionIconClicked
-        ) { _, musicFileSource -> presenter.onCompositionMenuClick(musicFileSource) }
+            presenter::onCompositionIconClicked,
+            this::onCompositionMenuClicked
+        )
         viewBinding.recyclerView.adapter = adapter
 
         val callback = ShortSwipeCallback(requireContext(),
@@ -149,15 +157,15 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         FormatUtils.formatLinkedFabView(viewBinding.vgFileMenu, viewBinding.fab)
         FormatUtils.formatLinkedFabView(viewBinding.vgMoveFileMenu, viewBinding.fab)
 
-        viewBinding.ivCut.setOnClickListener { presenter.onMoveSelectedFoldersButtonClicked() }
+        viewBinding.btnCut.setOnClickListener { presenter.onMoveSelectedFoldersButtonClicked() }
         viewBinding.ivCopy.setOnClickListener { presenter.onCopySelectedFoldersButtonClicked() }
 
         //maybe will be moved to root fragment later
         view.findViewById<View>(R.id.iv_close)
             .setOnClickListener { presenter.onCloseMoveMenuClicked() }
-        view.findViewById<View>(R.id.iv_paste)
+        view.findViewById<View>(R.id.btnPaste)
             .setOnClickListener { presenter.onPasteButtonClicked() }
-        view.findViewById<View>(R.id.iv_paste_in_new_folder)
+        view.findViewById<View>(R.id.btnPasteInNewFolder)
             .setOnClickListener { presenter.onPasteInNewFolderButtonClicked() }
 
         val fm = childFragmentManager
@@ -166,12 +174,12 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         val playListDialog = fm.findFragmentByTag(Tags.SELECT_PLAYLIST_TAG) as ChoosePlayListDialogFragment?
         playListDialog?.setOnCompleteListener(presenter::onPlayListToAddingSelected)
         editorErrorHandler = ErrorHandler(
-            fm,
+            this,
             presenter::onRetryFailedEditActionClicked,
             this::showEditorRequestDeniedMessage
         )
         deletingErrorHandler = DeleteErrorHandler(
-            fm,
+            this,
             presenter::onRetryFailedDeleteActionClicked,
             this::showEditorRequestDeniedMessage
         )
@@ -180,20 +188,16 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
             Tags.SELECT_PLAYLIST_FOR_FOLDER_TAG
         ) { fragment ->
             fragment.setComplexCompleteListener { playlist, bundle ->
-                val folderId = bundle.getLong(Constants.Arguments.ID_ARG)
+                val folderId = bundle.getLong(ID_ARG)
                 presenter.onPlayListForFolderSelected(folderId, playlist)
             }
         }
-        compositionActionDialogRunner = DialogFragmentRunner(
-            fm,
-            Tags.COMPOSITION_ACTION_TAG
-        ) { f -> f.setOnCompleteListener(this::onCompositionActionSelected) }
         filenameDialogFragmentRunner = DialogFragmentRunner(
             fm,
             Tags.FILE_NAME_TAG
         ) { fragment ->
             fragment.setComplexCompleteListener { name, extra ->
-                presenter.onNewFolderNameEntered(extra.getLong(Constants.Arguments.ID_ARG), name)
+                presenter.onNewFolderNameEntered(extra.getLong(ID_ARG), name)
             }
         }
         newFolderDialogFragmentRunner = DialogFragmentRunner(
@@ -240,6 +244,10 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun updateList(list: List<FileSource>) {
         adapter.submitList(list)
+        val highlightCompositionId = requireArguments().getLong(HIGHLIGHT_COMPOSITION_ID)
+        if (highlightCompositionId != 0L) {
+            highlightComposition(highlightCompositionId)
+        }
     }
 
     override fun showFolderInfo(folder: FolderFileSource) {
@@ -253,10 +261,12 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun showEmptyList() {
         viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.showMessage(
-            R.string.compositions_on_device_not_found,
-            false
-        )
+        val message = if (getFolderId() == null) {
+            R.string.compositions_on_device_not_found
+        } else {
+            R.string.no_compositions_in_folder
+        }
+        viewBinding.progressStateView.showMessage(message, false)
     }
 
     override fun showEmptySearchResult() {
@@ -319,7 +329,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun showSelectPlayListForFolderDialog(folder: FolderFileSource) {
         val bundle = Bundle()
-        bundle.putLong(Constants.Arguments.ID_ARG, folder.id)
+        bundle.putLong(ID_ARG, folder.id)
         val dialog = newChoosePlayListDialogFragment(bundle)
         choosePlaylistForFolderDialogRunner.show(dialog)
     }
@@ -345,7 +355,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     }
 
     override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {
-        DialogUtils.showConfirmDeleteDialog(
+        showConfirmDeleteDialog(
             requireContext(),
             compositionsToDelete,
             presenter::onDeleteCompositionsDialogConfirmed
@@ -353,10 +363,9 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     }
 
     override fun showConfirmDeleteDialog(folder: FolderFileSource) {
-        DialogUtils.showConfirmDeleteDialog(
-            requireContext(),
-            folder
-        ) { presenter.onDeleteFolderDialogConfirmed(folder) }
+        showConfirmDeleteDialog(requireContext(), folder) {
+            presenter.onDeleteFolderDialogConfirmed(folder)
+        }
     }
 
     override fun showDeleteCompositionError(errorCommand: ErrorCommand) {
@@ -375,7 +384,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     }
 
     override fun sendCompositions(compositions: List<Composition>) {
-        DialogUtils.shareCompositions(requireContext(), compositions)
+        shareCompositions(this, compositions)
     }
 
     override fun showReceiveCompositionsForSendError(errorCommand: ErrorCommand) {
@@ -388,20 +397,6 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun goToMusicStorageScreen(folderId: Long) {
         FragmentNavigation.from(parentFragmentManager).addNewFragment(newFolderFragment(folderId))
-    }
-
-    override fun showCompositionActionDialog(composition: Composition) {
-        @AttrRes val statusBarColor = if (toolbar.isInActionMode) {
-            R.attr.actionModeStatusBarColor
-        } else {
-            android.R.attr.statusBarColor
-        }
-        val fragment = CompositionActionDialogFragment.newInstance(
-            composition,
-            R.menu.composition_actions_menu,
-            statusBarColor
-        )
-        compositionActionDialogRunner.show(fragment)
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {
@@ -422,7 +417,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun showInputFolderNameDialog(folder: FolderFileSource) {
         val extra = Bundle()
-        extra.putLong(Constants.Arguments.ID_ARG, folder.id)
+        extra.putLong(ID_ARG, folder.id)
         val fragment = InputTextDialogFragment.newInstance(
             R.string.rename_folder,
             R.string.change,
@@ -515,8 +510,40 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         showProgressDialog(R.string.rename_progress)
     }
 
+    fun getFolderId(): Long? {
+        val id = requireArguments().getLong(ID_ARG)
+        return if (id == 0L) null else id
+    }
+
+    fun requestHighlightComposition(compositionId: Long) {
+        requireArguments().putLong(HIGHLIGHT_COMPOSITION_ID, compositionId)
+        if (adapter.itemCount != 0) {
+            highlightComposition(compositionId)
+        }
+    }
+
+    private fun highlightComposition(targetCompositionId: Long) {
+        viewBinding.recyclerView.post {
+            val position = adapter.currentList.indexOfFirst { source ->
+                source is CompositionFileSource && source.composition.id == targetCompositionId
+            }
+            if (position != -1) {
+                viewBinding.recyclerView.scrollToPosition(position)
+                viewBinding.recyclerView.post { adapter.highlightItem(position) }
+            }
+            requireArguments().remove(HIGHLIGHT_COMPOSITION_ID)
+        }
+    }
+
     private fun showProgressDialog(@StringRes resId: Int) {
-        progressDialogRunner.show(ProgressDialogFragment.newInstance(resId))
+        progressDialogRunner.show(newProgressDialogFragment(resId))
+    }
+
+    private fun onCompositionMenuClicked(view: View, source: CompositionFileSource) {
+        val composition = source.composition
+        showCompositionPopupMenu(view, R.menu.composition_actions_menu, composition) { item ->
+            onCompositionActionSelected(composition, item.itemId)
+        }
     }
 
     private fun onSelectionModeChanged(enabled: Boolean) {
@@ -533,7 +560,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
             R.id.menu_add_to_queue -> presenter.onAddToQueueCompositionClicked(composition)
             R.id.menu_add_to_playlist -> presenter.onAddToPlayListButtonClicked(composition)
             R.id.menu_edit -> startActivity(newCompositionEditorIntent(requireContext(), composition.id))
-            R.id.menu_share -> DialogUtils.shareComposition(requireContext(), composition)
+            R.id.menu_share -> shareComposition(this, composition)
             R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(composition)
         }
     }
@@ -551,10 +578,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     }
 
     private fun onFolderMenuClicked(view: View, folder: FolderFileSource) {
-        PopupMenuWindow.showPopup(
-            view,
-            R.menu.folder_item_menu
-        ) { item ->
+        PopupMenuWindow.showPopup(view, R.menu.folder_item_menu) { item ->
             when (item.itemId) {
                 R.id.menu_play -> presenter.onPlayFolderClicked(folder)
                 R.id.menu_play_next -> presenter.onPlayNextFolderClicked(folder)
@@ -566,11 +590,6 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
                 R.id.menu_delete -> presenter.onDeleteFolderButtonClicked(folder)
             }
         }
-    }
-
-    private fun getFolderId(): Long? {
-        val id = requireArguments().getLong(Constants.Arguments.ID_ARG)
-        return if (id == 0L) null else id
     }
 
     private fun onOptionsItemClicked(item: MenuItem) {
@@ -596,5 +615,4 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
             Snackbar.LENGTH_LONG
         ).show()
     }
-
 }

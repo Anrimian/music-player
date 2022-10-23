@@ -22,15 +22,16 @@ import com.github.anrimian.musicplayer.infrastructure.receivers.BluetoothConnect
 import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
+import com.github.anrimian.musicplayer.ui.utils.PermissionRequester;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.google.android.material.snackbar.Snackbar;
-import com.tbruyelle.rxpermissions3.RxPermissions;
 
 public class HeadsetSettingsFragment extends Fragment {
 
     private FragmentSettingsHeadsetBinding viewBinding;
 
-    private RxPermissions rxPermissions;
+    private final PermissionRequester permissionRequester = new PermissionRequester(this,
+            this::onBluetoothConnectPermissionResult);
 
     @Nullable
     @Override
@@ -50,8 +51,6 @@ public class HeadsetSettingsFragment extends Fragment {
         toolbar.setSubtitle(R.string.headset);
         toolbar.setTitleClickListener(null);
 
-        rxPermissions = new RxPermissions(requireActivity());
-
         SlidrPanel.simpleSwipeBack(viewBinding.clContainer, this, toolbar::onStackFragmentSlided);
 
         onCheckChanged(viewBinding.cbPlayOnConnect, this::onPlayOnConnectChecked);
@@ -61,9 +60,7 @@ public class HeadsetSettingsFragment extends Fragment {
 
     private void onPlayOnConnectChecked(boolean checked) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && checked) {
-            //noinspection ResultOfMethodCallIgnored
-            rxPermissions.request(Manifest.permission.BLUETOOTH_CONNECT)
-                    .subscribe(this::onBluetoothConnectPermissionResult);
+            permissionRequester.request(Manifest.permission.BLUETOOTH_CONNECT);
             return;
         }
         BluetoothConnectionReceiver.setEnabled(requireContext(), checked);
@@ -72,8 +69,8 @@ public class HeadsetSettingsFragment extends Fragment {
     @TargetApi(Build.VERSION_CODES.S)
     private void onBluetoothConnectPermissionResult(boolean granted) {
         BluetoothConnectionReceiver.setEnabled(requireContext(), granted);
+        setChecked(viewBinding.cbPlayOnConnect, granted);
         if (!granted) {
-            setChecked(viewBinding.cbPlayOnConnect, false);
             if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.BLUETOOTH_CONNECT)) {
                 AppSnackbar.make(viewBinding.clContainer, "Bluetooth connect permission required")
                         .setAction("Open app settings", () -> AndroidUtilsKt.startAppSettings(requireActivity()))

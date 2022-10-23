@@ -4,6 +4,8 @@ package com.github.anrimian.musicplayer.di;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.artist.ArtistEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.artist.ArtistEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorModule;
 import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerComponent;
@@ -31,6 +33,8 @@ import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsMod
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
+import com.github.anrimian.musicplayer.di.app.share.ShareComponent;
+import com.github.anrimian.musicplayer.di.app.share.ShareModule;
 
 import javax.annotation.Nullable;
 
@@ -117,9 +121,11 @@ public class Components {
     }
 
     public static AlbumEditorComponent getAlbumEditorComponent(long albumId) {
-        return getAppComponent().albumEditorComponent(
-                new AlbumEditorModule(albumId)
-        );
+        return getAppComponent().albumEditorComponent(new AlbumEditorModule(albumId));
+    }
+
+    public static ArtistEditorComponent getArtistEditorComponent(long artistId, String name) {
+        return getAppComponent().artistEditorComponent(new ArtistEditorModule(artistId, name));
     }
 
     public static SettingsComponent getSettingsComponent() {
@@ -128,6 +134,10 @@ public class Components {
 
     public static ExternalPlayerComponent getExternalPlayerComponent() {
         return getAppComponent().externalPlayerComponent(new ExternalPlayerModule());
+    }
+
+    public static ShareComponent getShareComponent(long[] ids) {
+        return getAppComponent().shareComponent(new ShareModule(ids));
     }
 
     private LibraryComponent buildLibraryComponent() {

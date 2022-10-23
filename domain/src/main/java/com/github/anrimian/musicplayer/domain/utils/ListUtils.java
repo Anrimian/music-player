@@ -2,11 +2,15 @@ package com.github.anrimian.musicplayer.domain.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 @SuppressWarnings("WeakerAccess")
 public class ListUtils {
@@ -20,6 +24,11 @@ public class ListUtils {
     @SafeVarargs
     public static <T> List<T> asList(T... objects) {
         return new ArrayList<>(Arrays.asList(objects));
+    }
+
+    @SafeVarargs
+    public static <T> Set<T> asSet(T... objects) {
+        return new HashSet<>(Arrays.asList(objects));
     }
 
     public static <T, E> List<E> mapList(List<T> from, List<E> to, MapperFunction<T, E> mapper) {
@@ -101,6 +110,25 @@ public class ListUtils {
             }
         }
         return -1;
+    }
+
+    public static <K, V> void removeMap(Map<K, V> map, Map<K, V> mapToRemove) {
+        for (K key: mapToRemove.keySet()) {
+            map.remove(key);
+        }
+    }
+
+    public static <E> boolean removeIf(Collection<E> collection, MapperFunction<? super E, Boolean> filter) {
+        Objects.requireNonNull(filter);
+        boolean removed = false;
+        final Iterator<E> each = collection.iterator();
+        while (each.hasNext()) {
+            if (filter.map(each.next())) {
+                each.remove();
+                removed = true;
+            }
+        }
+        return removed;
     }
 
     public interface MapperFunction<T, E> {

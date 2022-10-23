@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
+import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.EXTERNAL;
+import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
+
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
@@ -21,9 +24,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
-
-import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.EXTERNAL;
-import static com.github.anrimian.musicplayer.domain.interactors.player.PlayerType.LIBRARY;
 
 public class MusicServiceInteractor {
 
@@ -232,7 +232,7 @@ public class MusicServiceInteractor {
     }
 
     public Observable<List<PlayListItem>> getPlaylistItemsObservable(long playListId) {
-        return playListsInteractor.getCompositionsObservable(playListId);
+        return playListsInteractor.getCompositionsObservable(playListId, null);
     }
 
     public Completable startPlayingFromPlaylistItems(long playListId, int position) {

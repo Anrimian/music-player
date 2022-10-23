@@ -99,6 +99,7 @@ public class AdvancedToolbar extends FrameLayout {
     private final BehaviorSubject<Boolean> searchModeSubject = BehaviorSubject.createDefault(false);
     private final BehaviorSubject<Boolean> selectionModeSubject = BehaviorSubject.createDefault(false);
 
+    private boolean isContentVisible;
     private boolean inSearchMode;
     private boolean inSelectionMode;
 
@@ -180,8 +181,7 @@ public class AdvancedToolbar extends FrameLayout {
         searchModeSubject.onNext(enabled);
 
         etSearch.setVisibility(enabled? VISIBLE: GONE);
-//        clTitleContainer.post(() -> clTitleContainer.setVisibility(enabled? INVISIBLE: VISIBLE));
-        clTitleContainer.setVisibility(enabled? INVISIBLE: VISIBLE);
+        clTitleContainer.setAlpha((!enabled && isContentVisible)? 1f: 0f);
         getActionMenuView().setVisibility(enabled? GONE: VISIBLE);
         if (!isDrawerArrowLocked()) {
             setCommandButtonMode(!enabled, !jumpToState);
@@ -235,6 +235,25 @@ public class AdvancedToolbar extends FrameLayout {
             state = bundle.getParcelable("superState");
         }
         super.onRestoreInstanceState(state);
+    }
+
+    public AdvancedToolbar setup(Callback<SetupConfig> configCallback) {
+        SetupConfig config = new SetupConfig(getContext(), getTitle(), getSubtitle());
+        configCallback.call(config);
+
+        setTitle(config.title);
+        setSubtitle(config.subtitle);
+        setupSearch(config.textChangeListener, config.searchText);
+        if (config.menuListener == null) {
+            clearOptionsMenu();
+        } else {
+            setupOptionsMenu(config.menuResId, config.menuListener);
+        }
+        setTitleClickListener(config.titleClickListener);
+        if (config.selectionMenuListener != null) {
+            setupSelectionModeMenu(config.selectionMenuResId, config.selectionMenuListener);
+        }
+        return this;
     }
 
     public CharSequence getTitle() {
@@ -307,6 +326,11 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     private void onFragmentStackChanged(int stackSize, boolean jumpToState) {
+        if (isInSearchMode() && !jumpToState) {
+            //close search on navigation back or forward. Ignore first event
+            //possible improving: animate visibility with back button progress
+            setSearchModeEnabled(false);
+        }
         boolean isRoot = stackSize <= 1;
         //hmm, not sure about search mode, check how it works
         if (isRoot && (bottomSheetListener.isExpanded() || isInSearchMode())) {
@@ -380,12 +404,13 @@ public class AdvancedToolbar extends FrameLayout {
         }
     }
 
-    public void setContentVisibility(int visibility) {
-        clTitleContainer.setVisibility(visibility);
-    }
-
     public void setContentAlpha(float alpha) {
         clTitleContainer.setAlpha(alpha);
+        isContentVisible = alpha == 1f;
+    }
+
+    public void setContentVisible(boolean visible) {
+        this.isContentVisible = visible;
     }
 
     private void setSelectionModeEnabled(boolean enabled, boolean animate) {
@@ -471,6 +496,64 @@ public class AdvancedToolbar extends FrameLayout {
 
     private boolean isDrawerArrowLocked() {
         return bottomSheetListener.isExpanded() || navigation.getScreensCount() > 1;
+    }
+
+    public static class SetupConfig {
+
+        private final Context context;
+
+        private Callback<String> textChangeListener;
+        private Callback<String> textConfirmListener;
+        private String searchText;
+
+        private @MenuRes int menuResId;
+        private Callback<MenuItem> menuListener;
+
+        private View.OnClickListener titleClickListener;
+
+        private @MenuRes int selectionMenuResId;
+        private Callback<MenuItem> selectionMenuListener;
+
+        private CharSequence title;
+        private CharSequence subtitle;
+
+        public SetupConfig(Context context, CharSequence title, CharSequence subtitle) {
+            this.context = context;
+            this.title = title;
+            this.subtitle = subtitle;
+        }
+
+        public void setupSearch(Callback<String> textChangeListener, String text) {
+            this.textChangeListener = textChangeListener;
+            this.textConfirmListener = textChangeListener;
+            this.searchText = text;
+        }
+
+        public void setupOptionsMenu(@MenuRes int menuResId, Callback<MenuItem> listener) {
+            this.menuResId = menuResId;
+            this.menuListener = listener;
+        }
+
+        public void setupSelectionModeMenu(@MenuRes int menuResId, Callback<MenuItem> listener) {
+            this.selectionMenuResId = menuResId;
+            this.selectionMenuListener = listener;
+        }
+
+        public void setTitleClickListener(View.OnClickListener listener) {
+            this.titleClickListener = listener;
+        }
+
+        public void setTitle(@StringRes int titleId) {
+            setTitle(context.getString(titleId));
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public void setSubtitle(String subtitle) {
+            this.subtitle = subtitle;
+        }
     }
 
     public interface BottomSheetListener {

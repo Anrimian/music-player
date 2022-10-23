@@ -48,10 +48,6 @@
     <string name="save_as_play_list">Als Playlist speichern</string>
     <string name="cancel">Abbrechen</string>
     <string name="deleting">Löschen</string>
-    <string name="delete_composition_template">„%1$s“ löschen? Kann nicht rückgängig gemacht werden!</string>
-    <string name="delete_empty_folder">Ordner „%s“ löschen? Kann nicht rückgängig gemacht werden!</string>
-    <string name="delete_folder_template">%2$s aus dem Ordner „%1$s“ löschen? Kann nicht rückgängig gemacht werden!</string>
-    <string name="delete_template">„%1$s“ löschen? Kann nicht rückgängig gemacht werden!</string>
     <string name="delete_composition_success">„%1$s“ gelöscht</string>
     <string name="search">Suche</string>
     <string name="play_queue">Wiedergabeliste</string>
@@ -117,7 +113,6 @@
     <string name="copied_message">Text kopiert</string>
     <string name="folder_name">Ordnername</string>
     <string name="rename_folder">Ordner umbenennen</string>
-    <string name="cut">Ausschneiden</string>
     <string name="copy">Kopieren</string>
     <string name="paste">Einfügen</string>
     <string name="paste_in_new_folder">In neuen Ordner einfügen</string>
@@ -181,7 +176,6 @@
     <string name="clear_play_queue">Wiedergabeliste leeren</string>
     <string name="no_excluded_folders">Hier erscheinen Ordner, die bei der Suche nach Musikdateien ignoriert werden</string>
     <string name="keep_playing_after_window_close">Weiterspielen, auch wenn Fenster geschlossen wurde</string>
-    <string name="unknown_play_error">Unbekannter Abspielfehler</string>
     <string name="equalizer">Equalizer</string>
     <string name="system_equalizer">System-Equalizer</string>
     <string name="no_equalizer">Keiner</string>
@@ -193,7 +187,6 @@
     <string name="pick_from_gallery">Aus Galerie wählen</string>
     <string name="remove_cover">Cover entfernen</string>
     <string name="editor_timeout_error">Tag-Bearbeitung abgebrochen. Vielleicht wird das Dateiformat nicht unterstützt</string>
-    <string name="change_lyrics">Lyrics ändern</string>
     <string name="lyrics">Lyrics</string>
     <string name="check_tags_error">Überprüfung des Tags fehlgeschlagen: %s</string>
     <string name="changing_file_progress">Datei ändern …</string>
@@ -243,13 +236,30 @@
     <string name="sound_balance_state">Links: %1$d%%, Rechts: %2$d%%</string>
     <string name="language">Sprache</string>
     <string name="follow_system_language">Nach Systemsprache richten</string>
+    <string name="move">Verschieben</string>
+    <string name="no_compositions_in_folder">Keine Musik im Ordner gefunden</string>
+    <string name="follow_system_theme">Nach System-Design richten</string>
+    <string name="play_queue_is_empty">Wiedergabeliste ist leer</string>
+    <string name="no_lyrics_for_current_composition">Kein Songtext für den aktuellen Titel</string>
+    <string name="edit_lyrics">Songtext bearbeiten</string>
+    <string name="show_in_folders">In Ordnern anzeigen</string>
+    <string name="file_source_not_found">Externe Datei nicht gefunden</string>
+    <string name="file_is_too_large">Datei zu groß</string>
+    <string name="preparing_files">Dateien vorbereiten</string>
+    <string name="downloading">Herunterladen: %1$d/%2$d</string>
+    <string name="downloading_progress">Herunterladen (%d%%)</string>
+    <string name="rename_progress_count">Umbenennen (%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Kann nicht rückgängig gemacht werden!</string>
+    <string name="delete_composition_template">Titel „%1$s“ löschen</string>
+    <string name="delete_empty_folder">Ordner „%s“ löschen</string>
+    <string name="delete_folder_template">%2$s aus dem Ordner „%1$s“</string>
+    <string name="android_r_editor_restriction_error">Seit Android 11 dürfen Dateien nur noch kopiert, verschoben oder umbenannt werden, wenn sie in folgenden Ordnern liegen: %s.
+        Bitte Audiodateien dort speichern, dann sollte die Aktion klappen.
+    </string>
+    <string name="folder_already_excluded_from_scanning">Dieser Ordner wird bei der Musiksuche bereits ignoriert.</string>
+
 
     <plurals name="compositions_count">
-        <item quantity="one">%1$s Titel</item>
-        <item quantity="other">%1$s Titel</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
         <item quantity="one">%1$s Titel</item>
         <item quantity="other">%1$s Titel</item>
     </plurals>
@@ -292,6 +302,11 @@
     <plurals name="seconds_template">
         <item quantity="one">%1$d Sekunde</item>
         <item quantity="other">%1$d Sekunden</item>
+    </plurals>
+
+    <plurals name="delete_compositions_template">
+        <item quantity="one">%d Titel löschen</item>
+        <item quantity="other">%d Titel löschen</item>
     </plurals>
 
 </resources>

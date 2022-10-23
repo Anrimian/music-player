@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
@@ -143,10 +144,9 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
     }
 
     override fun showConfirmDeletePlayListDialog(playList: PlayList) {
-        DialogUtils.showConfirmDeleteDialog(
-            requireContext(),
-            playList
-        ) { presenter.onDeletePlayListDialogConfirmed(playList) }
+        showConfirmDeleteDialog(requireContext(), playList) {
+            presenter.onDeletePlayListDialogConfirmed(playList)
+        }
     }
 
     override fun showEditPlayListNameDialog(playList: PlayList) {

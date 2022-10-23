@@ -11,6 +11,8 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
@@ -39,8 +41,9 @@ public class PlayListsInteractor {
         return playListsRepository.getPlayListObservable(playListId);
     }
 
-    public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId) {
-        return playListsRepository.getCompositionsObservable(playlistId);
+    public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId,
+                                                                    @Nullable String searchText) {
+        return playListsRepository.getCompositionsObservable(playlistId, searchText);
     }
 
     public Single<PlayList> createPlayList(String name) {

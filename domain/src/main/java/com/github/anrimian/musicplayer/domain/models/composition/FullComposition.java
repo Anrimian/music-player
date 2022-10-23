@@ -39,6 +39,10 @@ public class FullComposition {
     @Nullable
     private final CorruptionType corruptionType;
 
+    private final int audioFileType;
+
+    private final InitialSource initialSource;
+
     @SuppressWarnings("NullableProblems")
     public FullComposition(String artist,
                            String title,
@@ -52,7 +56,9 @@ public class FullComposition {
                            Long storageId,
                            Date dateAdded,
                            Date dateModified,
-                           CorruptionType corruptionType) {
+                           CorruptionType corruptionType,
+                           int audioFileType,
+                           InitialSource initialSource) {
         this.artist = artist;
         this.title = title;
         this.album = album;
@@ -66,6 +72,8 @@ public class FullComposition {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
+        this.audioFileType = audioFileType;
+        this.initialSource = initialSource;
     }
 
     @Nullable
@@ -128,6 +136,14 @@ public class FullComposition {
     @Nullable
     public String getLyrics() {
         return lyrics;
+    }
+
+    public int getAudioFileType() {
+        return audioFileType;
+    }
+
+    public InitialSource getInitialSource() {
+        return initialSource;
     }
 
     @Override

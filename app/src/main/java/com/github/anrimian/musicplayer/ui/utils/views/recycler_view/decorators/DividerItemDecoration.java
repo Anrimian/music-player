@@ -111,7 +111,6 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         canvas.save();
         int left;
         final int right;
-        //noinspection AndroidLintNewApi - NewApi lint fails to handle overrides.
         if (parent.getClipToPadding()) {
             left = parent.getPaddingLeft();
             right = parent.getWidth() - parent.getPaddingRight();
@@ -143,7 +142,6 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         canvas.save();
         final int top;
         final int bottom;
-        //noinspection AndroidLintNewApi - NewApi lint fails to handle overrides.
         if (parent.getClipToPadding()) {
             top = parent.getPaddingTop();
             bottom = parent.getHeight() - parent.getPaddingBottom();

@@ -15,11 +15,11 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
-import com.github.anrimian.musicplayer.utils.Permissions;
 
 
 public class WidgetActionsReceiver extends BroadcastReceiver {
@@ -28,7 +28,7 @@ public class WidgetActionsReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         AppComponent appComponent = Components.getAppComponent();
         if (!Permissions.hasFilePermission(context)) {
-            appComponent.notificationDisplayer().showErrorNotification(R.string.no_file_permission);
+            appComponent.notificationsDisplayer().showErrorNotification(R.string.no_file_permission);
             return;
         }
 

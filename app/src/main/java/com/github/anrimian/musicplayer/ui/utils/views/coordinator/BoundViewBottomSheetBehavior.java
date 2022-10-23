@@ -1,9 +1,10 @@
 package com.github.anrimian.musicplayer.ui.utils.views.coordinator;
 
 import android.content.Context;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 /**
  * Created on 25.02.2018.
@@ -11,7 +12,7 @@ import android.view.View;
 
 public class BoundViewBottomSheetBehavior extends LinkedBottomSheetBehavior{
 
-    private boolean heightFixed = false;
+    private int parentHeight = 0;
 
     public BoundViewBottomSheetBehavior() {
     }
@@ -28,11 +29,11 @@ public class BoundViewBottomSheetBehavior extends LinkedBottomSheetBehavior{
         int parentHeight = parent.getHeight();
         int sheetHeight = dependency.getHeight();
 
-        if (!heightFixed && parentHeight != 0 && sheetHeight != 0) {
+        if (parentHeight != this.parentHeight && parentHeight != 0 && sheetHeight != 0) {
             CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) child.getLayoutParams();
             params.height = parentHeight - sheetHeight;
             child.setLayoutParams(params);
-            heightFixed = true;
+            this.parentHeight = parentHeight;
         }
     }
 }

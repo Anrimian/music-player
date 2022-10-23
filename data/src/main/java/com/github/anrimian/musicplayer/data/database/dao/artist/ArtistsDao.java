@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.database.dao.artist;
 
 import androidx.room.Dao;
-import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RawQuery;
 import androidx.sqlite.db.SimpleSQLiteQuery;
@@ -11,13 +10,14 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 @Dao
 public interface ArtistsDao {
@@ -36,21 +36,24 @@ public interface ArtistsDao {
     @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
     Observable<List<Composition>> getCompositionsByArtistObservable(SimpleSQLiteQuery query);
 
-    @Query("SELECT " +
-            "id as id, " +
-            "storageId as storageId " +
-            "FROM compositions " +
-            "WHERE artistId = :artistId")
-    List<CompositionId> getCompositionsByArtist(long artistId);
+    @Query("SELECT id FROM compositions WHERE artistId = :artistId OR " +
+            "albumId IN(SELECT id FROM albums WHERE artistId = :artistId)")
+    Single<List<Long>> getAllCompositionsByArtist(long artistId);
+
+    @Query("SELECT id FROM albums WHERE artistId = :artistId")
+    List<Long> getAllAlbumsWithArtist(long artistId);
 
     @Query("SELECT name FROM artists")
     String[] getAuthorNames();
 
+    @Query("SELECT name FROM artists WHERE id = :artistId")
+    String getAuthorName(long artistId);
+
     @Query("SELECT id FROM artists WHERE name = :name")
     Long findArtistIdByName(String name);
 
-    @Insert()
-    long insertArtist(ArtistEntity artistEntity);
+    @Query("INSERT OR REPLACE INTO artists (name) VALUES (:name)")
+    long insertArtist(String name);
 
     @Query("DELETE FROM artists " +
             "WHERE id = :id " +
@@ -66,8 +69,16 @@ public interface ArtistsDao {
     @Query("UPDATE artists SET name = :name WHERE id = :id")
     void updateArtistName(String name, long id);
 
-    @Query("SELECT EXISTS(SELECT 1 FROM artists WHERE name = :name)")
-    boolean isArtistExists(String name);
+    @Query("UPDATE compositions " +
+            "SET artistId = :newArtistId " +
+            "WHERE artistId = :oldArtistId")
+    void changeCompositionsArtist(long oldArtistId, long newArtistId);
+
+    @Query("UPDATE compositions " +
+            "SET dateModified = :dateModified " +
+            "WHERE artistId = :artistId OR " +
+            "albumId IN(SELECT id FROM albums WHERE artistId = :artistId)")
+    void updateArtistCompositionsModifyTime(long artistId, Date dateModified);
 
     static String getCompositionsQuery(boolean useFileName) {
         return "SELECT " +

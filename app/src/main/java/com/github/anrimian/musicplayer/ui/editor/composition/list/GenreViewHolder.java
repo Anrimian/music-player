@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.editor.composition.list;
 
+import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
+
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -11,9 +14,6 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder;
 
 import java.util.List;
-
-import static com.github.anrimian.musicplayer.domain.Payloads.NAME;
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.onLongClick;
 
 class GenreViewHolder extends BaseViewHolder {
 
@@ -38,12 +38,11 @@ class GenreViewHolder extends BaseViewHolder {
         showName();
     }
 
-    void update(ShortGenre genre, List<Object> payloads) {
+    void update(ShortGenre genre, List<?> payloads) {
         this.genre = genre;
         for (Object payload: payloads) {
             if (payload instanceof List) {
-                //noinspection SingleStatementInBlock,unchecked
-                update(genre, (List) payload);
+                update(genre, (List<?>) payload);
             }
             if (payload == NAME) {
                 showName();

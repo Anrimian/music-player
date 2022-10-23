@@ -1,37 +1,51 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public interface EditorRepository {
 
-    Completable changeCompositionGenre(FullComposition composition,
+    Completable changeCompositionGenre(long compositionId,
+                                       CompositionContentSource source,
                                        ShortGenre oldGenre,
                                        String newGenre);
 
-    Completable addCompositionGenre(FullComposition composition,
+    Completable addCompositionGenre(long compositionId,
+                                    CompositionContentSource source,
                                     String newGenre);
 
-    Completable removeCompositionGenre(FullComposition composition, ShortGenre genre);
+    Completable removeCompositionGenre(long compositionId,
+                                       CompositionContentSource source,
+                                       ShortGenre genre);
 
-    Completable changeCompositionAuthor(FullComposition composition, String newAuthor);
+    Completable changeCompositionAuthor(long compositionId,
+                                        CompositionContentSource source,
+                                        String newAuthor);
 
-    Completable changeCompositionAlbumArtist(FullComposition composition, String newAuthor);
+    Completable changeCompositionAlbumArtist(long compositionId,
+                                             CompositionContentSource source,
+                                             String newAuthor);
 
-    Completable changeCompositionAlbum(FullComposition composition, String newAlbum);
+    Completable changeCompositionAlbum(long compositionId,
+                                       CompositionContentSource source,
+                                       String newAlbum);
 
-    Completable changeCompositionTitle(FullComposition composition, String title);
+    Completable changeCompositionTitle(long compositionId, CompositionContentSource source, String title);
 
-    Completable changeCompositionLyrics(FullComposition composition, String text);
+    Completable changeCompositionLyrics(long compositionId,
+                                        CompositionContentSource source,
+                                        String text);
 
     Completable changeCompositionFileName(FullComposition composition, String fileName);
 
@@ -46,19 +60,35 @@ public interface EditorRepository {
                                         @Nullable Long targetParentFolderId,
                                         String directoryName);
 
-    Completable updateAlbumName(String name, long id);
+    Completable updateAlbumName(String name,
+                                List<Long> compositionIds,
+                                List<CompositionContentSource> sources,
+                                long albumId,
+                                BehaviorSubject<Long> editingSubject);
 
-    Completable updateAlbumArtist(String name, long albumId);
+    Completable updateAlbumArtist(String artist,
+                                  List<Long> compositionIds,
+                                  List<CompositionContentSource> sources,
+                                  long albumId,
+                                  BehaviorSubject<Long> editingSubject);
 
-    Completable updateArtistName(String name, long artistId);
+    Completable updateArtistName(String name,
+                                 List<Long> compositionIds,
+                                 List<CompositionContentSource> sources,
+                                 long artistId,
+                                 BehaviorSubject<Long> editingSubject);
 
-    Completable updateGenreName(String name, long genreId);
+    Completable updateGenreName(String name,
+                                List<Long> compositionIds,
+                                List<CompositionContentSource> sources,
+                                long genreId,
+                                BehaviorSubject<Long> editingSubject);
 
-    Single<String[]> getCompositionFileGenres(FullComposition composition);
+    Completable changeCompositionAlbumArt(long compositionId,
+                                          CompositionContentSource source,
+                                          ImageSource imageSource);
 
-    Completable changeCompositionAlbumArt(FullComposition composition, ImageSource imageSource);
+    Completable removeCompositionAlbumArt(long compositionId, CompositionContentSource source);
 
-    Completable removeCompositionAlbumArt(FullComposition composition);
-
-    Completable updateTagsFromSource(FullComposition fullComposition);
+    Completable updateTagsFromSource(CompositionContentSource source, FullComposition fullComposition);
 }

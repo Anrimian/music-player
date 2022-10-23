@@ -4,6 +4,8 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 
 import androidx.annotation.NonNull;
 
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
+import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
@@ -16,6 +18,8 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerPresenter;
+import com.github.anrimian.musicplayer.ui.player_screen.lyrics.LyricsPresenter;
+import com.github.anrimian.musicplayer.ui.player_screen.queue.PlayQueuePresenter;
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersPresenter;
 
 import javax.annotation.Nonnull;
@@ -46,12 +50,42 @@ public class LibraryModule {
     }
 
     @Provides
+    @Nonnull
+    PlayQueuePresenter playQueuePresenter(LibraryPlayerInteractor musicPlayerInteractor,
+                                          PlayListsInteractor playListsInteractor,
+                                          PlayerScreenInteractor playerScreenInteractor,
+                                          ErrorParser errorParser,
+                                          @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+        return new PlayQueuePresenter(musicPlayerInteractor,
+                playListsInteractor,
+                playerScreenInteractor,
+                errorParser,
+                uiScheduler);
+    }
+
+    @Provides
+    @Nonnull
+    LyricsPresenter lyricsPresenter(LibraryPlayerInteractor libraryPlayerInteractor,
+                                    EditorInteractor editorInteractor,
+                                    ErrorParser errorParser,
+                                    @Named(UI_SCHEDULER) Scheduler uiScheduler) {
+        return new LyricsPresenter(
+                libraryPlayerInteractor,
+                editorInteractor,
+                errorParser,
+                uiScheduler);
+    }
+
+    @Provides
     @NonNull
+    @LibraryScope
     PlayerScreenInteractor playerScreenInteractor(SleepTimerInteractor sleepTimerInteractor,
+                                                  LibraryPlayerInteractor libraryPlayerInteractor,
+                                                  SyncInteractor<?, ?, Long> syncInteractor,
                                                   UiStateRepository uiStateRepository,
                                                   SettingsRepository settingsRepository,
                                                   MediaScannerRepository mediaScannerRepository) {
-        return new PlayerScreenInteractor(sleepTimerInteractor, uiStateRepository, settingsRepository, mediaScannerRepository);
+        return new PlayerScreenInteractor(sleepTimerInteractor, libraryPlayerInteractor, syncInteractor, uiStateRepository, settingsRepository, mediaScannerRepository);
     }
 
     @Provides

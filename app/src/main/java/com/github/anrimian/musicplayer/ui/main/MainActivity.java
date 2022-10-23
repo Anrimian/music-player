@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.main;
 
-import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAY_QUEUE_ARG;
+import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAYER_PANEL_ARG;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.databinding.DialogErrorReportBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
@@ -28,7 +29,6 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
 import com.github.anrimian.musicplayer.ui.utils.fragments.FragmentUtilsKt;
-import com.github.anrimian.musicplayer.utils.Permissions;
 import com.github.anrimian.musicplayer.utils.logger.AppLogger;
 import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
@@ -62,10 +62,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (getOpenPlayQueueArg(intent)) {
+        if (getOpenPlayerPanelArg(intent)) {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_activity_container);
             if (fragment instanceof PlayerFragment) {
-                ((PlayerFragment) fragment).openPlayQueue();//non-smooth update, why...
+                ((PlayerFragment) fragment).openPlayerPanel();//non-smooth update, why...
             }
         }
     }
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToMainScreen() {
-        boolean openPlayQueue = getOpenPlayQueueArg(getIntent());
+        boolean openPlayQueue = getOpenPlayerPanelArg(getIntent());
         startFragment(PlayerFragmentKt.newPlayerFragment(openPlayQueue));
     }
 
@@ -112,10 +112,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean getOpenPlayQueueArg(Intent intent) {
-        boolean openPlayQueue = intent.getBooleanExtra(OPEN_PLAY_QUEUE_ARG, false);
-        getIntent().removeExtra(OPEN_PLAY_QUEUE_ARG);
-        return openPlayQueue;
+    private boolean getOpenPlayerPanelArg(Intent intent) {
+        boolean openPlayerPanel = intent.getBooleanExtra(OPEN_PLAYER_PANEL_ARG, false);
+        getIntent().removeExtra(OPEN_PLAYER_PANEL_ARG);
+        return openPlayerPanel;
     }
 
     public static class ErrorReportDialogFragment extends DialogFragment {

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.folders;
 
+import androidx.collection.LongSparseArray;
+
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.domain.utils.functions.Mapper;
@@ -19,6 +21,10 @@ public class FolderTreeBuilder<F, N> {
         this.valueFunc = valueFunc;
     }
 
+    public FolderNode<N> createFileTree(LongSparseArray<F> map) {
+        return createFileTree(fromSparseArray(map));
+    }
+
     public FolderNode<N> createFileTree(Observable<F> objectsObservable) {
         FolderNode<N> rootFolder = new FolderNode<>(null);
         objectsObservable.groupBy(pathFunc::map)
@@ -28,6 +34,16 @@ public class FolderTreeBuilder<F, N> {
                         .subscribe())
                 .subscribe();
         return rootFolder;
+    }
+
+    private <T> Observable<T> fromSparseArray(LongSparseArray<T> sparseArray) {
+        return Observable.create(emitter -> {
+            for(int i = 0, size = sparseArray.size(); i < size; i++) {
+                T existValue = sparseArray.valueAt(i);
+                emitter.onNext(existValue);
+            }
+            emitter.onComplete();
+        });
     }
 
     private List<N> toValueList(List<F> list) {

@@ -1,75 +1,78 @@
 package com.github.anrimian.musicplayer.ui.common.theme;
 
+import android.os.Build;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.github.anrimian.musicplayer.R;
 
-public enum AppTheme {
-    WHITE_PURPLE_DEFAULT(0,
-            R.style.PrimaryLightTheme,
+public class AppTheme {
+    public static final AppTheme WHITE_PURPLE_DEFAULT = new AppTheme(0,
+            R.style.PrimaryPurpleTheme,
             0,
             R.color.colorPrimary,
             R.color.light_background_level_0,
             R.color.colorAccent,
             R.color.color_control_highlight,
-            false),
-    DARK(1,
+            false);
+    public static final AppTheme DARK = new AppTheme(1,
             R.style.PrimaryDarkTheme,
             0,
             R.color.darkColorPrimary,
             R.color.dark_background_level_1,
             R.color.colorAccentDark,
             R.color.color_control_highlight_dark,
-            true),
-    WHITE_INDIGO(2,
+            true);
+    public static final AppTheme WHITE_INDIGO = new AppTheme(2,
             R.style.PrimaryBlueTheme,
             0,
             R.color.colorBluePrimary,
             R.color.light_background_level_0,
             R.color.colorGreenAccent,
             R.color.color_control_highlight,
-            false),
-    DARK_ORANGE(4,
+            false);
+    public static final AppTheme DARK_ORANGE = new AppTheme(4,
             R.style.DarkOrangeTheme,
             0,
             R.color.darkColorPrimary,
             R.color.dark_background_level_1,
             R.color.colorOrangeAccent,
             R.color.color_control_highlight_dark,
-            true),
-    WHITE_TEAL(3,
+            true);
+    public static final AppTheme WHITE_TEAL = new AppTheme(3,
             R.style.PrimaryTealTheme,
             0,
             R.color.colorTealPrimary,
             R.color.light_background_level_0,
             R.color.colorPinkAccent,
             R.color.color_control_highlight,
-            false),
-    DARK_GREEN(5,
+            false);
+    public static final AppTheme DARK_GREEN = new AppTheme(5,
             R.style.DarkGreenTheme,
             0,
             R.color.darkColorPrimary,
             R.color.dark_background_level_1,
             R.color.colorGreenAccent,
             R.color.color_control_highlight_dark,
-            true),
-    COMPLETELY_WHITE(6,
+            true);
+    public static final AppTheme COMPLETELY_WHITE = new AppTheme(6,
             R.style.CompletelyWhiteTheme,
             0,
             android.R.color.white,
             android.R.color.white,
             R.color.colorAccentBlue,
             R.color.color_control_highlight,
-            false),
-    COMPLETELY_BLACK(7,
+            false);
+    public static final AppTheme COMPLETELY_BLACK = new AppTheme(7,
             R.style.CompletelyBlackTheme,
             0,
             android.R.color.black,
             android.R.color.black,
             R.color.colorAccentDark,
             R.color.color_control_highlight_dark,
-            true),
-    WHITE_RED(8,
+            true);
+    public static final AppTheme WHITE_RED = new AppTheme(8,
             R.style.PrimaryRedTheme,
             0,
             R.color.colorRedPrimary,
@@ -77,6 +80,54 @@ public enum AppTheme {
             R.color.colorRedPrimary,
             R.color.color_control_highlight,
             false);
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    public static AppTheme getSystemWhiteTheme() {
+        return new AppTheme(-1,
+                R.style.SystemLightTheme,
+                0,
+                android.R.color.system_accent1_500,
+                android.R.color.system_accent1_100,
+                android.R.color.system_accent3_400,
+                R.color.color_control_highlight,
+                false);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    public static AppTheme getSystemDarkTheme() {
+        return new AppTheme(-2,
+                R.style.SystemDarkTheme,
+                0,
+                android.R.color.system_accent1_500,
+                android.R.color.system_accent1_900,
+                android.R.color.system_accent3_400,
+                R.color.color_control_highlight_dark,
+                true);
+    }
+
+    @NonNull
+    public static AppTheme getTheme(int id) {
+        for (AppTheme type : appThemes()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return WHITE_PURPLE_DEFAULT;
+    }
+
+    public static AppTheme[] appThemes() {
+        return new AppTheme[] {
+                WHITE_PURPLE_DEFAULT,
+                DARK,
+                WHITE_INDIGO,
+                DARK_ORANGE,
+                WHITE_TEAL,
+                DARK_GREEN,
+                COMPLETELY_WHITE,
+                COMPLETELY_BLACK,
+                WHITE_RED
+        };
+    }
 
     private final int id;
     private final int themeResId;
@@ -87,22 +138,14 @@ public enum AppTheme {
     private final int rippleColorId;
     private final boolean isDark;
 
-    @NonNull
-    public static AppTheme getTheme(int id) {
-        for (AppTheme type : values()) {
-            if (type.getId() == id) {
-                return type;
-            }
-        }
-        return WHITE_PURPLE_DEFAULT;
-    }
-
     AppTheme(int id,
              int themeResId,
              int descriptionId,
              int primaryColorId,
              int backgroundColorId,
-             int accentColorId, int rippleColorId, boolean isDark) {
+             int accentColorId,
+             int rippleColorId,
+             boolean isDark) {
         this.id = id;
         this.themeResId = themeResId;
         this.descriptionId = descriptionId;
@@ -143,5 +186,20 @@ public enum AppTheme {
 
     public boolean isDark() {
         return isDark;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AppTheme appTheme = (AppTheme) o;
+
+        return id == appTheme.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 }

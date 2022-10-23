@@ -1,34 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.constraintlayout.motion.widget.MotionLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:theme="@style/ToolbarStyle">
+    android:paddingStart="@dimen/toolbar_player_content_start_padding"
+    android:theme="@style/ToolbarStyle"
+    android:background="@android:color/transparent"
+    app:layoutDescription="@xml/scene_player_toolbar"
+    tools:ignore="RtlSymmetry">
+<!--transparent background is required for flTitleArea click effect-->
 
     <TextView
         android:id="@+id/tvQueueTitle"
         style="@style/ToolbarTitleStyle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/play_queue"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/tvQueueSubtitle"
         app:layout_constraintEnd_toStartOf="@id/acvPlayQueue"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0.0"
         tools:text="fflafff"/>
+
+    <TextView
+        android:id="@+id/tvLyricsTitle"
+        style="@style/ToolbarTitleStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lyrics"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/acvPlayQueue"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0.0"
+        tools:text="fflafdsdsdsdsdsdsdsdsddff"/>
 
     <TextView
         android:id="@+id/tvQueueSubtitle"
         style="@style/ToolbarSubtitleStyle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tvQueueTitle"
         app:layout_constraintStart_toStartOf="@id/tvQueueTitle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/acvPlayQueue"
-        tools:text="dd"/>
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0.0"
+        tools:text="dddsdsdsdsdsdsddsdsd"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrierTitles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="tvQueueTitle, tvQueueSubtitle"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrierLongestTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="tvQueueTitle, tvQueueSubtitle, tvLyricsTitle"/>
+
+    <LinearLayout
+        android:id="@+id/transitionShadow"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@id/barrierLongestTitle"
+        app:layout_constraintStart_toStartOf="@+id/barrierTitles"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <View
+            android:layout_width="6dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_translucent_gradient_primary"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorPrimary"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivActionIcon"
+        android:layout_width="@dimen/toolbar_title_menu_button_size"
+        android:layout_height="@dimen/toolbar_title_menu_button_size"
+        android:src="@drawable/ic_arrow_drop_down"
+        android:scaleType="center"
+        android:contentDescription="@null"
+        app:tint="?attr/toolbarTextColorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/acvPlayQueue"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/barrierTitles"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.6"/>
+
+    <FrameLayout
+        android:id="@+id/flTitleArea"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/ivActionIcon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.ActionMenuView
         android:id="@+id/acvPlayQueue"
@@ -40,4 +124,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:theme="@style/ToolbarStyle"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>

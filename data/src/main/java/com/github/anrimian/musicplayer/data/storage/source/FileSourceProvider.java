@@ -40,7 +40,7 @@ public class FileSourceProvider {
     }
 
     private File getTempFile(String name) throws IOException {
-        String dirPath = shareFolderPath() + File.separator + name;
+        String dirPath = tempFolderPath() + File.separator + name;
         File file = new File(dirPath);
         if (!file.exists()) {
             file.createNewFile();
@@ -48,7 +48,7 @@ public class FileSourceProvider {
         return file;
     }
 
-    private String shareFolderPath() {
+    private String tempFolderPath() {
         String folderPath = context.getFilesDir().getAbsolutePath() + File.separator + TEMP_FILES_FOLDER;
         File folder = new File(folderPath);
         if (!folder.exists()) {

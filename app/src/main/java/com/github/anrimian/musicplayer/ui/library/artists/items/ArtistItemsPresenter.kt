@@ -9,7 +9,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 
@@ -30,8 +29,6 @@ class ArtistItemsPresenter(
 ) {
 
     private var artist: Artist? = null
-
-    private var lastEditAction: Completable? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -61,20 +58,6 @@ class ArtistItemsPresenter(
     fun onRenameArtistClicked() {
         if (artist != null) {
             viewState.showRenameArtistDialog(artist!!)
-        }
-    }
-
-    fun onNewArtistNameEntered(name: String?, artistId: Long) {
-        lastEditAction = interactor.updateArtistName(name, artistId)
-            .observeOn(uiScheduler)
-            .doOnSubscribe { viewState.showRenameProgress() }
-            .doFinally { viewState.hideRenameProgress() }
-        lastEditAction!!.justSubscribe(this::onDefaultError)
-    }
-
-    fun onRetryFailedEditActionClicked() {
-        if (lastEditAction != null) {
-            lastEditAction!!.doFinally { lastEditAction = null }.justSubscribe(this::onDefaultError)
         }
     }
 

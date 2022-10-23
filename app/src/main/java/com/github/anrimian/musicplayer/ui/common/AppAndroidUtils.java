@@ -7,6 +7,8 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
+import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 
 import java.io.File;
 
@@ -22,6 +24,14 @@ public class AppAndroidUtils {
                     context.getString(R.string.file_uri_extract_error, file.getPath()),
                     Toast.LENGTH_LONG).show();
             return null;
+        }
+    }
+
+    public static void playPause(Context context, PlayerInteractor playerInteractor) {
+        if (playerInteractor.isPlaying()) {
+            playerInteractor.pause();
+        } else {
+            SystemServiceControllerImpl.startPlayForegroundService(context);
         }
     }
 }

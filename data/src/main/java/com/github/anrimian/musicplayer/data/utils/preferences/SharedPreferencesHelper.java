@@ -12,7 +12,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -179,6 +181,32 @@ public class SharedPreferencesHelper {
             int[] result = new int[length];
             for (int i = 0; i < jsonArray.length(); i++) {
                 result[i] = jsonArray.getInt(i);
+            }
+            return result;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void putStringList(String key, List<String> value) {
+        JSONArray jsonArray = new JSONArray();
+        for (String item: value) {
+            jsonArray.put(item);
+        }
+        putString(key, jsonArray.toString());
+    }
+
+    public List<String> getStringList(String key, List<String> defaultValue) {
+        try {
+            String rawData = getString(key);
+            if (rawData == null) {
+                return defaultValue;
+            }
+            JSONArray jsonArray = new JSONArray(rawData);
+            int length = jsonArray.length();
+            List<String> result = new ArrayList<>(length);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                result.add(i, jsonArray.getString(i));
             }
             return result;
         } catch (JSONException e) {

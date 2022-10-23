@@ -10,7 +10,7 @@ import com.github.anrimian.musicplayer.databinding.FragmentPlayListsBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
@@ -65,12 +65,10 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
     }
 
     override fun onFragmentMovedOnTop() {
-        val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
-        toolbar.setTitle(R.string.play_lists)
-        toolbar.subtitle = null
-        toolbar.setTitleClickListener(null)
-        toolbar.clearOptionsMenu()
-
+        requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar).setup { config ->
+            config.setTitle(R.string.play_lists)
+            config.setSubtitle(null)
+        }
         presenter.onFragmentMovedToTop()
     }
 
@@ -100,10 +98,9 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
     }
 
     override fun showConfirmDeletePlayListDialog(playList: PlayList) {
-        DialogUtils.showConfirmDeleteDialog(
-            requireContext(),
-            playList
-        ) { presenter.onDeletePlayListDialogConfirmed(playList) }
+        showConfirmDeleteDialog(requireContext(), playList) {
+            presenter.onDeletePlayListDialogConfirmed(playList)
+        }
     }
 
     override fun showPlayListDeleteSuccess(playList: PlayList) {
@@ -123,8 +120,7 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
     }
 
     override fun showEditPlayListNameDialog(playList: PlayList) {
-        val fragment = RenamePlayListDialogFragment.newInstance(playList.id)
-        fragment.safeShow(childFragmentManager)
+        RenamePlayListDialogFragment.newInstance(playList.id).safeShow(childFragmentManager)
     }
 
     private fun onPlaylistMenuClicked(playList: PlayList, view: View) {

@@ -48,13 +48,6 @@
     <string name="save_as_play_list">Enregistrer comme playlist</string>
     <string name="cancel">Annuler</string>
     <string name="deleting">Suppression</string>
-    <string name="delete_composition_template">Supprimer le morceau \"%1$s\" ? Cette action ne peut pas être annulée.</string>
-    <string name="delete_empty_folder">Supprimer le dossier \"%s\" ? Cette action ne peut pas être annulée.</string>
-    <string name="delete_folder_template">Supprimer %2$s du dossier \"%1$s\" ? Cette action ne peut pas être annulée.</string>
-    <string name="delete_template">
-        Supprimer \"%1$s\" ? Cette action ne peut pas être annulée.
-        chanson
-    </string>
     <string name="delete_composition_success">Le morceau \"%1$s\" a été</string>
     <string name="search">Rechercher</string>
     <string name="play_queue">Lancer la lecture de la file d\'attente</string>
@@ -120,7 +113,6 @@
     <string name="copied_message">Text copié</string>
     <string name="folder_name">Nom du dossier</string>
     <string name="rename_folder">Renommer le dossier</string>
-    <string name="cut">Couper</string>
     <string name="copy">Copier</string>
     <string name="paste">Coller</string>
     <string name="paste_in_new_folder">Coller dans un nouveau dossier</string>
@@ -184,7 +176,6 @@
     <string name="clear_play_queue">Effacer la file d\'attente de lecture</string>
     <string name="no_excluded_folders">Les dossiers exclus de la recherche apparaîtront ici.</string>
     <string name="keep_playing_after_window_close">Continuer la lecture après la fermeture de la fenêtre</string>
-    <string name="unknown_play_error">Erreur de lecture</string>
     <string name="equalizer">Égaliseur</string>
     <string name="system_equalizer">Égaliseur du système</string>
     <string name="no_equalizer">Aucun</string>
@@ -196,7 +187,6 @@
     <string name="pick_from_gallery">Choisir à partir de la gallerie</string>
     <string name="remove_cover">Supprimer la cover</string>
     <string name="editor_timeout_error">L\'éditeur de tags s\'est arrêté. Le format du fichier n\'est peut-être pas pris en charge</string>
-    <string name="change_lyrics">Changer les lyrics</string>
     <string name="lyrics">Lyrics</string>
     <string name="check_tags_error">Échec de la vérification des informations: %s</string>
     <string name="changing_file_progress">Changement de fichier…</string>
@@ -246,55 +236,87 @@
     <string name="sound_balance_state">Gauche: %1$d%%, Droite: %2$d%%</string>
     <string name="language">Langue</string>
     <string name="follow_system_language">Respecter la langue du système</string>
+    <string name="move">Déplacer</string>
+    <string name="no_compositions_in_folder">Les compositions sont introuvables dans le dossier</string>
+    <string name="follow_system_theme">Utiliser le thème de l\'appareil</string>
+    <string name="play_queue_is_empty">La file d\'attente de lecture est vide</string>
+    <string name="no_lyrics_for_current_composition">Pas de lyrics pour cette composition</string>
+    <string name="edit_lyrics">Modifier les lyrics</string>
+    <string name="show_in_folders">Afficher dans l\'explorateur des fichiers</string>
+    <string name="file_source_not_found">Fichier distant non trouvé</string>
+    <string name="file_is_too_large">Le fichier est volumineux</string>
+    <string name="preparing_files">Préparation des fichiers</string>
+    <string name="downloading">Téléchargement: %1$d/%2$d</string>
+    <string name="downloading_progress">En cours de téléchargement(%d%%)</string>
+    <string name="rename_progress_count">Restant(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Cette action est irréversible.</string>
+    <string name="delete_composition_template">Supprimer le titre \"%1$s\"</string>
+    <string name="delete_empty_folder">Supprimer le dossier \"%s\"</string>
+    <string name="delete_folder_template">%2$s à partir du dossier \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">
+    A partir de Android 11 copier/déplacer/renommer des fichiers sont authorises seulement dans les dossiers: \"%s\".
+        Placer les fichiers audio dans ces dossiers et l\'operation fonctionnera correctement
+    </string>
+    <string name="folder_already_excluded_from_scanning">The dossier est déjà exclus de la liste des dossiers à analyser</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s morceau</item>
-        <item quantity="other">%1$s morceaux</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
-        <item quantity="one">%1$s morceau</item>
+        <item quantity="many">%1$s morceaux</item>
         <item quantity="other">%1$s morceaux</item>
     </plurals>
 
     <plurals name="files_count">
         <item quantity="one">%1$s fichier</item>
+        <item quantity="many">%1$s fichiers</item>
         <item quantity="other">%1$s fichiers</item>
     </plurals>
 
     <plurals name="albums_count">
         <item quantity="one">%1$s album</item>
+        <item quantity="many">%1$s albums</item>
         <item quantity="other">%1$s albums</item>
     </plurals>
 
     <plurals name="play_next_message">
         <item quantity="one">%s morceau sera joué à la suite</item>
+        <item quantity="many">%s morceaux seront joués à la suite</item>
         <item quantity="other">%s morceaux seront joués à la suite</item>
     </plurals>
 
     <plurals name="added_to_queue_message">
         <item quantity="one">%s morceau ajouté à la fin de la liste de lecture</item>
+        <item quantity="many">%s morceaux ajoutés à la fin de la liste de lecture</item>
         <item quantity="other">%s morceaux ajoutés à la fin de la liste de lecture</item>
     </plurals>
 
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d morceau ajouté à la playlist \"%2$s\"</item>
+        <item quantity="many">%1$d morceaux ajoutés à la playlist \"%2$s\"</item>
         <item quantity="other">%1$d morceaux ajoutés à la playlist \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d morceaux supprimés de la playlist \"%2$s\"</item>
+        <item quantity="many">%1$d morceaux supprimés de la playlist \"%2$s\"</item>
         <item quantity="other">%1$d morceaux supprimés de la playlist \"%2$s\"</item>
     </plurals>
 
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d morceau supprimé</item>
+        <item quantity="many">%1$d morceaux supprimés</item>
         <item quantity="other">%1$d morceaux supprimés</item>
     </plurals>
 
     <plurals name="seconds_template">
         <item quantity="one">%1$d seconde</item>
+        <item quantity="many">%1$d secondes</item>
         <item quantity="other">%1$d secondes</item>
+    </plurals>
+
+    <plurals name="delete_compositions_template">
+        <item quantity="one">Supprimer %d titre</item>
+        <item quantity="many">Supprimer %d titres</item>
+        <item quantity="other">Supprimer %d titres</item>
     </plurals>
 
 </resources>

@@ -45,9 +45,6 @@ interface BaseLibraryCompositionsView : ListMvpView<Composition> {
     @Skip
     fun shareCompositions(selectedCompositions: Collection<Composition>)
 
-    @Skip
-    fun showCompositionActionDialog(composition: Composition, position: Int)
-
     @OneExecution
     fun showErrorMessage(errorCommand: ErrorCommand)
 

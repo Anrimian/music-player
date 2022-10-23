@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.settings.themes;
 
+import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
+
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +23,6 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.settings.themes.view.ThemesAdapter;
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel;
 import com.r0adkll.slidr.model.SlidrInterface;
-
-import static com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked;
 
 public class ThemeSettingsFragment extends Fragment {
 
@@ -64,7 +65,7 @@ public class ThemeSettingsFragment extends Fragment {
             }
         });
 
-        adapter = new ThemesAdapter(AppTheme.values(),
+        adapter = new ThemesAdapter(AppTheme.appThemes(),
                 themeController.getCurrentTheme(),
                 this::onThemeClicked);
         viewBinding.rvThemes.setAdapter(adapter);
@@ -73,6 +74,14 @@ public class ThemeSettingsFragment extends Fragment {
         viewBinding.cbAutoNightMode.setOnCheckedChangeListener((v, isChecked) ->
                 themeController.setAutoDarkModeEnabled(requireActivity(), isChecked)
         );
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            setChecked(viewBinding.cbFollowSystemTheme, themeController.isFollowSystemThemeEnabled());
+            viewBinding.cbFollowSystemTheme.setOnCheckedChangeListener((v, isChecked) ->
+                    themeController.setFollowSystemThemeEnabled(requireActivity(), isChecked)
+            );
+        } else {
+            viewBinding.cbFollowSystemTheme.setVisibility(View.GONE);
+        }
     }
 
     private void onAlbumsScrolled(boolean onStart) {
@@ -84,6 +93,7 @@ public class ThemeSettingsFragment extends Fragment {
     }
 
     private void onThemeClicked(AppTheme appTheme) {
+        viewBinding.cbFollowSystemTheme.setChecked(false);
         themeController.setTheme(requireActivity(), appTheme);
         adapter.setCurrentTheme(appTheme);
     }

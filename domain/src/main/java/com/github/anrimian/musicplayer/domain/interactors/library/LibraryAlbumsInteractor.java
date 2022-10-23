@@ -13,7 +13,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 
 public class LibraryAlbumsInteractor {
@@ -43,10 +42,6 @@ public class LibraryAlbumsInteractor {
 
     public Observable<Album> getAlbumObservable(long albumId) {
         return musicProviderRepository.getAlbumObservable(albumId);
-    }
-
-    public Completable updateAlbumName(String name, long albumId) {
-        return editorRepository.updateAlbumName(name, albumId);
     }
 
     public void setOrder(Order order) {

@@ -14,8 +14,8 @@
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginTop="@dimen/list_vertical_margin"
-        app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
-        app:layout_constraintStart_toEndOf="@+id/iv_music_icon"
+        app:layout_constraintEnd_toStartOf="@+id/btnActionsMenu"
+        app:layout_constraintStart_toEndOf="@+id/ivMusicIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:targetApi="lollipop"
         tools:text="cocompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositionmposition"/>
@@ -39,26 +39,8 @@
         app:layout_constraintStart_toStartOf="@+id/tv_composition_name"
         app:layout_constraintTop_toBottomOf="@id/tv_additional_info" />
 
-    <FrameLayout
-        android:id="@+id/clickable_item"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/divider"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <ImageView
-        android:id="@+id/btn_actions_menu"
-        style="@style/ButtonStyle.Menu"
-        android:layout_marginTop="2dp"
-        android:contentDescription="@string/content_description_menu"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_dots_vertical" />
-
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/iv_music_icon"
+        android:id="@+id/ivMusicIcon"
         style="@style/ImageStyle.QueueItemImage"
         android:scaleType="centerCrop"
         android:layout_marginStart="@dimen/content_horizontal_margin"
@@ -75,11 +57,39 @@
         android:layout_height="24dp"
         android:contentDescription="@null"
         app:tint="@android:color/white"
-        app:layout_constraintStart_toStartOf="@id/iv_music_icon"
-        app:layout_constraintEnd_toEndOf="@id/iv_music_icon"
-        app:layout_constraintTop_toTopOf="@id/iv_music_icon"
-        app:layout_constraintBottom_toBottomOf="@id/iv_music_icon"
+        app:layout_constraintStart_toStartOf="@id/ivMusicIcon"
+        app:layout_constraintEnd_toEndOf="@id/ivMusicIcon"
+        app:layout_constraintTop_toTopOf="@id/ivMusicIcon"
+        app:layout_constraintBottom_toBottomOf="@id/ivMusicIcon"
         tools:srcCompat="@drawable/ic_play"/>
+
+
+    <com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressView
+        android:id="@+id/pvFileState"
+        android:layout_width="@dimen/file_sync_state_icon_size"
+        android:layout_height="@dimen/file_sync_state_icon_size"
+        android:layout_marginBottom="@dimen/file_sync_state_icon_margin"
+        android:layout_marginEnd="@dimen/file_sync_state_icon_margin"
+        app:layout_constraintBottom_toBottomOf="@id/ivMusicIcon"
+        app:layout_constraintEnd_toEndOf="@id/ivMusicIcon"/>
+
+    <FrameLayout
+        android:id="@+id/clickable_item"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/divider"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/btnActionsMenu"
+        style="@style/ButtonStyle.Menu"
+        android:layout_marginTop="2dp"
+        android:contentDescription="@string/content_description_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_dots_vertical" />
 
     <FrameLayout
         android:id="@+id/icon_clickable_area"

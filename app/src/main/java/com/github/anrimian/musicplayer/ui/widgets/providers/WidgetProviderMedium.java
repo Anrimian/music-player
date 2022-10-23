@@ -27,28 +27,37 @@ public class WidgetProviderMedium extends WidgetProviderSmallExt {
                                   AppWidgetManager appWidgetManager,
                                   int widgetId,
                                   Context context,
-                                  boolean play,
+                                  int playerState,
                                   String compositionName,
                                   String compositionAuthor,
                                   long compositionId,
                                   long compositionUpdateTime,
+                                  long compositionSize,
+                                  boolean isFileExists,
                                   int queueSize,
                                   boolean enabled,
                                   boolean showCovers,
                                   boolean randomPlayModeEnabled,
                                   int repeatMode) {
         super.applyViewLogic(widgetView,
-                appWidgetManager, widgetId, context,
-                play,
+                appWidgetManager,
+                widgetId,
+                context,
+                playerState,
                 compositionName,
                 compositionAuthor,
                 compositionId,
                 compositionUpdateTime,
+                compositionSize,
+                isFileExists,
                 queueSize,
                 enabled,
                 showCovers,
                 randomPlayModeEnabled,
                 repeatMode);
+        widgetView.setBoolean(R.id.iv_rewind, "setEnabled", enabled);
+        widgetView.setBoolean(R.id.iv_fast_forward, "setEnabled", enabled);
+
         if (showCovers) {
             Components.getAppComponent().imageLoader()
                     .displayImage(widgetView,
@@ -56,7 +65,9 @@ public class WidgetProviderMedium extends WidgetProviderSmallExt {
                             widgetId,
                             compositionId,
                             compositionUpdateTime,
-                            R.drawable.ic_music_placeholder);
+                            compositionSize,
+                            isFileExists,
+                            R.drawable.ic_music_widget_placeholder);
         } else {
             widgetView.setImageViewResource(R.id.iv_cover, R.drawable.ic_music_placeholder);
         }

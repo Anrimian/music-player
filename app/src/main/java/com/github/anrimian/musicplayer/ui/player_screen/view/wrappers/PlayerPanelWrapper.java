@@ -8,7 +8,9 @@ public interface PlayerPanelWrapper {
 
     void collapseBottomPanelSmoothly();
 
+    void collapseBottomPanelSmoothly(Runnable doOnCollapse);
+
     void expandBottomPanel();
 
-    void openPlayQueue();
+    void openPlayerPanel();
 }

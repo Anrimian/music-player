@@ -4,5 +4,6 @@
     <!--widgets-->
     <dimen name="widget_content_margin_vertical">2dp</dimen>
     <dimen name="widget_content_spacing_margin">2dp</dimen>
+    <dimen name="widget_controls_bottom_margin">2dp</dimen>
 
 </resources>

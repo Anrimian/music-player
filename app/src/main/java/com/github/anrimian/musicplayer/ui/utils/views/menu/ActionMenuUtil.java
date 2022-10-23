@@ -2,9 +2,11 @@ package com.github.anrimian.musicplayer.ui.utils.views.menu;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.annotation.MenuRes;
+import androidx.annotation.NonNull;
 import androidx.appcompat.view.ActionBarPolicy;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.view.menu.MenuBuilder;
@@ -16,14 +18,14 @@ import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 
 public class ActionMenuUtil {
 
-    public static void setupMenu(ActionMenuView actionMenuView,
+    public static Menu setupMenu(ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  Callback<MenuItem> listener) {
-        setupMenu(actionMenuView, menuRes, listener, 0);
+        return setupMenu(actionMenuView, menuRes, listener, 0);
     }
 
     @SuppressLint("RestrictedApi")
-    public static void setupMenu(ActionMenuView actionMenuView,
+    public static Menu setupMenu(ActionMenuView actionMenuView,
                                  @MenuRes int menuRes,
                                  Callback<MenuItem> listener,
                                  int extraItemsCount) {
@@ -44,18 +46,19 @@ public class ActionMenuUtil {
         new SupportMenuInflater(context).inflate(menuRes, menuBuilder);
         menuBuilder.setCallback(new MenuBuilder.Callback() {
             @Override
-            public boolean onMenuItemSelected(MenuBuilder menu, MenuItem item) {
+            public boolean onMenuItemSelected(@NonNull MenuBuilder menu, @NonNull MenuItem item) {
                 listener.call(item);
                 return true;
             }
 
             @Override
-            public void onMenuModeChange(MenuBuilder menu) {
+            public void onMenuModeChange(@NonNull MenuBuilder menu) {
 
             }
         });
         menuBuilder.addMenuPresenter(actionMenuPresenter, context);
         actionMenuView.setPresenter(actionMenuPresenter);
         actionMenuPresenter.updateMenuView(true);
+        return menuBuilder;
     }
 }

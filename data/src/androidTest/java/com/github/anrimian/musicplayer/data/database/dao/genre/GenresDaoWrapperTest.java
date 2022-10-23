@@ -1,9 +1,9 @@
 package com.github.anrimian.musicplayer.data.database.dao.genre;
 
+import static com.github.anrimian.musicplayer.data.utils.TestDataProvider.composition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static utils.TestDataProvider.composition;
 
 import android.content.Context;
 

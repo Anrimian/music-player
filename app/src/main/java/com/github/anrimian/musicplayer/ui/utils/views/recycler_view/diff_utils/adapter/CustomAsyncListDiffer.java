@@ -266,7 +266,6 @@ public class CustomAsyncListDiffer<T> {
 
         // fast simple remove all
         if (newList == null) {
-            //noinspection ConstantConditions
             int countRemoved = mList.size();
             mList = null;
             mReadOnlyList = Collections.emptyList();

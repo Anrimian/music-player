@@ -10,8 +10,7 @@ import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 
-const val LIST_STATE = "list_state"
-const val RENAME_STATE = "rename_state"
+private const val LIST_STATE = "list_state"
 
 interface ArtistsListView : MvpView {
 
@@ -30,17 +29,8 @@ interface ArtistsListView : MvpView {
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showLoadingError(errorCommand: ErrorCommand)
 
-    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = RENAME_STATE)
-    fun showRenameProgress()
-
-    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = RENAME_STATE)
-    fun hideRenameProgress()
-
     @AddToEndSingle
     fun submitList(artists: List<Artist>)
-
-    @OneExecution
-    fun showErrorMessage(errorCommand: ErrorCommand)
 
     @OneExecution
     fun showSelectOrderScreen(order: Order)

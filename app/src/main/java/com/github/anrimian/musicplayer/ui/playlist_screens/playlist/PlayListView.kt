@@ -20,6 +20,9 @@ interface PlayListView : MvpView {
     fun showEmptyList()
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
+    fun showEmptySearchResult()
+
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showList()
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
@@ -70,9 +73,6 @@ interface PlayListView : MvpView {
     @Skip
     fun notifyItemMoved(from: Int, to: Int)
 
-    @Skip
-    fun showCompositionActionDialog(playListItem: PlayListItem, position: Int)
-
     @OneExecution
     fun showErrorMessage(errorCommand: ErrorCommand)
 
@@ -93,5 +93,8 @@ interface PlayListView : MvpView {
 
     @AddToEndSingle
     fun showRandomMode(isRandomModeEnabled: Boolean)
+
+    @AddToEndSingle
+    fun setDragEnabled(enabled: Boolean)
 
 }

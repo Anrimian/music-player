@@ -1,5 +1,10 @@
 package com.github.anrimian.musicplayer.data.utils.folders;
 
+import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+import static com.github.anrimian.musicplayer.domain.utils.rx.RxUtils.withDefaultValue;
+import static java.util.Collections.singletonList;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -12,11 +17,6 @@ import javax.annotation.Nullable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.PublishSubject;
-
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
-import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
-import static java.util.Collections.singletonList;
 
 public class RxNode<K> {
 

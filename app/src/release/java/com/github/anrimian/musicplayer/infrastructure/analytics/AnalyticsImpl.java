@@ -5,6 +5,8 @@ import android.util.Log;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
+import javax.annotation.Nullable;
+
 public class AnalyticsImpl implements Analytics {
 
     private final FileLog fileLog;
@@ -13,9 +15,13 @@ public class AnalyticsImpl implements Analytics {
         this.fileLog = fileLog;
     }
 
-    @Override
     public void processNonFatalError(Throwable throwable) {
-        fileLog.writeException(throwable);
+        processNonFatalError(throwable, null);
+    }
+
+    @Override
+    public void processNonFatalError(Throwable throwable, @Nullable String message) {
+        fileLog.writeException(throwable, message);
     }
 
     @Override

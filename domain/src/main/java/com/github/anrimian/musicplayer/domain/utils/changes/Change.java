@@ -1,119 +1,46 @@
 package com.github.anrimian.musicplayer.domain.utils.changes;
 
-import java.util.List;
+public class Change<T> {
+    private final T oldData;
+    private final T newData;
 
-import javax.annotation.Nonnull;
-
-public abstract class Change<T> {
-
-    public static class AddChange<T> extends Change<T> {
-
-        @Nonnull
-        protected final List<T> data;
-
-        public AddChange(@Nonnull List<T> data) {
-            this.data = data;
-        }
-
-        @Nonnull
-        public List<T> getData() {
-            return data;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            AddChange<?> addChange = (AddChange<?>) o;
-
-            return data.equals(addChange.data);
-        }
-
-        @Override
-        public int hashCode() {
-            return data.hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return "Change{" +
-                    "data=" + data +
-                    '}';
-        }
+    public Change(T oldData, T newData) {
+        this.oldData = oldData;
+        this.newData = newData;
     }
 
-    public static class DeleteChange<T> extends Change<T> {
-
-        @Nonnull
-        protected final List<T> data;
-
-        public DeleteChange(@Nonnull List<T> data) {
-            this.data = data;
-        }
-
-        @Nonnull
-        public List<T> getData() {
-            return data;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            DeleteChange<?> that = (DeleteChange<?>) o;
-
-            return data.equals(that.data);
-        }
-
-        @Override
-        public int hashCode() {
-            return data.hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return "Change{" +
-                    "data=" + data +
-                    '}';
-        }
+    public T getOldData() {
+        return oldData;
     }
 
-    public static class ModifyChange<T> extends Change<T> {
+    public T getNewData() {
+        return newData;
+    }
 
-        @Nonnull
-        private final List<ModifiedData<T>> data;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        public ModifyChange(@Nonnull List<ModifiedData<T>> data) {
-            this.data = data;
-        }
+        Change<?> change = (Change<?>) o;
 
-        @Nonnull
-        public List<ModifiedData<T>> getData() {
-            return data;
-        }
+        if (oldData != null ? !oldData.equals(change.oldData) : change.oldData != null)
+            return false;
+        return newData != null ? newData.equals(change.newData) : change.newData == null;
+    }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+    @Override
+    public int hashCode() {
+        int result = oldData != null ? oldData.hashCode() : 0;
+        result = 31 * result + (newData != null ? newData.hashCode() : 0);
+        return result;
+    }
 
-            ModifyChange<?> that = (ModifyChange<?>) o;
-
-            return data.equals(that.data);
-        }
-
-        @Override
-        public int hashCode() {
-            return data.hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return "ModifyChange{" +
-                    "data=" + data +
-                    '}';
-        }
+    @Override
+    public String toString() {
+        return "Change{" +
+                "oldData=" + oldData +
+                ", newData=" + newData +
+                '}';
     }
 }

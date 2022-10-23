@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.library.folders
 
-import com.github.anrimian.musicplayer.data.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
@@ -15,6 +14,7 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Completable
@@ -93,10 +93,6 @@ class LibraryFoldersPresenter(private val folderId: Long?,
                 viewState.showCurrentComposition(CurrentComposition(composition, true))
             }
         }
-    }
-
-    fun onCompositionMenuClick(musicFileSource: CompositionFileSource) {
-        viewState.showCompositionActionDialog(musicFileSource.composition)
     }
 
     fun onCompositionIconClicked(composition: Composition) {
@@ -387,7 +383,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     fun onChangeRandomModePressed() {
-        playerInteractor.isRandomPlayingEnabled = !playerInteractor.isRandomPlayingEnabled
+        playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
     }
 
     fun getSelectedMoveFiles(): LinkedHashSet<FileSource> = interactor.filesToMove
@@ -548,7 +544,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     private fun subscribeOnCurrentComposition() {
-        currentCompositionDisposable = playerInteractor.currentCompositionObservable
+        currentCompositionDisposable = playerInteractor.getCurrentCompositionObservable()
                 .observeOn(uiScheduler)
                 .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
         presenterBatterySafeDisposable.add(currentCompositionDisposable!!)
@@ -573,7 +569,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     private fun subscribeOnRepeatMode() {
-        playerInteractor.randomPlayingObservable
+        playerInteractor.getRandomPlayingObservable()
             .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
     }
 }

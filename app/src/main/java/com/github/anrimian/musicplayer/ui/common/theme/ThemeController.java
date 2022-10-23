@@ -1,9 +1,13 @@
 package com.github.anrimian.musicplayer.ui.common.theme;
 
+import static com.github.anrimian.musicplayer.domain.utils.rx.RxUtils.withDefaultValue;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.Build;
 
 import androidx.annotation.ColorInt;
 import androidx.core.content.ContextCompat;
@@ -15,9 +19,6 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
-import static com.github.anrimian.musicplayer.data.utils.rx.RxUtils.withDefaultValue;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
-
 public class ThemeController {
 
     private static final String PREFERENCES_NAME = "theme_preferences";
@@ -25,6 +26,7 @@ public class ThemeController {
     private static final String THEME_ID = "theme_id";
     private static final String LATEST_DARK_THEME_ID = "latest_dark_theme_id";
     private static final String AUTO_DARK_THEME = "auto_dark_theme";
+    private static final String FOLLOW_SYSTEM_THEME = "follow_system_theme";
 
     private final BehaviorSubject<AppTheme> themeSubject = BehaviorSubject.create();
 
@@ -39,7 +41,7 @@ public class ThemeController {
 
     public void applyCurrentTheme(Activity activity) {
         AppTheme appTheme = getCurrentUsedTheme();
-        if (appTheme != themeSubject.getValue()) {
+        if (!appTheme.equals(themeSubject.getValue())) {
             themeSubject.onNext(appTheme);
         }
         activity.getTheme().applyStyle(appTheme.getThemeResId(), true);
@@ -53,7 +55,7 @@ public class ThemeController {
 
     public void setTheme(Activity activity, AppTheme appTheme) {
         AppTheme currentTheme = getCurrentTheme();
-        if (appTheme == currentTheme) {
+        if (appTheme.equals(currentTheme)) {
             return;
         }
         if (currentTheme.isDark()) {
@@ -61,7 +63,7 @@ public class ThemeController {
         }
         preferences.putInt(THEME_ID, appTheme.getId());
 
-        if (applyThemeRules(appTheme) != applyThemeRules(currentTheme)) {
+        if (!applyThemeRules(appTheme).equals(applyThemeRules(currentTheme))) {
             processThemeChange(activity, appTheme);
         }
     }
@@ -82,13 +84,25 @@ public class ThemeController {
     public void setAutoDarkModeEnabled(Activity activity, boolean enabled) {
         AppTheme currentTheme = getCurrentUsedTheme();
         preferences.putBoolean(AUTO_DARK_THEME, enabled);
-        if (currentTheme != getCurrentUsedTheme()) {
+        if (!currentTheme.equals(getCurrentUsedTheme())) {
             processThemeChange(activity, getCurrentTheme());
         }
     }
 
     public boolean isAutoDarkThemeEnabled() {
         return preferences.getBoolean(AUTO_DARK_THEME, true);
+    }
+
+    public void setFollowSystemThemeEnabled(Activity activity, boolean enabled) {
+        AppTheme currentTheme = getCurrentUsedTheme();
+        preferences.putBoolean(FOLLOW_SYSTEM_THEME, enabled);
+        if (!currentTheme.equals(getCurrentUsedTheme())) {
+            processThemeChange(activity, getCurrentTheme());
+        }
+    }
+
+    public boolean isFollowSystemThemeEnabled() {
+        return preferences.getBoolean(FOLLOW_SYSTEM_THEME, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S);
     }
 
     private AppTheme getLatestDarkTheme() {
@@ -114,6 +128,12 @@ public class ThemeController {
     }
 
     private AppTheme applyThemeRules(AppTheme theme) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isFollowSystemThemeEnabled()) {
+            if (isAutoDarkThemeEnabled() && isSystemNightModeEnabled()) {
+                return AppTheme.getSystemDarkTheme();
+            }
+            return AppTheme.getSystemWhiteTheme();
+        }
         if (isAutoDarkThemeEnabled()
                 && !theme.isDark()
                 && isSystemNightModeEnabled()) {

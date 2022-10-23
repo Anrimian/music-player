@@ -5,20 +5,26 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
 
-class FolderRootPresenter(private val interactor: LibraryFoldersScreenInteractor,
-                          errorParser: ErrorParser,
-                          uiScheduler: Scheduler) 
-    : AppPresenter<FolderRootView>(uiScheduler, errorParser) {
+class FolderRootPresenter(
+    private val interactor: LibraryFoldersScreenInteractor,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler
+) : AppPresenter<FolderRootView>(uiScheduler, errorParser) {
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.showIdle()
     }
 
-    fun onEmptyFolderStackArrived() {
+    fun onCreateFolderTreeRequested() {
         viewState.showProgress()
         interactor.currentFolderScreens
-                .subscribeOnUi(this::onScreensReceived, this::onScreensReceivingError)
+            .subscribeOnUi(this::onScreensReceived, this::onScreensReceivingError)
+    }
+
+    fun onNavigateToCompositionRequested(compositionId: Long) {
+        interactor.getParentFolders(compositionId)
+            .subscribeOnUi(this::onScreensReceived, this::onScreensReceivingError)
     }
 
     private fun onScreensReceivingError(throwable: Throwable) {

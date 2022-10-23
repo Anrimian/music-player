@@ -39,6 +39,15 @@
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
                 android:layout_marginStart="@dimen/content_horizontal_margin"/>
 
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbFollowSystemTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/follow_system_theme"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"/>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </FrameLayout>

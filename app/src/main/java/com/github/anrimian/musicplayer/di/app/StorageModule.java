@@ -5,7 +5,9 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULE
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Environment;
 
+import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
@@ -14,7 +16,6 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrappe
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
-import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
@@ -31,15 +32,19 @@ import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenr
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
+import com.github.anrimian.musicplayer.data.storage.source.ContentSourceHelper;
 import com.github.anrimian.musicplayer.data.storage.source.FileSourceProvider;
+import com.github.anrimian.musicplayer.data.storage.source.StorageSourceRepositoryImpl;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.player.CompositionSourceInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
+import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -84,8 +89,9 @@ public class StorageModule {
     @Nonnull
     @Singleton
     CompositionSourceEditor compositionSourceEditor(StorageMusicProvider musicProvider,
-                                                    FileSourceProvider fileSourceProvider) {
-        return new CompositionSourceEditor(musicProvider, fileSourceProvider);
+                                                    FileSourceProvider fileSourceProvider,
+                                                    ContentSourceHelper contentSourceHelper) {
+        return new CompositionSourceEditor(musicProvider, fileSourceProvider, contentSourceHelper);
     }
 
     @Provides
@@ -99,7 +105,6 @@ public class StorageModule {
                                                  GenresDaoWrapper genresDao,
                                                  FoldersDaoWrapper foldersDao,
                                                  StorageMusicProvider storageMusicProvider,
-                                                 StorageGenresProvider storageGenresProvider,
                                                  StateRepository stateRepository,
                                                  SettingsRepository settingsRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
@@ -112,7 +117,6 @@ public class StorageModule {
                 genresDao,
                 foldersDao,
                 storageMusicProvider,
-                storageGenresProvider,
                 stateRepository,
                 settingsRepository,
                 scheduler);
@@ -130,9 +134,17 @@ public class StorageModule {
 
     @Provides
     @Nonnull
-    EditorInteractor compositionEditorInteractor(EditorRepository editorRepository,
-                                                 LibraryRepository musicProviderRepository) {
-        return new EditorInteractor(editorRepository, musicProviderRepository);
+    EditorInteractor compositionEditorInteractor(CompositionSourceInteractor sourceInteractor,
+                                                 SyncInteractor<?, ?, Long> syncInteractor,
+                                                 EditorRepository editorRepository,
+                                                 LibraryRepository musicProviderRepository,
+                                                 StorageSourceRepository storageSourceRepository) {
+        return new EditorInteractor(
+                sourceInteractor,
+                syncInteractor,
+                editorRepository,
+                musicProviderRepository,
+                storageSourceRepository);
     }
 
     @Provides
@@ -141,9 +153,15 @@ public class StorageModule {
     FileScanner fileScanner(CompositionsDaoWrapper compositionsDao,
                             CompositionSourceEditor compositionSourceEditor,
                             StateRepository stateRepository,
+                            StorageSourceRepository storageSourceRepository,
                             Analytics analytics,
                             @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new FileScanner(compositionsDao, compositionSourceEditor, stateRepository, analytics, scheduler);
+        return new FileScanner(compositionsDao,
+                compositionSourceEditor,
+                stateRepository,
+                storageSourceRepository,
+                analytics,
+                scheduler);
     }
 
     @Provides
@@ -155,6 +173,7 @@ public class StorageModule {
                                                   CompositionsDaoWrapper compositionsDao,
                                                   GenresDaoWrapper genresDao,
                                                   SettingsRepository settingsRepository,
+//                                                  StorageCompositionAnalyzer compositionAnalyzer,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
                                                   StoragePlaylistAnalyzer storagePlaylistAnalyzer,
                                                   FileScanner fileScanner,
@@ -181,10 +200,13 @@ public class StorageModule {
                                                    FoldersDaoWrapper foldersDaoWrapper,
                                                    StateRepository stateRepository,
                                                    StorageCompositionsInserter compositionsInserter) {
-        return new StorageCompositionAnalyzer(compositionsDao,
+        return new StorageCompositionAnalyzer(
+                compositionsDao,
                 foldersDaoWrapper,
                 stateRepository,
-                compositionsInserter);
+                compositionsInserter,
+                Environment.getExternalStorageDirectory().getAbsolutePath()
+        );
     }
 
     @Provides
@@ -199,15 +221,29 @@ public class StorageModule {
     StorageCompositionsInserter compositionsInserter(AppDatabase appDatabase,
                                                      CompositionsDao compositionsDao,
                                                      CompositionsDaoWrapper compositionsDaoWrapper,
-                                                     FoldersDao foldersDao,
+                                                     FoldersDaoWrapper foldersDao,
                                                      ArtistsDao artistsDao,
-                                                     AlbumsDao albumsDao) {
+                                                     ArtistsDaoWrapper artistsDaoWrapper,
+                                                     AlbumsDao albumsDao,
+                                                     AlbumsDaoWrapper albumsDaoWrapper) {
         return new StorageCompositionsInserter(appDatabase,
                 compositionsDao,
                 compositionsDaoWrapper,
                 foldersDao,
                 artistsDao,
-                albumsDao);
+                artistsDaoWrapper,
+                albumsDao,
+                albumsDaoWrapper);
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    StorageSourceRepository storageSourceRepository(CompositionsDaoWrapper compositionsDao,
+                                                    StorageMusicProvider storageMusicProvider,
+                                                    CompositionSourceEditor compositionSourceEditor,
+                                                    @Named(IO_SCHEDULER) Scheduler ioScheduler) {
+        return new StorageSourceRepositoryImpl(compositionsDao, storageMusicProvider, compositionSourceEditor, ioScheduler);
     }
 
 }

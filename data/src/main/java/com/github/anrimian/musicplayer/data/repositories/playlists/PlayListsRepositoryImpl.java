@@ -21,7 +21,6 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 
-//TODO consider write playlists in audio file tags
 public class PlayListsRepositoryImpl implements PlayListsRepository {
 
     private final SettingsRepository settingsRepository;
@@ -58,9 +57,11 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId) {
+    public Observable<List<PlayListItem>> getCompositionsObservable(long playlistId,
+                                                                    @Nullable String searchText) {
         return settingsRepository.getDisplayFileNameObservable()
-                .switchMap(useFileName -> playListsDao.getPlayListItemsObservable(playlistId, useFileName));
+                .switchMap(useFileName ->
+                        playListsDao.getPlayListItemsObservable(playlistId, useFileName, searchText));
     }
 
     @Override

@@ -4,10 +4,11 @@ import android.app.Application;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer;
-import com.github.anrimian.musicplayer.utils.Permissions;
+import com.github.anrimian.musicplayer.utils.DevTools;
 
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
@@ -25,7 +26,7 @@ public abstract class App extends Application {
 
         initComponents();
 
-//        DevTools.run(this);
+        DevTools.run(this);
 
         AppComponent appComponent = Components.getAppComponent();
         appComponent.appLogger().initFatalErrorRecorder();

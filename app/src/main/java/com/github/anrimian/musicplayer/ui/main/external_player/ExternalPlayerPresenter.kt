@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.main.external_player
 
-import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
 import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
@@ -8,16 +8,17 @@ import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
 
 class ExternalPlayerPresenter(
-        private val interactor: ExternalPlayerInteractor,
-        uiScheduler: Scheduler,
-        errorParser: ErrorParser
+    private val interactor: ExternalPlayerInteractor,
+    uiScheduler: Scheduler,
+    errorParser: ErrorParser
 ) : AppPresenter<ExternalPlayerView>(uiScheduler, errorParser) {
     
-    private var compositionSource: UriCompositionSource? = null
+    private var currentPosition: Long = 0
     
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.showKeepPlayerInBackground(interactor.isExternalPlayerKeepInBackground)
+        viewState.showKeepPlayerInBackground(interactor.isExternalPlayerKeepInBackground())
+        getCurrentSource()?.let(viewState::displayComposition)
 
         subscribeOnPlayerStateChanges()
         subscribeOnTrackPositionChanging()
@@ -29,19 +30,18 @@ class ExternalPlayerPresenter(
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!interactor.isExternalPlayerKeepInBackground) {
+        if (!interactor.isExternalPlayerKeepInBackground()) {
             interactor.stop()
         }
     }
 
-    fun onSourceForPlayingReceived(source: UriCompositionSource) {
-        compositionSource = source
-        interactor.startPlaying(compositionSource)
+    fun onSourceForPlayingReceived(source: ExternalCompositionSource) {
+        interactor.startPlaying(source)
         viewState.displayComposition(source)
+        viewState.showTrackState(currentPosition, source.duration)
     }
 
     fun onPlayPauseClicked() {
-        viewState.showPlayErrorEvent(null)
         interactor.playOrPause()
     }
 
@@ -62,7 +62,7 @@ class ExternalPlayerPresenter(
     }
 
     fun onKeepPlayerInBackgroundChecked(checked: Boolean) {
-        interactor.isExternalPlayerKeepInBackground = checked
+        interactor.setExternalPlayerKeepInBackground(checked)
     }
 
     fun onFastSeekForwardCalled() {
@@ -79,38 +79,53 @@ class ExternalPlayerPresenter(
     }
 
     private fun subscribeOnErrorEvents() {
-        interactor.errorEventsObservable.unsafeSubscribeOnUi(viewState::showPlayErrorEvent)
+        interactor.getPlayerStateObservable().unsafeSubscribeOnUi(this::onPlayerStateReceived)
+    }
+
+    private fun onPlayerStateReceived(playerState: PlayerState) {
+        if (playerState is PlayerState.Error) {
+            val errorCommand = errorParser.parseError(playerState.throwable)
+            viewState.showPlayErrorState(errorCommand)
+        } else {
+            viewState.showPlayErrorState(null)
+        }
     }
 
     private fun subscribeOnRepeatMode() {
-        interactor.externalPlayerRepeatModeObservable.unsafeSubscribeOnUi(viewState::showRepeatMode)
+        interactor.getExternalPlayerRepeatModeObservable().unsafeSubscribeOnUi(viewState::showRepeatMode)
     }
 
     private fun subscribeOnTrackPositionChanging() {
-        interactor.trackPositionObservable.unsafeSubscribeOnUi(this::onTrackPositionChanged)
+        interactor.getTrackPositionObservable().unsafeSubscribeOnUi(this::onTrackPositionChanged)
     }
 
     private fun onTrackPositionChanged(currentPosition: Long) {
-        if (compositionSource != null) {
-            val duration = compositionSource!!.duration
+        this.currentPosition = currentPosition
+        val source = getCurrentSource()
+        if (source != null) {
+            val duration = source.duration
             viewState.showTrackState(currentPosition, duration)
         }
     }
 
     private fun subscribeOnPlayerStateChanges() {
-        interactor.playerStateObservable.unsafeSubscribeOnUi(this::onPlayerStateChanged)
-    }
-
-    private fun onPlayerStateChanged(playerState: PlayerState) {
-        viewState.showPlayerState(playerState)
+        interactor.getIsPlayingStateObservable().unsafeSubscribeOnUi(viewState::showPlayerState)
     }
 
     private fun subscribeOnSpeedAvailableState() {
-        interactor.speedChangeAvailableObservable
+        interactor.getSpeedChangeAvailableObservable()
                 .unsafeSubscribeOnUi(viewState::showSpeedChangeFeatureVisible)
     }
 
     private fun subscribeOnSpeedState() {
-        interactor.playbackSpeedObservable.unsafeSubscribeOnUi(viewState::displayPlaybackSpeed)
+        interactor.getPlaybackSpeedObservable().unsafeSubscribeOnUi(viewState::displayPlaybackSpeed)
+    }
+
+    private fun getCurrentSource(): ExternalCompositionSource? {
+        val source = interactor.getCurrentSource()
+        if (source is ExternalCompositionSource) {
+            return source
+        }
+        return null
     }
 }

@@ -46,6 +46,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final CompositionsDaoWrapper compositionsDao;
     private final GenresDaoWrapper genresDao;
     private final SettingsRepository settingsRepository;
+//    private final StorageCompositionAnalyzer compositionAnalyzer;
     private final StorageCompositionAnalyzer compositionAnalyzer;
     private final StoragePlaylistAnalyzer playlistAnalyzer;
     private final FileScanner fileScanner;
@@ -62,6 +63,7 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                                       CompositionsDaoWrapper compositionsDao,
                                       GenresDaoWrapper genresDao,
                                       SettingsRepository settingsRepository,
+//                                      StorageCompositionAnalyzer compositionAnalyzer,
                                       StorageCompositionAnalyzer compositionAnalyzer,
                                       StoragePlaylistAnalyzer playlistAnalyzer,
                                       FileScanner fileScanner,

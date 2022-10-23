@@ -6,20 +6,16 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.3'
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath("de.mannodermaus.gradle.plugins:android-junit5:1.8.2.0")
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.8.2.1"
     }
 }
 
 allprojects {
     ext {
-        androidApplicationId = 'com.github.anrimian.musicplayer'
-        androidVersionCode = 129
-        androidVersionName = "0.9.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testJunit5Builder = "de.mannodermaus.junit5.AndroidJUnit5Builder"
-        testApplicationId = 'com.github.anrimian.musicplayer.test'
     }
     configurations.all {
         //fix for test running

@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.ui.player_screen
 
+import com.github.anrimian.filesync.models.state.file.FormattedFileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -17,22 +17,19 @@ import moxy.viewstate.strategy.alias.Skip
 interface PlayerView : MvpView {
     
     @AddToEndSingle
-    fun showPlayerState(state: PlayerState)
+    fun showPlayerState(isPlaying: Boolean)
+
+    @AddToEndSingle
+    fun showPlayErrorState(errorCommand: ErrorCommand?)
 
     @AddToEndSingle
     fun setButtonPanelState(expanded: Boolean)
 
-    @AddToEndSingle
-    fun setMusicControlsEnabled(show: Boolean)
+    @OneExecution
+    fun showPlayerContentPage(position: Int)
 
     @AddToEndSingle
     fun showCurrentQueueItem(item: PlayQueueItem?, showCover: Boolean)
-
-    @OneExecution
-    fun scrollQueueToPosition(position: Int)
-
-    @AddToEndSingle
-    fun updatePlayQueue(items: List<PlayQueueItem>)
 
     @AddToEndSingle
     fun showRepeatMode(mode: Int)
@@ -47,7 +44,7 @@ interface PlayerView : MvpView {
     fun showSelectPlayListDialog()
 
     @OneExecution
-    fun showShareMusicDialog(composition: Composition)
+    fun showShareCompositionDialog(composition: Composition)
 
     @OneExecution
     fun showAddingToPlayListError(errorCommand: ErrorCommand)
@@ -64,20 +61,11 @@ interface PlayerView : MvpView {
     @OneExecution
     fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>)
 
-    @AddToEndSingle
-    fun showPlayQueueSubtitle(size: Int)
-
     @OneExecution
     fun showDrawerScreen(selectedDrawerScreenId: Int, selectedPlayListScreenId: Long)
 
     @OneExecution
     fun showLibraryScreen(selectedLibraryScreen: Int)
-
-    @Skip
-    fun notifyItemMoved(from: Int, to: Int)
-
-    @AddToEndSingle
-    fun setPlayQueueCoversEnabled(isCoversEnabled: Boolean)
 
     @Skip
     fun startEditCompositionScreen(id: Long)
@@ -99,4 +87,11 @@ interface PlayerView : MvpView {
 
     @AddToEndSingle
     fun showFileScannerState(state: FileScannerState)
+
+    @Skip
+    fun locateCompositionInFolders(composition: Composition)
+
+    @AddToEndSingle
+    fun showCurrentCompositionSyncState(fileSyncState: FormattedFileSyncState)
+
 }

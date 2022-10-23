@@ -191,7 +191,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
                     isShuffled
             );
             return currentPosition == playQueueDao.getLastPosition(isShuffled);
-        });
+        }).subscribeOn(scheduler);
     }
 
     @Override

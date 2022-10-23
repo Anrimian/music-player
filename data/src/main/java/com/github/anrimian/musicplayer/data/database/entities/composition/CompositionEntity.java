@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.database.entities.composition;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -9,6 +10,7 @@ import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.Date;
@@ -60,9 +62,6 @@ public class CompositionEntity {
     @Nonnull
     private String fileName;
 
-    @Nonnull
-    private String filePath;
-
     private long duration;
     private long size;
 
@@ -76,20 +75,25 @@ public class CompositionEntity {
     @Nullable
     private CorruptionType corruptionType;
 
+    private final int audioFileType;
+    @androidx.annotation.NonNull
+    private final InitialSource initialSource;
+
     public CompositionEntity(@Nullable Long artistId,
                              @Nullable Long albumId,
                              @Nullable Long folderId,
                              @Nullable String title,
                              @Nullable String lyrics,
                              @Nonnull String fileName,
-                             @Nonnull String filePath,
                              long duration,
                              long size,
                              @Nullable Long storageId,
                              @Nonnull Date dateAdded,
                              @Nonnull Date dateModified,
-                             @androidx.annotation.NonNull Date lastScanDate,
-                             @Nullable CorruptionType corruptionType) {
+                             @NonNull Date lastScanDate,
+                             @Nullable CorruptionType corruptionType,
+                             int audioFileType,
+                             @androidx.annotation.NonNull InitialSource initialSource) {
         this.artistId = artistId;
         this.albumId = albumId;
         this.folderId = folderId;
@@ -97,13 +101,14 @@ public class CompositionEntity {
         this.title = title;
         this.lyrics = lyrics;
         this.fileName = fileName;
-        this.filePath = filePath;
         this.duration = duration;
         this.size = size;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.lastScanDate = lastScanDate;
         this.corruptionType = corruptionType;
+        this.audioFileType = audioFileType;
+        this.initialSource = initialSource;
 
         Objects.requireNonNull(fileName);
     }
@@ -146,11 +151,6 @@ public class CompositionEntity {
         return fileName;
     }
 
-    @Nonnull
-    public String getFilePath() {
-        return filePath;
-    }
-
     public long getDuration() {
         return duration;
     }
@@ -182,5 +182,14 @@ public class CompositionEntity {
     @Nullable
     public String getLyrics() {
         return lyrics;
+    }
+
+    public int getAudioFileType() {
+        return audioFileType;
+    }
+
+    @androidx.annotation.NonNull
+    public InitialSource getInitialSource() {
+        return initialSource;
     }
 }

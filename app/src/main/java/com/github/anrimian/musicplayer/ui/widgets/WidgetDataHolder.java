@@ -14,6 +14,8 @@ public class WidgetDataHolder {
     private static final String CURRENT_QUEUE_SIZE = "current_queue_size";
     private static final String CURRENT_COMPOSITION_ID = "current_composition_id";
     private static final String CURRENT_COMPOSITION_UPDATE_TIME = "current_composition_update_time";
+    private static final String CURRENT_COMPOSITION_SIZE = "current_composition_size";
+    private static final String CURRENT_COMPOSITION_IS_FILE_EXISTS = "current_composition_is_file_exists";
     private static final String RANDOM_PLAY = "random_play";
     private static final String REPEAT = "repeat";
     private static final String COVERS_ENABLED = "covers_enabled";
@@ -23,6 +25,8 @@ public class WidgetDataHolder {
                               String author,
                               long compositionId,
                               long updateTime,
+                              long size,
+                              boolean isFileExists,
                               int queueSize,
                               boolean randomPlay,
                               int repeatMode,
@@ -33,6 +37,8 @@ public class WidgetDataHolder {
                 .putString(CURRENT_COMPOSITION_AUTHOR, author)
                 .putLong(CURRENT_COMPOSITION_ID, compositionId)
                 .putLong(CURRENT_COMPOSITION_UPDATE_TIME, updateTime)
+                .putLong(CURRENT_COMPOSITION_SIZE, size)
+                .putBoolean(CURRENT_COMPOSITION_IS_FILE_EXISTS, isFileExists)
                 .putInt(CURRENT_QUEUE_SIZE, queueSize)
                 .putBoolean(RANDOM_PLAY, randomPlay)
                 .putInt(REPEAT, repeatMode)
@@ -63,6 +69,16 @@ public class WidgetDataHolder {
     public static long getCompositionUpdateTime(Context context) {
         SharedPreferencesHelper preferences = getPreferences(context);
         return preferences.getLong(CURRENT_COMPOSITION_UPDATE_TIME);
+    }
+
+    public static long getCompositionSize(Context context) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        return preferences.getLong(CURRENT_COMPOSITION_SIZE);
+    }
+
+    public static boolean getCompositionIsFileExists(Context context) {
+        SharedPreferencesHelper preferences = getPreferences(context);
+        return preferences.getBoolean(CURRENT_COMPOSITION_IS_FILE_EXISTS);
     }
 
     private static SharedPreferencesHelper getPreferences(Context context) {

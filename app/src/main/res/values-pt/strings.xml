@@ -47,10 +47,6 @@
     <string name="save_as_play_list">Salvar como lista de reprodução</string>
     <string name="cancel">Cancelar</string>
     <string name="deleting">Excluindo</string>
-    <string name="delete_composition_template">Excluir música \"%1$s\"? Essa ação não pode ser desfeita.</string>
-    <string name="delete_empty_folder">Excluir pasta \"%s\"? Essa ação não pode ser desfeita.</string>
-    <string name="delete_folder_template">Excluir %2$s da pasta \"%1$s\"? Essa ação não pode ser desfeita.</string>
-    <string name="delete_template">Excluir \"%1$s\"? Essa ação não pode ser desfeita.</string>
     <string name="delete_composition_success">Música \"%1$s\" excluído</string>
     <string name="search">Pesquisar</string>
     <string name="play_queue">Fila de reprodução</string>
@@ -116,7 +112,6 @@
     <string name="copied_message">Texto copiado</string>
     <string name="folder_name">Nome da pasta</string>
     <string name="rename_folder">Renomear pasta</string>
-    <string name="cut">Cortar</string>
     <string name="copy">Copiar</string>
     <string name="paste">Colar</string>
     <string name="paste_in_new_folder">Cole na nova pasta</string>
@@ -180,7 +175,6 @@
     <string name="clear_play_queue">Limpar fila de reprodução</string>
     <string name="no_excluded_folders">As pastas excluídas no escaneamento serão exibidas aqui</string>
     <string name="keep_playing_after_window_close">Continue reproduzindo após o fechamento da janela</string>
-    <string name="unknown_play_error">Erro de reprodução desconhecido</string>
     <string name="equalizer">Equalizador</string>
     <string name="system_equalizer">Equalizador do sistema</string>
     <string name="no_equalizer">Nenhum</string>
@@ -192,7 +186,6 @@
     <string name="pick_from_gallery">Escolha da galeria</string>
     <string name="remove_cover">Retirar capa</string>
     <string name="editor_timeout_error">O tempo limite do editor de TAGs expirou. Talvez o formato do arquivo não seja suportado</string>
-    <string name="change_lyrics">Alterar letras</string>
     <string name="lyrics">Letras</string>
     <string name="check_tags_error">Falha ao verificar as TAGS de composição: %s</string>
     <string name="changing_file_progress">Alterando arquivo…</string>
@@ -248,13 +241,31 @@
     <string name="language">Idioma</string>
     <string name="follow_system_language">Siga o idioma do sistema</string>
     <!---->
+    <!--not verified-->
+    <string name="move">Mover</string>
+    <string name="no_compositions_in_folder">Composições na pasta não encontradas</string>
+    <string name="follow_system_theme">Siga o tema do sistema</string>
+    <string name="play_queue_is_empty">A fila de reprodução está vazia</string>
+    <string name="no_lyrics_for_current_composition">Nenhuma letra para a composição atual</string>
+    <string name="edit_lyrics">Editar letras</string>
+    <string name="show_in_folders">Mostrar em pastas</string>
+    <string name="file_source_not_found">Arquivo remoto não encontrado</string>
+    <string name="file_is_too_large">O arquivo é muito grande</string>
+    <string name="preparing_files">Preparando arquivos</string>
+    <string name="downloading">Baixando: %1$d/%2$d</string>
+    <string name="downloading_progress">Baixando(%d%%)</string>
+    <string name="rename_progress_count">Renomeando(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Esta ação não pode ser desfeita.</string>
+    <string name="delete_composition_template">Excluir música \"%1$s\"</string>
+    <string name="delete_empty_folder">Excluir pasta \"%s\"</string>
+    <string name="delete_folder_template">%2$s da pasta \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">No Android 11, copiar/mover/renomear arquivos são permitidos apenas nas pastas: \"%s\".
+        Coloque os arquivos de áudio nessas pastas e a operação deve ser executada corretamente.
+    </string>
+    <string name="folder_already_excluded_from_scanning">Esta pasta já foi excluída da verificação</string>
+    <!---->
 
     <plurals name="compositions_count">
-        <item quantity="one">%1$s música</item>
-        <item quantity="other">%1$s músicas</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
         <item quantity="one">%1$s música</item>
         <item quantity="other">%1$s músicas</item>
     </plurals>
@@ -298,6 +309,13 @@
     <plurals name="seconds_template">
         <item quantity="one">%1$d segunda</item>
         <item quantity="other">%1$d segundas</item>
+    </plurals>
+    <!---->
+
+    <!-- not verified-->
+    <plurals name="delete_compositions_template">
+        <item quantity="one">Excluir %d música</item>
+        <item quantity="other">Excluir %d músicas</item>
     </plurals>
     <!---->
 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--toolbar-->
+    <dimen name="toolbar_player_content_start_padding">24dp</dimen>
+</resources>

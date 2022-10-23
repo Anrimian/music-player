@@ -13,11 +13,12 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.widget.Toast
 import com.github.anrimian.musicplayer.R
-import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
 import com.github.anrimian.musicplayer.data.utils.rx.retryWithDelay
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
+import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
@@ -28,10 +29,10 @@ import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotific
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
-import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.*
 import com.github.anrimian.musicplayer.infrastructure.service.music.CompositionSourceModelHelper
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
+import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
@@ -52,6 +53,7 @@ class MediaSessionHandler(private val context: Context,
                           private val playerInteractor: PlayerInteractor,
                           private val libraryPlayerInteractor: LibraryPlayerInteractor,
                           private val musicServiceInteractor: MusicServiceInteractor,
+                          private val ioScheduler: Scheduler,
                           private val uiScheduler: Scheduler,
                           private val errorParser: ErrorParser
 ) {
@@ -100,7 +102,7 @@ class MediaSessionHandler(private val context: Context,
         actionDisposable?.dispose()
         mediaSessionDisposable.clear()
         mediaSession?.run {
-            isActive = false
+//            isActive = false //removed after build 129. Observe and see how it works
             release()
         }
         mediaSession = null
@@ -108,62 +110,59 @@ class MediaSessionHandler(private val context: Context,
 
     private fun subscribeOnPlaybackStateActions() {
         mediaSessionDisposable.add(Observable.combineLatest(
-                playerInteractor.playerStateObservable,
-                libraryPlayerInteractor.currentQueueItemObservable,
-                playerInteractor.currentSourceObservable,
-                playerInteractor.trackPositionObservable,
-                playerInteractor.currentPlaybackSpeedObservable,
-                musicServiceInteractor.repeatModeObservable,
-                musicServiceInteractor.randomModeObservable,
-                playbackState::set
+            playerInteractor.getPlayerStateObservable(),
+            libraryPlayerInteractor.getCurrentQueueItemObservable(),
+            playerInteractor.getCurrentSourceObservable(),
+            playerInteractor.getTrackPositionObservable(),
+            playerInteractor.getCurrentPlaybackSpeedObservable(),
+            musicServiceInteractor.repeatModeObservable,
+            musicServiceInteractor.randomModeObservable,
+            playbackState::set
         ).observeOn(uiScheduler)
             .subscribe(this::onPlayBackStateReceived))
     }
 
     private fun onPlayBackStateReceived(playbackState: PlaybackState) {
         when(playbackState.currentSource) {
-            is UriCompositionSource -> processExternalPlaybackState(playbackState)
+            is ExternalCompositionSource -> processExternalPlaybackState(playbackState)
             else -> processLibraryPlaybackState((playbackState))
         }
     }
 
     private fun processExternalPlaybackState(playbackState: PlaybackState) {
         val playbackStateBuilder = PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY
-                                or PlaybackStateCompat.ACTION_STOP
-                                or PlaybackStateCompat.ACTION_PAUSE
-                                or PlaybackStateCompat.ACTION_PLAY_PAUSE
-                                or PlaybackStateCompat.ACTION_SEEK_TO
-                                or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
-                                or PlaybackStateCompat.ACTION_FAST_FORWARD
-                                or PlaybackStateCompat.ACTION_REWIND
-                                or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-                                or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
-                )
+            .setActions(
+                PlaybackStateCompat.ACTION_PLAY
+                        or PlaybackStateCompat.ACTION_STOP
+                        or PlaybackStateCompat.ACTION_PAUSE
+                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                        or PlaybackStateCompat.ACTION_SEEK_TO
+                        or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
+                        or PlaybackStateCompat.ACTION_FAST_FORWARD
+                        or PlaybackStateCompat.ACTION_REWIND
+                        or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                        or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
+            )
 
         playbackStateBuilder.addCustomAction(
-                REWIND_ACTION_ID,
-                context.getString(R.string.rewind),
-                R.drawable.ic_rewind
+            REWIND_ACTION_ID,
+            context.getString(R.string.rewind),
+            R.drawable.ic_rewind
         )
 
         playbackStateBuilder.addCustomAction(
-                FAST_FORWARD_ACTION_ID,
-                context.getString(R.string.fast_forward),
-                R.drawable.ic_fast_forward
+            FAST_FORWARD_ACTION_ID,
+            context.getString(R.string.fast_forward),
+            R.drawable.ic_fast_forward
         )
 
         playbackStateBuilder.addCustomAction(
-                REPEAT_ACTION_ID,
-                context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
-                FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
+            REPEAT_ACTION_ID,
+            context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
+            FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
         )
 
-        playbackStateBuilder.setState(
-                toMediaState(playbackState.playerState),
-                playbackState.trackPosition,
-                playbackState.playbackSpeed)
+        setMediaState(playbackStateBuilder, playbackState)
 
         playbackStateBuilder.setActiveQueueItemId(0L)
 
@@ -174,52 +173,49 @@ class MediaSessionHandler(private val context: Context,
 
     private fun processLibraryPlaybackState(playbackState: PlaybackState) {
         val playbackStateBuilder = PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY
-                                or PlaybackStateCompat.ACTION_STOP
-                                or PlaybackStateCompat.ACTION_PAUSE
-                                or PlaybackStateCompat.ACTION_PLAY_PAUSE
-                                or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-                                or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                                or PlaybackStateCompat.ACTION_SEEK_TO
-                                or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
-                                or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
-                                or PlaybackStateCompat.ACTION_FAST_FORWARD
-                                or PlaybackStateCompat.ACTION_REWIND
-                                or PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM
-                                or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-                                or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
-                )
+            .setActions(
+                PlaybackStateCompat.ACTION_PLAY
+                        or PlaybackStateCompat.ACTION_STOP
+                        or PlaybackStateCompat.ACTION_PAUSE
+                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                        or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                        or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                        or PlaybackStateCompat.ACTION_SEEK_TO
+                        or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
+                        or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
+                        or PlaybackStateCompat.ACTION_FAST_FORWARD
+                        or PlaybackStateCompat.ACTION_REWIND
+                        or PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM
+                        or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                        or PlaybackStateCompat.ACTION_SET_PLAYBACK_SPEED
+            )
 
         playbackStateBuilder.addCustomAction(
-                REPEAT_ACTION_ID,
-                context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
-                FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
+            REPEAT_ACTION_ID,
+            context.getString(FormatUtils.getRepeatModeText(playbackState.repeatMode)),
+            FormatUtils.getRepeatModeIcon(playbackState.repeatMode)
         )
         playbackStateBuilder.addCustomAction(
-                SHUFFLE_ACTION_ID,
-                context.getString(R.string.content_description_shuffle),
-                FormatUtils.getRandomModeIcon(playbackState.randomMode)
+            SHUFFLE_ACTION_ID,
+            context.getString(R.string.content_description_shuffle),
+            FormatUtils.getRandomModeIcon(playbackState.randomMode)
         )
         playbackStateBuilder.addCustomAction(
-                REWIND_ACTION_ID,
-                context.getString(R.string.rewind),
-                R.drawable.ic_rewind
+            REWIND_ACTION_ID,
+            context.getString(R.string.rewind),
+            R.drawable.ic_rewind
         )
         playbackStateBuilder.addCustomAction(
-                FAST_FORWARD_ACTION_ID,
-                context.getString(R.string.fast_forward),
-                R.drawable.ic_fast_forward
+            FAST_FORWARD_ACTION_ID,
+            context.getString(R.string.fast_forward),
+            R.drawable.ic_fast_forward
         )
 
         //leave it for now
 //      if (!isSourceEqual) {
 //          newTrackPosition = CompositionSourceModelHelper.getTrackPosition(newCompositionSource);
 //      }
-        playbackStateBuilder.setState(
-                toMediaState(playbackState.playerState),
-                playbackState.trackPosition,
-                playbackState.playbackSpeed)
+        setMediaState(playbackStateBuilder, playbackState)
 
         val playQueueCurrentItemId = playbackState.playQueueCurrentItem.playQueueItem?.id ?: 0L
         playbackStateBuilder.setActiveQueueItemId(playQueueCurrentItemId)
@@ -243,11 +239,11 @@ class MediaSessionHandler(private val context: Context,
 
     private fun subscribeOnMediaSessionMetadata() {
         mediaSessionDisposable.add(Observable.combineLatest(
-                playerInteractor.currentSourceObservable,
-                musicServiceInteractor.notificationSettingObservable,
-                metadataState::set
+            playerInteractor.getCurrentSourceObservable(),
+            musicServiceInteractor.notificationSettingObservable,
+            metadataState::set
         ).observeOn(uiScheduler)
-                .subscribe(this::onMetadataStateReceived))
+            .subscribe(this::onMetadataStateReceived))
     }
 
     private fun onMetadataStateReceived(state: MetadataState) {
@@ -255,61 +251,78 @@ class MediaSessionHandler(private val context: Context,
         val currentSource = state.currentSource.value
 
         CompositionSourceModelHelper.updateMediaSessionMetadata(
-                currentSource,
-                metadataBuilder,
-                getMediaSession(),
-                context
+            currentSource,
+            metadataBuilder,
+            getMediaSession(),
+            context
         )
 
         //we can use uri
         CompositionSourceModelHelper.updateMediaSessionAlbumArt(
-                currentSource,
-                metadataBuilder,
-                getMediaSession(),
-                state.settings.isCoversOnLockScreen
+            currentSource,
+            metadataBuilder,
+            getMediaSession(),
+            state.settings.isCoversOnLockScreen
         )
     }
 
     private fun subscribeOnPlayQueue() {
         mediaSessionDisposable.add(Observable.combineLatest(
-                libraryPlayerInteractor.playQueueObservable.toObservable(),
-                playerInteractor.currentSourceObservable,
-                ::toSessionQueueItems
+            libraryPlayerInteractor.getPlayQueueObservable().toObservable(),
+            playerInteractor.getCurrentSourceObservable()
+                .map { source -> source.value is LibraryCompositionSource }
+                .distinctUntilChanged(),
+            ::toSessionQueueItems
         ).retryWithDelay(10, 10, TimeUnit.SECONDS)
-            .subscribe(this::onPlayQueueReceived))
+            .subscribeOn(ioScheduler)
+            .subscribe(this::onPlayQueueReceived, errorParser::logError))
     }
 
     private fun onPlayQueueReceived(playQueue: List<MediaSessionCompat.QueueItem>) {
         mediaSession?.setQueue(playQueue)
     }
 
-    private fun toSessionQueueItems(playQueue: List<PlayQueueItem>,
-                                    currentSource: Optional<CompositionSource>
+    private fun toSessionQueueItems(
+        playQueue: List<PlayQueueItem>,
+        isLibrarySource: Boolean
     ): List<MediaSessionCompat.QueueItem> {
-        return when(currentSource.value) {
-            is LibraryCompositionSource -> playQueue.map(this::toSessionQueueItem)
-            else -> emptyList()
-        }
+        return if (isLibrarySource) playQueue.map(this::toSessionQueueItem) else emptyList()
     }
 
     private fun toSessionQueueItem(item: PlayQueueItem): MediaSessionCompat.QueueItem {
         val composition = item.composition
         val mediaDescription = MediaDescriptionCompat.Builder()
-                .setTitle(CompositionHelper.formatCompositionName(composition))
-                .setSubtitle(formatCompositionAdditionalInfoForMediaBrowser(context, composition))
-                .build()
+            .setTitle(CompositionHelper.formatCompositionName(composition))
+            .setSubtitle(formatCompositionAdditionalInfoForMediaBrowser(context, composition))
+            .build()
         return MediaSessionCompat.QueueItem(mediaDescription, item.id)
     }
 
-    private fun toMediaState(playerState: PlayerState): Int {
-        return when (playerState) {
+    private fun setMediaState(
+        playbackStateBuilder: PlaybackStateCompat.Builder,
+        playbackState: PlaybackState
+    ) {
+        val playerState = when (val playerState = playbackState.playerState) {
             PlayerState.IDLE -> PlaybackStateCompat.STATE_NONE
+            PlayerState.PREPARING,
             PlayerState.LOADING -> PlaybackStateCompat.STATE_CONNECTING
             PlayerState.PAUSE -> PlaybackStateCompat.STATE_PAUSED
             PlayerState.PLAY -> PlaybackStateCompat.STATE_PLAYING
             PlayerState.STOP -> PlaybackStateCompat.STATE_STOPPED
-            else -> throw IllegalStateException("unexpected player state: $playerState")
+            is PlayerState.Error -> {
+                val errorCode = when(playerState.throwable) {
+                    is UnsupportedSourceException -> PlaybackStateCompat.ERROR_CODE_NOT_SUPPORTED
+                    else -> PlaybackStateCompat.ERROR_CODE_APP_ERROR
+                }
+                val errorMessage = errorParser.parseError(playerState.throwable).message
+                playbackStateBuilder.setErrorMessage(errorCode, errorMessage)
+                PlaybackStateCompat.STATE_PAUSED
+            }
         }
+        playbackStateBuilder.setState(
+            playerState,
+            playbackState.trackPosition,
+            playbackState.playbackSpeed)
     }
 
     private class MetadataState {
@@ -317,8 +330,8 @@ class MediaSessionHandler(private val context: Context,
         lateinit var settings: MusicNotificationSetting
 
         fun set(
-                currentSource: Optional<CompositionSource>,
-                settings: MusicNotificationSetting
+            currentSource: Optional<CompositionSource>,
+            settings: MusicNotificationSetting
         ): MetadataState {
             this.currentSource = currentSource
             this.settings = settings
@@ -336,13 +349,13 @@ class MediaSessionHandler(private val context: Context,
         var randomMode: Boolean = false
 
         fun set(
-                playerState: PlayerState,
-                playQueueCurrentItem: PlayQueueEvent,
-                currentSource: Optional<CompositionSource>,
-                trackPosition: Long,
-                playbackSpeed: Float,
-                repeatMode: Int,
-                randomMode: Boolean
+            playerState: PlayerState,
+            playQueueCurrentItem: PlayQueueEvent,
+            currentSource: Optional<CompositionSource>,
+            trackPosition: Long,
+            playbackSpeed: Float,
+            repeatMode: Int,
+            randomMode: Boolean
         ): PlaybackState {
             this.playerState = playerState
             this.playQueueCurrentItem = playQueueCurrentItem
@@ -358,11 +371,11 @@ class MediaSessionHandler(private val context: Context,
     private inner class AppMediaSessionCallback : MediaSessionCompat.Callback() {
 
         override fun onPlay() {
-            SystemServiceControllerImpl.startPlayForegroundService(context)
+            AppAndroidUtils.playPause(context, playerInteractor)
         }
 
         override fun onPause() {
-            playerInteractor.pause()
+            AppAndroidUtils.playPause(context, playerInteractor)
         }
 
         override fun onStop() {
@@ -421,18 +434,18 @@ class MediaSessionHandler(private val context: Context,
                 PAUSE_ACTION_ID -> libraryPlayerInteractor.pause()
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     actionDisposable = musicServiceInteractor.shuffleAllAndPlay()
-                            .subscribe({}, this::processError)
+                        .subscribe({}, this::processError)
                 }
                 COMPOSITIONS_ACTION_ID -> {
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromCompositions(position)
-                            .subscribe({}, this::processError)
+                        .subscribe({}, this::processError)
                 }
                 SEARCH_ITEMS_ACTION_ID -> {
                     val position = extras.getInt(POSITION_ARG)
                     val searchQuery = extras.getString(SEARCH_QUERY_ARG)
                     actionDisposable = musicServiceInteractor.playFromSearch(searchQuery, position)
-                            .subscribe({}, this::processError)
+                        .subscribe({}, this::processError)
                 }
                 FOLDERS_ACTION_ID -> {
                     var folderId: Long? = extras.getLong(FOLDER_ID_ARG)
@@ -446,19 +459,19 @@ class MediaSessionHandler(private val context: Context,
                     val artistId = extras.getLong(ARTIST_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromArtistCompositions(artistId, position)
-                            .subscribe({}, this::processError)
+                        .subscribe({}, this::processError)
                 }
                 ALBUM_ITEMS_ACTION_ID -> {
                     val albumId = extras.getLong(ALBUM_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromAlbumCompositions(albumId, position)
-                            .subscribe({}, this::processError)
+                        .subscribe({}, this::processError)
                 }
                 PLAYLIST_ITEMS_ACTION_ID -> {
                     val playlistId = extras.getLong(PLAYLIST_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromPlaylistItems(playlistId, position)
-                            .subscribe({}, this::processError)
+                        .subscribe({}, this::processError)
                 }
             }
         }
@@ -479,7 +492,7 @@ class MediaSessionHandler(private val context: Context,
         override fun onPlayFromSearch(query: String, extras: Bundle) {
             val formattedQuery = query.ifEmpty { null }
             actionDisposable = musicServiceInteractor.playFromSearch(formattedQuery)
-                    .subscribe({}, this::processError)
+                .subscribe({}, this::processError)
         }
 
         //next - not implemented

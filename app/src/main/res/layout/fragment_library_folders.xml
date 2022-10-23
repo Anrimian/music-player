@@ -56,7 +56,7 @@
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/vg_file_menu"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                android:layout_height="56dp"
                 android:layout_marginBottom="@dimen/margin_normal"
                 android:layout_marginStart="@dimen/margin_normal"
                 android:tint="@android:color/white"
@@ -75,11 +75,31 @@
                     android:paddingStart="@dimen/content_internal_margin"
                     android:paddingEnd="@dimen/content_internal_margin">
 
-                    <ImageView
-                        android:id="@+id/iv_cut"
-                        style="@style/BrightButtonStyle"
-                        app:srcCompat="@drawable/ic_cut"
-                        android:contentDescription="@string/cut" />
+                    <LinearLayout
+                        android:id="@+id/btnCut"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/move"
+                        tools:ignore="UseCompoundDrawables">
+
+                        <ImageView
+                            style="@style/ImageButtonStyle"
+                            android:layout_gravity="center_horizontal"
+                            app:srcCompat="@drawable/ic_cut"
+                            android:contentDescription="@string/move" />
+
+                        <TextView
+                            style="@style/TextStyle.ButtonHint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/move"
+                            tools:text="fdfddddddddf"/>
+
+                    </LinearLayout>
 
                     <ImageView
                         android:id="@+id/iv_copy"
@@ -87,7 +107,8 @@
                         android:layout_marginStart="@dimen/content_internal_margin"
                         android:contentDescription="@string/copy"
                         android:visibility="gone"
-                        app:srcCompat="@drawable/ic_copy" />
+                        app:srcCompat="@drawable/ic_copy"
+                        tools:visibility="visible" />
 
                 </LinearLayout>
 
@@ -110,8 +131,6 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:divider="@drawable/divider"
-                    android:showDividers="middle"
                     android:layout_gravity="center"
                     android:orientation="horizontal"
                     android:paddingStart="@dimen/content_internal_margin"
@@ -121,21 +140,61 @@
                         android:id="@+id/iv_close"
                         style="@style/BrightButtonStyle"
                         app:srcCompat="@drawable/ic_close"
+                        android:layout_gravity="center"
                         android:contentDescription="@string/close" />
 
-                    <ImageView
-                        android:id="@+id/iv_paste"
-                        style="@style/BrightButtonStyle"
-                        android:layout_marginStart="@dimen/content_internal_margin"
-                        app:srcCompat="@drawable/ic_paste"
-                        android:contentDescription="@string/paste"/>
+                    <LinearLayout
+                        android:id="@+id/btnPaste"
+                        android:layout_width="60dp"
+                        android:layout_height="56dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/paste"
+                        tools:ignore="UseCompoundDrawables">
 
-                    <ImageView
-                        android:id="@+id/iv_paste_in_new_folder"
-                        style="@style/BrightButtonStyle"
-                        android:layout_marginStart="@dimen/content_internal_margin"
-                        app:srcCompat="@drawable/ic_folder_plus_outline"
-                        android:contentDescription="@string/paste_in_new_folder"/>
+                        <ImageView
+                            style="@style/ImageButtonStyle"
+                            android:layout_gravity="center_horizontal"
+                            app:srcCompat="@drawable/ic_paste"
+                            android:contentDescription="@string/paste" />
+
+                        <TextView
+                            style="@style/TextStyle.ButtonHint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/paste"
+                            tools:text="fdfddddddf"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnPasteInNewFolder"
+                        android:layout_width="60dp"
+                        android:layout_height="56dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:paddingEnd="10dp"
+                        android:contentDescription="@string/paste_in_new_folder"
+                        tools:ignore="RtlSymmetry,UseCompoundDrawables">
+
+                        <ImageView
+                            style="@style/ImageButtonStyle"
+                            android:layout_gravity="center_horizontal"
+                            app:srcCompat="@drawable/ic_folder_plus_outline"
+                            android:contentDescription="@string/paste" />
+
+                        <TextView
+                            style="@style/TextStyle.ButtonHint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/paste_in_new_folder"
+                            tools:text="fdgggggjjjggggjjggggggjjgggggdddf"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -144,7 +203,7 @@
             <com.github.anrimian.musicplayer.ui.utils.views.progress_state.ProgressStateView
                 android:id="@+id/progressStateView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

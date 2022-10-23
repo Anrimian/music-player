@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
+
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -16,9 +19,6 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 
 @RequiresApi(api = Build.VERSION_CODES.R)
 public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
@@ -140,7 +140,13 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
                 compositions,
                 Composition::getStorageId)
         );
-        return latestCompositionsToDelete;
+        // we are always expecting exception from deleteCompositions() here. But
+        // deleteCompositions() can be executed successfully on first attempt when we have created these files
+        // in this case clean token and compositions
+        var result = latestCompositionsToDelete;
+        latestCompositionsToDelete = null;
+        this.tokenForDelete = null;
+        return result;
     }
 
     @Override

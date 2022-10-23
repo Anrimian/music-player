@@ -47,10 +47,7 @@
     <string name="save_as_play_list">Save as playlist</string>
     <string name="cancel">Cancel</string>
     <string name="deleting">Deleting</string>
-    <string name="delete_composition_template">Delete song \"%1$s\"? This action cannot be undone.</string>
-    <string name="delete_empty_folder">Delete folder \"%s\"? This action cannot be undone.</string>
-    <string name="delete_folder_template">Delete %2$s from folder \"%1$s\"? This action cannot be undone.</string>
-    <string name="delete_template">Delete \"%1$s\"? This action cannot be undone.</string>
+
     <string name="delete_composition_success">Song \"%1$s\" deleted</string>
     <string name="search">Search</string>
     <string name="play_queue">Play queue</string>
@@ -116,7 +113,6 @@
     <string name="copied_message">Text copied</string>
     <string name="folder_name">Folder name</string>
     <string name="rename_folder">Rename folder</string>
-    <string name="cut">Cut</string>
     <string name="copy">Copy</string>
     <string name="paste">Paste</string>
     <string name="paste_in_new_folder">Paste in new folder</string>
@@ -180,7 +176,6 @@
     <string name="clear_play_queue">Clear play queue</string>
     <string name="no_excluded_folders">Folders excluded from scanning will be appear here</string>
     <string name="keep_playing_after_window_close">Keep playing after window closing</string>
-    <string name="unknown_play_error">Unknown play error</string>
     <string name="equalizer">Equalizer</string>
     <string name="system_equalizer">System equalizer</string>
     <string name="no_equalizer">None</string>
@@ -192,7 +187,6 @@
     <string name="pick_from_gallery">Pick from gallery</string>
     <string name="remove_cover">Remove cover</string>
     <string name="editor_timeout_error">Tag editor timed out. Perhaps file format is unsupported</string>
-    <string name="change_lyrics">Change lyrics</string>
     <string name="lyrics">Lyrics</string>
     <string name="check_tags_error">Failed to check composition tags: %s</string>
     <string name="changing_file_progress">Changing file…</string>
@@ -242,13 +236,29 @@
     <string name="sound_balance_state">Left: %1$d%%, Right: %2$d%%</string>
     <string name="language">Language</string>
     <string name="follow_system_language">Follow system language</string>
+    <string name="move">Move</string>
+    <string name="no_compositions_in_folder">Compositions in folder not found</string>
+    <string name="follow_system_theme">Follow system theme</string>
+    <string name="play_queue_is_empty">Play queue is empty</string>
+    <string name="no_lyrics_for_current_composition">No lyrics for current composition</string>
+    <string name="edit_lyrics">Edit lyrics</string>
+    <string name="show_in_folders">Show in folders</string>
+    <string name="file_source_not_found">Remote file not found</string>
+    <string name="file_is_too_large">File is too large</string>
+    <string name="preparing_files">Preparing files</string>
+    <string name="downloading">Downloading: %1$d/%2$d</string>
+    <string name="downloading_progress">Downloading(%d%%)</string>
+    <string name="rename_progress_count">Renaming(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? This action cannot be undone.</string>
+    <string name="delete_composition_template">Delete song \"%1$s\"</string>
+    <string name="delete_empty_folder">Delete folder \"%s\"</string>
+    <string name="delete_folder_template">%2$s from folder \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">From Android 11 copying/moving/renaming files are allowed only in folders: \"%s\".
+        Place audio files into these folders and operation should perform correctly.
+    </string>
+    <string name="folder_already_excluded_from_scanning">This folder is already excluded from scanning</string>
 
     <plurals name="compositions_count">
-        <item quantity="one">%1$s song</item>
-        <item quantity="other">%1$s songs</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
         <item quantity="one">%1$s song</item>
         <item quantity="other">%1$s songs</item>
     </plurals>
@@ -291,6 +301,11 @@
     <plurals name="seconds_template">
         <item quantity="one">%1$d second</item>
         <item quantity="other">%1$d seconds</item>
+    </plurals>
+
+    <plurals name="delete_compositions_template">
+        <item quantity="one">Delete %d song</item>
+        <item quantity="other">Delete %d songs</item>
     </plurals>
 
 </resources>

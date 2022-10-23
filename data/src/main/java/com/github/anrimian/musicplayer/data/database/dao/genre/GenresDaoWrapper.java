@@ -12,7 +12,6 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
-import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
@@ -22,10 +21,12 @@ import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class GenresDaoWrapper {
 
@@ -83,8 +84,8 @@ public class GenresDaoWrapper {
         return genreDao.getCompositionsInGenreObservable(sqlQuery);
     }
 
-    public List<CompositionId> getCompositionsInGenre(long genreId) {
-        return genreDao.getCompositionsInGenre(genreId);
+    public Single<List<Long>> getAllCompositionsByGenre(long genreId) {
+        return genreDao.getAllCompositionsByGenre(genreId);
     }
 
     public Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId) {
@@ -154,15 +155,22 @@ public class GenresDaoWrapper {
     }
 
     public void updateGenreName(String name, long genreId) {
-        genreDao.updateGenreName(name, genreId);
+        appDatabase.runInTransaction(() -> {
+            genreDao.updateGenreCompositionsModifyTime(genreId, new Date());
+
+            Long existsGenreId = genreDao.findGenre(name);
+            if (existsGenreId == null) {
+                genreDao.updateGenreName(name, genreId);
+                return;
+            }
+
+            genreDao.changeCompositionsGenre(genreId, existsGenreId);
+            genreDao.deleteEmptyGenre(genreId);
+        });
     }
 
     public void deleteGenre(long genreId) {
         genreDao.deleteGenre(genreId);
-    }
-
-    public boolean isGenreExists(String name) {
-        return genreDao.isGenreExists(name);
     }
 
     public boolean isGenreExists(long id) {

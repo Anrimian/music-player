@@ -21,7 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -63,14 +63,14 @@ public class ViewUtils {
         return bottomSheetDialog.getBehavior();
     }
 
-    public static void onCheckChanged(CheckBox checkBox, Callback<Boolean> listener) {
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> listener.call(isChecked));
+    public static void onCheckChanged(CompoundButton button, Callback<Boolean> listener) {
+        button.setOnCheckedChangeListener((buttonView, isChecked) -> listener.call(isChecked));
     }
 
-    public static void setChecked(CheckBox checkBox, boolean checked) {
-        if (checkBox.isChecked() != checked) {
-            checkBox.setChecked(checked);
-            checkBox.jumpDrawablesToCurrentState();
+    public static void setChecked(CompoundButton button, boolean checked) {
+        if (button.isChecked() != checked) {
+            button.setChecked(checked);
+            button.jumpDrawablesToCurrentState();
         }
     }
 

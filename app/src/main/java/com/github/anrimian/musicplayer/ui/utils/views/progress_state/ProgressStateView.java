@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.R;
@@ -62,12 +63,16 @@ public class ProgressStateView extends LinearLayout {
         handler.removeCallbacksAndMessages(null);
     }
 
-    public void showMessage(int messageId) {
+    public void showMessage(@StringRes int messageId) {
         showMessage(messageId, false);
     }
 
-    public void showMessage(int messageId, boolean showTryAgainButton) {
+    public void showMessage(@StringRes int messageId, boolean showTryAgainButton) {
         showMessage(messageId, NO_DRAWABLE, showTryAgainButton);
+    }
+
+    public void showMessage(@StringRes int messageId, @StringRes int buttonText) {
+        showMessage(getContext().getString(messageId), buttonText);
     }
 
     public void showMessage(int messageId, @DrawableRes int emptyImageRes, boolean showTryAgainButton) {
@@ -79,8 +84,21 @@ public class ProgressStateView extends LinearLayout {
         showMessage(message, NO_DRAWABLE, showTryAgainButton);
     }
 
+    public void showMessage(String message, @StringRes int buttonText) {
+        showMessage(message, getContext().getString(buttonText));
+    }
+
+    public void showMessage(String message, @Nullable String buttonText) {
+        showMessage(message, NO_DRAWABLE, buttonText);
+    }
+
     public void showMessage(String message, @DrawableRes int imageRes, boolean showTryAgainButton) {
-        getInitializedViews().showMessage(message, imageRes, showTryAgainButton);
+        String buttonText = showTryAgainButton? getContext().getString(R.string.try_again) : null;
+        showMessage(message, imageRes, buttonText);
+    }
+
+    public void showMessage(String message, @DrawableRes int imageRes, @Nullable String buttonText) {
+        getInitializedViews().showMessage(message, imageRes, buttonText);
         handler.removeCallbacksAndMessages(null);
     }
 
@@ -110,6 +128,7 @@ public class ProgressStateView extends LinearLayout {
             root.setGravity(Gravity.CENTER);
             int elementsMargin = resources.getDimensionPixelSize(R.dimen.margin_normal);
             root.setPadding(elementsMargin, elementsMargin, elementsMargin, elementsMargin);
+            root.setBackgroundResource(AndroidUtils.getResourceIdFromAttr(context, android.R.attr.colorBackground));
 
             progressBar = new ProgressBar(context);
             progressBar.setVisibility(INVISIBLE);
@@ -128,11 +147,11 @@ public class ProgressStateView extends LinearLayout {
             tvMessage.setLayoutParams(tvParams);
             tvMessage.setGravity(Gravity.CENTER_HORIZONTAL);
             tvMessage.setTextColor(AndroidUtils.getColorFromAttr(context, android.R.attr.textColorPrimary));
-            tvMessage.setTextSize(20f);
+            tvMessage.setTextSize(19f);
             root.addView(tvMessage);
 
             btnTryAgain = new TextView(context);
-            btnTryAgain.setBackgroundResource(R.drawable.bg_outline_button);
+            btnTryAgain.setBackgroundResource(R.drawable.bg_button_outline);
             btnTryAgain.setTextColor(ContextCompat.getColorStateList(context, R.color.color_accent_state));
             int buttonPadding = AndroidUtils.dpToPx(16, context);
             btnTryAgain.setPadding(buttonPadding, buttonPadding, buttonPadding, buttonPadding);
@@ -141,7 +160,6 @@ public class ProgressStateView extends LinearLayout {
             btnParams.topMargin = elementsMargin;
             btnTryAgain.setVisibility(INVISIBLE);
             btnTryAgain.setGravity(Gravity.CENTER_HORIZONTAL);
-            btnTryAgain.setText(R.string.try_again);
             btnTryAgain.setOnClickListener(v -> {
                 if (onTryAgainClick != null) {
                     onTryAgainClick.run();
@@ -160,7 +178,9 @@ public class ProgressStateView extends LinearLayout {
             root.setClickable(false);
         }
 
-        public void showMessage(String message, @DrawableRes int imageRes, boolean showTryAgainButton) {
+        public void showMessage(String message,
+                                @DrawableRes int imageRes,
+                                @Nullable String buttonText) {
             root.setVisibility(VISIBLE);
             root.setClickable(true);
             root.setContentDescription(message);
@@ -176,7 +196,8 @@ public class ProgressStateView extends LinearLayout {
             } else {
                 ivEmpty.setVisibility(GONE);
             }
-            if (showTryAgainButton) {
+            if (buttonText != null) {
+                btnTryAgain.setText(buttonText);
                 btnTryAgain.setVisibility(VISIBLE);
             } else {
                 btnTryAgain.setVisibility(GONE);

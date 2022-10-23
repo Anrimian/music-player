@@ -143,9 +143,9 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
             val preset = presets[i]
             menuBuilder.add(i, preset.presetName)
         }
-        viewBinding.tvPresets.setOnClickListener { v: View? ->
+        viewBinding.tvPresets.setOnClickListener { view ->
             PopupMenuWindow.showActionBarPopup(
-                viewBinding.tvPresets,
+                view,
                 menuBuilder.items,
                 { menu -> presenter.onPresetSelected(presets[menu.itemId]) },
                 Gravity.END

@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.create;
 
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setSoftInputVisible;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -25,8 +27,6 @@ import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
 import moxy.MvpAppCompatDialogFragment;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
-
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.setSoftInputVisible;
 
 public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
         implements CreatePlayListView {
@@ -55,7 +55,7 @@ public class CreatePlayListDialogFragment extends MvpAppCompatDialogFragment
         DialogCommonInputBinding viewBinding = DialogCommonInputBinding.inflate(
                 LayoutInflater.from(requireActivity())
         );
-        etPlayListName = viewBinding.etPlaylistName;
+        etPlayListName = viewBinding.etInput;
         tvError = viewBinding.tvError;
         tvProgress = viewBinding.tvProgress;
         progressBar = viewBinding.progressBar;

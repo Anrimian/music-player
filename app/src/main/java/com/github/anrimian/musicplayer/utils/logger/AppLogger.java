@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.utils.logger;
 
+import static com.github.anrimian.musicplayer.ui.common.AppAndroidUtils.createUri;
+
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -10,10 +12,10 @@ import android.widget.Toast;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
+import com.github.anrimian.musicplayer.ui.utils.AppInfo;
+import com.github.anrimian.musicplayer.ui.utils.AppInfoKt;
 
 import java.util.List;
-
-import static com.github.anrimian.musicplayer.ui.common.AppAndroidUtils.createUri;
 
 public class AppLogger {
 
@@ -52,7 +54,9 @@ public class AppLogger {
     public void startSendLogScreen(Activity activity) {
         Uri uri = createUri(activity, fileLog.getFile());
         Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Log info");
+        AppInfo appInfo = AppInfoKt.getAppInfo(activity);
+        String subject = "Log info(v: " + appInfo.getVersionName() + ", build: " + appInfo.getVersionCode() + ")";
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);//not working, grant manually, but leave
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{ activity.getString(R.string.log_email) });

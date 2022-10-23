@@ -124,6 +124,10 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.getCurrentFolderScreens();
     }
 
+    public Single<List<Long>> getParentFolders(Long compositionId) {
+        return foldersInteractor.getParentFolders(compositionId);
+    }
+
     public Completable renameFolder(long folderId, String newName) {
         return foldersInteractor.renameFolder(folderId, newName);
     }

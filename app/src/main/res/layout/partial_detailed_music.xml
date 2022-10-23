@@ -12,7 +12,7 @@
 
     <!--uses to catch unnecessary clicks-->
     <View
-        android:id="@+id/bottom_panel"
+        android:id="@+id/bottomPanel"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clickable="true"
@@ -24,7 +24,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <View
-        android:id="@+id/top_panel"
+        android:id="@+id/topPanel"
         android:layout_width="0dp"
         android:layout_height="0dp" />
 
@@ -40,40 +40,40 @@
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_skip_to_previous"
+        android:id="@+id/ivSkipToPrevious"
         style="@style/ButtonStyle.Main"
         android:layout_marginEnd="@dimen/content_spacing_margin"
         android:layout_marginStart="@dimen/content_spacing_margin"
         android:contentDescription="@string/previous_track"
-        app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
+        app:layout_constraintEnd_toStartOf="@+id/ivPlayPause"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@+id/btn_random_play"
-        app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
+        app:layout_constraintStart_toEndOf="@+id/btnRandomPlay"
+        app:layout_constraintTop_toTopOf="@+id/ivPlayPause"
         app:srcCompat="@drawable/ic_skip_previous" />
 
     <ImageView
-        android:id="@+id/iv_play_pause"
+        android:id="@+id/ivPlayPause"
         style="@style/ButtonStyle.Main"
-        app:layout_constraintBottom_toBottomOf="@id/btn_random_play"
-        app:layout_constraintTop_toTopOf="@id/btn_random_play"
-        app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
-        app:layout_constraintStart_toEndOf="@+id/iv_skip_to_previous"
+        app:layout_constraintBottom_toBottomOf="@id/btnRandomPlay"
+        app:layout_constraintTop_toTopOf="@id/btnRandomPlay"
+        app:layout_constraintEnd_toStartOf="@+id/ivSkipToNext"
+        app:layout_constraintStart_toEndOf="@+id/ivSkipToPrevious"
         app:srcCompat="@drawable/ic_pause"
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/iv_skip_to_next"
+        android:id="@+id/ivSkipToNext"
         style="@style/ButtonStyle.Main"
         android:layout_marginEnd="@dimen/content_spacing_margin"
         android:layout_marginStart="@dimen/content_spacing_margin"
         android:contentDescription="@string/next_track"
-        app:layout_constraintEnd_toStartOf="@+id/btn_infinite_play"
-        app:layout_constraintStart_toEndOf="@+id/iv_play_pause"
-        app:layout_constraintTop_toTopOf="@+id/iv_play_pause"
+        app:layout_constraintEnd_toStartOf="@+id/btnInfinitePlay"
+        app:layout_constraintStart_toEndOf="@+id/ivPlayPause"
+        app:layout_constraintTop_toTopOf="@+id/ivPlayPause"
         app:srcCompat="@drawable/ic_skip_next" />
 
     <TextView
-        android:id="@+id/tv_current_composition"
+        android:id="@+id/tvCurrentComposition"
         style="@style/TextStyle.Composition"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -82,24 +82,24 @@
         android:singleLine="true"
         android:layout_marginBottom="@dimen/content_spacing_margin"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintTop_toTopOf="@+id/music_icon_wrapper"
-        app:layout_constraintBottom_toTopOf="@+id/tv_current_composition_author"
-        app:layout_constraintEnd_toEndOf="@+id/tv_current_composition_author"
-        app:layout_constraintStart_toStartOf="@+id/tv_current_composition_author"
+        app:layout_constraintTop_toTopOf="@+id/musicIconWrapper"
+        app:layout_constraintBottom_toTopOf="@+id/tvCurrentCompositionAuthor"
+        app:layout_constraintEnd_toEndOf="@+id/tvCurrentCompositionAuthor"
+        app:layout_constraintStart_toStartOf="@+id/tvCurrentCompositionAuthor"
         tools:text="testtggpptesttggppptresttststststtsttesttggppptresttststststtstptresttststststtst" />
 
     <ImageView
-        android:id="@+id/btn_random_play"
+        android:id="@+id/btnRandomPlay"
         style="@style/ButtonStyle"
         android:contentDescription="@string/content_description_shuffle"
-        android:layout_marginBottom="@dimen/content_horizontal_margin"
+        android:layout_marginBottom="@dimen/content_vertical_margin"
         android:layout_marginStart="@dimen/content_vertical_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_shuffle"/>
 
     <ImageView
-        android:id="@+id/btn_infinite_play"
+        android:id="@+id/btnInfinitePlay"
         style="@style/ButtonStyle"
         android:contentDescription="@string/content_description_repeat_mode"
         android:layout_marginBottom="@dimen/content_vertical_margin"
@@ -109,29 +109,43 @@
         app:srcCompat="@drawable/ic_repeat" />
 
     <TextView
-        android:id="@+id/tv_played_time"
+        android:id="@+id/tvPlayedTime"
         style="@style/TextStyle.Time"
         android:gravity="center_vertical|start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_random_play"
-        app:layout_constraintStart_toStartOf="@+id/btn_random_play"
+        app:layout_constraintBottom_toTopOf="@+id/btnRandomPlay"
+        app:layout_constraintStart_toStartOf="@+id/btnRandomPlay"
         tools:text="00:11"/>
 
     <TextView
-        android:id="@+id/tv_total_time"
+        android:id="@+id/tvError"
+        style="@style/TextStyle.Error.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/content_spacing_margin"
+        android:layout_marginEnd="@dimen/content_spacing_margin"
+        android:layout_marginTop="-16dp"
+        app:layout_constraintTop_toBottomOf="@id/sbTrackState"
+        app:layout_constraintStart_toEndOf="@id/tvPlayedTime"
+        app:layout_constraintEnd_toStartOf="@id/tvTotalTime"
+        app:layout_constrainedWidth="true"
+        tools:text="Unsupported format" />
+
+    <TextView
+        android:id="@+id/tvTotalTime"
         style="@style/TextStyle.Time"
         android:gravity="center_vertical|end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_infinite_play"
-        app:layout_constraintEnd_toEndOf="@+id/btn_infinite_play"
+        app:layout_constraintBottom_toTopOf="@+id/btnInfinitePlay"
+        app:layout_constraintEnd_toEndOf="@+id/btnInfinitePlay"
         tools:text="00:11" />
 
     <SeekBar
-        android:id="@+id/sb_track_state"
+        android:id="@+id/sbTrackState"
         style="@style/SeekBarStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -141,7 +155,7 @@
         android:layout_marginRight="1.5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tv_played_time"/>
+        app:layout_constraintBottom_toTopOf="@id/tvPlayedTime"/>
 
     <TextView
         android:id="@+id/tvPlaybackSpeed"
@@ -149,9 +163,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
-        app:layout_constraintTop_toTopOf="@id/tv_total_time"
-        app:layout_constraintBottom_toBottomOf="@id/tv_total_time"
-        app:layout_constraintEnd_toStartOf="@id/tv_total_time"/>
+        app:layout_constraintTop_toTopOf="@id/tvTotalTime"
+        app:layout_constraintBottom_toBottomOf="@id/tvTotalTime"
+        app:layout_constraintEnd_toStartOf="@id/tvTotalTime"/>
 
     <TextView
         android:id="@+id/tvSleepTime"
@@ -159,22 +173,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/content_horizontal_margin"
-        app:layout_constraintTop_toTopOf="@id/tv_played_time"
-        app:layout_constraintBottom_toBottomOf="@id/tv_played_time"
-        app:layout_constraintStart_toEndOf="@id/tv_played_time"
+        app:layout_constraintTop_toTopOf="@id/tvPlayedTime"
+        app:layout_constraintBottom_toBottomOf="@id/tvPlayedTime"
+        app:layout_constraintStart_toEndOf="@id/tvPlayedTime"
         tools:text="00:11" />
 
     <FrameLayout
-        android:id="@+id/music_icon_wrapper"
+        android:id="@+id/musicIconWrapper"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="@dimen/content_vertical_margin"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/sb_track_state"
-        app:layout_constraintStart_toStartOf="@id/tv_played_time">
+        app:layout_constraintBottom_toTopOf="@id/sbTrackState"
+        app:layout_constraintStart_toStartOf="@id/tvPlayedTime">
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/iv_music_icon"
+            android:id="@+id/ivMusicIcon"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="@string/cover"
@@ -185,8 +199,17 @@
 
     </FrameLayout>
 
+    <com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressView
+        android:id="@+id/pvFileState"
+        android:layout_width="@dimen/file_sync_state_panel_icon_size"
+        android:layout_height="@dimen/file_sync_state_panel_icon_size"
+        android:layout_marginBottom="@dimen/file_sync_state_panel_icon_margin"
+        android:layout_marginEnd="@dimen/file_sync_state_panel_icon_margin"
+        app:layout_constraintBottom_toBottomOf="@id/musicIconWrapper"
+        app:layout_constraintEnd_toEndOf="@id/musicIconWrapper"/>
+
     <ImageView
-        android:id="@+id/btn_actions_menu"
+        android:id="@+id/btnActionsMenu"
         style="@style/ButtonStyle.Menu"
         android:contentDescription="@string/content_description_menu"
         android:layout_marginTop="4dp"
@@ -195,7 +218,7 @@
         app:srcCompat="@drawable/ic_dots_vertical" />
 
     <TextView
-        android:id="@+id/tv_current_composition_author"
+        android:id="@+id/tvCurrentCompositionAuthor"
         style="@style/TextStyle.Subtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -203,10 +226,10 @@
         android:ellipsize="end"
         android:layout_marginStart="@dimen/content_internal_margin"
         android:layout_marginEnd="@dimen/content_internal_margin"
-        app:layout_constraintTop_toBottomOf="@+id/tv_current_composition"
-        app:layout_constraintBottom_toBottomOf="@+id/music_icon_wrapper"
-        app:layout_constraintEnd_toStartOf="@+id/btn_actions_menu"
-        app:layout_constraintStart_toEndOf="@+id/music_icon_wrapper"
+        app:layout_constraintTop_toBottomOf="@+id/tvCurrentComposition"
+        app:layout_constraintBottom_toBottomOf="@+id/musicIconWrapper"
+        app:layout_constraintEnd_toStartOf="@+id/btnActionsMenu"
+        app:layout_constraintStart_toEndOf="@+id/musicIconWrapper"
         tools:text="ddddddddddddddddddddd"/>
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

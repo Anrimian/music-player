@@ -11,13 +11,14 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 @Dao
 public interface AlbumsDao {
@@ -31,12 +32,8 @@ public interface AlbumsDao {
     @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
     Observable<List<Composition>> getCompositionsInAlbumObservable(SimpleSQLiteQuery query);
 
-    @Query("SELECT " +
-            "id as id, " +
-            "storageId as storageId " +
-            "FROM compositions " +
-            "WHERE albumId = :albumId")
-    List<CompositionId> getCompositionsInAlbum(long albumId);
+    @Query("SELECT id FROM compositions WHERE albumId = :albumId")
+    Single<List<Long>> getCompositionIdsInAlbum(long albumId);
 
     @Query("SELECT id as id," +
             "name as name, " +
@@ -45,14 +42,6 @@ public interface AlbumsDao {
             "FROM albums " +
             "WHERE albums.artistId = :artistId")
     Observable<List<Album>> getAllAlbumsForArtistObservable(long artistId);
-
-    @Query("SELECT id as id," +
-            "name as name, " +
-            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
-            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
-            "FROM albums " +
-            "WHERE albums.artistId = :artistId")
-    List<Album> getAllAlbumsForArtist(long artistId);
 
     @Query("SELECT id as id," +
             "name as name, " +
@@ -69,6 +58,9 @@ public interface AlbumsDao {
             "FROM albums " +
             "WHERE id = :albumId LIMIT 1")
     Album getAlbum(long albumId);
+
+    @Query("SELECT name as name FROM albums WHERE id = :albumId LIMIT 1")
+    String getAlbumName(long albumId);
 
     @Query("SELECT id FROM albums " +
             "WHERE (artistId = :artistId OR (artistId IS NULL AND :artistId IS NULL)) " +
@@ -98,8 +90,15 @@ public interface AlbumsDao {
     @Query("SELECT artistId FROM albums WHERE id = :albumId")
     Long getArtistId(long albumId);
 
-    @Query("SELECT EXISTS(SELECT 1 FROM albums WHERE name = :name)")
-    boolean isAlbumExists(String name);
+    @Query("UPDATE compositions SET albumId = :newAlbumId WHERE id IN (" +
+            "SELECT id FROM compositions WHERE albumId = :oldAlbumId" +
+            ")")
+    void changeCompositionsAlbum(long oldAlbumId, long newAlbumId);
+
+    @Query("UPDATE compositions SET dateModified = :dateModified WHERE id IN (" +
+            "SELECT id FROM compositions WHERE albumId = :albumId" +
+            ")")
+    void updateAlbumCompositionsModifyTime(long albumId, Date dateModified);
 
     static String getCompositionsQuery(boolean useFileName) {
         return "SELECT " +

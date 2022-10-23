@@ -9,19 +9,20 @@ import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
-import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.AlbumAlreadyExistsException;
-import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.ArtistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.EditorTimeoutException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
-import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.GenreAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
+import com.github.anrimian.musicplayer.data.storage.exceptions.NotAllowedPathException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.models.composition.content.LocalSourceNotFoundException;
+import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException;
+import com.github.anrimian.musicplayer.domain.models.exceptions.FolderAlreadyIgnoredException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateException;
@@ -64,7 +65,7 @@ public class DefaultErrorParser extends ErrorParser {
         if (throwable instanceof PlayListAlreadyDeletedException) {
             return error(R.string.play_not_exists);
         }
-        if (throwable instanceof FileNotFoundException) {
+        if (throwable instanceof FileNotFoundException || throwable instanceof LocalSourceNotFoundException) {
             return error(R.string.file_not_found);
         }
         if (throwable instanceof MoveInTheSameFolderException) {
@@ -78,15 +79,6 @@ public class DefaultErrorParser extends ErrorParser {
         }
         if (throwable instanceof FileExistsException) {
             return error(R.string.file_already_exists);
-        }
-        if (throwable instanceof ArtistAlreadyExistsException) {
-            return error(R.string.artist_already_exists);
-        }
-        if (throwable instanceof AlbumAlreadyExistsException) {
-            return error(R.string.album_already_exists);
-        }
-        if (throwable instanceof GenreAlreadyExistsException) {
-            return error(R.string.genre_already_exists);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
                 && (throwable instanceof RecoverableSecurityException || throwable instanceof RecoverableSecurityExceptionExt)) {
@@ -110,6 +102,17 @@ public class DefaultErrorParser extends ErrorParser {
         }
         if (throwable instanceof UnavailableMediaStoreException) {
             return error(R.string.system_media_store_system_error);
+        }
+        if (throwable instanceof UnsupportedSourceException) {
+            return error(R.string.unsupported_format_hint);
+        }
+        if (throwable instanceof FolderAlreadyIgnoredException) {
+            return error(R.string.folder_already_excluded_from_scanning);
+        }
+        if (throwable instanceof NotAllowedPathException) {
+            return new ErrorCommand(
+                    getString(R.string.android_r_editor_restriction_error, throwable.getMessage())
+            );
         }
         if (throwable instanceof FileWriteNotAllowedException) {
             logException(throwable);

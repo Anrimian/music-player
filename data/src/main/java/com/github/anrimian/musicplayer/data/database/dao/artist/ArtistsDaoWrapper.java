@@ -4,21 +4,31 @@ import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.
 
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
-import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
+import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class ArtistsDaoWrapper {
 
+    private final AppDatabase appDatabase;
     private final ArtistsDao artistsDao;
+    private final AlbumsDao albumsDao;
 
-    public ArtistsDaoWrapper(ArtistsDao artistsDao) {
+    public ArtistsDaoWrapper(AppDatabase appDatabase, ArtistsDao artistsDao, AlbumsDao albumsDao) {
+        this.appDatabase = appDatabase;
         this.artistsDao = artistsDao;
+        this.albumsDao = albumsDao;
     }
 
     public Observable<List<Artist>> getAllObservable(Order order, String searchText) {
@@ -39,8 +49,8 @@ public class ArtistsDaoWrapper {
         return artistsDao.getCompositionsByArtistObservable(sqlQuery);
     }
 
-    public List<CompositionId> getCompositionsByArtist(long artistId) {
-        return artistsDao.getCompositionsByArtist(artistId);
+    public Single<List<Long>> getAllCompositionsByArtist(long artistId) {
+        return artistsDao.getAllCompositionsByArtist(artistId);
     }
 
     public Observable<Artist> getArtistObservable(long artistId) {
@@ -53,12 +63,51 @@ public class ArtistsDaoWrapper {
         return artistsDao.getAuthorNames();
     }
 
-    public void updateArtistName(String name, long id) {
-        artistsDao.updateArtistName(name, id);
+    public String getAuthorName(long artistId) {
+        return artistsDao.getAuthorName(artistId);
     }
 
-    public boolean isArtistExists(String name) {
-        return artistsDao.isArtistExists(name);
+    public void updateArtistName(String name, long id) {
+        appDatabase.runInTransaction(() -> {
+            artistsDao.updateArtistCompositionsModifyTime(id, new Date());
+
+            Long existArtistId = artistsDao.findArtistIdByName(name);
+            if (existArtistId == null) {
+                artistsDao.updateArtistName(name, id);
+                return;
+            }
+
+            artistsDao.changeCompositionsArtist(id, existArtistId);
+
+            List<Long> albums = artistsDao.getAllAlbumsWithArtist(id);
+            for (Long albumId: albums) {
+                String albumName = albumsDao.getAlbumName(albumId);
+                Long existAlbumId = albumsDao.findAlbum(existArtistId, albumName);
+                if (existAlbumId != null) {
+                    albumsDao.changeCompositionsAlbum(albumId, existAlbumId);
+                    albumsDao.deleteEmptyAlbum(albumId);
+                } else {
+                    albumsDao.setAuthorId(albumId, existArtistId);
+                }
+            }
+            artistsDao.deleteEmptyArtist(id);
+        });
+    }
+
+    @Nullable
+    public Long getOrInsertArtist(String artist, Map<String, Long> artistsCache) {
+        Long artistId = artistsCache.get(artist);
+        if (artistId != null) {
+            return artistId;
+        }
+        if (artist != null) {
+            artistId = artistsDao.findArtistIdByName(artist);
+            if (artistId == null) {
+                artistId = artistsDao.insertArtist(artist);
+            }
+            artistsCache.put(artist, artistId);
+        }
+        return artistId;
     }
 
     private String getOrderQuery(Order order) {

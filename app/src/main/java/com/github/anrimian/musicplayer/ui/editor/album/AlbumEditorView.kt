@@ -1,10 +1,12 @@
 package com.github.anrimian.musicplayer.ui.editor.album
 
+import com.github.anrimian.filesync.models.ProgressInfo
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
+import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 import moxy.viewstate.strategy.alias.Skip
 
@@ -36,5 +38,14 @@ interface AlbumEditorView : MvpView {
 
     @Skip
     fun showEnterNameDialog(album: Album)
+
+    @AddToEndSingle
+    fun showPreparedFilesCount(processed: Int, total: Int)
+
+    @AddToEndSingle
+    fun showDownloadingFileInfo(progressInfo: ProgressInfo)
+
+    @AddToEndSingle
+    fun showEditedFilesCount(processed: Int, total: Int)
 
 }

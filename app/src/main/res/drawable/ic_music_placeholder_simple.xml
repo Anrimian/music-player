@@ -2,5 +2,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <size android:height="48dp" android:width="48dp"/>
-    <solid android:color="@android:color/darker_gray"/>
+    <solid android:color="?attr/colorAccent"/>
 </shape>

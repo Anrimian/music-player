@@ -20,6 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings("WeakerAccess")
 public class FileLog {
 
@@ -60,9 +62,14 @@ public class FileLog {
         writeLog(sb.toString());
     }
 
-    public void writeException(Throwable throwable) {
+    public void writeException(Throwable throwable, @Nullable String message) {
         StringBuilder sb = new StringBuilder();
         sb.append("Non fatal error:\n");
+        if (message != null) {
+            sb.append("Message: ");
+            sb.append(message);
+            sb.append("\n");
+        }
         appendSystemInfo(sb);
         writeStackTrace(sb, throwable);
         writeLog(sb.toString());
@@ -101,8 +108,12 @@ public class FileLog {
         sb.append(Build.MODEL);
         sb.append("\n");
 
+        appendCurrentTime(sb);
+    }
+
+    private void appendCurrentTime(StringBuilder sb) {
         sb.append("Log time: ");
-        sb.append(new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()).format(new Date()));
+        sb.append(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.getDefault()).format(new Date()));
         sb.append("\n");
     }
 

@@ -113,6 +113,7 @@
             android:importantForAutofill="no"
             android:background="@android:color/transparent"
             android:textColorHint="?android:attr/textColorSecondaryInverse"
+            android:textCursorDrawable="@drawable/bg_toolbar_text_cursor"
             android:maxLines="1"
             tools:ignore="UnusedAttribute" />
 

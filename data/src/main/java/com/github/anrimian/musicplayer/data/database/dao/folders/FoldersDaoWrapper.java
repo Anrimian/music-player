@@ -10,9 +10,8 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
-import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
-import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.exceptions.FolderAlreadyIgnoredException;
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
@@ -24,6 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
@@ -75,10 +75,6 @@ public class FoldersDaoWrapper {
                 .map(list -> list.get(0));
     }
 
-    public List<StorageFolder> getAllFolders() {
-        return foldersDao.getAllFolders();
-    }
-
     public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources,
                                                                      boolean useFileName) {
         return Observable.fromIterable(fileSources)
@@ -112,14 +108,17 @@ public class FoldersDaoWrapper {
         return result;
     }
 
-    public IgnoredFolder insert(String path) {
+    public IgnoredFolder insertIgnoredFolder(String path) {
         Date addDate = new Date();
-        foldersDao.insert(new IgnoredFolderEntity(path, addDate));
+        insertIgnoredFolder(path, addDate);
         return new IgnoredFolder(path, addDate);
     }
 
-    public void insert(IgnoredFolder folder) {
-        foldersDao.insert(new IgnoredFolderEntity(folder.getRelativePath(), folder.getAddDate()));
+    public void insertIgnoredFolder(String relativePath, Date addDate) {
+        long id = foldersDao.insert(relativePath, addDate);
+        if (id == -1) {
+            throw new FolderAlreadyIgnoredException();
+        }
     }
 
     public void deleteFolder(Long folderId, List<Composition> childCompositions) {
@@ -148,10 +147,12 @@ public class FoldersDaoWrapper {
         return foldersDao.getAllChildFoldersId(parentId);
     }
 
-    public List<Long> getAllParentFoldersId(Long currentFolder) {
+    public List<Long> getAllParentFoldersId(@Nullable Long currentFolder) {
         List<Long> result = new LinkedList<>();
         result.add(null);//null folder is always first
-        result.addAll(foldersDao.getAllParentFoldersId(currentFolder));
+        if (currentFolder != null) {
+            result.addAll(foldersDao.getAllParentFoldersId(currentFolder));
+        }
         return result;
     }
 
@@ -175,6 +176,7 @@ public class FoldersDaoWrapper {
                     foldersDao.updateParentId(id, toFolderId);
                 }
             }
+            deleteEmptyFolders();
         });
     }
 
@@ -198,12 +200,62 @@ public class FoldersDaoWrapper {
         return foldersDao.isFolderWithNameExists(parentId, name);
     }
 
+    public void deleteEmptyFolders() {
+        int deletedRows;
+        do {
+            deletedRows = foldersDao.deleteFoldersWithoutContainment();
+        } while (deletedRows != 0);
+    }
+
+    @Nullable
+    public Long getOrCreateFolder(String filePath, Map<String, Long> folderCache) {
+        return getOrCreateFolder(filePath, filePath, null, folderCache);
+    }
+
+    @Nullable
+    private Long getOrCreateFolder(String fullPath,
+                                   String filePath,
+                                   @Nullable Long parentId,
+                                   Map<String, Long> folderCache) {
+        if (filePath.isEmpty()) {
+            return parentId;
+        }
+
+        Long cachedId = folderCache.get(fullPath);
+        if (cachedId != null) {
+            return cachedId;
+        }
+
+        Long folderId;
+        int delimiterIndex = filePath.indexOf('/');
+        if (delimiterIndex == -1) {
+            folderId = getFolderId(filePath, parentId);
+        } else {
+            String folderName = filePath.substring(0, delimiterIndex);
+            long parentFolderId = getFolderId(folderName, parentId);
+            String folderPath = filePath.substring(delimiterIndex + 1);
+            folderId = getOrCreateFolder(fullPath, folderPath, parentFolderId, folderCache);
+        }
+        folderCache.put(fullPath, folderId);
+        return folderId;
+    }
+
+    private long getFolderId(String folderName, @Nullable Long parentId) {
+        Long folderId = foldersDao.getFolderByName(parentId, folderName);
+        if (folderId != null) {
+            return folderId;
+        }
+        return foldersDao.insertFolder(new FolderEntity(parentId, folderName));
+    }
+
     private Observable<List<FolderFileSource>> getFoldersObservable(Long parentFolderId,
                                                                     Order order,
                                                                     @Nullable String searchText) {
         String query = FoldersDao.getRecursiveFolderQuery(parentFolderId) +
+                ", childCompositions(storageId, initialSource) AS (SELECT storageId, initialSource FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))" +
                 "SELECT id, name, " +
-                "(SELECT count() FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id)) as filesCount " +
+                "(SELECT count() FROM childCompositions) as filesCount, " +
+                "(SELECT exists(SELECT 1 FROM childCompositions WHERE storageId IS NOT NULL AND initialSource = 1 LIMIT 1)) as hasAnyStorageFile " +
                 "FROM folders " +
                 "WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)";
 

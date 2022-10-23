@@ -33,6 +33,10 @@ public class Composition {
     @Nullable
     private final CorruptionType corruptionType;
 
+    private final boolean isFileExists;
+
+    private final InitialSource initialSource;
+
     @SuppressWarnings("NullableProblems")//annotations break room annotations processing
     public Composition(String artist,
                        String title,
@@ -43,7 +47,9 @@ public class Composition {
                        Long storageId,
                        Date dateAdded,
                        Date dateModified,
-                       CorruptionType corruptionType) {
+                       CorruptionType corruptionType,
+                       boolean isFileExists,
+                       InitialSource initialSource) {
         this.artist = artist;
         this.title = title;
         this.album = album;
@@ -54,6 +60,8 @@ public class Composition {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.corruptionType = corruptionType;
+        this.isFileExists = isFileExists;
+        this.initialSource = initialSource;
     }
 
     @Nullable
@@ -101,6 +109,14 @@ public class Composition {
     @Nullable
     public CorruptionType getCorruptionType() {
         return corruptionType;
+    }
+
+    public boolean isFileExists() {
+        return isFileExists;
+    }
+
+    public InitialSource getInitialSource() {
+        return initialSource;
     }
 
     @Override

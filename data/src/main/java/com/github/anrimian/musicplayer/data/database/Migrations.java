@@ -1,17 +1,14 @@
 package com.github.anrimian.musicplayer.data.database;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
-import androidx.core.content.ContextCompat;
 import androidx.room.migration.Migration;
 import androidx.room.util.CursorUtil;
 import androidx.sqlite.db.SupportSQLiteDatabase;
@@ -22,6 +19,8 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.utils.Permissions;
+import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.util.HashMap;
@@ -30,6 +29,51 @@ import java.util.Map;
 
 @SuppressLint("RestrictedApi")
 class Migrations {
+
+    public static Migration getMigration8_9(Context context) {
+        return new Migration(8, 9) {
+            @Override
+            public void migrate(@NonNull SupportSQLiteDatabase database) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `lastScanDate` INTEGER NOT NULL, `corruptionType` TEXT, `audioFileType` INTEGER NOT NULL, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
+
+                database.execSQL(
+                        "INSERT INTO `compositions_temp` (" +
+                                "id, artistId, albumId, folderId, storageId, title, lyrics, fileName," +
+                                "duration, size, dateAdded, dateModified, lastScanDate, corruptionType," +
+                                "audioFileType, initialSource" +
+                                ") SELECT " +
+                                "id, artistId, albumId, folderId, storageId, title, lyrics, fileName," +
+                                "duration, size, dateAdded, dateModified, lastScanDate, corruptionType," +
+                                "1 AS audioFileType, 1 AS initialSource FROM compositions"
+                );
+
+                //set audioFileType
+                StorageAlbumsProvider albumsProvider = new StorageAlbumsProvider(context);
+                StorageMusicProvider provider = new StorageMusicProvider(context, albumsProvider);
+
+                LongSparseArray<StorageFullComposition> storageCompositions = null;
+                if (Permissions.hasFilePermission(context)) {
+                    try {
+                        storageCompositions = provider.getCompositions(0, true);
+                    } catch (Exception ignored) {}
+                }
+                if (storageCompositions == null) {
+                    storageCompositions = new LongSparseArray<>();
+                }
+                AndroidCollectionUtils.forEach(storageCompositions, item -> {
+                    database.execSQL("UPDATE `compositions_temp` SET audioFileType = "
+                            + item.getAudioFileType() + " WHERE storageId = " + item.getStorageId());
+                });
+
+                database.execSQL("DROP TABLE `compositions`");
+                database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
+
+                database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
+                database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
+                database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
+            }
+        };
+    }
 
     static Migration MIGRATION_7_8 = new Migration(7, 8) {
         @Override
@@ -139,7 +183,7 @@ class Migrations {
                 StorageAlbumsProvider storageAlbumsProvider = new StorageAlbumsProvider(context);
                 StorageMusicProvider provider = new StorageMusicProvider(context, storageAlbumsProvider);
                 LongSparseArray<StorageFullComposition> storageCompositions;
-                if (hasFilePermission(context)) {
+                if (Permissions.hasFilePermission(context)) {
                     storageCompositions = provider.getCompositions(0, false);
                     if (storageCompositions == null) {
                         storageCompositions = new LongSparseArray<>();
@@ -294,7 +338,7 @@ class Migrations {
                 for(int i = 0, size = map.size(); i < size; i++) {
                     StorageFullComposition composition = map.valueAt(i);
                     ContentValues cv = new ContentValues();
-                    cv.put("storageId", composition.getId());
+                    cv.put("storageId", composition.getStorageId());
                     cv.put("artist", composition.getArtist());
                     cv.put("title", composition.getTitle());
                     StorageAlbum storageAlbum = composition.getStorageAlbum();
@@ -306,7 +350,7 @@ class Migrations {
                     cv.put("size", composition.getSize());
                     cv.put("dateAdded", composition.getDateAdded().getTime());
                     cv.put("dateModified", composition.getDateModified().getTime());
-                    cv.put("corruptionType", enumConverter.toName(CompositionCorruptionDetector.getCorruptionType(composition)));
+                    cv.put("corruptionType", enumConverter.toName(CompositionCorruptionDetector.getCorruptionType(composition.getDuration())));
                     database.insert("compositions", SQLiteDatabase.CONFLICT_REPLACE, cv);
                 }
 
@@ -344,10 +388,5 @@ class Migrations {
                 database.execSQL("CREATE  INDEX `index_play_queue_audioId` ON `play_queue` (`audioId`)");
             }
         };
-    }
-
-    private static boolean hasFilePermission(Context context) {
-        return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED;
     }
 }

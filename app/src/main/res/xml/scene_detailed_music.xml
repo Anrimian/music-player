@@ -9,47 +9,47 @@
     <ConstraintSet android:id="@id/start">
 
         <Constraint
-            android:id="@+id/iv_skip_to_previous"
+            android:id="@+id/ivSkipToPrevious"
             style="@style/ButtonStyle.Main"
-            app:layout_constraintEnd_toStartOf="@+id/iv_play_pause"
-            app:layout_constraintTop_toTopOf="@+id/iv_play_pause" />
+            app:layout_constraintEnd_toStartOf="@+id/ivPlayPause"
+            app:layout_constraintTop_toTopOf="@+id/ivPlayPause" />
 
         <Constraint
-            android:id="@+id/iv_play_pause"
+            android:id="@+id/ivPlayPause"
             style="@style/ButtonStyle.Main"
-            app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_next"
-            app:layout_constraintTop_toTopOf="@+id/iv_skip_to_next"/>
+            app:layout_constraintEnd_toStartOf="@+id/ivSkipToNext"
+            app:layout_constraintTop_toTopOf="@+id/ivSkipToNext"/>
 
         <Constraint
-            android:id="@+id/iv_skip_to_next"
+            android:id="@+id/ivSkipToNext"
             style="@style/ButtonStyle.Main"
             android:layout_marginEnd="@dimen/content_spacing_margin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/tv_current_composition"/>
+            app:layout_constraintBottom_toBottomOf="@id/tvCurrentComposition"/>
 
         <Constraint
-            android:id="@+id/tv_current_composition"
+            android:id="@+id/tvCurrentComposition"
             style="@style/TextStyle.Medium"
             android:layout_width="0dp"
             android:layout_height="@dimen/bottom_sheet_height"
             android:layout_marginEnd="@dimen/content_internal_margin"
             android:layout_marginStart="@dimen/content_horizontal_margin"
-            app:layout_constraintEnd_toStartOf="@+id/iv_skip_to_previous"
+            app:layout_constraintEnd_toStartOf="@+id/ivSkipToPrevious"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
-            android:id="@+id/music_icon_wrapper"
+            android:id="@+id/musicIconWrapper"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/content_spacing_margin"
-            app:layout_constraintTop_toTopOf="@id/tv_current_composition"
+            app:layout_constraintTop_toTopOf="@id/tvCurrentComposition"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/tv_current_composition" />
+            app:layout_constraintBottom_toBottomOf="@id/tvCurrentComposition" />
 
         <Constraint
-            android:id="@id/btn_actions_menu"
+            android:id="@id/btnActionsMenu"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="4dp"
@@ -58,32 +58,32 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
-            android:id="@+id/tv_current_composition_author"
+            android:id="@+id/tvCurrentCompositionAuthor"
             style="@style/TextStyle.Subtitle"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@+id/tv_current_composition"
-            app:layout_constraintStart_toStartOf="@+id/tv_current_composition"/>
+            app:layout_constraintTop_toBottomOf="@+id/tvCurrentComposition"
+            app:layout_constraintStart_toStartOf="@+id/tvCurrentComposition"/>
 
         <Constraint
-            android:id="@+id/top_panel"
+            android:id="@+id/topPanel"
             android:layout_width="0dp"
             android:layout_height="@dimen/bottom_sheet_height"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/iv_skip_to_previous" />
+            app:layout_constraintEnd_toStartOf="@id/ivSkipToPrevious" />
         <Constraint
-            app:layout_constraintEnd_toEndOf="@id/btn_infinite_play"
+            app:layout_constraintEnd_toEndOf="@id/btnInfinitePlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/sb_track_state" />
+            app:layout_constraintBottom_toTopOf="@id/sbTrackState" />
         <Constraint
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            app:layout_constraintBottom_toTopOf="@+id/btn_random_play"
-            app:layout_constraintStart_toStartOf="@+id/btn_random_play"
-            android:id="@+id/tv_played_time"
+            app:layout_constraintBottom_toTopOf="@+id/btnRandomPlay"
+            app:layout_constraintStart_toStartOf="@+id/btnRandomPlay"
+            android:id="@+id/tvPlayedTime"
             app:layout_constraintHorizontal_bias="1.0" />
 
     </ConstraintSet>

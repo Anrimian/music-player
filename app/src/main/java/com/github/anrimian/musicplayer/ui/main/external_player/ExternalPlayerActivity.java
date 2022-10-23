@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.main.external_player;
 
 import static android.view.View.VISIBLE;
+import static com.github.anrimian.musicplayer.Constants.Arguments.LAUNCH_PREPARE_ARG;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatMilliseconds;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
@@ -17,24 +18,25 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.data.models.composition.source.UriCompositionSource;
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding;
 import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.player.PlayerState;
-import com.github.anrimian.musicplayer.domain.models.player.error.ErrorType;
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils;
 import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils;
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -86,7 +88,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         viewBinding.ivRewind.setOnClickListener(v -> presenter.onFastSeekBackwardCalled());
         setOnHoldListener(viewBinding.ivRewind, presenter::onFastSeekBackwardCalled);
 
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null && getIntent().getBooleanExtra(LAUNCH_PREPARE_ARG, true)) {
             Uri uriToPlay = getIntent().getData();
             createCompositionSource(uriToPlay);
         }
@@ -114,7 +116,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     }
 
     @Override
-    public void displayComposition(UriCompositionSource source) {
+    public void displayComposition(ExternalCompositionSource source) {
         viewBinding.tvComposition.setText(formatCompositionName(source.getTitle(), source.getDisplayName()));
         viewBinding.tvCompositionAuthor.setText(FormatUtils.formatAuthor(source.getArtist(), this));
         seekBarViewWrapper.setMax(source.getDuration());
@@ -125,8 +127,8 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     }
 
     @Override
-    public void showPlayerState(PlayerState state) {
-        if (state == PlayerState.PLAY) {
+    public void showPlayerState(boolean isPlaying) {
+        if (isPlaying) {
             AndroidUtils.setAnimatedVectorDrawable(viewBinding.ivPlayPause, R.drawable.anim_play_to_pause);
             viewBinding.ivPlayPause.setContentDescription(getString(R.string.pause));
         } else {
@@ -152,8 +154,13 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
     }
 
     @Override
-    public void showPlayErrorEvent(@Nullable ErrorType errorType) {
-        viewBinding.tvError.setText(getErrorEventText(errorType));
+    public void showPlayErrorState(@Nullable ErrorCommand errorCommand) {
+        if (errorCommand == null) {
+            viewBinding.tvError.setVisibility(View.GONE);
+            return;
+        }
+        viewBinding.tvError.setVisibility(VISIBLE);
+        viewBinding.tvError.setText(errorCommand.getMessage());
     }
 
     @Override
@@ -176,20 +183,13 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
         viewBinding.tvPlaybackSpeed.setVisibility(visible? VISIBLE: View.GONE);
     }
 
-    @Nullable
-    private String getErrorEventText(@Nullable ErrorType errorType) {
-        if (errorType == null) {
-            return null;
+    private void createCompositionSource(@Nullable Uri uri) {
+        if (uri == null) {
+            Toast.makeText(this, "Not enough data to play composition", Toast.LENGTH_LONG).show();
+            finish();
+            return;
         }
-        switch (errorType) {
-            case UNSUPPORTED: return getString(R.string.unsupported_format_hint);
-            case NOT_FOUND: return getString(R.string.file_not_found);
-            default: return getString(R.string.unknown_play_error);
-        }
-    }
-
-    private void createCompositionSource(Uri uri) {
-        UriCompositionSource.Builder builder = new UriCompositionSource.Builder(uri);
+        ExternalCompositionSource.Builder builder = new ExternalCompositionSource.Builder(uri);
         sourceCreationDisposable = Single.fromCallable(() -> builder)
                 .map(this::readDataFromContentResolver)
                 .timeout(2, TimeUnit.SECONDS)
@@ -203,7 +203,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
                 );
     }
 
-    private UriCompositionSource.Builder readDataFromContentResolver(UriCompositionSource.Builder builder) {
+    private ExternalCompositionSource.Builder readDataFromContentResolver(ExternalCompositionSource.Builder builder) {
         String displayName = null;
         long size = 0;
 
@@ -227,7 +227,7 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
                 .setSize(size);
     }
 
-    private UriCompositionSource.Builder readDataFromFile(UriCompositionSource.Builder builder) {
+    private ExternalCompositionSource.Builder readDataFromFile(ExternalCompositionSource.Builder builder) {
         String title = null;
         String artist = null;
         String album = null;
@@ -252,7 +252,9 @@ public class ExternalPlayerActivity extends MvpAppCompatActivity implements Exte
 
         } finally {
             if (mmr != null) {
-                mmr.release();
+                try {
+                    mmr.release();
+                } catch (IOException ignored) {}
             }
         }
 

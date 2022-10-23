@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="180dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="?attr/colorPrimary"
-    android:alpha="0.7">
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    tools:background="@color/colorPrimary">
 
     <FrameLayout
-        android:id="@+id/flShortSyncState"
+        android:id="@+id/flDrawerHeaderContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fitsSystemWindows="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/tvFileScannerState"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,6 +25,7 @@
         android:layout_marginEnd="@dimen/drawer_content_margin"
         android:layout_marginBottom="@dimen/drawer_content_margin"
         android:lines="2"
+        android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

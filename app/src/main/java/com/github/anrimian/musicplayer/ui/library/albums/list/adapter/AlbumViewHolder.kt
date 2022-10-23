@@ -25,6 +25,10 @@ class AlbumViewHolder(
         viewBinding.btnActionsMenu.setOnClickListener { v -> onItemMenuClickListener(v, album) }
     }
 
+    override fun release() {
+        Components.getAppComponent().imageLoader().clearImage(viewBinding.ivMusicIcon)
+    }
+
     fun bind(album: Album) {
         this.album = album
         showAlbumName()
@@ -50,10 +54,6 @@ class AlbumViewHolder(
                 showAdditionalInfo()
             }
         }
-    }
-
-    fun release() {
-        Components.getAppComponent().imageLoader().clearImage(viewBinding.ivMusicIcon)
     }
 
     private fun showAlbumName() {

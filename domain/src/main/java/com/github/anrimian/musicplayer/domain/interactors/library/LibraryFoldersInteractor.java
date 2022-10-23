@@ -149,6 +149,10 @@ public class LibraryFoldersInteractor {
         return libraryRepository.getAllParentFolders(currentFolder);
     }
 
+    public Single<List<Long>> getParentFolders(Long compositionId) {
+        return libraryRepository.getAllParentFoldersForComposition(compositionId);
+    }
+
     public Completable renameFolder(long folderId, String newName) {
         return editorRepository.changeFolderName(folderId, newName);
     }

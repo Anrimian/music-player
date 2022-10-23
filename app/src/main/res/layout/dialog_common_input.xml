@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <EditText
-        android:id="@+id/et_playlist_name"
+        android:id="@+id/etInput"
         style="@style/EditTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -24,15 +24,15 @@
         tools:targetApi="o" />
 
     <TextView
-        android:id="@+id/tv_error"
+        android:id="@+id/tvError"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         style="@style/TextStyle.Error"
         android:layout_marginLeft="@dimen/content_spacing_margin"
         android:layout_marginRight="@dimen/content_spacing_margin"
-        app:layout_constraintTop_toBottomOf="@id/et_playlist_name"
-        app:layout_constraintStart_toStartOf="@id/et_playlist_name"
-        app:layout_constraintEnd_toEndOf="@id/et_playlist_name"
+        app:layout_constraintTop_toBottomOf="@id/etInput"
+        app:layout_constraintStart_toStartOf="@id/etInput"
+        app:layout_constraintEnd_toEndOf="@id/etInput"
         tools:text="test error"/>
 
     <TextView
@@ -41,18 +41,22 @@
         android:layout_height="wrap_content"
         android:text="@string/create_progress"
         style="@style/TextStyle.Progress"
-        android:layout_marginStart="@dimen/content_spacing_margin"
+        android:layout_marginStart="4dp"
         app:layout_constraintTop_toTopOf="@+id/progress_bar"
         app:layout_constraintBottom_toBottomOf="@+id/progress_bar"
-        app:layout_constraintStart_toStartOf="@id/et_playlist_name"/>
+        app:layout_constraintStart_toEndOf="@id/progress_bar"/>
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        style="@style/CircularProgressIndicatorStyle"
         android:id="@+id/progress_bar"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="@dimen/content_spacing_margin"
-        app:layout_constraintStart_toEndOf="@id/tv_progress"
+        android:layout_marginStart="4dp"
+        android:indeterminate="true"
+        app:indicatorSize="16dp"
+        app:trackThickness="2dp"
+        app:layout_constraintStart_toStartOf="@id/etInput"
         app:layout_constraintLeft_toRightOf="@id/tv_progress"
-        app:layout_constraintTop_toBottomOf="@+id/et_playlist_name" />
+        app:layout_constraintTop_toBottomOf="@+id/etInput" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.database.dao.folders;
 
+import androidx.annotation.Nullable;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -10,10 +11,10 @@ import androidx.sqlite.db.SupportSQLiteQuery;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
-import com.github.anrimian.musicplayer.data.database.entities.folder.StorageFolder;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -23,6 +24,10 @@ public interface FoldersDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(IgnoredFolderEntity entity);
+
+    @Query("INSERT OR IGNORE INTO ignored_folders (relativePath, addDate) " +
+            "VALUES (:relativePath, :addDate)")
+    long insert(String relativePath, Date addDate);
 
     @Query("SELECT relativePath FROM ignored_folders")
     String[] getIgnoredFolders();
@@ -40,14 +45,12 @@ public interface FoldersDao {
     List<Long> getFoldersIds(SupportSQLiteQuery query);
 
     @Query("SELECT id, name, " +
-            "0 as filesCount " +//we don't use it for now
+            "0 as filesCount, " +//we don't use it for now
+            "1 as hasAnyStorageFile " +//we don't use it for now
             "FROM folders " +
             "WHERE id = :folderId OR (id IS NULL AND :folderId IS NULL) " +
             "LIMIT 1")
     Observable<List<FolderFileSource>> getFolderObservable(Long folderId);
-
-    @Query("SELECT * FROM folders")
-    List<StorageFolder> getAllFolders();
 
     @Insert
     long insertFolder(FolderEntity entity);
@@ -122,8 +125,22 @@ public interface FoldersDao {
             "LIMIT 1)")
     boolean isFolderWithNameExists(Long parentId, String name);
 
+    @Nullable
+    @Query("SELECT id " +
+            "FROM folders " +
+            "WHERE (parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)) " +
+            "AND name = :name " +
+            "LIMIT 1")
+    Long getFolderByName(Long parentId, String name);
+
     @Query("SELECT exists(SELECT 1 FROM folders WHERE id = :id LIMIT 1)")
     boolean isFolderExists(long id);
+
+    @Query("WITH parentIds AS (SELECT parentId FROM folders)" +
+            "DELETE FROM folders " +
+            "WHERE (SELECT count() FROM parentIds WHERE parentIds.parentId = folders.id) = 0 " +
+            "AND (SELECT count() FROM compositions WHERE folderId = folders.id) = 0")
+    int deleteFoldersWithoutContainment();
 
     static String getRecursiveFolderQuery(Long parentFolderId) {
         return "WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +

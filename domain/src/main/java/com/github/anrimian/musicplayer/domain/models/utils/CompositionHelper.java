@@ -6,12 +6,14 @@ import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DATE_ADDED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
+import static com.github.anrimian.musicplayer.domain.Payloads.FILE_EXISTS;
 import static com.github.anrimian.musicplayer.domain.Payloads.SIZE;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.LinkedList;
@@ -29,7 +31,8 @@ public class CompositionHelper {
                 && first.getDuration() == second.getDuration()
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
-                && first.getCorruptionType() == second.getCorruptionType();
+                && first.getCorruptionType() == second.getCorruptionType()
+                && first.isFileExists() == second.isFileExists();
     }
 
     public static boolean hasSourceChanges(@Nonnull Composition first, @Nonnull Composition second) {
@@ -62,6 +65,9 @@ public class CompositionHelper {
         if (first.getCorruptionType() != second.getCorruptionType()) {
             payloads.add(CORRUPTED);
         }
+        if (first.isFileExists() != second.isFileExists()) {
+            payloads.add(FILE_EXISTS);
+        }
         return payloads;
     }
 
@@ -74,5 +80,9 @@ public class CompositionHelper {
             return formatFileName(fileName);
         }
         return title;
+    }
+
+    public static boolean isCompositionFileRemote(Composition composition) {
+        return !composition.isFileExists() && composition.getInitialSource() == InitialSource.REMOTE;
     }
 }

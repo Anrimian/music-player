@@ -48,13 +48,6 @@
     <string name="save_as_play_list">Захаваць як плэйліст</string>
     <string name="cancel">Адмена</string>
     <string name="deleting">Выдаленне</string>
-    <string name="delete_composition_template">
-        Выдаліць кампазіцыю \"%1$s\"?
-        Гэтае дзеянне нельга будзе адмяніць.
-    </string>
-    <string name="delete_folder_template">Выдаліць %2$s з тэчкі \"%1$s\"? Гэтае дзеянне нельга будзе адмяніць.</string>
-    <string name="delete_empty_folder">Выдаліць тэчку \"%s\"? Гэтае дзеянне нельга будзе адмяніць.</string>
-    <string name="delete_template">Выдаліць %1$s? Гэтае дзеянне нельга будзе адмяніць.</string>
     <string name="delete_composition_success">Кампазіцыя \"%1$s\" выдалена</string>
     <string name="search">Пошук</string>
     <string name="play_queue">Чарга прайгравання</string>
@@ -113,7 +106,6 @@
     <string name="copied_message">Тэкст скапіяваны</string>
     <string name="folder_name">Імя тэчкі</string>
     <string name="rename_folder">Перайменаваць тэчку</string>
-    <string name="cut">Выразаць</string>
     <string name="copy">Капіяваць</string>
     <string name="paste">Уставіць</string>
     <string name="paste_in_new_folder">Уставіць у новую тэчку</string>
@@ -177,7 +169,6 @@
     <string name="clear_play_queue">Ачысціць чаргу прайгравання</string>
     <string name="no_excluded_folders">Тэчкі, выключаныя з медыя сканара, будуць з\'яўляцца тут</string>
     <string name="keep_playing_after_window_close">Працягваць прайграванне пасьле зачынення акна</string>
-    <string name="unknown_play_error">Невядомая памылка прайгравання</string>
     <string name="equalizer">Эквалайзер</string>
     <string name="system_equalizer">Сістэмны эквалайзер</string>
     <string name="no_equalizer">Не выкарыстоўваць</string>
@@ -189,7 +180,6 @@
     <string name="pick_from_gallery">Выбраць з галерэі</string>
     <string name="remove_cover">Прыбраць вокладку</string>
     <string name="editor_timeout_error">Час чакання рэдактара тэгаў скончыўся. Магчыма, фармат файла не падтрымліваецца</string>
-    <string name="change_lyrics">Змяніць тэкст кампазіцыі</string>
     <string name="lyrics">Тэкст кампазіцыі</string>
     <string name="check_tags_error">Немагчыма праверыць тэгі кампазіцыі: %s</string>
     <string name="changing_file_progress">Змена файла…</string>
@@ -240,15 +230,30 @@
     <string name="language">Мова</string>
     <string name="follow_system_language">Выкарыстоўваць мову сістэмы</string>
 
+    <string name="move">Перамясціць</string>
+    <string name="no_compositions_in_folder">Кампазіцыі ў тэчцы не знойдзены</string>
+    <string name="follow_system_theme">Ужываць сістэмную тэму</string>
+    <string name="play_queue_is_empty">Чарга прайгравання пустая</string>
+    <string name="no_lyrics_for_current_composition">Няма тэксту ў бягучай кампазіцыі</string>
+    <string name="edit_lyrics">Рэдагаваць тэкст кампазіцыі</string>
+    <string name="show_in_folders">Паказаць у тэчках</string>
+    <string name="file_source_not_found">Выдалены файл не знойдзены</string>
+    <string name="file_is_too_large">Файл занадта вялікі</string>
+    <string name="preparing_files">Падрыхтоўка файлаў</string>
+    <string name="downloading">Загрузка: %1$d/%2$d</string>
+    <string name="downloading_progress">Загрузка(%d%%)</string>
+    <string name="rename_progress_count">Перайменаванне(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Гэтае дзеянне нельга будзе адмяніць.</string>
+    <string name="delete_composition_template">Выдаліць кампазіцыю \"%1$s\"</string>
+    <string name="delete_empty_folder">Выдаліць тэчку \"%s\"</string>
+    <string name="delete_folder_template">%2$s з тэчкі \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">Пачынаючы з Android 11 капіяванне/перасоўванне/перайменаванне файлаў дазволенае толькі ў тэчках: \"%s\".
+        Перамесціце аўдыё файлы ў гэтыя тэчкі і дзеянне павінна будзе працаваць карэктна.
+    </string>
+    <string name="folder_already_excluded_from_scanning">Гэтая тэчка ўжо выключана з сканавання</string>
+
     <plurals name="compositions_count">
         <item quantity="one">%1$s кампазіцыя</item>
-        <item quantity="few">%1$s кампазіцыі</item>
-        <item quantity="many">%1$s кампазіцый</item>
-        <item quantity="other">%1$s кампазіцый</item>
-    </plurals>
-
-    <plurals name="compositions_count_dativ">
-        <item quantity="one">%1$s кампазіцыю</item>
         <item quantity="few">%1$s кампазіцыі</item>
         <item quantity="many">%1$s кампазіцый</item>
         <item quantity="other">%1$s кампазіцый</item>
@@ -308,6 +313,13 @@
         <item quantity="few">%1$d секунды</item>
         <item quantity="many">%1$d секунд</item>
         <item quantity="other">%1$d секунд</item>
+    </plurals>
+
+    <plurals name="delete_compositions_template">
+        <item quantity="one">Выдаліць %d кампазіцыю</item>
+        <item quantity="few">Выдаліць %1$s кампазіцыі</item>
+        <item quantity="many">Выдаліць %1$s кампазіцый</item>
+        <item quantity="other">Выдаліць %d кампазіцый</item>
     </plurals>
 
 </resources>

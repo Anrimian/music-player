@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.editor.composition
 
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -29,6 +30,9 @@ interface CompositionEditorView : MvpView {
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = CHANGE_FILE_STATE)
     fun hideChangeFileProgress()
+
+    @AddToEndSingle
+    fun showSyncState(fileSyncState: FileSyncState, composition: FullComposition)
 
     @AddToEndSingle
     fun showCompositionCover(composition: FullComposition)

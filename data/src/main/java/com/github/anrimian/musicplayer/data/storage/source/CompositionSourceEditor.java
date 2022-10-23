@@ -1,17 +1,18 @@
 package com.github.anrimian.musicplayer.data.storage.source;
 
-import static com.github.anrimian.musicplayer.domain.utils.FileUtils.getFileName;
-
+import android.net.Uri;
 import android.os.Build;
 
-import com.github.anrimian.musicplayer.data.models.composition.CompositionId;
+import com.github.anrimian.musicplayer.data.models.composition.file.StorageCompositionSource;
 import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
-import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.domain.utils.functions.ThrowsCallback;
 
 import org.jaudiotagger.audio.AudioFile;
@@ -19,7 +20,6 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
 import org.jaudiotagger.tag.images.AndroidArtwork;
 import org.jaudiotagger.tag.images.Artwork;
@@ -32,12 +32,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class CompositionSourceEditor {
 
@@ -46,183 +45,135 @@ public class CompositionSourceEditor {
 
     private final StorageMusicProvider storageMusicProvider;
     private final FileSourceProvider fileSourceProvider;
+    private final ContentSourceHelper contentSourceHelper;
 
     public CompositionSourceEditor(StorageMusicProvider storageMusicProvider,
-                                   FileSourceProvider fileSourceProvider) {
+                                   FileSourceProvider fileSourceProvider,
+                                   ContentSourceHelper contentSourceHelper) {
         this.storageMusicProvider = storageMusicProvider;
         this.fileSourceProvider = fileSourceProvider;
+        this.contentSourceHelper = contentSourceHelper;
     }
 
-    public Completable setCompositionTitle(FullComposition composition, String title) {
-        return getPath(composition)
-                .flatMapCompletable(path -> setCompositionTitle(path, composition.getStorageId(), title));
+    public Completable setCompositionTitle(CompositionContentSource source, String title) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.TITLE, title));
     }
 
-    public Completable setCompositionAuthor(FullComposition composition, String author) {
-        return getPath(composition)
-                .flatMapCompletable(path -> setCompositionAuthor(path, composition.getStorageId(), author));
+    public Completable setCompositionAuthor(CompositionContentSource source, String author) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.ARTIST, author));
     }
 
-    public Completable setCompositionAuthor(CompositionId composition, String author) {
-        return getPath(composition)
-                .flatMapCompletable(path -> setCompositionAuthor(path, composition.getStorageId(), author));
-    }
-
-    public Completable setCompositionAlbum(FullComposition composition, String author) {
-        return getPath(composition)
-                .flatMapCompletable(path -> setCompositionAlbum(path, composition.getStorageId(), author));
-    }
-
-    public Completable setCompositionAlbum(CompositionId composition, String author) {
-        return getPath(composition)
-                .flatMapCompletable(path -> setCompositionAlbum(path, composition.getStorageId(), author));
-    }
-
-    public Single<List<CompositionId>> setCompositionsAlbum(List<CompositionId> compositions, String album) {
-        return Observable.fromIterable(compositions)
-                .flatMapCompletable(composition -> setCompositionAlbum(composition, album))
-                .onErrorResumeNext(throwable -> storageMusicProvider.processStorageError(throwable, compositions))
-                .toSingleDefault(compositions);
-    }
-
-    public Completable setCompositionAlbumArtist(FullComposition composition, String artist) {
-        return getPath(composition)
-                .flatMapCompletable(path -> setCompositionAlbumArtist(path, composition.getStorageId(), artist));
-    }
-
-    public Single<List<CompositionId>> setCompositionsAlbumArtist(List<CompositionId> compositions, String artist) {
-        return Observable.fromIterable(compositions)
-                .flatMapCompletable(composition -> setCompositionAlbumArtist(composition, artist))
-                .onErrorResumeNext(throwable -> storageMusicProvider.processStorageError(throwable, compositions))
-                .toSingleDefault(compositions);
-    }
-
-    public Completable setCompositionAlbumArtist(CompositionId composition, String artist) {
-        return getPath(composition)
-                .flatMapCompletable(path -> setCompositionAlbumArtist(path, composition.getStorageId(), artist));
-    }
-
-    public Completable setCompositionLyrics(FullComposition composition, String text) {
-        return getPath(composition)
-                .flatMapCompletable(path -> setCompositionLyrics(path, composition.getStorageId(), text));
-    }
-
-    public Completable changeCompositionGenre(FullComposition composition,
-                                              String oldGenre,
-                                              String newGenre) {
-        return getPath(composition)
-                .flatMapCompletable(path -> changeCompositionGenre(path, composition.getStorageId(), oldGenre, newGenre));
-    }
-
-    public Completable changeCompositionGenre(CompositionId composition,
-                                              String oldGenre,
-                                              String newGenre) {
-        return getPath(composition)
-                .flatMapCompletable(path -> changeCompositionGenre(path, composition.getStorageId(), oldGenre, newGenre));
-    }
-
-    public Completable addCompositionGenre(FullComposition composition,
-                                           String newGenre) {
-        return getPath(composition)
-                .flatMapCompletable(path -> addCompositionGenre(path, composition.getStorageId(), newGenre));
-    }
-
-    public Completable removeCompositionGenre(FullComposition composition, String genre) {
-        return getPath(composition)
-                .flatMapCompletable(path -> removeCompositionGenre(path, composition.getStorageId(), genre));
-    }
-
-    public Single<String[]> getCompositionGenres(FullComposition composition) {
-        return getPath(composition)
-                .flatMap(this::getCompositionGenres);
-    }
-
-    public Single<Long> changeCompositionAlbumArt(FullComposition composition,
-                                                  ImageSource imageSource) {
-        return getPath(composition)
-                .flatMap(path -> changeCompositionAlbumArt(path, composition.getStorageId(), imageSource));
-    }
-
-    public Single<Long> removeCompositionAlbumArt(FullComposition composition) {
-        return getPath(composition)
-                .flatMap(path -> removeCompositionAlbumArt(path, composition.getStorageId()));
-    }
-
-    public Single<CompositionSourceTags> getFullTags(FullComposition composition) {
-        return getPath(composition)
-                .flatMap(this::getFullTags);
-    }
-
-    public Maybe<byte[]> getCompositionArtworkBinaryData(long storageId) {
-        return getPath(storageId)
-                .flatMapMaybe(this::getArtworkBinaryData);
-    }
-
-    //genre not found case
-    Completable changeCompositionGenre(String filePath,
-                                       Long storageId,
-                                       String oldGenre,
-                                       String newGenre) {
-        return Completable.fromAction(() -> {
-            String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
-            genres = genres.replace(oldGenre, newGenre);
-            editFile(filePath, storageId, FieldKey.GENRE, genres);
-        });
-    }
-
-    Completable setCompositionAlbumArtist(String filePath,
-                                          Long storageId,
-                                          String artist) {
-        return Completable.fromAction(() -> editFile(filePath, storageId, FieldKey.ALBUM_ARTIST, artist));
-    }
-
-    Completable setCompositionAlbum(String filePath,
-                                    Long storageId,
-                                    String author) {
-        return Completable.fromAction(() -> editFile(filePath, storageId, FieldKey.ALBUM, author));
-    }
-
-
-    Completable setCompositionTitle(String filePath,
-                                    Long storageId,
-                                    String title) {
-        return Completable.fromAction(() -> editFile(filePath, storageId, FieldKey.TITLE, title));
-    }
-
-    Completable setCompositionLyrics(String filePath,
-                                     Long storageId,
-                                     String text) {
-        return Completable.fromAction(() -> editFile(filePath, storageId, FieldKey.LYRICS, text));
-    }
-
-    Completable addCompositionGenre(String filePath,
-                                    Long storageId,
-                                    String newGenre) {
-        return Completable.fromAction(() -> {
-            AudioFile file = AudioFileIO.read(new File(filePath));
-            Tag tag = file.getTag();
-            if (tag == null) {
-                tag = new ID3v24Tag();
-                file.setTag(tag);
+    public Completable renameCompositionAuthor(CompositionContentSource source,
+                                               String oldName,
+                                               String author) {
+        return Completable.fromAction(() -> editAudioFileTag(source, tag -> {
+            if (TextUtils.isEmpty(oldName)) {
+                throw new IllegalStateException("renaming empty name is not allowed");
             }
-            tag.addField(FieldKey.GENRE, newGenre);
-            AudioFileIO.write(file);
-//            String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
-//            StringBuilder sb = new StringBuilder(genres);
-//            if (sb.length() != 0) {
-//                sb.append(GENRE_DIVIDER);
-//            }
-//            sb.append(newGenre);
-//            sb.append(GENRE_DIVIDER);
-//            editFile(filePath, FieldKey.GENRE, sb.toString());
-        });
+            String currentArtist = tag.getFirst(FieldKey.ARTIST);
+            if (oldName.equals(currentArtist)) {
+                tag.setField(FieldKey.ARTIST, author);
+            }
+            String currentAlbumArtist = tag.getFirst(FieldKey.ALBUM_ARTIST);
+            if (oldName.equals(currentAlbumArtist)) {
+                tag.setField(FieldKey.ALBUM_ARTIST, author);
+            }
+        }));
     }
 
-    Completable removeCompositionGenre(String filePath,
-                                       Long storageId,
-                                       String genre) {
-        return Completable.fromAction(() -> {
-            String genres = getFileTag(filePath).getFirst(FieldKey.GENRE);
+    public Completable renameCompositionsAuthor(List<CompositionContentSource> sources,
+                                                String oldName,
+                                                String author,
+                                                BehaviorSubject<Long> editingSubject) {
+        return Observable.fromIterable(sources)
+                .concatMapCompletable(source -> renameCompositionAuthor(source, oldName, author)
+                        .doOnSubscribe(d -> editingSubject.onNext(0L))
+                )
+                .onErrorResumeNext(throwable ->
+                        storageMusicProvider.processStorageException(
+                                throwable,
+                                ListUtils.mapList(sources, contentSourceHelper::createUri)
+                        )
+                );
+    }
+
+    public Completable setCompositionAlbum(CompositionContentSource source, String album) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.ALBUM, album));
+    }
+
+    public Completable setCompositionsAlbum(List<CompositionContentSource> sources,
+                                            String album,
+                                            BehaviorSubject<Long> editingSubject) {
+        return Observable.fromIterable(sources)
+                .concatMapCompletable(source -> setCompositionAlbum(source, album)
+                        .doOnSubscribe(d -> editingSubject.onNext(0L))
+                )
+                .onErrorResumeNext(throwable ->
+                        storageMusicProvider.processStorageException(
+                                throwable,
+                                ListUtils.mapList(sources, contentSourceHelper::createUri)
+                        )
+                );
+    }
+
+    public Completable setCompositionAlbumArtist(CompositionContentSource source, String artist) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.ALBUM_ARTIST, artist));
+    }
+
+    public Completable setCompositionsAlbumArtist(List<CompositionContentSource> sources,
+                                                  String artist,
+                                                  BehaviorSubject<Long> editingSubject) {
+        return Observable.fromIterable(sources)
+                .flatMapCompletable(source -> setCompositionAlbumArtist(source, artist)
+                        .doOnSubscribe(d -> editingSubject.onNext(0L))
+                )
+                .onErrorResumeNext(throwable ->
+                        storageMusicProvider.processStorageException(
+                                throwable,
+                                ListUtils.mapList(sources, contentSourceHelper::createUri)
+                        )
+                );
+    }
+
+    public Completable setCompositionsGenre(List<CompositionContentSource> sources,
+                                            String oldName,
+                                            String genre,
+                                            BehaviorSubject<Long> editingSubject) {
+        return Observable.fromIterable(sources)
+                .flatMapCompletable(source -> changeCompositionGenre(source, oldName, genre)
+                        .doOnSubscribe(d -> editingSubject.onNext(0L))
+                )
+                .onErrorResumeNext(throwable ->
+                        storageMusicProvider.processStorageException(
+                                throwable,
+                                ListUtils.mapList(sources, contentSourceHelper::createUri)
+                        )
+                );
+    }
+
+    public Completable setCompositionLyrics(CompositionContentSource source, String text) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.LYRICS, text));
+    }
+
+    public Completable changeCompositionGenre(CompositionContentSource source,
+                                              String oldGenre,
+                                              String newGenre) {
+        return Completable.fromAction(() -> editAudioFileTag(source, tag -> {
+            String genres = tag.getFirst(FieldKey.GENRE);
+            genres = genres.replace(oldGenre, newGenre);
+            tag.setField(FieldKey.GENRE, genres);
+        }));
+    }
+
+    public Completable addCompositionGenre(CompositionContentSource source, String newGenre) {
+        return Completable.fromAction(() ->
+                editAudioFileTag(source, tag -> tag.addField(FieldKey.GENRE, newGenre))
+        );
+    }
+
+    public Completable removeCompositionGenre(CompositionContentSource source, String genre) {
+        return Completable.fromAction(() -> editAudioFileTag(source, tag -> {
+            String genres = tag.getFirst(FieldKey.GENRE);
             int startIndex = genres.indexOf(genre);
             if (startIndex == -1) {
                 return;
@@ -242,106 +193,13 @@ public class CompositionSourceEditor {
 
             sb.delete(startIndex, endIndex);
 
-            editFile(filePath, storageId, FieldKey.GENRE, sb.toString());
-        });
+            tag.setField(FieldKey.GENRE, sb.toString());
+        }));
     }
 
-    Maybe<String> getCompositionTitle(String filePath) {
-        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.TITLE));
-    }
-
-    Maybe<String> getCompositionAuthor(String filePath) {
-        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.ARTIST));
-    }
-
-    Maybe<String> getCompositionAlbum(String filePath) {
-        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.ALBUM));
-    }
-
-    Maybe<String> getCompositionAlbumArtist(String filePath) {
-        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.ALBUM_ARTIST));
-    }
-
-    Maybe<String> getCompositionGenre(String filePath) {
-        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.GENRE));
-    }
-
-    Maybe<String> getCompositionLyrics(String filePath) {
-        return Maybe.fromCallable(() -> getFileTag(filePath).getFirst(FieldKey.LYRICS));
-    }
-
-    private Completable setCompositionAuthor(String filePath, Long storageId, String author) {
-        return Completable.fromAction(() -> editFile(filePath, storageId, FieldKey.ARTIST, author));
-    }
-
-    private Single<String[]> getCompositionGenres(String filePath) {
-        return Single.fromCallable(() -> {
-            String genres =  getFileTag(filePath).getFirst(FieldKey.GENRE);
-            if (genres == null) {
-                return new String[0];
-            }
-            return genres.split(String.valueOf(GENRE_DIVIDER));
-        });
-    }
-
-    private Single<CompositionSourceTags> getFullTags(String filePath) {
-        return Single.fromCallable(() -> {
-            try {
-                Tag tag = getFileTag(filePath);
-                return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
-                        tag.getFirst(FieldKey.ARTIST),
-                        tag.getFirst(FieldKey.ALBUM),
-                        tag.getFirst(FieldKey.ALBUM_ARTIST),
-                        tag.getFirst(FieldKey.LYRICS));
-            } catch (Exception e) {
-                throw new TagReaderException("Unable to read: " + filePath, e);
-            }
-        });
-    }
-
-    private Maybe<byte[]> getArtworkBinaryData(String filePath) {
-        return Maybe.fromCallable(() -> {
-            Tag tag = getFileTag(filePath);
-            if (tag == null) {
-                return null;
-            }
-            Artwork artwork = tag.getFirstArtwork();
-            if (artwork == null) {
-                return null;
-            }
-            return artwork.getBinaryData();
-        });
-    }
-
-    private Single<String> getPath(CompositionId composition) {
-        return getPath(composition.getStorageId());
-    }
-
-    private Single<String> getPath(FullComposition composition) {
-        return getPath(composition.getStorageId());
-    }
-
-    private Single<String> getPath(@Nullable Long storageId) {
-        return Single.fromCallable(() -> {
-            if (storageId == null) {
-                throw new RuntimeException("composition not found");
-            }
-            String path = storageMusicProvider.getCompositionFilePath(storageId);
-            if (path == null) {
-                throw new RuntimeException("composition path not found in system media store");
-            }
-            return path;
-        });
-    }
-
-    private Tag getFileTag(String filePath) throws Exception {
-        AudioFile file = readFile(new File(filePath));
-        return file.getTagOrCreateDefault();
-    }
-
-    private Single<Long> changeCompositionAlbumArt(String filePath, Long id, ImageSource imageSource) {
-        return Single.fromCallable(() -> editAudioFileTag(filePath,
-                id,
+    public Single<Long> changeCompositionAlbumArt(CompositionContentSource source,
+                                                  ImageSource imageSource) {
+        return Single.fromCallable(() -> editAudioFileTag(source,
                 tag -> {
                     try (InputStream stream = fileSourceProvider.getImageStream(imageSource)) {
                         if (stream == null) {
@@ -358,28 +216,89 @@ public class CompositionSourceEditor {
         ));
     }
 
-    private Single<Long> removeCompositionAlbumArt(String filePath, Long id) {
-        return Single.fromCallable(() -> editAudioFileTag(filePath, id, Tag::deleteArtworkField));
+    public Single<Long> removeCompositionAlbumArt(CompositionContentSource source) {
+        return Single.fromCallable(() -> editAudioFileTag(source, Tag::deleteArtworkField));
     }
 
-    private void editFile(String filePath,
-                          long id,
+    public Single<CompositionSourceTags> getFullTags(CompositionContentSource source) {
+        return Single.fromCallable(() -> {
+            try {
+                Tag tag = getFileTag(source);
+                return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
+                        tag.getFirst(FieldKey.ARTIST),
+                        tag.getFirst(FieldKey.ALBUM),
+                        tag.getFirst(FieldKey.ALBUM_ARTIST),
+                        tag.getFirst(FieldKey.LYRICS));
+            } catch (Exception e) {
+                throw new TagReaderException("Unable to read: " + source, e);
+            }
+        });
+    }
+
+    public Maybe<byte[]> getCompositionArtworkBinaryData(CompositionContentSource source) {
+        return Maybe.fromCallable(() -> {
+            Tag tag = getFileTag(source);
+            if (tag == null) {
+                return null;
+            }
+            Artwork artwork = tag.getFirstArtwork();
+            if (artwork == null) {
+                return null;
+            }
+            return artwork.getBinaryData();
+        });
+    }
+
+    String getCompositionTitle(CompositionContentSource source) {
+        return getFileTag(source).getFirst(FieldKey.TITLE);
+    }
+
+    String getCompositionAuthor(CompositionContentSource source) {
+        return getFileTag(source).getFirst(FieldKey.ARTIST);
+    }
+
+    String getCompositionAlbum(CompositionContentSource source) {
+        return getFileTag(source).getFirst(FieldKey.ALBUM);
+    }
+
+    String getCompositionAlbumArtist(CompositionContentSource source) {
+        return getFileTag(source).getFirst(FieldKey.ALBUM_ARTIST);
+    }
+
+    String getCompositionGenre(CompositionContentSource source) {
+        return getFileTag(source).getFirst(FieldKey.GENRE);
+    }
+
+    String getCompositionLyrics(CompositionContentSource source) {
+        return getFileTag(source).getFirst(FieldKey.LYRICS);
+    }
+
+    private Tag getFileTag(CompositionContentSource source) {
+        try {
+            return readFile(contentSourceHelper.getAsFile(source)).getTagOrCreateDefault();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void editFile(CompositionContentSource source,
                           FieldKey genericKey,
                           String value) throws Exception {
-        editAudioFileTag(filePath,
-                id,
-                tag -> tag.setField(genericKey, value == null? "" : value)
-        );
+        editAudioFileTag(source, tag -> tag.setField(genericKey, value == null? "" : value));
     }
 
-    private long editAudioFileTag(String filePath, Long id, ThrowsCallback<Tag> callback)
-            throws Exception {
-        File fileToEdit = new File(filePath);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R || !fileToEdit.canWrite()) {//will see how it works
-            return fileSourceProvider.useTempFile(getFileName(filePath), tempFile -> {
+
+    private long editAudioFileTag(CompositionContentSource source,
+                                  ThrowsCallback<Tag> callback) throws Exception {
+        File fileToEdit = contentSourceHelper.getAsFile(source);
+        if (source instanceof StorageCompositionSource
+                && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R || !fileToEdit.canWrite())
+        ) {
+            StorageCompositionSource storageSource = (StorageCompositionSource) source;
+            return fileSourceProvider.useTempFile(fileToEdit.getName(), tempFile -> {
                 copyFileUsingStream(fileToEdit, tempFile);
                 runFileAction(tempFile, callback);
-                copyFileToMediaStore(tempFile, id);
+                copyFileToMediaStore(tempFile, storageSource.getUri());
             });
         } else {
             runFileAction(fileToEdit, callback);
@@ -402,9 +321,9 @@ public class CompositionSourceEditor {
         }
     }
 
-    private void copyFileToMediaStore(File source, Long id) throws IOException {
+    private void copyFileToMediaStore(File source, Uri uri) throws IOException {
         try (InputStream is = new FileInputStream(source);
-             OutputStream os = storageMusicProvider.openCompositionOutputStream(id)
+             OutputStream os = storageMusicProvider.openCompositionOutputStream(uri)
         ) {
             byte[] buffer = new byte[1024];
             int length;
