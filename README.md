@@ -7,7 +7,7 @@ Another music player project for android, in accordance with author's vision of 
 <img src="https://user-images.githubusercontent.com/8379914/197509105-11eaddc3-c855-4c36-9aa2-f4f9f19f907e.png" width="20%"> <img src="https://user-images.githubusercontent.com/8379914/197509266-8b416532-307a-4f25-9aeb-5d22815e291a.png" width="20%"> <img src="https://user-images.githubusercontent.com/8379914/197509271-89fd426f-5ecd-44a2-a752-c0735802a8c5.png" width="20%">
 
 ## Translations
-All translations are provided only by users. If you find an error in app texts or want to offer translation to your language, you can email me about it.\
+All translations are provided only by users. If you find an error in app texts or want to offer translation to your language, you can write on this email about it.\
 smusicplayer.feedback@gmail.com
 
 ## Credits
