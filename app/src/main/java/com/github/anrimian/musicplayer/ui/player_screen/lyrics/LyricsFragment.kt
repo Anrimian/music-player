@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLyricsBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
@@ -108,14 +109,14 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
     }
 
     override fun showEnterLyricsDialog(lyrics: String) {
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.edit_lyrics,
             R.string.change,
             R.string.cancel,
             R.string.lyrics,
-            lyrics
-        ).completeOnEnterButton(false)
-            .build()
+            lyrics,
+            completeOnEnterButton = false
+        )
         lyricsDialogFragmentRunner.show(fragment)
     }
 

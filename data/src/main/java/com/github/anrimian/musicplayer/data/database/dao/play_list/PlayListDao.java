@@ -50,14 +50,19 @@ public interface PlayListDao {
     @Query("UPDATE play_lists SET dateModified = :modifyTime WHERE storageId = :storageId")
     void updatePlayListModifyTimeByStorageId(long storageId, Date modifyTime);
 
-    //can we cache duplicates?
-    @Query("SELECT " +
+    @Query("WITH entries(playlistId, duration) AS ( " +
+            "   SELECT " +
+            "   playlistId AS playlistId, " +
+            "   (SELECT duration FROM compositions WHERE compositions.id = play_lists_entries.audioId) AS duration " +
+            "   FROM play_lists_entries" +
+            ")" +
+            "SELECT " +
             "play_lists.id as id, " +
             "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
-            "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount, " +
-            "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM play_lists_entries WHERE playListId = play_lists.id)) as totalDuration " +
+            "(SELECT count() FROM entries WHERE playListId = play_lists.id) as compositionsCount, " +
+            "(SELECT sum(duration) FROM entries WHERE playlistId = play_lists.id) as totalDuration " +
             "FROM play_lists " +
             "ORDER BY dateModified DESC")
     Observable<List<PlayList>> getPlayListsObservable();
@@ -81,13 +86,19 @@ public interface PlayListDao {
             "FROM play_lists WHERE play_lists.storageId IS NOT NULL")
     List<IdPair> getPlayListsIds();
 
-    @Query("SELECT " +
+    @Query("WITH entries(playlistId, duration) AS ( " +
+            "   SELECT " +
+            "   playlistId AS playlistId, " +
+            "   (SELECT duration FROM compositions WHERE compositions.id = play_lists_entries.audioId) AS duration " +
+            "   FROM play_lists_entries" +
+            ")" +
+            "SELECT " +
             "play_lists.id as id, " +
             "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
-            "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount, " +
-            "(SELECT sum(duration) FROM compositions WHERE compositions.id IN (SELECT audioId FROM play_lists_entries WHERE playListId = play_lists.id)) as totalDuration " +
+            "(SELECT count() FROM entries WHERE playListId = play_lists.id) as compositionsCount, " +
+            "(SELECT sum(duration) FROM entries WHERE playlistId = play_lists.id) as totalDuration " +
             "FROM play_lists " +
             "WHERE play_lists.id = :id ")
     Observable<List<PlayList>> getPlayListObservable(long id);

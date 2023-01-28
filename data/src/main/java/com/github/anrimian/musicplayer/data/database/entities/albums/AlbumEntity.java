@@ -30,17 +30,9 @@ public class AlbumEntity {
 
     private String name;
 
-    private int firstYear;
-    private int lastYear;
-
-    public AlbumEntity(@Nullable Long artistId,
-                       String name,
-                       int firstYear,
-                       int lastYear) {
+    public AlbumEntity(@Nullable Long artistId, String name) {
         this.artistId = artistId;
         this.name = name;
-        this.firstYear = firstYear;
-        this.lastYear = lastYear;
     }
 
     public long getId() {
@@ -66,21 +58,5 @@ public class AlbumEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getFirstYear() {
-        return firstYear;
-    }
-
-    public void setFirstYear(int firstYear) {
-        this.firstYear = firstYear;
-    }
-
-    public int getLastYear() {
-        return lastYear;
-    }
-
-    public void setLastYear(int lastYear) {
-        this.lastYear = lastYear;
     }
 }

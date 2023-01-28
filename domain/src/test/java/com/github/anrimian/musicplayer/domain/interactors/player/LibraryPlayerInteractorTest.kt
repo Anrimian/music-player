@@ -120,7 +120,7 @@ class LibraryPlayerInteractorTest {
     @Test
     fun `on finished event received with last item in queue with repeat mode`() {
         whenever(playQueueRepository.skipToNext()).thenReturn(Single.just(0))
-        whenever(settingsRepository.repeatMode).thenReturn(RepeatMode.REPEAT_PLAY_LIST)
+        whenever(settingsRepository.repeatMode).thenReturn(RepeatMode.REPEAT_PLAY_QUEUE)
 
         playerEventSubject.onNext(PlayerEvent.FinishedEvent(testLibrarySource))
         verify(playQueueRepository).skipToNext()

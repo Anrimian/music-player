@@ -50,17 +50,17 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
         super.onViewCreated(view, savedInstanceState)
 
         layoutManager = LinearLayoutManager(context)
-        viewBinding.recyclerView.layoutManager = layoutManager
+        viewBinding.rvPlayLists.layoutManager = layoutManager
 
-        RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView)
+        RecyclerViewUtils.attachFastScroller(viewBinding.rvPlayLists)
 
         adapter = PlayListsAdapter(
-            viewBinding.recyclerView,
+            viewBinding.rvPlayLists,
             this::goToPlayListScreen,
             this::onPlaylistMenuClicked
         )
 
-        viewBinding.recyclerView.adapter = adapter
+        viewBinding.rvPlayLists.adapter = adapter
         viewBinding.fab.setOnClickListener { onCreatePlayListButtonClicked() }
     }
 

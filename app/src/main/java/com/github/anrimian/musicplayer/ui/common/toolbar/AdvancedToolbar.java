@@ -311,10 +311,27 @@ public class AdvancedToolbar extends FrameLayout {
     }
 
     public void setupSearch(Callback<String> textChangeListener, String text) {
-        this.textChangeListener = textChangeListener;
-        this.textConfirmListener = textChangeListener;
+        setupSearch(textChangeListener);
         etSearch.setText(text);
         setSearchModeEnabled(!isEmpty(text));
+    }
+
+    public void setupSearch(Callback<String> textChangeListener) {
+        this.textChangeListener = textChangeListener;
+        this.textConfirmListener = textChangeListener;
+    }
+
+    public void setSearchLocked(boolean locked) {
+        etSearch.setEnabled(!locked);
+    }
+
+    public boolean isSearchLocked() {
+        return !etSearch.isEnabled();
+    }
+
+    @Nullable
+    public String getSearchText() {
+        return etSearch.getText().toString();
     }
 
     public Observable<Boolean> getSearchModeObservable() {

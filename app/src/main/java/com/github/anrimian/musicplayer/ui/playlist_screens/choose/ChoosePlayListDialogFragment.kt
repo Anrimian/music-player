@@ -76,15 +76,15 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
         view.minimumHeight = minHeight
 
         val layoutManager = LinearLayoutManager(context)
-        viewBinding.recyclerView.layoutManager = layoutManager
+        viewBinding.rvChoosePlayLists.layoutManager = layoutManager
         adapter = PlayListsAdapter(
-            viewBinding.recyclerView,
+            viewBinding.rvChoosePlayLists,
             this::onPlayListSelected,
             this::onPlaylistMenuClicked
         )
-        viewBinding.recyclerView.adapter = adapter
+        viewBinding.rvChoosePlayLists.adapter = adapter
 
-        RecyclerViewUtils.attachDynamicShadow(viewBinding.recyclerView, viewBinding.titleShadow)
+        RecyclerViewUtils.attachDynamicShadow(viewBinding.rvChoosePlayLists, viewBinding.titleShadow)
 
         val bottomSheetBehavior = ViewUtils.findBottomSheetBehavior(dialog)
         bottomSheetBehavior.peekHeight = minHeight
@@ -113,7 +113,7 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
     }
 
     override fun showBottomSheetSlided(slideOffset: Float) {
-        viewBinding.recyclerView.post {
+        viewBinding.rvChoosePlayLists.post {
             val contentView = AndroidUtils.getContentView(activity) ?: return@post
 
             var usableSlideOffset = slideOffset

@@ -104,7 +104,7 @@ public class CompositionsDaoWrapperTest {
     @Test
     public void updateAlbumArtistWithSingleAlbum() {
         long artistId = artistsDao.insertArtist( "test artist");
-        long albumId = albumsDao.insert(new AlbumEntity(artistId, "test album", 0, 0));
+        long albumId = albumsDao.insertAlbum(artistId, "test album");
         long compositionId = compositionsDao.insert(composition(null, albumId, "test title"));
 
         daoWrapper.updateAlbumArtist(compositionId, "test artist2");
@@ -122,7 +122,7 @@ public class CompositionsDaoWrapperTest {
     @Test
     public void nullifyAlbumArtist() {
         long artistId = artistsDao.insertArtist( "test artist");
-        long albumId = albumsDao.insert(new AlbumEntity(artistId, "test album", 0, 0));
+        long albumId = albumsDao.insertAlbum(artistId, "test album");
         long compositionId = compositionsDao.insert(composition(null, albumId, "test title"));
 
         daoWrapper.updateAlbumArtist(compositionId, null);
@@ -137,7 +137,7 @@ public class CompositionsDaoWrapperTest {
     @Test
     public void updateAlbumArtistWithMultipleEntriesAlbum() {
         Long artistId = artistsDao.insertArtist( "test artist");
-        long albumId = albumsDao.insert(new AlbumEntity(artistId, "test album", 0, 0));
+        long albumId = albumsDao.insertAlbum(artistId, "test album");
         long compositionId = compositionsDao.insert(composition(null, albumId, "test title"));
         compositionsDao.insert(composition(null, albumId, "test title2"));
 
@@ -166,7 +166,7 @@ public class CompositionsDaoWrapperTest {
     @Test
     public void updateArtistWitFullAlbumMove() {
         long artistId = artistsDao.insertArtist( "test artist");
-        long albumId = albumsDao.insert(new AlbumEntity(artistId, "test album", 0, 0));
+        long albumId = albumsDao.insertAlbum(artistId, "test album");
         long compositionId = compositionsDao.insert(composition(null, albumId, "test title"));
         long secondCompositionId = compositionsDao.insert(composition(null, albumId, "test title2"));
 
@@ -197,7 +197,7 @@ public class CompositionsDaoWrapperTest {
     @Test
     public void updateAlbumToUnknownName() {
         long artistId = artistsDao.insertArtist( "test artist");
-        albumsDao.insert(new AlbumEntity(artistId, "test album", 0, 0));
+        albumsDao.insertAlbum(artistId, "test album");
         long compositionId = compositionsDao.insert(composition(artistId, null, "test title"));
 
         daoWrapper.updateAlbum(compositionId, "test album2");
@@ -212,7 +212,7 @@ public class CompositionsDaoWrapperTest {
     @Test
     public void nullifyAlbum() {
         long artistId = artistsDao.insertArtist( "test artist");
-        albumsDao.insert(new AlbumEntity(artistId, "test album", 0, 0));
+        albumsDao.insertAlbum(artistId, "test album");
         long compositionId = compositionsDao.insert(composition(artistId, null, "test title"));
 
         daoWrapper.updateAlbum(compositionId, null);
@@ -225,8 +225,8 @@ public class CompositionsDaoWrapperTest {
     @Test
     public void updateAlbumToKnownName() {
         long artistId = artistsDao.insertArtist( "test artist");
-        albumsDao.insert(new AlbumEntity(artistId, "test album", 0, 0));
-        Long secondAlbumId = albumsDao.insert(new AlbumEntity(artistId, "test album2", 0, 0));
+        albumsDao.insertAlbum(artistId, "test album");
+        Long secondAlbumId = albumsDao.insertAlbum(artistId, "test album2");
         long compositionId = compositionsDao.insert(composition(artistId, null, "test title"));
 
         daoWrapper.updateAlbum(compositionId, "test album2");
@@ -242,7 +242,7 @@ public class CompositionsDaoWrapperTest {
     public void updateAlbumToWithDifferentAlbumArtist() {
         long compositionArtistId = artistsDao.insertArtist( "test artist");
         long albumArtistId = artistsDao.insertArtist( "test album artist");
-        long oldAlbumId = albumsDao.insert(new AlbumEntity(albumArtistId, "test album", 0, 0));
+        long oldAlbumId = albumsDao.insertAlbum(albumArtistId, "test album");
         long compositionId = compositionsDao.insert(composition(compositionArtistId, oldAlbumId, "test title"));
 
         daoWrapper.updateAlbum(compositionId, "test album2");
@@ -257,7 +257,7 @@ public class CompositionsDaoWrapperTest {
     @Test
     public void updateAlbumWithOldAlbumWithoutArtist() {
         long compositionArtistId = artistsDao.insertArtist( "test artist");
-        long oldAlbumId = albumsDao.insert(new AlbumEntity(null, "test album", 0, 0));
+        long oldAlbumId = albumsDao.insertAlbum(null, "test album");
         long compositionId = compositionsDao.insert(composition(compositionArtistId, oldAlbumId, "test title"));
 
         daoWrapper.updateAlbum(compositionId, "test album2");
@@ -282,7 +282,7 @@ public class CompositionsDaoWrapperTest {
 
     @Test
     public void updateAlbumWithoutArtistAndWithKnownName() {
-        Long secondAlbumId = albumsDao.insert(new AlbumEntity(null, "test album2", 0, 0));
+        Long secondAlbumId = albumsDao.insertAlbum(null, "test album2");
         long compositionId = compositionsDao.insert(composition(null, null, "test title"));
 
         daoWrapper.updateAlbum(compositionId, "test album2");

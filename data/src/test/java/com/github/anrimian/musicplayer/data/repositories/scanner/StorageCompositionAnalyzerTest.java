@@ -17,7 +17,6 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.models.changes.Change;
-import com.github.anrimian.musicplayer.data.models.composition.AudioFileType;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -119,8 +118,7 @@ public class StorageCompositionAnalyzerTest {
                 1L,
                 new Date(1),
                 new Date(1000),
-                null,
-                AudioFileType.MUSIC);
+                null);
         newCompositions.put(1L, changedComposition);
 
         analyzer.applyCompositionsData(newCompositions);
@@ -149,7 +147,7 @@ public class StorageCompositionAnalyzerTest {
                 1L,
                 new Date(1),
                 new Date(1000),
-                new StorageAlbum(1, "test album", null, 0, 1), AudioFileType.MUSIC);
+                new StorageAlbum(1, "test album", null));
         newCompositions.put(1L, changedComposition);
 
         analyzer.applyCompositionsData(newCompositions);
@@ -175,7 +173,6 @@ public class StorageCompositionAnalyzerTest {
                 0,
                 1L,
                 1L,
-                AudioFileType.MUSIC,
                 InitialSource.LOCAL,
                 null,
                 new Date(1),
@@ -194,7 +191,7 @@ public class StorageCompositionAnalyzerTest {
                 1L,
                 new Date(1),
                 new Date(1000),
-                new StorageAlbum(1, "test album", "new album artist", 0, 1), AudioFileType.MUSIC);
+                new StorageAlbum(1, "test album", "new album artist"));
         newCompositions.put(1L, changedComposition);
 
         analyzer.applyCompositionsData(newCompositions);

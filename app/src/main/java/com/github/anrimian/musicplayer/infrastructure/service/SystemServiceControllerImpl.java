@@ -2,13 +2,16 @@ package com.github.anrimian.musicplayer.infrastructure.service;
 
 import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
 
+import android.app.ForegroundServiceStartNotAllowedException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
@@ -16,6 +19,7 @@ import com.github.anrimian.musicplayer.Constants;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.di.Components;
+import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 
@@ -100,7 +104,22 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     private static void startServiceFromBg(Context context, Intent intent) {
         Intent bgIntent = new Intent(intent);
         intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, true);
-        ContextCompat.startForegroundService(context, bgIntent);
+        //let's see how try-catch will work
+        try {
+            ContextCompat.startForegroundService(context, bgIntent);
+        } catch (Exception e) {
+            int sdkVersion = Build.VERSION.SDK_INT;
+            if (sdkVersion >= Build.VERSION_CODES.S && sdkVersion < Build.VERSION_CODES.TIRAMISU
+                    && e instanceof ForegroundServiceStartNotAllowedException) {
+                AppComponent appComponent = Components.getAppComponent();
+                appComponent.analytics().processNonFatalError(e);
+                appComponent.notificationsDisplayer().showErrorNotification(R.string.app_has_no_system_permission_to_start);
+                //check toast on this api version(S)
+                Toast.makeText(context, R.string.app_has_no_system_permission_to_start, Toast.LENGTH_LONG).show();
+                return;
+            }
+            throw e;
+        }
     }
 
     private static class ForegroundServiceStarterConnection implements ServiceConnection {

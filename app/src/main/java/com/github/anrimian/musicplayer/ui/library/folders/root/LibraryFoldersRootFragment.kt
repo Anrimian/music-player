@@ -35,6 +35,8 @@ class LibraryFoldersRootFragment : LibraryFragment(), FolderRootView, BackButton
 
     private lateinit var binding: FragmentRootLibraryFoldersBinding
 
+    private lateinit var toolbar: AdvancedToolbar
+
     private lateinit var jvFoldersContainer: JugglerView
     private lateinit var navigation: FragmentNavigation
     private val navigationWrapper = DefferedObject<FragmentNavigation>()
@@ -51,6 +53,8 @@ class LibraryFoldersRootFragment : LibraryFragment(), FolderRootView, BackButton
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolbar = requireActivity().findViewById(R.id.toolbar)
+
         binding.progressStateView.onTryAgainClick { setupFolderTree() }
 
         navigation = FragmentNavigation.from(childFragmentManager)
@@ -90,15 +94,22 @@ class LibraryFoldersRootFragment : LibraryFragment(), FolderRootView, BackButton
     override fun showFolderScreens(ids: List<Long?>) {
         val highlightCompositionId = requireArguments().getLong(HIGHLIGHT_COMPOSITION_ID)
 
-        //if we have highlight request and target fragment is on top, just proceed call without creation
+        //if we have highlight request and target fragment is on top without active search,
+        // just proceed call without creation
         val currentFragment = navigation.fragmentOnTop
-        if (highlightCompositionId != 0L
-            && currentFragment is LibraryFoldersFragment
-            && currentFragment.getFolderId() == ids.last()
-        ) {
-            requireArguments().remove(HIGHLIGHT_COMPOSITION_ID)
-            currentFragment.requestHighlightComposition(highlightCompositionId)
-            return
+        if (highlightCompositionId != 0L && currentFragment is LibraryFoldersFragment) {
+            val isSearchActive = toolbar.isInSearchMode
+            if (isSearchActive) {
+                toolbar.setSearchModeEnabled(false)
+                if (toolbar.isSearchLocked) {
+                    toolbar.isSearchLocked = false
+                }
+            }
+            if (!isSearchActive && currentFragment.getFolderId() == ids.last()) {
+                requireArguments().remove(HIGHLIGHT_COMPOSITION_ID)
+                currentFragment.requestHighlightComposition(highlightCompositionId)
+                return
+            }
         }
 
         navigation.addNewFragmentStack(

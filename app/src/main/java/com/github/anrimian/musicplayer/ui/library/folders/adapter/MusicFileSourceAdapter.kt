@@ -29,8 +29,8 @@ class MusicFileSourceAdapter(
     private val onFolderClickListener: (Int, FolderFileSource) -> Unit,
     private val onLongClickListener: (Int, FileSource) -> Unit,
     private val onFolderMenuClickListener: (View, FolderFileSource) -> Unit,
-    private val compositionIconClickListener: (Composition) -> Unit,
-    private val menuClickListener: (View, CompositionFileSource) -> Unit
+    private val compositionIconClickListener: (Int, Composition) -> Unit,
+    private val menuClickListener: (View, Int, CompositionFileSource) -> Unit
 ) : MvpDiffAdapter<FileSource, FileViewHolder>(
     lifecycleOwner,
     recyclerView,

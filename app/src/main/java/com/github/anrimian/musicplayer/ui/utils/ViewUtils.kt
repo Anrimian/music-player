@@ -2,12 +2,16 @@ package com.github.anrimian.musicplayer.ui.utils
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
+import android.content.Context
 import android.graphics.Color
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
+import android.widget.Button
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
@@ -56,4 +60,8 @@ fun ViewPager2.reduceDragSensitivityBy(f: Int) {
         touchSlopField.set(recyclerView, touchSlop * f)
     } catch (ignored: NoSuchFieldException) {}
       catch (ignored: IllegalAccessException) {}
+}
+
+fun Context.createStyledButton(@StyleRes styleRes: Int): Button {
+    return Button(ContextThemeWrapper(this, styleRes), null, styleRes)
 }

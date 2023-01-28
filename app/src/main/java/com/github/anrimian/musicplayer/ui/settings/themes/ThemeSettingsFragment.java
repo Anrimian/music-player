@@ -61,7 +61,7 @@ public class ThemeSettingsFragment extends Fragment {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                onAlbumsScrolled(viewBinding.rvThemes.computeHorizontalScrollOffset() == 0);
+                onThemesScrolled(viewBinding.rvThemes.computeHorizontalScrollOffset() == 0);
             }
         });
 
@@ -84,7 +84,7 @@ public class ThemeSettingsFragment extends Fragment {
         }
     }
 
-    private void onAlbumsScrolled(boolean onStart) {
+    private void onThemesScrolled(boolean onStart) {
         if (onStart) {
             slidrInterface.unlock();
         } else {

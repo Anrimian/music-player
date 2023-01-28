@@ -21,7 +21,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 import java.util.Date;
 import java.util.List;
 
-import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
@@ -33,6 +32,9 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "trackNumber as trackNumber, " +
+            "discNumber as discNumber, " +
+            "comment as comment, " +
             "lyrics as lyrics, " +
             "fileName as fileName, " +
             "duration as duration, " +
@@ -41,13 +43,13 @@ public interface CompositionsDao {
             "storageId as storageId, " +
             "dateAdded as dateAdded, " +
             "dateModified as dateModified, " +
+            "coverModifyTime as coverModifyTime, " +
             "corruptionType as corruptionType, " +
-            "audioFileType as audioFileType, " +
             "initialSource as initialSource " +
             "FROM compositions " +
             "WHERE id = :id " +
             "LIMIT 1")
-    Observable<List<FullComposition>> getCompositionObservable(long id);
+    Observable<List<FullComposition>> getFullCompositionObservable(long id);
 
     @Query("SELECT IFNULL(lyrics, '') FROM compositions WHERE id = :id LIMIT 1")
     Observable<String> getLyricsObservable(long id);
@@ -57,6 +59,9 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "trackNumber as trackNumber, " +
+            "discNumber as discNumber, " +
+            "comment as comment, " +
             "lyrics as lyrics, " +
             "fileName as fileName, " +
             "duration as duration, " +
@@ -65,8 +70,8 @@ public interface CompositionsDao {
             "storageId as storageId, " +
             "dateAdded as dateAdded, " +
             "dateModified as dateModified, " +
+            "coverModifyTime as coverModifyTime, " +
             "corruptionType as corruptionType, " +
-            "audioFileType as audioFileType, " +
             "initialSource as initialSource " +
             "FROM compositions " +
             "WHERE id = :id " +
@@ -74,10 +79,10 @@ public interface CompositionsDao {
     FullComposition getFullComposition(long id);
 
     @RawQuery(observedEntities = { CompositionEntity.class, ArtistEntity.class, AlbumEntity.class })
-    Observable<List<Composition>> getAllObservable(SupportSQLiteQuery query);
+    Observable<List<Composition>> getCompositionsObservable(SupportSQLiteQuery query);
 
     @RawQuery(observedEntities = { CompositionEntity.class, ArtistEntity.class, AlbumEntity.class })
-    Observable<List<Composition>> getAllInFolderObservable(SupportSQLiteQuery query);
+    Observable<List<Composition>> getCompositionsInFolderObservable(SupportSQLiteQuery query);
 
     @RawQuery
     List<Composition> executeQuery(SimpleSQLiteQuery sqlQuery);
@@ -111,7 +116,6 @@ public interface CompositionsDao {
             "compositions.duration as duration, " +
             "compositions.size as size, " +
             "compositions.id as id, " +
-            "compositions.audioFileType as audioFileType, " +
             "compositions.initialSource as initialSource, " +
             "compositions.storageId as storageId, " +
             "compositions.folderId as folderId, " +
@@ -135,30 +139,26 @@ public interface CompositionsDao {
             "fileName = :fileName, " +
             "duration = :duration, " +
             "size = :size, " +
-            "dateModified = :dateModified, " +
-            "audioFileType = :audioFileType " +
+            "dateModified = :dateModified " +
             "WHERE storageId = :storageId")
     void update(String title,
                 String fileName,
                 long duration,
                 long size,
                 Date dateModified,
-                long storageId,
-                int audioFileType);
+                long storageId);
 
     @Query("UPDATE compositions SET " +
             "title = :title, " +
             "duration = :duration, " +
             "size = :size, " +
-            "dateModified = :dateModified, " +
-            "audioFileType = :audioFileType " +
+            "dateModified = :dateModified " +
             "WHERE id = :id")
     void update(long id,
                 String title,
                 long duration,
                 long size,
-                long dateModified,
-                int audioFileType);
+                long dateModified);
 
     @Query("DELETE FROM compositions WHERE id = :id")
     void delete(long id);
@@ -175,8 +175,23 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET title = :title WHERE id = :id")
     void updateTitle(long id, String title);
 
+    @Query("UPDATE compositions SET duration = :duration WHERE id = :id")
+    void updateDuration(long id, long duration);
+
+    @Query("UPDATE compositions SET trackNumber = :trackNumber WHERE id = :id")
+    void updateTrackNumber(long id, Long trackNumber);
+
+    @Query("UPDATE compositions SET discNumber = :discNumber WHERE id = :id")
+    void updateDiscNumber(long id, Long discNumber);
+
+    @Query("UPDATE compositions SET comment = :comment WHERE id = :id")
+    void updateComment(long id, String comment);
+
     @Query("UPDATE compositions SET lyrics = :lyrics WHERE id = :id")
     void updateLyrics(long id, String lyrics);
+
+    @Query("UPDATE compositions SET size = :fileSize WHERE id = :id")
+    void updateFileSize(long id, long fileSize);
 
     @Query("UPDATE compositions SET fileName = :fileName WHERE id = :id")
     void updateCompositionFileName(long id, String fileName);
@@ -214,8 +229,11 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET dateModified = :date WHERE id = :id")
     void setUpdateTime(long id, Date date);
 
-    @Query("UPDATE compositions SET dateModified = :date, size = :size WHERE id = :id")
-    void setModifyTimeAndSize(long id, long size, Date date);
+    @Query("UPDATE compositions SET coverModifyTime = :date, dateModified = :date, size = :size WHERE id = :id")
+    void setCoverModifyTimeAndSize(long id, long size, Date date);
+
+    @Query("UPDATE compositions SET coverModifyTime = :time WHERE id = :id")
+    void setCoverModifyTime(long id, long time);
 
     @Query("SELECT count() FROM compositions")
     long getCompositionsCount();
@@ -225,6 +243,9 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "trackNumber as trackNumber, " +
+            "discNumber as discNumber, " +
+            "comment as comment, " +
             "lyrics as lyrics, " +
             "fileName as fileName, " +
             "duration as duration, " +
@@ -233,15 +254,15 @@ public interface CompositionsDao {
             "storageId as storageId, " +
             "dateAdded as dateAdded, " +
             "dateModified as dateModified, " +
+            "coverModifyTime as coverModifyTime, " +
             "corruptionType as corruptionType, " +
-            "audioFileType as audioFileType, " +
             "initialSource as initialSource " +
             "FROM compositions " +
             "WHERE (lastScanDate < dateModified OR lastScanDate < :lastCompleteScanTime) " +
             "AND storageId IS NOT NULL " +
             "ORDER BY dateModified DESC " +
-            "LIMIT 1")
-    Maybe<FullComposition> selectNextCompositionToScan(long lastCompleteScanTime);
+            "LIMIT :filesCount")
+    Single<List<FullComposition>> selectNextCompositionsToScan(long lastCompleteScanTime, int filesCount);
 
     @Query("UPDATE compositions SET lastScanDate = :time WHERE id = :id")
     void setCompositionLastFileScanTime(long id, Date time);
@@ -279,16 +300,16 @@ public interface CompositionsDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "trackNumber as trackNumber, " +
+            "discNumber as discNumber, " +
+            "comment as comment, " +
             "lyrics as lyrics, " +
-            "(SELECT firstYear FROM albums WHERE id = albumId) as albumFirstYear, " +
-            "(SELECT lastYear FROM albums WHERE id = albumId) as albumLastYear, " +
             "duration as duration, " +
             "size as size, " +
             "dateAdded as dateAdded, " +
             "dateModified as dateModified, " +
-            "lastScanDate as lastScanDate, " +
-            "storageId IS NOT NULL AS isFileExists, " +
-            "audioFileType AS audioFileType " +
+            "coverModifyTime as coverModifyTime, " +
+            "storageId IS NOT NULL AS isFileExists " +
             "FROM compositions ")
     Single<List<ExternalComposition>> getAllAsExternalCompositions();
 
@@ -350,6 +371,7 @@ public interface CompositionsDao {
                 "compositions.size AS size, " +
                 "compositions.dateAdded AS dateAdded, " +
                 "compositions.dateModified AS dateModified, " +
+                "compositions.coverModifyTime AS coverModifyTime, " +
                 "storageId IS NOT NULL AS isFileExists, " +
                 "initialSource AS initialSource, " +
                 "compositions.corruptionType AS corruptionType ";

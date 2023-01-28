@@ -23,7 +23,7 @@
     <style name="BrightButtonStyle">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
-        <item name="android:tint">@android:color/white</item>
+        <item name="tint">@color/color_action_bar_button</item>
         <item name="android:scaleType">centerInside</item>
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
@@ -31,7 +31,7 @@
     <style name="ImageButtonStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:tint">@android:color/white</item>
+        <item name="tint">@color/color_action_bar_button</item>
         <item name="android:scaleType">centerInside</item>
     </style>
 
@@ -181,7 +181,7 @@
     </style>
 
     <style name="TextStyle.ButtonHint">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/color_action_bar_button</item>
         <item name="android:textSize">10sp</item>
         <item name="android:maxLines">2</item>
         <item name="android:ellipsize">end</item>
@@ -193,7 +193,11 @@
         <item name="android:layout_height">@dimen/play_button_expand_size</item>
     </style>
 
-    <style name="ImageStyle">
+    <style name="BaseShapeableImageStyle">
+        <item name="strokeColor">@null</item><!--fixes error message from lib-->
+    </style>
+
+    <style name="ImageStyle" parent="BaseShapeableImageStyle">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
     </style>
@@ -247,6 +251,10 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">?attr/colorAccent</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="EditTextStyle.Toolbar">
+        <item name="android:colorControlActivated">?attr/colorAccentDark</item>
     </style>
 
     <style name="CircularProgressIndicatorStyle">

@@ -17,7 +17,6 @@
         app:layout_constraintEnd_toStartOf="@+id/btnActionsMenu"
         app:layout_constraintStart_toEndOf="@+id/ivMusicIcon"
         app:layout_constraintTop_toTopOf="parent"
-        tools:targetApi="lollipop"
         tools:text="cocompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositionmposition"/>
 
     <TextView

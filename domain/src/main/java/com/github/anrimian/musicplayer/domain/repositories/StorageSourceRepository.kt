@@ -8,6 +8,9 @@ import java.io.FileDescriptor
 
 interface StorageSourceRepository {
 
+    /**
+     * completes if there are no info about file in database
+     */
     fun getStorageSource(
         compositionId: Long
     ): Maybe<CompositionContentSource>

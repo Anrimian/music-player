@@ -39,21 +39,6 @@ import javax.annotation.Nullable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import androidx.collection.LruCache;
-
-import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
-import com.github.anrimian.musicplayer.domain.models.Screens;
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
-
-import javax.annotation.Nullable;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.subjects.BehaviorSubject;
-
 /**
  * Created on 16.11.2017.
  */

@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -282,15 +283,15 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
     override fun showRenameGenreDialog(genre: Genre) {
         val bundle = Bundle()
         bundle.putLong(Constants.Arguments.ID_ARG, genre.id)
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.change_name,
             R.string.change,
             R.string.cancel,
             R.string.name,
-            genre.name
-        ).canBeEmpty(false)
-            .extra(bundle)
-            .build()
+            genre.name,
+            canBeEmpty = false,
+            extra = bundle
+        )
         editGenreNameDialogRunner.show(fragment)
     }
 

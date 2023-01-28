@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.serialization.GenreSerializer
@@ -182,15 +183,15 @@ class GenresListFragment : LibraryFragment(), GenresListView, FragmentLayerListe
     private fun showEditGenreNameDialog(genre: Genre) {
         val bundle = Bundle()
         bundle.putLong(Constants.Arguments.ID_ARG, genre.id)
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.change_name,
             R.string.change,
             R.string.cancel,
             R.string.name,
-            genre.name
-        ).canBeEmpty(false)
-            .extra(bundle)
-            .build()
+            genre.name,
+            canBeEmpty = false,
+            extra = bundle
+        )
         editGenreNameDialogRunner.show(fragment)
     }
 

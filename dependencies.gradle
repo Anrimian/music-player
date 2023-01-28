@@ -9,45 +9,47 @@ allprojects {
 }
 
 ext {
-    //Android
+    //sdk
     androidBuildToolsVersion = "33.0.0"
     androidMinSdkVersion = 21
     androidTargetSdkVersion = 33
     androidCompileSdkVersion = 33
 
     //support libraries
-    androidXVersion = "1.5.0"
-    googleMaterialVersion = "1.6.1"
-    recyclerViewVersion = "1.2.1"
-    recyclerViewFastScrollVersion = "1.1.8"
+    androidXVersion = "1.5.1"
     mediaCompatVersion = "1.6.0"
 
-    constraintLayoutVersion = "2.1.4"
+    //core
     rxJavaVersion = "3.1.5"
-    rxAndroidVersion = "3.0.0"
-    rxPermissionsVersion = "0.12"
+    rxAndroidVersion = "3.0.2"
     rxJavaExtVersion = "3.1.1"
     moxyVersion = "2.2.2"
-    daggerVersion = "2.43.2"
-    slidrVersion = "2.1.0"
-    exoPlayerVersion = "2.18.1"
+    daggerVersion = "2.44.2"
+    exoPlayerVersion = "2.18.2"
     roomVersion = "2.4.3"
     jTaggerVersion = '2.2.6c'
-    chipsLayoutManagerVersion = "0.3.7"
-    glideVersion = "4.13.2"
+    glideVersion = "4.14.2"
     workManagerVersion = "2.7.1"
 
+    //ui
+    googleMaterialVersion = "1.7.0"
+    constraintLayoutVersion = "2.1.4"
+    recyclerViewVersion = "1.2.1"
+    recyclerViewFastScrollVersion = "1.1.8"
+    slidrVersion = "2.1.0"
+    chipsLayoutManagerVersion = "0.3.7"
+
     //remote repos libraries
-    dropboxSdkVersion = "5.3.0"
-    playServicesAuthVersion = "20.2.0"
-    googleApiVersion = "2.0.0"
+    dropboxSdkVersion = "5.4.4"
+    playServicesAuthVersion = "20.3.0"
+    googleApiVersion = "2.0.1"
     gDriveVersion = "v3-rev20220214-1.32.1"
 
     //Testing
-    jUnit5Version = '5.9.0'
+    jUnit5Version = '5.9.1'
     jUnit5PluginVersion = '1.3.0'
     espressoVersion = '3.3.0'
-    mockitoVersion = '4.7.0'
+    mockitoVersion = '4.9.0'
     mockitoKtVersion = '4.0.0'
     dexmakerVersion = '2.28.1'
     androidXTestVersion = "1.4.0"
@@ -57,21 +59,18 @@ ext {
 }
 
 ext {
+    //sdk
     kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 
+    //support libs
     appCompat = "androidx.appcompat:appcompat:$androidXVersion"
     appCompatResources = "androidx.appcompat:appcompat-resources:$androidXVersion"
-    //in recent version added +200kb, candidate for optimization
-    material = "com.google.android.material:material:$googleMaterialVersion"
-    recyclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    recyclerViewFastScroll = "me.zhanghai.android.fastscroll:library:$recyclerViewFastScrollVersion"
     supportMedia = "androidx.media:media:$mediaCompatVersion"
-    constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
 
+    //core
     rxJava = "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     rxJavaExt = "com.github.akarnokd:rxjava3-extensions:$rxJavaExtVersion"
     rxAndroid = "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
-    rxPermissions = "com.github.tbruyelle:rxpermissions:$rxPermissionsVersion"
 
     moxy = "com.github.moxy-community:moxy:$moxyVersion"
     moxyCompiler = "com.github.moxy-community:moxy-compiler:$moxyVersion"
@@ -84,10 +83,6 @@ ext {
 
     dagger = "com.google.dagger:dagger:$daggerVersion"
     daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
-
-    slidr = "com.r0adkll:slidableactivity:$slidrVersion"
-
-    chipsLayoutManager = "com.beloo.widget:ChipsLayoutManager:$chipsLayoutManagerVersion"
 
     exoPlayerCore = "com.google.android.exoplayer:exoplayer-core:$exoPlayerVersion"
 
@@ -103,6 +98,17 @@ ext {
     workManagerRx = "androidx.work:work-rxjava3:$workManagerVersion"
 
     jAudioTagger = "com.github.Anrimian:jaudiotagger:$jTaggerVersion"
+
+    //ui
+    //in recent version added +200kb, candidate for optimization
+    material = "com.google.android.material:material:$googleMaterialVersion"
+    constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+    recyclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    recyclerViewFastScroll = "me.zhanghai.android.fastscroll:library:$recyclerViewFastScrollVersion"
+
+    slidr = "com.r0adkll:slidableactivity:$slidrVersion"
+
+    chipsLayoutManager = "com.beloo.widget:ChipsLayoutManager:$chipsLayoutManagerVersion"
 
     //remote repos libraries
     dropboxSdk = "com.dropbox.core:dropbox-core-sdk:$dropboxSdkVersion"

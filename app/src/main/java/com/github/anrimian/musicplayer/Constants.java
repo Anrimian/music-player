@@ -20,15 +20,8 @@ public interface Constants {
         String ID_ARG = "id_arg";//we can replace other `id_arg`
         String STATUS_BAR_COLOR_ATTR_ARG = "status_bar_color_attr";
         String OPEN_PLAYER_PANEL_ARG = "open_player_panel_arg";
-        String COMPOSITION_NAME_ARG = "composition_name_arg";
-        String COMPOSITION_AUTHOR_ARG = "composition_author_arg";
         String COMPOSITION_ID_ARG = "composition_id_arg";
-        String COMPOSITION_UPDATE_TIME_ARG = "composition_update_time_arg";
-        String COMPOSITION_SIZE = "composition_size_arg";
-        String COMPOSITION_IS_FILE_EXISTS_ARG = "composition_is_file_exists_arg";
         String ALBUM_ID_ARG = "album_id_arg";
-        String PLAY_ARG = "play_arg";
-        String QUEUE_SIZE_ARG = "queue_size_arg";
         String TITLE_ARG = "title_arg";
         String POSITIVE_BUTTON_ARG = "positive_button_arg";
         String NEGATIVE_BUTTON_ARG = "negative_button_arg";
@@ -41,9 +34,6 @@ public interface Constants {
         String MENU_ARG = "menu_arg";
         String HINTS_ARG = "hints_arg";
         String PLAYLIST_ARG = "playlist_arg";
-        String RANDOM_PLAY_ARG = "random_play_arg";
-        String REPEAT_ARG = "repeat_arg";
-        String COVERS_ENABLED_ARG = "covers_enabled_arg";
         String FILE_NAME_SETTING_ARG = "file_name_setting_arg";
         String HIGHLIGHT_COMPOSITION_ID = "highlight_composition_id";
         String IDS_ARG = "ids_arg";

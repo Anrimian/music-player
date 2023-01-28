@@ -2,6 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/menu_search"
+        android:title="@string/search"
+        android:icon="@drawable/ic_magnify"
+        app:iconTint="?attr/toolbarTextColorPrimary"
+        app:showAsAction="ifRoom"/>
+
     <item android:id="@+id/menu_order"
         android:title="@string/order"
         android:icon="@drawable/ic_sort"

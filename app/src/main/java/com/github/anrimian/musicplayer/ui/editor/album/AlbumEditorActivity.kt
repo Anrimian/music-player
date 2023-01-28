@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.databinding.ActivityAlbumEditBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
@@ -134,25 +135,25 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
     }
 
     override fun showEnterAuthorDialog(album: Album, hints: Array<String>?) {
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.change_album_artist,
             R.string.change,
             R.string.cancel,
             R.string.artist,
-            album.artist
-        ).hints(hints)
-            .build()
+            album.artist,
+            hints = hints
+        )
         authorDialogFragmentRunner.show(fragment)
     }
 
     override fun showEnterNameDialog(album: Album) {
-        val fragment = InputTextDialogFragment.newInstance(
+        val fragment = newInputTextDialogFragment(
             R.string.change_name,
             R.string.change,
             R.string.cancel,
             R.string.name,
             album.name,
-            false
+            canBeEmpty = false
         )
         nameDialogFragmentRunner.show(fragment)
     }

@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.ui.utils.dialogs.menu;
 
+import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.createMenu;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -18,9 +21,6 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.DialogMenuBinding;
 import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback;
 import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener;
-
-import static com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.createMenu;
 
 public class MenuDialogFragment extends DialogFragment {
 
@@ -55,11 +55,11 @@ public class MenuDialogFragment extends DialogFragment {
         DialogMenuBinding binding = DialogMenuBinding.inflate(LayoutInflater.from(requireContext()));
         View view = binding.getRoot();
 
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.rvMenuItems.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         MenuAdapter menuAdapter = new MenuAdapter(getMenu(), R.layout.item_dialog_menu);
         menuAdapter.setOnItemClickListener(this::onMenuItemClicked);
-        binding.recyclerView.setAdapter(menuAdapter);
+        binding.rvMenuItems.setAdapter(menuAdapter);
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle(getTitle())

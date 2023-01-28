@@ -4,8 +4,8 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 
 import androidx.annotation.NonNull;
 
-import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.filesync.SyncInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
@@ -82,10 +83,17 @@ public class LibraryModule {
     PlayerScreenInteractor playerScreenInteractor(SleepTimerInteractor sleepTimerInteractor,
                                                   LibraryPlayerInteractor libraryPlayerInteractor,
                                                   SyncInteractor<?, ?, Long> syncInteractor,
+                                                  PlayQueueRepository playQueueRepository,
                                                   UiStateRepository uiStateRepository,
                                                   SettingsRepository settingsRepository,
                                                   MediaScannerRepository mediaScannerRepository) {
-        return new PlayerScreenInteractor(sleepTimerInteractor, libraryPlayerInteractor, syncInteractor, uiStateRepository, settingsRepository, mediaScannerRepository);
+        return new PlayerScreenInteractor(sleepTimerInteractor,
+                libraryPlayerInteractor,
+                syncInteractor,
+                playQueueRepository,
+                uiStateRepository,
+                settingsRepository,
+                mediaScannerRepository);
     }
 
     @Provides

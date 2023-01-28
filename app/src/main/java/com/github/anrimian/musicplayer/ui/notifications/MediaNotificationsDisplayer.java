@@ -49,6 +49,7 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 
 import javax.annotation.Nonnull;
 
+//for api 33 can be used without actions
 public class MediaNotificationsDisplayer {
 
     private static final int FOREGROUND_NOTIFICATION_ID = 1;

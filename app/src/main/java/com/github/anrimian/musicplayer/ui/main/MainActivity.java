@@ -12,6 +12,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -22,9 +23,9 @@ import com.github.anrimian.musicplayer.databinding.DialogErrorReportBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
+import com.github.anrimian.musicplayer.ui.main.setup.SetupFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragmentKt;
-import com.github.anrimian.musicplayer.ui.start.StartFragment;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener;
@@ -38,6 +39,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Components.getAppComponent().themeController().applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
+
+        //trick to fix internal id issue in ViewPager2.
+        //Delete after this issue will be solved: https://issuetracker.google.com/issues/185820237
+        //Solution is taken from https://stackoverflow.com/a/59989710/5541688
+        //counter reduced from 1000 to 100, return back if fix won't help
+        for (int i = 0; i < 99; i++) {
+            ViewCompat.generateViewId();
+        }
+
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
@@ -89,12 +99,12 @@ public class MainActivity extends AppCompatActivity {
         if (Permissions.hasFilePermission(this)) {
             goToMainScreen();
         } else {
-            goToStartScreen();
+            goToSetupScreen();
         }
     }
 
-    private void goToStartScreen() {
-        startFragment(new StartFragment());
+    private void goToSetupScreen() {
+        startFragment(new SetupFragment());
     }
 
     private void goToMainScreen() {

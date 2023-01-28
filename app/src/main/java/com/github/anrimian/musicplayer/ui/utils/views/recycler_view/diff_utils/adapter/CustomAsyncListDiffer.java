@@ -115,6 +115,8 @@ public class CustomAsyncListDiffer<T> {
     final AsyncDifferConfig<T> mConfig;
     Executor mMainThreadExecutor;
 
+    private final boolean detectMoves;
+
     private static class MainThreadExecutor implements Executor {
         final Handler mHandler = new Handler(Looper.getMainLooper());
         MainThreadExecutor() {}
@@ -176,9 +178,29 @@ public class CustomAsyncListDiffer<T> {
     public CustomAsyncListDiffer(RecyclerView recyclerView,
                                  @NonNull ListUpdateCallback listUpdateCallback,
                                  @NonNull AsyncDifferConfig<T> config) {
+        this(recyclerView, listUpdateCallback, config, true);
+    }
+
+    /**
+     * Create a AsyncListDiffer with the provided config, and ListUpdateCallback to dispatch
+     * updates to.
+     *
+     * @param listUpdateCallback Callback to dispatch updates to.
+     * @param config Config to define background work Executor, and DiffUtil.ItemCallback for
+     *               computing List diffs.
+     *
+     * @see DiffUtil.DiffResult#dispatchUpdatesTo(RecyclerView.Adapter)
+     */
+    @SuppressLint("RestrictedApi")
+    @SuppressWarnings("WeakerAccess")
+    public CustomAsyncListDiffer(RecyclerView recyclerView,
+                                 @NonNull ListUpdateCallback listUpdateCallback,
+                                 @NonNull AsyncDifferConfig<T> config,
+                                 boolean detectMoves) {
         this.recyclerView = recyclerView;
         mUpdateCallback = listUpdateCallback;
         mConfig = config;
+        this.detectMoves = detectMoves;
         if (config.getMainThreadExecutor() != null) {
             mMainThreadExecutor = config.getMainThreadExecutor();
         } else {
@@ -342,7 +364,7 @@ public class CustomAsyncListDiffer<T> {
                         // non-null which is the only case handled above.
                         throw new AssertionError();
                     }
-                });
+                }, detectMoves);
 
                 mMainThreadExecutor.execute(new Runnable() {
                     @Override

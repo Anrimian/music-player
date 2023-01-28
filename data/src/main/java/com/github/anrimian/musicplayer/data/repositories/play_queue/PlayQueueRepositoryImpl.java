@@ -3,15 +3,20 @@ package com.github.anrimian.musicplayer.data.repositories.play_queue;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
 import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
 
+import android.util.Log;
+
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
+import com.github.anrimian.musicplayer.domain.utils.rx.CacheFlowable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -22,6 +27,7 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
@@ -30,7 +36,9 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     private final UiStateRepository uiStatePreferences;
     private final Scheduler scheduler;
 
-    private final Flowable<List<PlayQueueItem>> playQueueObservable;
+    private final BehaviorSubject<Long> playQueueCreateTimeSubject = BehaviorSubject.createDefault(0L);
+
+    private final CacheFlowable<List<PlayQueueItem>> playQueueObservable;
     private final Observable<PlayQueueEvent> currentItemObservable;
 
     private boolean firstItemEmitted;
@@ -45,21 +53,19 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         this.uiStatePreferences = uiStatePreferences;
         this.scheduler = scheduler;
 
-        playQueueObservable = settingsPreferences.getRandomPlayingObservable()
-                .switchMap(isRandom -> settingsPreferences.getDisplayFileNameObservable()
-                        .switchMap(useFileName -> playQueueDao.getPlayQueueObservable(isRandom, useFileName))
-                )
-                .toFlowable(BackpressureStrategy.LATEST)
-                .replay(1)
-                .refCount();
+        playQueueObservable = new CacheFlowable<>(
+                settingsPreferences.getRandomPlayingObservable()
+                        .switchMap(isRandom -> settingsPreferences.getDisplayFileNameObservable()
+                                .switchMap(useFileName -> playQueueDao.getPlayQueueObservable(isRandom, useFileName))
+                        ).toFlowable(BackpressureStrategy.LATEST),
+                new ArrayList<>()
+        );
 
         currentItemObservable = uiStatePreferences.getCurrentItemIdObservable()
                 .switchMap(this::getPlayQueueEvent)
                 .subscribeOn(scheduler)
                 .replay(1)
                 .refCount();
-
-//        subscribeOnPositionChange();
     }
 
     @Override
@@ -92,12 +98,14 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
-        return playQueueObservable;
+        return playQueueObservable.getFlowable();
     }
 
     @Override
     public void setRandomPlayingEnabled(boolean enabled) {
         Completable.fromAction(() -> {
+            Log.d("KEK", "SET RANDOM MODE: " + enabled);
+            playQueueObservable.clearCache();
             if (enabled) {
                 long itemId = uiStatePreferences.getCurrentQueueItemId();
                 playQueueDao.reshuffleQueue(itemId);
@@ -205,6 +213,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         return playQueueDao.getPlayQueueSizeObservable();
     }
 
+    @Override
+    public Observable<PlayQueueData> getPlayQueueDataObservable() {
+        return Observable.combineLatest(
+                settingsPreferences.getRandomPlayingObservable(),
+                playQueueCreateTimeSubject,
+                PlayQueueData::new
+        );
+    }
+
     private void setCurrentItem(@Nullable Long itemId) {
         if (itemId == null) {
             itemId = NO_ITEM;
@@ -212,25 +229,14 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         uiStatePreferences.setCurrentQueueItemId(itemId);
     }
 
-    /**
-     * Position saving for moving to next item after current item deleted
-     * Let it stay for a while, see how replacing will work
-     */
-    private void subscribeOnPositionChange() {
-        Observable.combineLatest(uiStatePreferences.getCurrentItemIdObservable(),
-                settingsPreferences.getRandomPlayingObservable(),
-                playQueueDao::getPositionObservable)
-                .switchMap(observable -> observable)
-                .doOnNext(uiStatePreferences::setCurrentItemLastPosition)
-                .subscribe();//scheduler?
-    }
-
     private void insertNewQueue(List<Composition> compositions, int startPosition) {
         consumeDeletedItemEvent = true;
+        playQueueObservable.clearCache();
         long itemId = playQueueDao.insertNewPlayQueue(compositions,
                 settingsPreferences.isRandomPlayingEnabled(),
                 startPosition);
         setCurrentItem(itemId);
+        playQueueCreateTimeSubject.onNext(System.currentTimeMillis());
         consumeDeletedItemEvent = false;
     }
 

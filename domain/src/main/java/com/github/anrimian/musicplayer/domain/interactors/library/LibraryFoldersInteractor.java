@@ -1,8 +1,10 @@
 package com.github.anrimian.musicplayer.domain.interactors.library;
 
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
@@ -76,19 +78,15 @@ public class LibraryFoldersInteractor {
         return libraryRepository.getAllCompositionsInFolders(fileSources);
     }
 
-    public void play(List<FileSource> fileSources) {
-        libraryRepository.getAllCompositionsInFolders(fileSources)
-                .doOnSuccess(musicPlayerInteractor::startPlaying)
-                .subscribe();
-    }
-
-    public void play(Long folderId, Composition composition) {
-        libraryRepository.getAllCompositionsInFolder(folderId)
-                .doOnSuccess(compositions -> {
-                    int firstPosition = compositions.indexOf(composition);
-                    musicPlayerInteractor.startPlaying(compositions, firstPosition);
-                })
-                .subscribe();
+    public void play(List<FileSource> fileSources, int position) {
+        Composition composition = null;
+        if (position != Constants.NO_POSITION) {
+            FileSource source = fileSources.get(position);
+            if (source instanceof CompositionFileSource) {
+                composition = ((CompositionFileSource) source).getComposition();
+            }
+        }
+        play(fileSources, composition);
     }
 
     public void play(Long folderId, long compositionId) {
@@ -176,6 +174,18 @@ public class LibraryFoldersInteractor {
     public Completable deleteIgnoredFolder(IgnoredFolder folder) {
         return libraryRepository.deleteIgnoredFolder(folder)
                 .andThen(mediaScannerRepository.runStorageScanner());
+    }
+
+    private void play(List<FileSource> fileSources, @Nullable Composition composition) {
+        libraryRepository.getAllCompositionsInFolders(fileSources)
+                .doOnSuccess(compositions -> {
+                    //in folders we can have duplicates in list in search mode,
+                    // so compare by references too
+                    int firstPosition = ListUtils.findPosition(compositions,
+                            c -> c.equals(composition) && c == composition);
+                    musicPlayerInteractor.startPlaying(compositions, firstPosition);
+                })
+                .subscribe();
     }
 
 }

@@ -18,6 +18,7 @@ import com.github.anrimian.musicplayer.data.storage.exceptions.NotAllowedPathExc
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.models.composition.content.CorruptedMediaFileException;
 import com.github.anrimian.musicplayer.domain.models.composition.content.LocalSourceNotFoundException;
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
@@ -104,6 +105,9 @@ public class DefaultErrorParser extends ErrorParser {
             return error(R.string.system_media_store_system_error);
         }
         if (throwable instanceof UnsupportedSourceException) {
+            return error(R.string.unsupported_format_hint);
+        }
+        if (throwable instanceof CorruptedMediaFileException) {
             return error(R.string.unsupported_format_hint);
         }
         if (throwable instanceof FolderAlreadyIgnoredException) {

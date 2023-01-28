@@ -85,7 +85,7 @@ public class PopupMenuWindow {
         @SuppressLint("InflateParams")
         View popupView = inflater.inflate(R.layout.menu_popup, null);
 
-        RecyclerView recyclerView = popupView.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = popupView.findViewById(R.id.rvMenuItems);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 

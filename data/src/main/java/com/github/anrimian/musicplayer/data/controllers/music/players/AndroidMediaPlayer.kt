@@ -54,7 +54,8 @@ class AndroidMediaPlayer(
         previousException: Exception?,
     ): Completable {
         this.previousException = previousException
-        return prepareMediaSource(source)
+        return Single.fromCallable { source }//try to solve crash - added source emit
+            .flatMapCompletable(this::prepareMediaSource)
             .doOnSubscribe { isSourcePrepared = false }
             .doOnComplete { isSourcePrepared = true }
             .onErrorResumeNext { t -> Completable.error(mapPrepareException(t)) }

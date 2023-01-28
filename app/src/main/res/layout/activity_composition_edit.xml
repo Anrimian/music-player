@@ -46,7 +46,7 @@
                     app:layout_constraintEnd_toEndOf="parent"/>
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/iv_cover"
+                    android:id="@+id/ivCover"
                     style="@style/ImageStyle"
                     android:scaleType="centerCrop"
                     android:layout_marginTop="@dimen/content_internal_margin"
@@ -62,8 +62,8 @@
                     android:layout_height="@dimen/file_sync_state_panel_icon_size"
                     android:layout_marginBottom="@dimen/file_sync_state_panel_icon_margin"
                     android:layout_marginEnd="@dimen/file_sync_state_panel_icon_margin"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_cover"
-                    app:layout_constraintEnd_toEndOf="@id/iv_cover"/>
+                    app:layout_constraintBottom_toBottomOf="@id/ivCover"
+                    app:layout_constraintEnd_toEndOf="@id/ivCover"/>
 
                 <ImageView
                     android:id="@+id/iv_cover_edit"
@@ -81,7 +81,7 @@
                     android:layout_marginStart="@dimen/toolbar_content_start"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/iv_cover"
+                    app:layout_constraintTop_toBottomOf="@+id/ivCover"
                     app:layout_constraintBottom_toTopOf="@id/tv_filename_hint"/>
 
                 <FrameLayout

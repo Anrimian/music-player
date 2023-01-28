@@ -67,7 +67,7 @@ class ExternalPlayerInteractor(
 
     fun setExternalPlayerRepeatMode(mode: Int) {
         //not supported
-        if (mode == RepeatMode.REPEAT_PLAY_LIST) {
+        if (mode == RepeatMode.REPEAT_PLAY_QUEUE) {
             return
         }
         settingsRepository.externalPlayerRepeatMode = mode

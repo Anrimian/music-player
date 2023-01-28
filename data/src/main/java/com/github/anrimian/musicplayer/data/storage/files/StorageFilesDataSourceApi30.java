@@ -124,7 +124,7 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
     public List<Composition> deleteCompositionFiles(List<Composition> compositions,
                                                     Object tokenForDelete) {
         // From android 11 delete actions are started twice.
-        // Moreover, files are deleting by system after dialog confirm.
+        // Moreover, files will be deleted by the system after dialog confirmation.
         // So, on second attempt composition list can be null when it is received from folder by db query
         // So token for delete represent folder object that is not changed on second attempt
 

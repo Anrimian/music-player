@@ -25,7 +25,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
@@ -176,6 +176,36 @@ public class EditorRepositoryImpl implements EditorRepository {
     }
 
     @Override
+    public Completable changeCompositionTrackNumber(long compositionId,
+                                                    CompositionContentSource source,
+                                                    @Nullable Long trackNumber) {
+        return performSourceUpdate(source, sourceEditor.setCompositionTrackNumber(source, trackNumber)
+                .doOnComplete(() -> setCompositionInitialSourceToApp(compositionId))
+                .doOnComplete(() -> compositionsDao.updateTrackNumber(compositionId, trackNumber))
+        );
+    }
+
+    @Override
+    public Completable changeCompositionDiscNumber(long compositionId,
+                                                   CompositionContentSource source,
+                                                   @Nullable Long trackNumber) {
+        return performSourceUpdate(source, sourceEditor.setCompositionDiscNumber(source, trackNumber)
+                .doOnComplete(() -> setCompositionInitialSourceToApp(compositionId))
+                .doOnComplete(() -> compositionsDao.updateDiscNumber(compositionId, trackNumber))
+        );
+    }
+
+    @Override
+    public Completable changeCompositionComment(long compositionId,
+                                                CompositionContentSource source,
+                                                String text) {
+        return performSourceUpdate(source, sourceEditor.setCompositionComment(source, text)
+                .doOnComplete(() -> setCompositionInitialSourceToApp(compositionId))
+                .doOnComplete(() -> compositionsDao.updateComment(compositionId, text))
+        );
+    }
+
+    @Override
     public Completable changeCompositionLyrics(long compositionId,
                                                CompositionContentSource source,
                                                String text) {
@@ -313,7 +343,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         return performSourceUpdate(source, sourceEditor.changeCompositionAlbumArt(source, imageSource)
                 .doOnSuccess(newSize -> {
                     setCompositionInitialSourceToApp(compositionId);
-                    compositionsDao.updateModifyTimeAndSize(compositionId, newSize, new Date());
+                    compositionsDao.updateCoverModifyTimeAndSize(compositionId, newSize, new Date());
                 })
                 .ignoreElement()
                 .timeout(CHANGE_COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, Completable.error(new EditorTimeoutException()))
@@ -325,7 +355,7 @@ public class EditorRepositoryImpl implements EditorRepository {
         return performSourceUpdate(source, sourceEditor.removeCompositionAlbumArt(source)
                 .doOnSuccess(newSize -> {
                     setCompositionInitialSourceToApp(compositionId);
-                    compositionsDao.updateModifyTimeAndSize(compositionId, newSize, new Date());
+                    compositionsDao.updateCoverModifyTimeAndSize(compositionId, newSize, new Date());
                     runSystemRescan(source);
                 })
                 .ignoreElement()
@@ -340,16 +370,15 @@ public class EditorRepositoryImpl implements EditorRepository {
     @Override
     public Completable updateTagsFromSource(CompositionContentSource source,
                                             FullComposition composition) {
-        return sourceEditor.getFullTags(source)
-                .flatMapCompletable(tags -> updateCompositionTags(composition, tags))
+        return sourceEditor.getAudioFileInfo(source)
+                .flatMapCompletable(info -> updateCompositionTags(composition, info))
                 .doOnComplete(() -> setCompositionInitialSourceToApp(composition.getId()))
                 .subscribeOn(scheduler);
     }
 
-    private Completable updateCompositionTags(FullComposition composition,
-                                              CompositionSourceTags tags) {
+    private Completable updateCompositionTags(FullComposition composition, AudioFileInfo fileInfo) {
         return Completable.fromAction(() ->
-                compositionsDao.updateCompositionBySourceTags(composition, tags)
+                compositionsDao.updateCompositionByFileInfo(composition, fileInfo)
         );
     }
 
@@ -399,10 +428,8 @@ public class EditorRepositoryImpl implements EditorRepository {
     private Completable performSourceUpdate(CompositionContentSource source, Completable completable) {
         return completable
                 .doOnSubscribe(o -> storageMusicProvider.setContentObserverEnabled(false))
-                .doOnComplete(() -> {
-                    storageMusicProvider.setContentObserverEnabled(true);
-                    runSystemRescan(source);
-                })
+                .doOnComplete(() -> runSystemRescan(source))
+                .doFinally(() -> storageMusicProvider.setContentObserverEnabled(true))
                 .subscribeOn(scheduler);
     }
 
@@ -414,9 +441,9 @@ public class EditorRepositoryImpl implements EditorRepository {
                 .doOnSubscribe(o -> storageMusicProvider.setContentObserverEnabled(false))
                 .doOnComplete(() -> {
                     setCompositionIdsInitialSourceToApp(compositionIds);
-                    storageMusicProvider.setContentObserverEnabled(true);
                     runSystemRescan(sources);
                 })
+                .doFinally(() -> storageMusicProvider.setContentObserverEnabled(true))
                 .subscribeOn(scheduler);
     }
 

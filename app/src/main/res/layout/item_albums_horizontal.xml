@@ -17,7 +17,7 @@
         android:text="@string/albums"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_albums"
+        android:id="@+id/rvAlbums"
         android:nestedScrollingEnabled="true"
         android:orientation="vertical"
         android:layout_width="match_parent"

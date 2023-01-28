@@ -20,7 +20,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbu
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.Permissions;
-import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
+import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
 import java.util.HashMap;
@@ -30,50 +30,94 @@ import java.util.Map;
 @SuppressLint("RestrictedApi")
 class Migrations {
 
-    public static Migration getMigration8_9(Context context) {
-        return new Migration(8, 9) {
-            @Override
-            public void migrate(@NonNull SupportSQLiteDatabase database) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `lastScanDate` INTEGER NOT NULL, `corruptionType` TEXT, `audioFileType` INTEGER NOT NULL, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
+    static Migration MIGRATION_12_13 = new Migration(12, 13) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `trackNumber` INTEGER, `discNumber` INTEGER, `comment` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `lastScanDate` INTEGER NOT NULL, `coverModifyTime` INTEGER NOT NULL, `corruptionType` TEXT, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
 
-                database.execSQL(
-                        "INSERT INTO `compositions_temp` (" +
-                                "id, artistId, albumId, folderId, storageId, title, lyrics, fileName," +
-                                "duration, size, dateAdded, dateModified, lastScanDate, corruptionType," +
-                                "audioFileType, initialSource" +
-                                ") SELECT " +
-                                "id, artistId, albumId, folderId, storageId, title, lyrics, fileName," +
-                                "duration, size, dateAdded, dateModified, lastScanDate, corruptionType," +
-                                "1 AS audioFileType, 1 AS initialSource FROM compositions"
-                );
+            database.execSQL(
+                    "INSERT INTO `compositions_temp` (" +
+                            "id, artistId, albumId, folderId, storageId, title, trackNumber, " +
+                            "discNumber, comment, lyrics, fileName, duration, size, dateAdded, " +
+                            "dateModified, lastScanDate, coverModifyTime, corruptionType," +
+                            "initialSource" +
+                            ") SELECT " +
+                            "id, artistId, albumId, folderId, storageId, title, trackNumber, " +
+                            "discNumber, comment, lyrics, fileName, duration, size, dateAdded, " +
+                            "dateModified, lastScanDate, coverModifyTime, corruptionType," +
+                            "initialSource FROM compositions"
+            );
 
-                //set audioFileType
-                StorageAlbumsProvider albumsProvider = new StorageAlbumsProvider(context);
-                StorageMusicProvider provider = new StorageMusicProvider(context, albumsProvider);
+            database.execSQL("DROP TABLE `compositions`");
+            database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
 
-                LongSparseArray<StorageFullComposition> storageCompositions = null;
-                if (Permissions.hasFilePermission(context)) {
-                    try {
-                        storageCompositions = provider.getCompositions(0, true);
-                    } catch (Exception ignored) {}
-                }
-                if (storageCompositions == null) {
-                    storageCompositions = new LongSparseArray<>();
-                }
-                AndroidCollectionUtils.forEach(storageCompositions, item -> {
-                    database.execSQL("UPDATE `compositions_temp` SET audioFileType = "
-                            + item.getAudioFileType() + " WHERE storageId = " + item.getStorageId());
-                });
+            database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
+            database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
+            database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
+        }
+    };
 
-                database.execSQL("DROP TABLE `compositions`");
-                database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
+    static Migration MIGRATION_11_12 = new Migration(11, 12) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE compositions ADD COLUMN trackNumber INTEGER");
+            database.execSQL("ALTER TABLE compositions ADD COLUMN discNumber INTEGER");
+            database.execSQL("ALTER TABLE compositions ADD COLUMN comment TEXT");
+        }
+    };
 
-                database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
-                database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
-                database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
-            }
-        };
-    }
+    static Migration MIGRATION_10_11 = new Migration(10, 11) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `albums_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
+
+            database.execSQL(
+                    "INSERT INTO `albums_temp` (" +
+                            "id, artistId, name" +
+                            ") SELECT " +
+                            "id, artistId, name " +
+                            "FROM albums"
+            );
+
+            database.execSQL("DROP TABLE `albums`");
+            database.execSQL("ALTER TABLE `albums_temp` RENAME TO `albums`");
+
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_albums_artistId` ON `albums` (`artistId`)");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_albums_artistId_name` ON `albums` (`artistId`, `name`)");
+        }
+    };
+
+    static Migration MIGRATION_9_10 = new Migration(9, 10) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE compositions ADD COLUMN coverModifyTime INTEGER NOT NULL DEFAULT 0");
+        }
+    };
+
+    static Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `lastScanDate` INTEGER NOT NULL, `corruptionType` TEXT, `audioFileType` INTEGER NOT NULL, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
+
+            database.execSQL(
+                    "INSERT INTO `compositions_temp` (" +
+                            "id, artistId, albumId, folderId, storageId, title, lyrics, fileName," +
+                            "duration, size, dateAdded, dateModified, lastScanDate, corruptionType," +
+                            "audioFileType, initialSource" +
+                            ") SELECT " +
+                            "id, artistId, albumId, folderId, storageId, title, lyrics, fileName," +
+                            "duration, size, dateAdded, dateModified, lastScanDate, corruptionType," +
+                            "1 AS audioFileType, 1 AS initialSource FROM compositions"
+            );
+
+            database.execSQL("DROP TABLE `compositions`");
+            database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
+
+            database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
+            database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
+            database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
+        }
+    };
 
     static Migration MIGRATION_7_8 = new Migration(7, 8) {
         @Override
@@ -129,20 +173,21 @@ class Migrations {
 
             //don't migrate folders, they will update automatically on next storage rescan
             try (Cursor c = database.query("SELECT * FROM compositions")) {
+                CursorWrapper cursorWrapper = new CursorWrapper(c);
                 while (c.moveToNext()) {
                     ContentValues cv = new ContentValues();
 
-                    cv.put("id", getLong(c, "id"));
-                    cv.put("artistId", getLong(c, "artistId"));
-                    cv.put("albumId", getLong(c, "albumId"));
-                    cv.put("storageId", getLong(c, "storageId"));
-                    cv.put("title", c.getString(c.getColumnIndex("title")));
-                    cv.put("filePath", c.getString(c.getColumnIndex("filePath")));
-                    cv.put("duration", getLong(c, "duration"));
-                    cv.put("size", getLong(c, "size"));
-                    cv.put("dateAdded", getLong(c, "dateAdded"));
-                    cv.put("dateModified", getLong(c, "dateModified"));
-                    cv.put("corruptionType", c.getString(c.getColumnIndex("corruptionType")));
+                    cv.put("id", cursorWrapper.getLong( "id"));
+                    cv.put("artistId", cursorWrapper.getLong("artistId"));
+                    cv.put("albumId", cursorWrapper.getLong( "albumId"));
+                    cv.put("storageId", cursorWrapper.getLong("storageId"));
+                    cv.put("title", cursorWrapper.getString("title"));
+                    cv.put("filePath", cursorWrapper.getString("filePath"));
+                    cv.put("duration", cursorWrapper.getLong( "duration"));
+                    cv.put("size", cursorWrapper.getLong( "size"));
+                    cv.put("dateAdded", cursorWrapper.getLong("dateAdded"));
+                    cv.put("dateModified", cursorWrapper.getLong("dateModified"));
+                    cv.put("corruptionType", cursorWrapper.getString("corruptionType"));
                     database.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv);
                 }
 
@@ -195,15 +240,16 @@ class Migrations {
                 Map<String, Long> artistCache = new HashMap<>();
                 Map<String, Long> albumsCache = new HashMap<>();
                 try (Cursor c = database.query("SELECT * FROM compositions")) {
+                    CursorWrapper cursorWrapper = new CursorWrapper(c);
                     while (c.moveToNext()) {
                         ContentValues cv = new ContentValues();
 
                         //artists
-                        String artist = c.getString(c.getColumnIndex("artist"));
+                        String artist = cursorWrapper.getString("artist");
                         Long artistId = insertArtist(artist, database, artistCache);
                         cv.put("artistId", artistId);
 
-                        long storageId = c.getLong(c.getColumnIndex("storageId"));
+                        long storageId = cursorWrapper.getLong("storageId");
 
                         //albums
                         Long albumId = null;
@@ -219,15 +265,15 @@ class Migrations {
                         }
                         cv.put("albumId", albumId);
 
-                        cv.put("id", c.getLong(c.getColumnIndex("id")));
+                        cv.put("id", cursorWrapper.getLong("id"));
                         cv.put("storageId", storageId);
-                        cv.put("title", c.getString(c.getColumnIndex("title")));
-                        cv.put("filePath", c.getString(c.getColumnIndex("filePath")));
-                        cv.put("duration", c.getLong(c.getColumnIndex("duration")));
-                        cv.put("size", c.getLong(c.getColumnIndex("size")));
-                        cv.put("dateAdded", c.getLong(c.getColumnIndex("dateAdded")));
-                        cv.put("dateModified", c.getLong(c.getColumnIndex("dateModified")));
-                        cv.put("corruptionType", c.getString(c.getColumnIndex("corruptionType")));
+                        cv.put("title", cursorWrapper.getString("title"));
+                        cv.put("filePath", cursorWrapper.getString("filePath"));
+                        cv.put("duration", cursorWrapper.getLong("duration"));
+                        cv.put("size", cursorWrapper.getLong("size"));
+                        cv.put("dateAdded", cursorWrapper.getLong("dateAdded"));
+                        cv.put("dateModified", cursorWrapper.getLong("dateModified"));
+                        cv.put("corruptionType", cursorWrapper.getString("corruptionType"));
                         database.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv);
                     }
                 }
@@ -277,8 +323,8 @@ class Migrations {
         ContentValues cvAlb = new ContentValues();
         cvAlb.put("artistId", albumArtistId);
         cvAlb.put("name", album.getAlbum());
-        cvAlb.put("firstYear", album.getFirstYear());
-        cvAlb.put("lastYear", album.getLastYear());
+        cvAlb.put("firstYear", 0);
+        cvAlb.put("lastYear", 0);
 
         albumId = database.insert("albums", SQLiteDatabase.CONFLICT_REPLACE, cvAlb);
 
@@ -292,20 +338,22 @@ class Migrations {
             //copy values with verified index
             LongSparseArray<Integer> positionMap = new LongSparseArray<>();
             try (Cursor c = database.query("SELECT id FROM play_queue ORDER BY position")) {
+                CursorWrapper cursorWrapper = new CursorWrapper(c);
                 for (int i = 0; i < c.getCount(); i++) {
                     c.moveToPosition(i);
-                    positionMap.put(c.getLong(c.getColumnIndex("id")), i);
+                    positionMap.put(cursorWrapper.getLong("id"), i);
                 }
             }
 
             LinkedList<ContentValues> cvList = new LinkedList<>();
             try (Cursor c = database.query("SELECT id, audioId FROM play_queue ORDER BY shuffledPosition")) {
+                CursorWrapper cursorWrapper = new CursorWrapper(c);
                 for (int i = 0; i < c.getCount(); i++) {
                     c.moveToPosition(i);
                     ContentValues cv = new ContentValues();
-                    long id = c.getLong(c.getColumnIndex("id"));
+                    long id = cursorWrapper.getLong("id");
                     cv.put("id", id);
-                    cv.put("audioId", c.getLong(c.getColumnIndex("audioId")));
+                    cv.put("audioId", cursorWrapper.getLong("audioId"));
                     cv.put("position", positionMap.get(id));
                     cv.put("shuffledPosition", i);
                     cvList.add(cv);

@@ -41,8 +41,8 @@ public class StorageAlbumsProvider {
                         Albums.ALBUM,
 //                        Albums.ALBUM_ID,
 //                        Albums.ALBUM_KEY,
-                        Albums.FIRST_YEAR,
-                        Albums.LAST_YEAR,
+//                        Albums.FIRST_YEAR,
+//                        Albums.LAST_YEAR,
                         Albums.ARTIST,
 //                        Albums.ARTIST_ID
                 },
@@ -116,13 +116,7 @@ public class StorageAlbumsProvider {
             artist = null;
         }
 
-        return new StorageAlbum(
-                cursorWrapper.getLong(Albums._ID),
-                name,
-                artist,
-                cursorWrapper.getInt(Albums.FIRST_YEAR),
-                cursorWrapper.getInt(Albums.LAST_YEAR)
-        );
+        return new StorageAlbum(cursorWrapper.getLong(Albums._ID), name, artist);
     }
 
 }

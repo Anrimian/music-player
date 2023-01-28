@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
+import com.github.anrimian.musicplayer.domain.models.composition.tags.CompositionSourceTags;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,10 +44,13 @@ public class CompositionSourceEditorTest {
 
     @Test
     public void testEditor() {
-        System.out.println("title: " + sourceEditor.getCompositionTitle(source));
-        System.out.println("author: " + sourceEditor.getCompositionAuthor(source));
-        System.out.println("album: " + sourceEditor.getCompositionAlbum(source));
-        System.out.println("album artist: " + sourceEditor.getCompositionAlbumArtist(source));
+        AudioFileInfo audioFileInfo = sourceEditor.getAudioFileInfo(source).blockingGet();
+        CompositionSourceTags tags = audioFileInfo.getAudioTags();
+        System.out.println("title: " + tags.getTitle());
+        System.out.println("author: " + tags.getArtist());
+        System.out.println("album: " + tags.getAlbum());
+        System.out.println("album artist: " + tags.getAlbumArtist());
+        System.out.println("durationSeconds: " + tags.getDurationSeconds());
         System.out.println("genre: " + sourceEditor.getCompositionGenre(source));
     }
 

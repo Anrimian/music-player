@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.domain.utils;
 
 
+import javax.annotation.Nullable;
+
 public class TextUtils {
 
     public static String getLastPathSegment(String text) {
@@ -95,5 +97,25 @@ public class TextUtils {
         }
         String tail = string.substring(lastIndex).replace(from, to);
         return string.substring(0, lastIndex) + tail;
+    }
+
+    @Nullable
+    public static Long safeParseLong(@Nullable String value, @Nullable Long fallbackValue) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return fallbackValue;
+        }
+    }
+
+    @Nullable
+    public static String toString(@Nullable Long value) {
+        if (value == null) {
+            return null;
+        }
+        return value.toString();
     }
 }

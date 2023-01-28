@@ -1,13 +1,14 @@
 package com.github.anrimian.musicplayer.domain.interactors.player;
 
 import com.github.anrimian.filesync.SyncInteractor;
-import com.github.anrimian.filesync.models.state.file.FormattedFileSyncState;
+import com.github.anrimian.filesync.models.state.file.FileSyncState;
 import com.github.anrimian.filesync.models.state.file.NotActive;
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
@@ -18,6 +19,7 @@ public class PlayerScreenInteractor {
     private final SleepTimerInteractor sleepTimerInteractor;
     private final LibraryPlayerInteractor libraryPlayerInteractor;
     private final SyncInteractor<?, ?, Long> syncInteractor;
+    private final PlayQueueRepository playQueueRepository;
     private final UiStateRepository uiStateRepository;
     private final SettingsRepository settingsRepository;
     private final MediaScannerRepository mediaScannerRepository;
@@ -25,12 +27,14 @@ public class PlayerScreenInteractor {
     public PlayerScreenInteractor(SleepTimerInteractor sleepTimerInteractor,
                                   LibraryPlayerInteractor libraryPlayerInteractor,
                                   SyncInteractor<?, ?, Long> syncInteractor,
+                                  PlayQueueRepository playQueueRepository,
                                   UiStateRepository uiStateRepository,
                                   SettingsRepository settingsRepository,
                                   MediaScannerRepository mediaScannerRepository) {
         this.sleepTimerInteractor = sleepTimerInteractor;
         this.libraryPlayerInteractor = libraryPlayerInteractor;
         this.syncInteractor = syncInteractor;
+        this.playQueueRepository = playQueueRepository;
         this.uiStateRepository = uiStateRepository;
         this.settingsRepository = settingsRepository;
         this.mediaScannerRepository = mediaScannerRepository;
@@ -84,18 +88,18 @@ public class PlayerScreenInteractor {
         return mediaScannerRepository.getFileScannerStateObservable();
     }
 
-    public Observable<FormattedFileSyncState> getCurrentCompositionFileSyncState() {
-        FormattedFileSyncState syncState = new FormattedFileSyncState();
-        return libraryPlayerInteractor.getCurrentCompositionObservable()
-                .switchMap(currentComposition -> {
-                    Composition composition = currentComposition.getComposition();
-                    if (composition == null) {
-                        return Observable.just(syncState.set(NotActive.INSTANCE, false));
+    public Observable<FileSyncState> getCurrentCompositionFileSyncState() {
+        return libraryPlayerInteractor.getCurrentQueueItemObservable()
+                .switchMap(queueItem -> {
+                    PlayQueueItem item = queueItem.getPlayQueueItem();
+                    if (item == null) {
+                        return Observable.just(NotActive.INSTANCE);
                     }
-                    return syncInteractor.getFileSyncStateObservable(composition.getId())
-                            .map(state -> syncState.set(state,
-                                    CompositionHelper.isCompositionFileRemote(composition)
-                            ));
+                    return syncInteractor.getFileSyncStateObservable(item.getComposition().getId());
                 });
+    }
+
+    public Observable<PlayQueueData> getPlayQueueDataObservable() {
+        return playQueueRepository.getPlayQueueDataObservable();
     }
 }

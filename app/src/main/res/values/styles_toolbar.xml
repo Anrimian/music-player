@@ -46,7 +46,7 @@
     </style>
 
     <style name="ToolbarSubtitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
-        <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
+        <item name="android:textColor">@color/color_text_secondary_inverse</item>
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
         <item name="android:textAlignment">viewStart</item>

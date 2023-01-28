@@ -52,7 +52,7 @@ public class ExcludedFoldersFragment extends MvpAppCompatFragment implements Exc
                              @Nullable Bundle savedInstanceState) {
         viewBinding = FragmentExcludedFoldersBinding.inflate(inflater, container, false);
         clContainer = viewBinding.clContainer;
-        recyclerView = viewBinding.recyclerView;
+        recyclerView = viewBinding.rvExcludedFolders;
         return viewBinding.getRoot();
     }
 

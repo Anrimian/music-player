@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions
 
-import android.os.Build
 import com.github.anrimian.musicplayer.data.database.AppDatabase
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper
@@ -10,7 +9,6 @@ import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapp
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionMapper
 import com.github.anrimian.musicplayer.data.models.changes.Change
-import com.github.anrimian.musicplayer.data.models.composition.AudioFileType
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
@@ -89,8 +87,6 @@ class StorageCompositionsInserter(
             albumId = albumsDaoWrapper.getOrInsertAlbum(
                 storageAlbum.album,
                 storageAlbum.artist,
-                storageAlbum.firstYear,
-                storageAlbum.lastYear,
                 artistsCache,
                 albumsCache
             )
@@ -145,20 +141,6 @@ class StorageCompositionsInserter(
             compositionsDao.updateFolderId(compositionId, folderId)
         }
 
-        val oldAudioFileType = oldComposition.audioFileType
-        var newAudioFileType = composition.audioFileType
-        if (oldAudioFileType != newAudioFileType) {
-            //ignore change for this cases
-            if (oldAudioFileType == AudioFileType.AUDIOBOOK
-                && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                newAudioFileType = oldAudioFileType
-            }
-            if (oldAudioFileType == AudioFileType.RECORDING
-                && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                newAudioFileType = oldAudioFileType
-            }
-        }
-
         compositionsDao.update(
             composition.title,
             composition.fileName,
@@ -166,7 +148,6 @@ class StorageCompositionsInserter(
             composition.size,
             composition.dateModified,
             composition.storageId,
-            newAudioFileType
         )
     }
 

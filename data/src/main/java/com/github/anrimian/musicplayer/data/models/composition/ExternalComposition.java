@@ -15,19 +15,19 @@ public class ExternalComposition {
     @Nullable
     private final String albumArtist;
     @Nullable
+    private final Long trackNumber;
+    @Nullable
+    private final Long discNumber;
+    @Nullable
+    private final String comment;
+    @Nullable
     private final String lyrics;
-
-
-    private final int albumFirstYear;
-    private final int albumLastYear;
 
     private final long duration;
     private final long size;
     private final long dateAdded;
     private final long dateModified;
-    private final long lastScanDate;
-
-    private final int audioFileType;
+    private final long coverModifyTime;
 
     private final boolean isFileExists;
 
@@ -37,15 +37,15 @@ public class ExternalComposition {
                                @Nullable String artist,
                                @Nullable String album,
                                @Nullable String albumArtist,
+                               @Nullable Long trackNumber,
+                               @Nullable Long discNumber,
+                               @Nullable String comment,
                                @Nullable String lyrics,
-                               int albumFirstYear,
-                               int albumLastYear,
                                long duration,
                                long size,
-                               int audioFileType,
                                long dateAdded,
                                long dateModified,
-                               long lastScanDate,
+                               long coverModifyTime,
                                boolean isFileExists) {
         this.parentPath = parentPath;
         this.fileName = fileName;
@@ -53,15 +53,15 @@ public class ExternalComposition {
         this.artist = artist;
         this.album = album;
         this.albumArtist = albumArtist;
+        this.trackNumber = trackNumber;
+        this.discNumber = discNumber;
+        this.comment = comment;
         this.lyrics = lyrics;
-        this.albumFirstYear = albumFirstYear;
-        this.albumLastYear = albumLastYear;
         this.duration = duration;
         this.size = size;
-        this.audioFileType = audioFileType;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.lastScanDate = lastScanDate;
+        this.coverModifyTime = coverModifyTime;
         this.isFileExists = isFileExists;
     }
 
@@ -93,20 +93,31 @@ public class ExternalComposition {
         return albumArtist;
     }
 
-    public int getAlbumFirstYear() {
-        return albumFirstYear;
-    }
-
-    public int getAlbumLastYear() {
-        return albumLastYear;
-    }
-
     public long getDateModified() {
         return dateModified;
     }
 
+    public long getCoverModifyTime() {
+        return coverModifyTime;
+    }
+
     public boolean isFileExists() {
         return isFileExists;
+    }
+
+    @Nullable
+    public Long getTrackNumber() {
+        return trackNumber;
+    }
+
+    @Nullable
+    public Long getDiscNumber() {
+        return discNumber;
+    }
+
+    @Nullable
+    public String getComment() {
+        return comment;
     }
 
     @Nullable
@@ -124,13 +135,5 @@ public class ExternalComposition {
 
     public long getDateAdded() {
         return dateAdded;
-    }
-
-    public long getLastScanDate() {
-        return lastScanDate;
-    }
-
-    public int getAudioFileType() {
-        return audioFileType;
     }
 }

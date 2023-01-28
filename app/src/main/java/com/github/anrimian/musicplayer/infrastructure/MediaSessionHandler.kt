@@ -11,6 +11,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.view.KeyEvent
 import android.widget.Toast
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
@@ -18,6 +19,7 @@ import com.github.anrimian.musicplayer.data.utils.rx.retryWithDelay
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor
+import com.github.anrimian.musicplayer.domain.models.composition.content.CorruptedMediaFileException
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
@@ -37,6 +39,7 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
+import com.github.anrimian.musicplayer.ui.utils.getParcelable
 import com.github.anrimian.musicplayer.ui.utils.pIntentFlag
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
@@ -49,13 +52,16 @@ private const val SHUFFLE_ACTION_ID = "shuffle_action_id"
 private const val FAST_FORWARD_ACTION_ID = "fast_forward_action_id"
 private const val REWIND_ACTION_ID = "rewind_action_id"
 
-class MediaSessionHandler(private val context: Context,
-                          private val playerInteractor: PlayerInteractor,
-                          private val libraryPlayerInteractor: LibraryPlayerInteractor,
-                          private val musicServiceInteractor: MusicServiceInteractor,
-                          private val ioScheduler: Scheduler,
-                          private val uiScheduler: Scheduler,
-                          private val errorParser: ErrorParser
+private const val PLAY_EVENT_LOCK_WINDOW_MILLIS = 15L
+
+class MediaSessionHandler(
+    private val context: Context,
+    private val playerInteractor: PlayerInteractor,
+    private val libraryPlayerInteractor: LibraryPlayerInteractor,
+    private val musicServiceInteractor: MusicServiceInteractor,
+    private val ioScheduler: Scheduler,
+    private val uiScheduler: Scheduler,
+    private val errorParser: ErrorParser
 ) {
 
     private var mediaSession: MediaSessionCompat? = null
@@ -233,7 +239,7 @@ class MediaSessionHandler(private val context: Context,
 
     private fun getSessionRepeatMode(repeatMode: Int) = when (repeatMode) {
         RepeatMode.REPEAT_COMPOSITION -> PlaybackStateCompat.REPEAT_MODE_ONE
-        RepeatMode.REPEAT_PLAY_LIST -> PlaybackStateCompat.REPEAT_MODE_ALL
+        RepeatMode.REPEAT_PLAY_QUEUE -> PlaybackStateCompat.REPEAT_MODE_ALL
         else -> PlaybackStateCompat.REPEAT_MODE_NONE
     }
 
@@ -311,7 +317,8 @@ class MediaSessionHandler(private val context: Context,
             PlayerState.STOP -> PlaybackStateCompat.STATE_STOPPED
             is PlayerState.Error -> {
                 val errorCode = when(playerState.throwable) {
-                    is UnsupportedSourceException -> PlaybackStateCompat.ERROR_CODE_NOT_SUPPORTED
+                    is UnsupportedSourceException,
+                    is CorruptedMediaFileException -> PlaybackStateCompat.ERROR_CODE_NOT_SUPPORTED
                     else -> PlaybackStateCompat.ERROR_CODE_APP_ERROR
                 }
                 val errorMessage = errorParser.parseError(playerState.throwable).message
@@ -370,6 +377,8 @@ class MediaSessionHandler(private val context: Context,
 
     private inner class AppMediaSessionCallback : MediaSessionCompat.Callback() {
 
+        private var lastEventTime = 0L
+
         override fun onPlay() {
             AppAndroidUtils.playPause(context, playerInteractor)
         }
@@ -402,7 +411,7 @@ class MediaSessionHandler(private val context: Context,
                 }
                 PlaybackStateCompat.REPEAT_MODE_GROUP,
                 PlaybackStateCompat.REPEAT_MODE_ALL -> {
-                    RepeatMode.REPEAT_PLAY_LIST
+                    RepeatMode.REPEAT_PLAY_QUEUE
                 }
                 PlaybackStateCompat.REPEAT_MODE_ONE -> {
                     RepeatMode.REPEAT_COMPOSITION
@@ -546,6 +555,14 @@ class MediaSessionHandler(private val context: Context,
 
         //must call super
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
+            //fix for case when double or triple tap is considered as skipTo + play/pause
+            val keyEvent = mediaButtonEvent.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+            if (keyEvent != null && keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
+                if (lastEventTime + PLAY_EVENT_LOCK_WINDOW_MILLIS > System.currentTimeMillis()) {
+                    return true
+                }
+            }
+            lastEventTime = System.currentTimeMillis()
             return super.onMediaButtonEvent(mediaButtonEvent)
         }
 

@@ -42,40 +42,50 @@ public class CompositionEntity {
     private long id;
 
     @Nullable
-    private Long artistId;
+    private final Long artistId;
 
     @Nullable
-    private Long albumId;
+    private final Long albumId;
 
     @Nullable
-    private Long folderId;
+    private final Long folderId;
 
     @Nullable
-    private Long storageId;
+    private final Long storageId;
 
     @Nullable
-    private String title;
+    private final String title;
 
     @Nullable
-    private String lyrics;
+    private final Long trackNumber;
+
+    @Nullable
+    private final Long discNumber;
+
+    @Nullable
+    private final String comment;
+
+    @Nullable
+    private final String lyrics;
 
     @Nonnull
-    private String fileName;
+    private final String fileName;
 
-    private long duration;
-    private long size;
+    private final long duration;
+    private final long size;
 
     @Nonnull
-    private Date dateAdded;
+    private final Date dateAdded;
     @Nonnull
-    private Date dateModified;
+    private final Date dateModified;
     @androidx.annotation.NonNull
-    private Date lastScanDate;
+    private final Date lastScanDate;
+    @androidx.annotation.NonNull
+    private final Date coverModifyTime;
 
     @Nullable
-    private CorruptionType corruptionType;
+    private final CorruptionType corruptionType;
 
-    private final int audioFileType;
     @androidx.annotation.NonNull
     private final InitialSource initialSource;
 
@@ -83,6 +93,9 @@ public class CompositionEntity {
                              @Nullable Long albumId,
                              @Nullable Long folderId,
                              @Nullable String title,
+                             @Nullable Long trackNumber,
+                             @Nullable Long discNumber,
+                             @Nullable String comment,
                              @Nullable String lyrics,
                              @Nonnull String fileName,
                              long duration,
@@ -91,14 +104,17 @@ public class CompositionEntity {
                              @Nonnull Date dateAdded,
                              @Nonnull Date dateModified,
                              @NonNull Date lastScanDate,
+                             @NonNull Date coverModifyTime,
                              @Nullable CorruptionType corruptionType,
-                             int audioFileType,
-                             @androidx.annotation.NonNull InitialSource initialSource) {
+                             @NonNull InitialSource initialSource) {
         this.artistId = artistId;
         this.albumId = albumId;
         this.folderId = folderId;
         this.storageId = storageId;
         this.title = title;
+        this.trackNumber = trackNumber;
+        this.discNumber = discNumber;
+        this.comment = comment;
         this.lyrics = lyrics;
         this.fileName = fileName;
         this.duration = duration;
@@ -106,8 +122,8 @@ public class CompositionEntity {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.lastScanDate = lastScanDate;
+        this.coverModifyTime = coverModifyTime;
         this.corruptionType = corruptionType;
-        this.audioFileType = audioFileType;
         this.initialSource = initialSource;
 
         Objects.requireNonNull(fileName);
@@ -146,6 +162,21 @@ public class CompositionEntity {
         return title;
     }
 
+    @Nullable
+    public Long getTrackNumber() {
+        return trackNumber;
+    }
+
+    @Nullable
+    public Long getDiscNumber() {
+        return discNumber;
+    }
+
+    @Nullable
+    public String getComment() {
+        return comment;
+    }
+
     @Nonnull
     public String getFileName() {
         return fileName;
@@ -174,6 +205,11 @@ public class CompositionEntity {
         return lastScanDate;
     }
 
+    @androidx.annotation.NonNull
+    public Date getCoverModifyTime() {
+        return coverModifyTime;
+    }
+
     @Nullable
     public CorruptionType getCorruptionType() {
         return corruptionType;
@@ -182,10 +218,6 @@ public class CompositionEntity {
     @Nullable
     public String getLyrics() {
         return lyrics;
-    }
-
-    public int getAudioFileType() {
-        return audioFileType;
     }
 
     @androidx.annotation.NonNull

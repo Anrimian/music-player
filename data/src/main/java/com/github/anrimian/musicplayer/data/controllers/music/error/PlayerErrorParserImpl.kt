@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaS
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser
 import com.github.anrimian.musicplayer.domain.models.composition.content.*
+import com.google.android.exoplayer2.ParserException
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.source.UnrecognizedInputFormatException
 import com.google.android.exoplayer2.upstream.ContentDataSource.ContentDataSourceException
@@ -18,6 +19,7 @@ open class PlayerErrorParserImpl(
 
     override fun parseError(throwable: Throwable): Throwable {
         when (throwable) {
+            is RelaunchSourceException -> return throwable
             is FileNotFoundException -> return LocalSourceNotFoundException()
             is CompositionNotFoundException -> return LocalSourceNotFoundException()
             is PlaybackException -> {
@@ -37,6 +39,9 @@ open class PlayerErrorParserImpl(
                 }
                 if (cause is UnrecognizedInputFormatException) {
                     return UnsupportedSourceException()
+                }
+                if (cause is ParserException) {
+                    return CorruptedMediaFileException()
                 }
             }
             is UnsupportedSourceException -> return throwable

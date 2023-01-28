@@ -30,7 +30,7 @@ class CompositeMediaPlayer(
     private val currentPlayerSubject = BehaviorSubject.createDefault(currentPlayer)
 
     private var currentSource: CompositionContentSource? = null
-    private var previousPrepareException: Exception? = null
+    private var previousPlayerException: Exception? = null
 
     override fun prepareToPlay(
         source: CompositionContentSource,
@@ -43,8 +43,8 @@ class CompositeMediaPlayer(
         //workaround for android media player unsupported error case
         var ex: Exception? = null
         if (source == currentSource) {
-            ex = previousPrepareException
-            previousPrepareException = null
+            ex = previousPlayerException
+            previousPlayerException = null
         }
         currentSource = source
         return Single.fromCallable { currentPlayer }
@@ -143,6 +143,7 @@ class CompositeMediaPlayer(
             val newPlayerIndex = currentPlayerIndex + 1
             //don't switch player when we reached end of available players
             if (newPlayerIndex >= 0 && newPlayerIndex < mediaPlayers.size) {
+                previousPlayerException = throwable as Exception
                 setPlayer(newPlayerIndex)
                 return true
             }

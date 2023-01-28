@@ -5,6 +5,7 @@
     <attr name="colorPrimaryDarkSecondary" format="color"/>
     <attr name="colorPrimaryVariant" format="color"/>
     <attr name="colorAccentContrast" format="color"/>
+    <attr name="colorAccentDark" format="color"/>
 
     <!--action mode-->
     <attr name="actionModeBackgroundColor" format="color"/>
@@ -42,4 +43,12 @@
 
     <!--snackbar-->
     <attr name="snackbarBackground" format="color"/>
+
+    <!--widgets-->
+    <attr name="widgetBackground" format="color"/>
+    <attr name="widgetTextColorPrimary" format="color"/>
+    <attr name="widgetTextColorSecondary" format="color"/>
+    <attr name="widgetButtonColor" format="color"/>
+    <attr name="widgetDisabledColor" format="color"/>
+    <attr name="widgetSelectableColor" format="color"/>
 </resources>

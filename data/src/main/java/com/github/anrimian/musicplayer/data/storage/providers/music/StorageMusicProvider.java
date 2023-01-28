@@ -26,7 +26,6 @@ import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.collection.LongSparseArray;
 
-import com.github.anrimian.musicplayer.data.models.composition.AudioFileType;
 import com.github.anrimian.musicplayer.data.storage.exceptions.NotAllowedPathException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UpdateMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
@@ -119,23 +118,12 @@ public class StorageMusicProvider {
                 Media._ID,
                 Media.ALBUM_ID,
                 Media.DATE_ADDED,
-                Media.DATE_MODIFIED,
-                Media.IS_MUSIC,
-                Media.IS_PODCAST,
-                Media.IS_ALARM,
-                Media.IS_NOTIFICATION,
-                Media.IS_RINGTONE
+                Media.DATE_MODIFIED
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             queryBuilder.append(Media.RELATIVE_PATH);
         } else {
             queryBuilder.append(Media.DATA);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            queryBuilder.append(Media.IS_AUDIOBOOK);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            queryBuilder.append(Media.IS_RECORDING);
         }
         String[] query = queryBuilder.build();
 
@@ -198,20 +186,6 @@ public class StorageMusicProvider {
                 int dateAddedIndex = getColumnIndex(cursor, Media.DATE_ADDED);
                 int dateModifiedIndex = getColumnIndex(cursor, Media.DATE_MODIFIED);
 
-                int isMusicIndex = getColumnIndex(cursor, Media.IS_MUSIC);
-                int isPodcastIndex = getColumnIndex(cursor, Media.IS_PODCAST);
-                int isAudioBookIndex = 0;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    isAudioBookIndex = getColumnIndex(cursor, Media.IS_AUDIOBOOK);
-                }
-                int isRecordingIndex = 0;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    getColumnIndex(cursor, Media.IS_RECORDING);
-                }
-                int isAlarmIndex = getColumnIndex(cursor, Media.IS_ALARM);
-                int isNotificationIndex = getColumnIndex(cursor, Media.IS_NOTIFICATION);
-                int isRingtoneIndex = getColumnIndex(cursor, Media.IS_RINGTONE);
-
                 while (MediaStoreUtils.moveToNext(cursor)) {
                     StorageFullComposition composition = buildStorageComposition(
                             artistIndex,
@@ -225,13 +199,6 @@ public class StorageMusicProvider {
                             albumIdIndex,
                             dateAddedIndex,
                             dateModifiedIndex,
-                            isMusicIndex,
-                            isPodcastIndex,
-                            isAudioBookIndex,
-                            isRecordingIndex,
-                            isAlarmIndex,
-                            isNotificationIndex,
-                            isRingtoneIndex,
                             cursorWrapper,
                             albums
                     );
@@ -374,6 +341,9 @@ public class StorageMusicProvider {
         deleteCompositions(asList(id));
     }
 
+    //TODO after delete we can see event from here with undeleted files
+    // lock events for a short period of time?
+    // Reproduce: open folder, api 28, delete-download-delete cycle. Sometimes file is restored
     public void deleteCompositions(List<Long> ids) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
@@ -521,13 +491,12 @@ public class StorageMusicProvider {
         cv.put(Media.SIZE, composition.getSize());
         cv.put(Media.DATE_ADDED, composition.getDateAdded().getTime() / 1000);
         cv.put(Media.DATE_MODIFIED, composition.getDateModified().getTime() / 1000);
-        putAudioFileType(cv, composition.getAudioFileType());
+        putAudioFileType(cv, parentPath);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             return insertCompositionApi30(name, parentPath, cv, streamCallback);
         }
 
-        //noinspection deprecation
         File parentFolder = new File(Environment.getExternalStorageDirectory() + "/" + parentPath);
         //noinspection ResultOfMethodCallIgnored
         parentFolder.mkdirs();
@@ -546,7 +515,6 @@ public class StorageMusicProvider {
             throw new RuntimeException(e);
         }
 
-        //noinspection deprecation
         cv.put(Media.DATA, absolutePath);
 
         Uri uri = contentResolver.insert(getStorageUriForInsertion(), cv);
@@ -671,13 +639,6 @@ public class StorageMusicProvider {
             int albumIdIndex,
             int dateAddedIndex,
             int dateModifiedIndex,
-            int isMusicIndex,
-            int isPodcastIndex,
-            int isAudioBookIndex,
-            int isRecordingIndex,
-            int isAlarmIndex,
-            int isNotificationIndex,
-            int isRingtoneIndex,
             CursorWrapper cursorWrapper,
             LongSparseArray<StorageAlbum> albums
     ) {
@@ -702,7 +663,6 @@ public class StorageMusicProvider {
             if (isEmpty(filePath)) {
                 return null;
             }
-            //noinspection ConstantConditions
             filePath = FileUtils.getParentDirPath(filePath);
         }
 
@@ -745,15 +705,6 @@ public class StorageMusicProvider {
 
         StorageAlbum storageAlbum = albums.get(albumId);
 
-        int audioFileType = getAudioFileType(cursorWrapper,
-                isMusicIndex,
-                isPodcastIndex,
-                isAudioBookIndex,
-                isRecordingIndex,
-                isAlarmIndex,
-                isNotificationIndex,
-                isRingtoneIndex);
-
         return new StorageFullComposition(
                 artist,
                 title,
@@ -764,78 +715,43 @@ public class StorageMusicProvider {
                 id,
                 dateAdded,
                 dateModified,
-                storageAlbum,
-                audioFileType);
+                storageAlbum);
     }
 
-    private int getAudioFileType(CursorWrapper cursor,
-                                 int isMusicIndex,
-                                 int isPodcastIndex,
-                                 int isAudioBookIndex,
-                                 int isRecordingIndex,
-                                 int isAlarmIndex,
-                                 int isNotificationIndex,
-                                 int isRingtoneIndex) {
-        if (cursor.getBoolean(isMusicIndex)) {
-            return AudioFileType.MUSIC;
+    private void putAudioFileType(ContentValues cv, String parentPath) {
+        if (parentPath.isEmpty()
+                || TextUtils.containsIgnoreCase(parentPath, Environment.DIRECTORY_MUSIC)) {
+            cv.put(Media.IS_MUSIC, true);
+            return;
         }
-        if (cursor.getBoolean(isPodcastIndex)) {
-            return AudioFileType.PODCAST;
+        if (TextUtils.containsIgnoreCase(parentPath, Environment.DIRECTORY_PODCASTS)) {
+            cv.put(Media.IS_PODCAST, true);
+            return;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cursor.getBoolean(isAudioBookIndex)) {
-            return AudioFileType.AUDIOBOOK;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                TextUtils.containsIgnoreCase(parentPath, Environment.DIRECTORY_AUDIOBOOKS)) {
+            cv.put(Media.IS_AUDIOBOOK, true);
+            return;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && cursor.getBoolean(isRecordingIndex)) {
-            return AudioFileType.RECORDING;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                TextUtils.containsIgnoreCase(parentPath, Environment.DIRECTORY_RECORDINGS)) {
+            cv.put(Media.IS_RECORDING, true);
+            return;
         }
-        if (cursor.getBoolean(isAlarmIndex)) {
-            return AudioFileType.ALARM;
+        if (TextUtils.containsIgnoreCase(parentPath, Environment.DIRECTORY_NOTIFICATIONS)) {
+            cv.put(Media.IS_NOTIFICATION, true);
+            return;
         }
-        if (cursor.getBoolean(isNotificationIndex)) {
-            return AudioFileType.NOTIFICATION;
+        if (TextUtils.containsIgnoreCase(parentPath, Environment.DIRECTORY_ALARMS)) {
+            cv.put(Media.IS_ALARM, true);
+            return;
         }
-        if (cursor.getBoolean(isRingtoneIndex)) {
-            return AudioFileType.RINGTONE;
+        if (TextUtils.containsIgnoreCase(parentPath, Environment.DIRECTORY_RINGTONES)) {
+            cv.put(Media.IS_RINGTONE, true);
+            return;
         }
-        return AudioFileType.MUSIC;
-    }
-
-    private void putAudioFileType(ContentValues cv, int audioFileType) {
-        switch (audioFileType) {
-            case AudioFileType.MUSIC: {
-                cv.put(Media.IS_MUSIC, true);
-                return;
-            }
-            case AudioFileType.PODCAST: {
-                cv.put(Media.IS_PODCAST, true);
-                return;
-            }
-            case AudioFileType.AUDIOBOOK: {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    cv.put(Media.IS_AUDIOBOOK, true);
-                }
-                return;
-            }
-            case AudioFileType.RECORDING: {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    cv.put(Media.IS_RECORDING, true);
-                }
-                return;
-            }
-            case AudioFileType.NOTIFICATION: {
-                cv.put(Media.IS_NOTIFICATION, true);
-                return;
-            }
-            case AudioFileType.ALARM: {
-                cv.put(Media.IS_ALARM, true);
-                return;
-            }
-            case AudioFileType.RINGTONE: {
-                cv.put(Media.IS_RINGTONE, true);
-                return;
-            }
-            default: cv.put(Media.IS_MUSIC, true);
-        }
+        //default
+        cv.put(Media.IS_MUSIC, true);
     }
 
     private Uri unsafeGetStorageUri() {

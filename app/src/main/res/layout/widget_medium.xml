@@ -1,111 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widget_view"
+    android:id="@android:id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_appwidget"
+    android:theme="@style/WidgetTheme"
+    android:background="@drawable/bg_appwidget_default"
     tools:layout_width="500dp"
     tools:layout_height="80dp">
 
     <ImageView
-        android:id="@+id/iv_cover"
+        android:id="@+id/ivCover"
         style="@style/WidgetImageStyle"
         android:layout_marginStart="@dimen/widget_medium_content_margin_horizontal"
         android:layout_marginTop="@dimen/widget_medium_content_margin_vertical"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
         android:contentDescription="@null"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_music_placeholder" />
+        android:src="@drawable/ic_music_widget_placeholder"
+        android:layout_centerVertical="true"/>
 
-    <TextView
-        android:id="@+id/tvComposition"
-        style="@style/AppWidget.Text.Primary"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_marginStart="@dimen/widget_medium_content_spacing_margin_horizontal"
-        android:layout_marginTop="@dimen/widget_medium_content_margin_vertical"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/iv_cover"
-        android:layout_toStartOf="@+id/iv_shuffle_mode"
-        android:layout_marginEnd="@dimen/widget_medium_content_margin_horizontal"
-        tools:text="composition_name composition_name composition_name composition_name" />
+        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
+        android:layout_toEndOf="@id/ivCover"
+        android:layout_toStartOf="@+id/ivShuffleMode"
+        android:layout_centerVertical="true">
 
-    <TextView
-        android:id="@+id/tvCompositionAuthor"
-        style="@style/AppWidget.Text.Secondary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
-        android:layout_alignStart="@id/tvComposition"
-        android:layout_below="@id/tvComposition"
-        android:layout_toStartOf="@+id/iv_shuffle_mode"
-        android:layout_alignEnd="@id/tvComposition"
-        tools:text="composition_author composition_author composition_author composition_author composition_author" />
+        <TextView
+            android:id="@+id/tvComposition"
+            style="@style/AppWidget.Text.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/widget_title_padding_end"
+            android:text="@string/title"
+            tools:text="composition_name composition_name composition_name composition_name"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/tvCompositionAuthor"
+            style="@style/AppWidget.Text.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
+            android:text="@string/artist"
+            tools:text="composition_author composition_author composition_author composition_author composition_author" />
+
+    </LinearLayout>
 
     <ImageView
-        android:id="@+id/iv_shuffle_mode"
+        android:id="@+id/ivMenu"
+        style="@style/AppWidget_DotImageButton"
+        android:paddingStart="@dimen/widget_menu_horizontal_margin"
+        android:paddingBottom="@dimen/widget_menu_vertical_margin"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/ivShuffleMode"
+        android:contentDescription="@string/content_description_menu"
+        tools:ignore="RtlSymmetry" />
+
+    <ImageView
+        android:id="@+id/ivShuffleMode"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
+        android:layout_marginEnd="@dimen/widget_medium_controls_spacing_margin"
         android:layout_alignTop="@id/ivPlayPause"
         android:layout_alignBottom="@+id/ivSkipToNext"
-        android:layout_toStartOf="@id/ivSkipToPrevious"
+        android:layout_toStartOf="@id/ivRewind"
         android:src="@drawable/ic_shuffle"
-        android:contentDescription="@string/previous_track"/>
+        android:contentDescription="@string/content_description_shuffle"/>
 
     <ImageView
-        android:id="@+id/ivSkipToPrevious"
+        android:id="@+id/ivRewind"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
+        android:layout_marginEnd="@dimen/widget_medium_controls_spacing_margin"
         android:layout_alignTop="@id/ivPlayPause"
         android:layout_alignBottom="@+id/ivSkipToNext"
-        android:layout_toStartOf="@+id/iv_rewind"
-        android:src="@drawable/ic_skip_previous"
-        android:contentDescription="@string/previous_track"/>
-
-    <ImageView
-        android:id="@+id/iv_rewind"
-        style="@style/AppWidget_ImageButton"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
-        android:layout_alignTop="@id/ivPlayPause"
-        android:layout_alignBottom="@+id/ivSkipToNext"
-        android:layout_toStartOf="@+id/ivPlayPause"
+        android:layout_toStartOf="@+id/ivSkipToPrevious"
         android:src="@drawable/ic_rewind"
         android:contentDescription="@string/rewind"/>
 
     <ImageView
+        android:id="@+id/ivSkipToPrevious"
+        style="@style/AppWidget_ImageButton"
+        android:layout_marginEnd="@dimen/widget_medium_controls_spacing_margin"
+        android:layout_alignTop="@id/ivPlayPause"
+        android:layout_alignBottom="@+id/ivSkipToNext"
+        android:layout_toStartOf="@+id/ivPlayPause"
+        android:src="@drawable/ic_skip_previous"
+        android:contentDescription="@string/previous_track"/>
+
+    <ImageView
         android:id="@+id/ivPlayPause"
         style="@style/AppWidget_ImageButton"
+        android:layout_marginEnd="@dimen/widget_medium_controls_spacing_margin"
         android:layout_alignTop="@+id/ivSkipToNext"
         android:layout_alignBottom="@+id/ivSkipToNext"
-        android:layout_toStartOf="@id/iv_fast_forward"
+        android:layout_toStartOf="@id/ivSkipToNext"
         android:src="@drawable/ic_play"
         android:contentDescription="@string/play"/>
 
     <ImageView
-        android:id="@+id/iv_fast_forward"
-        style="@style/AppWidget_ImageButton"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="@dimen/widget_medium_content_spacing_margin_horizontal"
-        android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
-        android:layout_marginBottom="@dimen/widget_medium_content_spacing_margin_vertical"
-        android:layout_toStartOf="@id/ivSkipToNext"
-        android:contentDescription="@string/fast_forward"
-        android:src="@drawable/ic_fast_forward" />
-
-    <ImageView
         android:id="@+id/ivSkipToNext"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
+        android:layout_marginEnd="@dimen/widget_medium_controls_spacing_margin"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@id/ivRepeatMode"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
-        android:layout_marginBottom="@dimen/widget_medium_content_spacing_margin_vertical"
+        android:layout_toStartOf="@id/ivFastForward"
         android:src="@drawable/ic_skip_next"
         android:contentDescription="@string/next_track"/>
+
+    <ImageView
+        android:id="@+id/ivFastForward"
+        style="@style/AppWidget_ImageButton"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
+        android:layout_marginEnd="@dimen/widget_medium_controls_spacing_margin"
+        android:layout_marginBottom="@dimen/widget_medium_content_spacing_margin_vertical"
+        android:layout_toStartOf="@id/ivRepeatMode"
+        android:contentDescription="@string/fast_forward"
+        android:src="@drawable/ic_fast_forward" />
 
     <ImageView
         android:id="@+id/ivRepeatMode"
@@ -113,8 +128,8 @@
         android:layout_alignTop="@id/ivPlayPause"
         android:layout_alignBottom="@+id/ivSkipToNext"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="@dimen/widget_content_margin_horizontal"
+        android:layout_marginEnd="@dimen/widget_medium_controls_margin_horizontal"
         android:src="@drawable/ic_repeat"
-        android:contentDescription="@string/previous_track"/>
+        android:contentDescription="@string/content_description_repeat_mode"/>
 
 </RelativeLayout>

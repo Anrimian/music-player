@@ -3,5 +3,7 @@
     <!--dialogs-->
     <item name="dialog_min_width_major" type="dimen">45%</item>
     <item name="dialog_min_width_minor" type="dimen">72%</item>
+    <item name="popup_dialog_min_width_major" type="dimen">35%</item>
+    <item name="popup_dialog_min_width_minor" type="dimen">52%</item>
 
 </resources>

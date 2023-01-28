@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common.images;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,6 +30,7 @@ import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCo
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelperKt;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
 import com.github.anrimian.musicplayer.ui.common.images.glide.GlideApp;
@@ -114,7 +116,11 @@ public class CoverImageLoader {
                                              @NonNull FullComposition data,
                                              @DrawableRes int errorPlaceholder) {
         displayImageInReusableTarget(imageView,
-                new CompositionImage(data.getId(), data.getDateModified(), data.getSize(), data.getStorageId() != null),
+                new CompositionImage(data.getId(),
+                        data.getDateModified(),
+                        data.getCoverModifyTime(),
+                        data.getSize(),
+                        CompositionHelperKt.isFileExists(data)),
                 null,
                 errorPlaceholder);
     }
@@ -220,9 +226,10 @@ public class CoverImageLoader {
 
     public void displayImage(@NonNull RemoteViews widgetView,
                              @IdRes int viewId,
-                             int appWidgetId,
+                             ComponentName componentName,
                              long compositionId,
                              long compositionUpdateTime,
+                             long lastCoverModifyTime,
                              long compositionSize,
                              boolean isFileExists,
                              @DrawableRes int placeholder) {
@@ -230,13 +237,14 @@ public class CoverImageLoader {
                 viewId,
                 widgetView,
                 placeholder,
-                appWidgetId);
+                componentName);
 
         GlideApp.with(context)
                 .asBitmap()
                 .load(new CompositionImage(
                         compositionId,
                         new Date(compositionUpdateTime),
+                        new Date(lastCoverModifyTime),
                         compositionSize,
                         isFileExists)
                 ).override(getCoverSize())
@@ -361,6 +369,7 @@ public class CoverImageLoader {
         return new CompositionImage(
                 composition.getId(),
                 composition.getDateModified(),
+                composition.getCoverModifyTime(),
                 composition.getSize(),
                 composition.isFileExists()
         );

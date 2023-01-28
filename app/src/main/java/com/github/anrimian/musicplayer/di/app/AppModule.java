@@ -30,6 +30,7 @@ import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayerIm
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerPresenter;
 import com.github.anrimian.musicplayer.ui.widgets.WidgetUpdater;
+import com.github.anrimian.musicplayer.ui.widgets.menu.WidgetMenuPresenter;
 import com.github.anrimian.musicplayer.utils.logger.AppLogger;
 import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
@@ -74,7 +75,7 @@ public class AppModule {
     @Singleton
     NotificationsDisplayer notificationsDisplayer(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return new NotificationDisplayerApi33();
+            return new NotificationDisplayerApi33(context);
         }
         return new NotificationsDisplayerImpl(context);
     }
@@ -162,5 +163,13 @@ public class AppModule {
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler,
                                             ErrorParser errorParser) {
         return new SleepTimerPresenter(sleepTimerInteractor, uiScheduler, errorParser);
+    }
+
+    @Provides
+    @NonNull
+    WidgetMenuPresenter widgetMenuPresenter(LibraryPlayerInteractor libraryPlayerInteractor,
+                                            @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                            ErrorParser errorParser) {
+        return new WidgetMenuPresenter(libraryPlayerInteractor, uiScheduler, errorParser);
     }
 }

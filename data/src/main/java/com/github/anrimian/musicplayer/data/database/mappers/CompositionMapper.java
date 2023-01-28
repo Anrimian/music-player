@@ -20,6 +20,9 @@ public class CompositionMapper {
                 folderId,
                 composition.getTitle(),
                 null,
+                null,
+                null,
+                null,
                 composition.getFileName(),
                 composition.getDuration(),
                 composition.getSize(),
@@ -27,8 +30,8 @@ public class CompositionMapper {
                 composition.getDateAdded(),
                 composition.getDateModified(),
                 new Date(0),
+                new Date(0),
                 CompositionCorruptionDetector.getCorruptionType(composition),
-                composition.getAudioFileType(),
                 InitialSource.LOCAL);
     }
 
@@ -40,6 +43,9 @@ public class CompositionMapper {
                 albumId,
                 folderId,
                 composition.getTitle(),
+                composition.getTrackNumber(),
+                composition.getDiscNumber(),
+                composition.getComment(),
                 composition.getLyrics(),
                 composition.getFileName(),
                 composition.getDuration(),
@@ -47,9 +53,9 @@ public class CompositionMapper {
                 null,
                 new Date(composition.getDateAdded()),
                 new Date(composition.getDateModified()),
-                new Date(composition.getLastScanDate()),
-                CompositionCorruptionDetector.getCorruptionType(composition.getDuration()),
-                composition.getAudioFileType(),
+                new Date(0),
+                new Date(0),
+                null,
                 InitialSource.REMOTE);
     }
 }

@@ -79,25 +79,25 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         viewBinding.progressStateView.onTryAgainClick { presenter.onTryAgainLoadCompositionsClicked() }
 
         layoutManager = LinearLayoutManager(context)
-        viewBinding.recyclerView.layoutManager = layoutManager
-        RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView, true)
+        viewBinding.rvCompositions.layoutManager = layoutManager
+        RecyclerViewUtils.attachFastScroller(viewBinding.rvCompositions, true)
         adapter = CompositionsAdapter(
             this,
-            viewBinding.recyclerView,
+            viewBinding.rvCompositions,
             presenter.getSelectedCompositions(),
             presenter::onCompositionClicked,
             presenter::onCompositionLongClick,
             presenter::onCompositionIconClicked,
             this::onCompositionMenuClicked
         )
-        viewBinding.recyclerView.adapter = adapter
+        viewBinding.rvCompositions.adapter = adapter
         val callback = ShortSwipeCallback(requireContext(),
             R.drawable.ic_play_next,
             R.string.play_next,
             swipeCallback = presenter::onPlayNextCompositionClicked
         )
         val itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
+        itemTouchHelper.attachToRecyclerView(viewBinding.rvCompositions)
 
         viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
         onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)

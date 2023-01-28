@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widget_view"
+    android:id="@android:id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_appwidget"
+    android:theme="@style/WidgetTheme"
+    android:background="@drawable/bg_appwidget_default"
     tools:layout_width="300dp"
     tools:layout_height="100dp">
+
+    <ImageView
+        android:id="@+id/ivMenu"
+        style="@style/AppWidget_DotImageButton"
+        android:paddingStart="@dimen/widget_menu_horizontal_margin"
+        android:paddingBottom="@dimen/widget_menu_vertical_margin"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/content_description_menu"
+        tools:ignore="RtlSymmetry" />
 
     <TextView
         android:id="@+id/tvComposition"
@@ -16,10 +27,12 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="@dimen/widget_content_margin_horizontal"
-        android:layout_marginTop="@dimen/widget_content_margin_vertical"
-        android:layout_marginEnd="@dimen/widget_content_margin_horizontal"
-        tools:text="Composition name" />
+        android:layout_marginStart="@dimen/widget_small_content_margin_horizontal"
+        android:layout_marginTop="@dimen/widget_small_content_margin_vertical"
+        android:layout_marginEnd="@dimen/widget_small_content_margin_horizontal"
+        android:paddingEnd="@dimen/widget_title_padding_end"
+        android:text="@string/title"
+        tools:ignore="RtlSymmetry" />
 
     <TextView
         android:id="@+id/tvCompositionAuthor"
@@ -29,13 +42,13 @@
         android:layout_below="@id/tvComposition"
         android:layout_alignStart="@id/tvComposition"
         android:layout_alignEnd="@+id/tvComposition"
-        android:layout_marginTop="@dimen/widget_content_spacing_margin"
-        tools:text="Composition artist" />
+        android:layout_marginTop="@dimen/widget_small_content_spacing_margin"
+        android:text="@string/artist"/>
 
     <ImageView
         android:id="@+id/ivSkipToPrevious"
         style="@style/AppWidget_ImageButton"
-        android:layout_marginEnd="@dimen/widget_content_spacing_margin"
+        android:layout_marginEnd="@dimen/widget_small_content_spacing_margin"
         android:layout_alignTop="@id/ivPlayPause"
         android:layout_alignBottom="@+id/ivSkipToNext"
         android:layout_toStartOf="@+id/ivPlayPause"
@@ -45,6 +58,7 @@
     <ImageView
         android:id="@+id/ivPlayPause"
         style="@style/AppWidget_ImageButton"
+        android:layout_marginEnd="@dimen/widget_small_content_spacing_margin"
         android:layout_alignTop="@+id/ivSkipToNext"
         android:layout_alignBottom="@+id/ivSkipToNext"
         android:layout_toStartOf="@id/ivSkipToNext"
@@ -56,10 +70,9 @@
         style="@style/AppWidget_ImageButton"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="@dimen/widget_content_spacing_margin"
-        android:layout_marginTop="@dimen/widget_content_spacing_margin"
-        android:layout_marginEnd="@dimen/widget_content_margin_horizontal"
-        android:layout_marginBottom="@dimen/widget_controls_bottom_margin"
+        android:layout_marginTop="@dimen/widget_small_content_spacing_margin"
+        android:layout_marginEnd="@dimen/widget_small_controls_margin_horizontal"
+        android:layout_marginBottom="@dimen/widget_small_controls_bottom_margin"
         android:contentDescription="@string/next_track"
         android:src="@drawable/ic_skip_next" />
 

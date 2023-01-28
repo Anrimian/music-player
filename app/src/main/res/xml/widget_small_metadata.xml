@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:initialLayout="@layout/widget_small"
     android:minHeight="40dp"
     android:minWidth="180dp"
     android:minResizeWidth="180dp"
     android:resizeMode="horizontal"
     android:updatePeriodMillis="0"
-    android:previewImage="@drawable/widget_small_preview">
+    android:previewImage="@drawable/widget_small_preview"
+    android:previewLayout="@layout/widget_small"
+    tools:targetApi="s">
 </appwidget-provider>

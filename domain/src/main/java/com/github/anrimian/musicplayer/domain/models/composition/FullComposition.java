@@ -20,6 +20,12 @@ public class FullComposition {
     @Nullable
     private final String albumArtist;
     @Nullable
+    private final Long trackNumber;
+    @Nullable
+    private final Long discNumber;
+    @Nullable
+    private final String comment;
+    @Nullable
     private final String lyrics;
     @Nonnull
     private final String fileName;
@@ -35,11 +41,11 @@ public class FullComposition {
     private final Date dateAdded;
     @Nonnull
     private final Date dateModified;
+    @Nonnull
+    private final Date coverModifyTime;
 
     @Nullable
     private final CorruptionType corruptionType;
-
-    private final int audioFileType;
 
     private final InitialSource initialSource;
 
@@ -48,6 +54,9 @@ public class FullComposition {
                            String title,
                            String album,
                            String albumArtist,
+                           @Nullable Long trackNumber,
+                           @Nullable Long discNumber,
+                           @Nullable String comment,
                            String lyrics,
                            String fileName,
                            long duration,
@@ -56,14 +65,17 @@ public class FullComposition {
                            Long storageId,
                            Date dateAdded,
                            Date dateModified,
+                           Date coverModifyTime,
                            CorruptionType corruptionType,
-                           int audioFileType,
                            InitialSource initialSource) {
         this.artist = artist;
         this.title = title;
         this.album = album;
         this.albumArtist = albumArtist;
         this.lyrics = lyrics;
+        this.trackNumber = trackNumber;
+        this.discNumber = discNumber;
+        this.comment = comment;
         this.fileName = fileName;
         this.duration = duration;
         this.size = size;
@@ -71,8 +83,8 @@ public class FullComposition {
         this.storageId = storageId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
+        this.coverModifyTime = coverModifyTime;
         this.corruptionType = corruptionType;
-        this.audioFileType = audioFileType;
         this.initialSource = initialSource;
     }
 
@@ -128,18 +140,34 @@ public class FullComposition {
         return dateModified;
     }
 
+    @Nonnull
+    public Date getCoverModifyTime() {
+        return coverModifyTime;
+    }
+
     @Nullable
     public CorruptionType getCorruptionType() {
         return corruptionType;
     }
 
     @Nullable
-    public String getLyrics() {
-        return lyrics;
+    public Long getTrackNumber() {
+        return trackNumber;
     }
 
-    public int getAudioFileType() {
-        return audioFileType;
+    @Nullable
+    public Long getDiscNumber() {
+        return discNumber;
+    }
+
+    @Nullable
+    public String getComment() {
+        return comment;
+    }
+
+    @Nullable
+    public String getLyrics() {
+        return lyrics;
     }
 
     public InitialSource getInitialSource() {

@@ -67,14 +67,14 @@ class AlbumsListFragment : LibraryFragment(), AlbumsListView, FragmentLayerListe
         viewBinding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked)
         
         adapter = AlbumsAdapter(
-            viewBinding.recyclerView,
+            viewBinding.rvAlbums,
             this::goToAlbumScreen,
             this::onAlbumMenuClicked
         )
-        viewBinding.recyclerView.adapter = adapter
+        viewBinding.rvAlbums.adapter = adapter
         layoutManager = LinearLayoutManager(context)
-        viewBinding.recyclerView.layoutManager = layoutManager
-        RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView)
+        viewBinding.rvAlbums.layoutManager = layoutManager
+        RecyclerViewUtils.attachFastScroller(viewBinding.rvAlbums)
 
         val fm = childFragmentManager
         selectOrderDialogRunner = DialogFragmentRunner(fm, Tags.ORDER_TAG) { f ->

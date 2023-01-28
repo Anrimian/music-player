@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.ui.common;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.widget.Toast;
 
@@ -9,6 +11,7 @@ import androidx.core.content.FileProvider;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 
 import java.io.File;
 
@@ -33,5 +36,16 @@ public class AppAndroidUtils {
         } else {
             SystemServiceControllerImpl.startPlayForegroundService(context);
         }
+    }
+
+    public static PendingIntent broadcastPendingIntent(Context context,
+                                                       int requestCode,
+                                                       Intent intent) {
+        return PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                AndroidUtilsKt.broadcastPendingIntentFlag()
+        );
     }
 }

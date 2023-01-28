@@ -115,4 +115,8 @@
     <!--dark theme(green)-->
     <color name="colorGreenDarkAccent">#00c853</color>
 
+    <!--widgets-->
+    <color name="widget_default_bg_color">@color/light_background_level_0</color>
+    <color name="widget_dark_default_bg_color">@color/dark_background_level_2</color>
+
 </resources>

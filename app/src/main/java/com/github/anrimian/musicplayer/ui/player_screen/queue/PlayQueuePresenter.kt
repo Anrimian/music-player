@@ -1,20 +1,22 @@
 package com.github.anrimian.musicplayer.ui.player_screen.queue
 
+import com.github.anrimian.musicplayer.domain.Constants.NO_POSITION
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
 
 class PlayQueuePresenter(
@@ -25,13 +27,15 @@ class PlayQueuePresenter(
     uiScheduler: Scheduler
 ): AppPresenter<PlayQueueView>(uiScheduler, errorParser) {
 
-    private val batterySafeDisposable = CompositeDisposable()
-
     private val listDragFilter = ListDragFilter()
+
+    private var currentQueueData: PlayQueueData? = null
+    private var playQueueDisposable: Disposable? = null
+    private var positionDisposable: Disposable? = null
 
     private var playQueue: List<PlayQueueItem> = ArrayList()
     private var currentItem: PlayQueueItem? = null
-    private var currentPosition = -1
+    private var currentPosition = NO_POSITION
 
     private var isDragging = false
     private var isCoversEnabled = false
@@ -43,19 +47,14 @@ class PlayQueuePresenter(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         subscribeOnUiSettings()
-    }
-
-    fun onStart() {
+        launchPlayQueueSubscription()
         subscribeOnPlayerStateChanges()
-        subscribeOnPlayQueue()
         subscribeOnCurrentCompositionChanging()
-        subscribeOnCurrentPosition()
     }
 
-    fun onStop() {
-        batterySafeDisposable.clear()
+    fun onLoadAgainQueueClicked() {
+        subscribeOnPlayQueue()
     }
-
 
     fun onQueueItemClicked(position: Int, item: PlayQueueItem) {
         if (item == currentItem) {
@@ -65,7 +64,7 @@ class PlayQueuePresenter(
         currentPosition = position
         currentItem = item
         playerInteractor.skipToItem(item.id)
-        viewState.showCurrentQueueItem(currentItem, isCoversEnabled)
+        viewState.showCurrentQueueItem(currentItem)
     }
 
     fun onQueueItemIconClicked(position: Int, playQueueItem: PlayQueueItem) {
@@ -209,55 +208,79 @@ class PlayQueuePresenter(
     private fun onUiSettingsReceived(isCoversEnabled: Boolean) {
         this.isCoversEnabled = isCoversEnabled
         viewState.setPlayQueueCoversEnabled(isCoversEnabled)
-        if (currentItem != null) {
-            viewState.showCurrentQueueItem(currentItem, isCoversEnabled)
-        }
     }
 
     private fun subscribeOnPlayerStateChanges() {
-        batterySafeDisposable.add(playerInteractor.getIsPlayingStateObservable()
-            .observeOn(uiScheduler)
-            .subscribe(viewState::showPlayerState))
+        playerInteractor.getIsPlayingStateObservable()
+            .unsafeSubscribeOnUi(viewState::showPlayerState)
+    }
+
+    private fun launchPlayQueueSubscription() {
+        playerScreenInteractor.playQueueDataObservable
+            .unsafeSubscribeOnUi(this::onQueueDataReceived)
+    }
+
+    private fun onQueueDataReceived(data: PlayQueueData) {
+        if (currentQueueData != data) {
+            //fast clear list to prevent list update calculation for new queues
+            if (currentQueueData != null) {
+                viewState.updatePlayQueue(null)
+            }
+            currentQueueData = data
+            subscribeOnPlayQueue()
+        }
     }
 
     private fun subscribeOnPlayQueue() {
-        batterySafeDisposable.add(playerInteractor.getPlayQueueObservable()
+        RxUtils.dispose(positionDisposable, presenterDisposable)
+        RxUtils.dispose(playQueueDisposable, presenterDisposable)
+        playQueueDisposable = playerInteractor.getPlayQueueObservable()
             .observeOn(uiScheduler)
             .filter(listDragFilter::filterListEmitting)
-            .subscribe(this::onPlayQueueChanged, errorParser::logError))
+            .subscribe(this::onPlayQueueReceived, this::onPlayQueueReceivingError)
+        presenterDisposable.add(playQueueDisposable!!)
     }
 
-    private fun onPlayQueueChanged(list: List<PlayQueueItem>) {
+    private fun onPlayQueueReceived(list: List<PlayQueueItem>) {
         playQueue = list
         viewState.updatePlayQueue(list)
+        viewState.showList(list.size)
+        subscribeOnCurrentPosition()
     }
 
-    private fun subscribeOnCurrentCompositionChanging() {
-        batterySafeDisposable.add(playerInteractor.getCurrentQueueItemObservable()
-            .observeOn(uiScheduler)
-            .subscribe(this::onPlayQueueEventReceived))
+    private fun onPlayQueueReceivingError(throwable: Throwable) {
+        viewState.showListError(errorParser.parseError(throwable))
     }
 
     private fun subscribeOnCurrentPosition() {
-        batterySafeDisposable.add(playerInteractor.getCurrentItemPositionObservable()
+        if (RxUtils.isActive(positionDisposable)) {
+            return
+        }
+        currentPosition = NO_POSITION
+        positionDisposable = playerInteractor.getCurrentItemPositionObservable()
             .observeOn(uiScheduler)
-            .subscribe(this::onItemPositionReceived))
+            .subscribe(this::onItemPositionReceived)
+        presenterDisposable.add(positionDisposable!!)
     }
 
     private fun onItemPositionReceived(position: Int) {
+        val firstReceive = currentPosition == NO_POSITION
         if (!isDragging && currentPosition != position) {
             currentPosition = position
-            viewState.scrollQueueToPosition(position, playerScreenInteractor.isPlayerPanelOpen)
+            viewState.scrollQueueToPosition(position, !firstReceive)
         }
+    }
+
+    private fun subscribeOnCurrentCompositionChanging() {
+        playerInteractor.getCurrentQueueItemObservable()
+            .unsafeSubscribeOnUi(this::onPlayQueueEventReceived)
     }
 
     private fun onPlayQueueEventReceived(playQueueEvent: PlayQueueEvent) {
         val newItem = playQueueEvent.playQueueItem
-        if (currentItem == null
-            || currentItem != newItem
-            || !CompositionHelper.areSourcesTheSame(newItem!!.composition, currentItem!!.composition)) {
+        if (currentItem != newItem) {
             currentItem = newItem
-            viewState.showCurrentQueueItem(newItem, isCoversEnabled)
+            viewState.showCurrentQueueItem(newItem)
         }
     }
 

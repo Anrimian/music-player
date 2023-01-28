@@ -8,6 +8,7 @@ public interface Payloads {
     Object ARTIST = new Object();
     Object DATE_ADDED = new Object();
     Object DATE_MODIFIED = new Object();
+    Object COVER_MODIFY_TIME = new Object();
     Object DURATION = new Object();
     Object SIZE = new Object();
     Object TITLE = new Object();

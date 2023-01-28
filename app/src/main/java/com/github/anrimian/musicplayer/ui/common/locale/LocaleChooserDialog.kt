@@ -21,7 +21,7 @@ fun showLocaleChooserDialog(context: Context, onCompleteListener: (Locale?) -> U
     val binding = DialogMenuBinding.inflate(LayoutInflater.from(context))
     val view = binding.root
 
-    binding.recyclerView.layoutManager = LinearLayoutManager(context)
+    binding.rvMenuItems.layoutManager = LinearLayoutManager(context)
 
     val menuBuilder = SimpleMenuBuilder(context)
     menuBuilder.add(FOLLOW_SYSTEM_LANGUAGE_ID, context.getString(R.string.follow_system_language))
@@ -48,7 +48,7 @@ fun showLocaleChooserDialog(context: Context, onCompleteListener: (Locale?) -> U
         onCompleteListener(locale)
         dialog.dismiss()
     }
-    binding.recyclerView.adapter = menuAdapter
+    binding.rvMenuItems.adapter = menuAdapter
     return dialog
 }
 

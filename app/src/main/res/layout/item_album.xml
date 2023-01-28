@@ -8,6 +8,7 @@
     android:background="?attr/listItemBackground">
 
     <com.google.android.material.imageview.ShapeableImageView
+        style="@style/BaseShapeableImageStyle"
         android:id="@+id/ivMusicIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"

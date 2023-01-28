@@ -21,7 +21,6 @@ import moxy.viewstate.strategy.alias.Skip
  */
 
 private const val LIST_STATE = "list_state"
-private const val FOLDER_STATE = "back_path_button_state"
 private const val PROGRESS_DIALOG_STATE = "progress_dialog_state"
 
 interface LibraryFoldersView : MvpView {
@@ -41,11 +40,8 @@ interface LibraryFoldersView : MvpView {
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showError(errorCommand: ErrorCommand)
 
-    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = FOLDER_STATE)
-    fun showFolderInfo(folder: FolderFileSource)
-
-    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = FOLDER_STATE)
-    fun hideFolderInfo()
+    @AddToEndSingle
+    fun showFolderInfo(folder: FolderFileSource?)
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
     fun hideProgressDialog()
@@ -91,9 +87,6 @@ interface LibraryFoldersView : MvpView {
 
     @OneExecution
     fun showConfirmDeleteDialog(folder: FolderFileSource)
-
-    @AddToEndSingle
-    fun showSearchMode(show: Boolean)
 
     @OneExecution
     fun sendCompositions(compositions: List<Composition>)

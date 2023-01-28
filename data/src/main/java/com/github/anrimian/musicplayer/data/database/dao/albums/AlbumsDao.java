@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.data.database.dao.albums;
 
 import androidx.room.Dao;
-import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RawQuery;
 import androidx.sqlite.db.SimpleSQLiteQuery;
@@ -17,14 +16,16 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
 @Dao
 public interface AlbumsDao {
 
-    @Insert
-    long insert(AlbumEntity entity);
+    @Query("INSERT OR REPLACE INTO albums (artistId, name) VALUES (:artistId, :name)")
+    long insertAlbum(@Nullable Long artistId, String name);
 
     @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
     Observable<List<Album>> getAllObservable(SupportSQLiteQuery query);

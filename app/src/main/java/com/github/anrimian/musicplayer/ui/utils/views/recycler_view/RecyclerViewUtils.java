@@ -46,10 +46,7 @@ public class RecyclerViewUtils {
         Context context = rv.getContext();
         rv.post(() -> {
             if (smooth) {
-                RecyclerViewUtils.smoothScrollToTop(position,
-                        lm,
-                        context,
-                        170);
+                RecyclerViewUtils.smoothScrollToTop(position, lm, context, 170);
             } else {
                 lm.scrollToPositionWithOffset(position, 0);
             }

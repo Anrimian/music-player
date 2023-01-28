@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 
@@ -49,4 +50,6 @@ public interface PlayQueueRepository {
     Completable clearPlayQueue();
 
     Observable<Integer> getPlayQueueSizeObservable();
+
+    Observable<PlayQueueData> getPlayQueueDataObservable();
 }

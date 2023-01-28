@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -251,17 +252,18 @@ public class FoldersDaoWrapper {
     private Observable<List<FolderFileSource>> getFoldersObservable(Long parentFolderId,
                                                                     Order order,
                                                                     @Nullable String searchText) {
-        String query = FoldersDao.getRecursiveFolderQuery(parentFolderId) +
+        boolean selectAllFolders = !TextUtils.isEmpty(searchText);
+        String query = FoldersDao.getRecursiveFolderQuery(parentFolderId, selectAllFolders) +
                 ", childCompositions(storageId, initialSource) AS (SELECT storageId, initialSource FROM compositions WHERE folderId IN (SELECT childFolderId FROM allChildFolders WHERE rootFolderId = folders.id))" +
                 "SELECT id, name, " +
                 "(SELECT count() FROM childCompositions) as filesCount, " +
                 "(SELECT exists(SELECT 1 FROM childCompositions WHERE storageId IS NOT NULL AND initialSource = 1 LIMIT 1)) as hasAnyStorageFile " +
                 "FROM folders " +
-                "WHERE parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)";
+                "WHERE (? IS NULL AND (parentId = " + parentFolderId + " OR (parentId IS NULL AND " + parentFolderId + " IS NULL)))";
 
         query += getSearchQuery();
         query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 2));
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 3));
         return foldersDao.getFoldersObservable(sqlQuery);
     }
 
@@ -293,7 +295,7 @@ public class FoldersDaoWrapper {
     }
 
     private String getSearchQuery() {
-        return " AND (? IS NULL OR (name NOTNULL AND name LIKE ?))";
+        return " OR (? IS NOT NULL AND name LIKE ?)";
     }
 
     private Observable<Composition> fileSourceToComposition(FileSource fileSource, Order order, boolean useFileName) {

@@ -8,6 +8,7 @@
     android:background="@drawable/bg_selectable_round_shape">
 
     <com.google.android.material.imageview.ShapeableImageView
+        style="@style/BaseShapeableImageStyle"
         android:id="@+id/ivMusicIcon"
         android:layout_width="56dp"
         android:layout_height="56dp"

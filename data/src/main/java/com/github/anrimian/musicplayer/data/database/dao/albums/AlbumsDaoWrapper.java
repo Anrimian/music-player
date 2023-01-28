@@ -8,7 +8,6 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
@@ -119,8 +118,6 @@ public class AlbumsDaoWrapper {
     @Nullable
     public Long getOrInsertAlbum(String albumName,
                                  String albumArtist,
-                                 int firstYear,
-                                 int lastYear,
                                  Map<String, Long> artistsCache,
                                  Map<String, Long> albumsCache) {
         if (albumName == null) {
@@ -136,12 +133,9 @@ public class AlbumsDaoWrapper {
 
         albumId = albumsDao.findAlbum(albumArtistId, albumName);
         if (albumId == null) {
-            albumId = albumsDao.insert(new AlbumEntity(albumArtistId,
-                    albumName,
-                    firstYear,
-                    lastYear));
+            albumId = albumsDao.insertAlbum(albumArtistId, albumName);
         }
-        albumsCache.put(albumName, albumId);
+        albumsCache.put(cacheKey, albumId);
         return albumId;
     }
 

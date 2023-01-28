@@ -25,6 +25,7 @@
         <item name="dialogColorControlHighlight">@color/color_control_highlight</item>
         <item name="colorControlHighlightInverse">@color/color_control_highlight_dark</item>
         <item name="colorControlThird">@color/color_control_third</item>
+        <item name="colorAccentDark">?attr/colorAccent</item>
 
         <!--text colors-->
         <item name="android:textColorPrimary">@color/text_color_primary</item>
@@ -99,6 +100,11 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+    <style name="PopupActivityTheme" parent="DialogActivityTheme">
+        <item name="android:windowMinWidthMajor">@dimen/popup_dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/popup_dialog_min_width_minor</item>
     </style>
 
     <style name="DialogActivityAnimation" parent="@android:style/Animation.Dialog">

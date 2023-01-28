@@ -236,29 +236,27 @@
     <string name="sound_balance_state">Vlevo: %1$d%%, Vpravo: %2$d%%</string>
     <string name="language">Jazyk</string>
     <string name="follow_system_language">Použij systémový jazyk</string>
-    <!--not verified-->
     <string name="move">Přesunout</string>
-    <string name="no_compositions_in_folder">Skladby ve složce nebyly nalezeny</string>
-    <string name="follow_system_theme">Následovat systémový motiv</string>
+    <string name="no_compositions_in_folder">Ve složce nebyla nalezena žádná skladba</string>
+    <string name="follow_system_theme">Použít systémový vzhled</string>
     <string name="play_queue_is_empty">Fronta přehrávání je prázdná</string>
-    <string name="no_lyrics_for_current_composition">Žádný text pro aktuální skladbu</string>
-    <string name="edit_lyrics">Upravit text písně</string>
+    <string name="no_lyrics_for_current_composition">Žádný text pro tuto skladbu</string>
+    <string name="edit_lyrics">Upravit text</string>
     <string name="show_in_folders">Zobrazit ve složkách</string>
-    <string name="file_source_not_found">Vzdálený soubor nebyl nalezen</string>
+    <string name="file_source_not_found">Vzdálený soubor nenalezen</string>
     <string name="file_is_too_large">Soubor je příliš velký</string>
-    <string name="preparing_files">Příprava souborů</string>
+    <string name="preparing_files">Připravuji soubory</string>
     <string name="downloading">Stahování: %1$d/%2$d</string>
-    <string name="downloading_progress">Stahování (%d%%)</string>
-    <string name="rename_progress_count">Přejmenování (%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? Tuto akci nelze vrátit.</string>
+    <string name="downloading_progress">Stahování:(%d%%)</string>
+    <string name="rename_progress_count">Zbývá(%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Tato akce se nedá vrátit.</string>
     <string name="delete_composition_template">Smazat skladbu \"%1$s\"</string>
     <string name="delete_empty_folder">Smazat složku \"%s\"</string>
     <string name="delete_folder_template">%2$s ze složky \"%1$s\"</string>
-    <string name="android_r_editor_restriction_error">V systému Android 11 je kopírování/přesouvání/přejmenovávání souborů povoleno pouze ve složkách: \"%s\".
-        Umístěte zvukové soubory do těchto složek a operace by měla fungovat správně.
+    <string name="android_r_editor_restriction_error">Od Android 11 je kopírování/přesouvání/přejmenování souborů je povolené pouze v těchto složkách: \"%s\".
+        Vložte audio soubory do těchto složek a operace by měly proběhnout.
     </string>
-    <string name="folder_already_excluded_from_scanning">Tato složka je již vyloučena z kontroly</string>
-    <!---->
+    <string name="folder_already_excluded_from_scanning">Tato složka je už vyloučena z prohledávání</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s píseň</item>
@@ -323,13 +321,11 @@
         <item quantity="other">%1$d sekund</item>
     </plurals>
 
-    <!--not verified-->
     <plurals name="delete_compositions_template">
         <item quantity="one">Smazat %d píseň</item>
         <item quantity="few">Smazat %d písně</item>
-        <item quantity="many">Smazat %d písně</item>
-        <item quantity="other">Smazat %d písním</item>
+        <item quantity="many">Smazat %d písní</item>
+        <item quantity="other">Smazat %d písní</item>
     </plurals>
-    <!---->
 
 </resources>

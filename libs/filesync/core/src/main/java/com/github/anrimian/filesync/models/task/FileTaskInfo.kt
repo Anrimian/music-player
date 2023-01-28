@@ -5,7 +5,7 @@ import com.github.anrimian.filesync.models.repo.RemoteRepoInfo
 class FileTaskInfo<K>(
     val task: Task<K>,
     val taskCreateTime: Long,
-    val excludeReason: Int,//TODO replace with enum
+    val excludeReason: ExcludeReason?,
     val repoInfo: RemoteRepoInfo?,
 ) {
 

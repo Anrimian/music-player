@@ -91,6 +91,7 @@
         <item name="colorPrimaryDark">@color/colorRedPrimaryDark</item>
         <item name="colorAccent">@color/colorRedPrimary</item>
         <item name="colorAccentContrast">@color/colorRedAccentContrast</item>
+        <item name="colorAccentDark">@color/colorRedPrimaryDark</item>
 
         <!--text-->
         <item name="dialogButtonColor">@color/colorRedPrimary</item>
@@ -152,6 +153,15 @@
         <item name="popupMenuBackgroundColor">@color/dark_background_level_0</item>
         <item name="dialogBackground">@color/dark_background_level_0</item>
         <item name="subToolbarBackground">@android:color/black</item>
+    </style>
+
+    <style name="WidgetTheme">
+        <item name="widgetBackground">@color/widget_default_bg_color</item>
+        <item name="widgetTextColorPrimary">@color/text_color_primary</item>
+        <item name="widgetTextColorSecondary">@color/text_color_secondary</item>
+        <item name="widgetButtonColor">@color/primary_button_color</item>
+        <item name="widgetDisabledColor">@color/disabled_color</item>
+        <item name="widgetSelectableColor">@color/color_control_highlight_light</item>
     </style>
 
 </resources>

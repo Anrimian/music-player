@@ -31,12 +31,48 @@ public class MigrationsTest {
     );
 
     @Test
+    public void testMigrationFrom12To13() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 12);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                13,
+                false,
+                Migrations.MIGRATION_12_13);
+    }
+
+    @Test
+    public void testMigrationFrom11To12() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 11);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                12,
+                false,
+                Migrations.MIGRATION_11_12);
+    }
+
+    @Test
+    public void testMigrationFrom10To11() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 10);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                11,
+                false,
+                Migrations.MIGRATION_10_11);
+    }
+
+    @Test
+    public void testMigrationFrom9To10() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 9);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                10,
+                false,
+                Migrations.MIGRATION_9_10);
+    }
+
+    @Test
     public void testMigrationFrom8To9() throws Exception {
         testHelper.createDatabase(TEST_DB_NAME, 8);
         testHelper.runMigrationsAndValidate(TEST_DB_NAME,
                 9,
                 false,
-                Migrations.getMigration8_9(context));
+                Migrations.MIGRATION_8_9);
     }
 
     @Test

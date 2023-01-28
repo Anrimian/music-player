@@ -15,7 +15,7 @@
         android:focusableInTouchMode="true">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+            android:id="@+id/recyclerView"
             android:background="?attr/listBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -32,7 +32,7 @@
             android:tint="@android:color/white"
             android:contentDescription="@string/play_all"
             app:fabSize="normal"
-            app:layout_anchor="@id/recycler_view"
+            app:layout_anchor="@id/recyclerView"
             app:layout_anchorGravity="bottom|right|end"
             app:srcCompat="@drawable/ic_play"
             app:layout_behavior="@string/fab_behavior"/>

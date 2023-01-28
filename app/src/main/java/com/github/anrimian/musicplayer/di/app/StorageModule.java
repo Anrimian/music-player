@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app;
 
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.SLOW_BG_SCHEDULER;
 
 import android.content.Context;
 import android.os.Build;
@@ -155,7 +156,7 @@ public class StorageModule {
                             StateRepository stateRepository,
                             StorageSourceRepository storageSourceRepository,
                             Analytics analytics,
-                            @Named(IO_SCHEDULER) Scheduler scheduler) {
+                            @Named(SLOW_BG_SCHEDULER) Scheduler scheduler) {
         return new FileScanner(compositionsDao,
                 compositionSourceEditor,
                 stateRepository,

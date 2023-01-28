@@ -33,11 +33,8 @@ public class StorageFullComposition {
 
     private final StorageAlbum storageAlbum;
 
-    private final int audioFileType;
-
     @Nonnull
     private String relativePath;
-
 
     public StorageFullComposition(@Nullable String artist,
                                   @Nullable String title,
@@ -48,8 +45,7 @@ public class StorageFullComposition {
                                   long storageId,
                                   @Nonnull Date dateAdded,
                                   @Nonnull Date dateModified,
-                                  StorageAlbum storageAlbum,
-                                  int audioFileType) {
+                                  StorageAlbum storageAlbum) {
         this.artist = artist;
         this.title = title;
         this.fileName = fileName;
@@ -60,7 +56,6 @@ public class StorageFullComposition {
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
         this.storageAlbum = storageAlbum;
-        this.audioFileType = audioFileType;
     }
 
     public void setRelativePath(@Nonnull String relativePath) {
@@ -111,10 +106,6 @@ public class StorageFullComposition {
     @Nonnull
     public Date getDateModified() {
         return dateModified;
-    }
-
-    public int getAudioFileType() {
-        return audioFileType;
     }
 
     @NonNull

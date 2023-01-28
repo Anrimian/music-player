@@ -1,5 +1,8 @@
 package com.github.anrimian.musicplayer.domain.interactors.library;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
+
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
@@ -12,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -76,12 +80,16 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.getAllCompositionsInFileSources(fileSources);
     }
 
-    public void play(List<FileSource> fileSources) {
-        foldersInteractor.play(fileSources);
+    public void play(FileSource fileSource) {
+        foldersInteractor.play(asList(fileSource), Constants.NO_POSITION);
     }
 
-    public void play(Long folderId, Composition composition) {
-        foldersInteractor.play(folderId, composition);
+    public void play(Collection<FileSource> fileSources) {
+        play(fileSources, Constants.NO_POSITION);
+    }
+
+    public void play(Collection<FileSource> fileSources, int position) {
+        foldersInteractor.play(new ArrayList<>(fileSources), position);
     }
 
     public Single<List<Composition>> addCompositionsToPlayNext(List<FileSource> fileSources) {

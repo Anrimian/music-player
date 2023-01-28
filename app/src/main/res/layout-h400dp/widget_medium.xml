@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widget_view"
+    android:id="@android:id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_appwidget"
+    android:theme="@style/WidgetTheme"
+    android:background="@drawable/bg_appwidget_default"
     tools:layout_width="400dp"
-    tools:layout_height="85dp">
+    tools:layout_height="120dp">
 
     <ImageView
-        android:id="@+id/iv_cover"
+        android:id="@+id/ivMenu"
+        style="@style/AppWidget_DotImageButton"
+        android:paddingStart="@dimen/widget_menu_horizontal_margin"
+        android:paddingBottom="@dimen/widget_menu_vertical_margin"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/content_description_menu"
+        tools:ignore="RtlSymmetry" />
+
+    <ImageView
+        android:id="@+id/ivCover"
         style="@style/WidgetImageStyle"
         android:layout_marginStart="@dimen/widget_medium_content_margin_horizontal"
         android:layout_marginTop="@dimen/widget_medium_content_margin_vertical"
-        android:layout_marginEnd="@dimen/widget_medium_content_spacing_margin_horizontal"
         android:contentDescription="@null"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_music_placeholder" />
+        android:src="@drawable/ic_music_widget_placeholder" />
 
     <TextView
         android:id="@+id/tvComposition"
@@ -27,9 +37,12 @@
         android:layout_alignParentEnd="true"
         android:layout_marginStart="@dimen/widget_medium_content_spacing_margin_horizontal"
         android:layout_marginTop="@dimen/widget_medium_content_margin_vertical"
-        android:layout_marginEnd="@dimen/widget_medium_content_margin_vertical"
-        android:layout_toEndOf="@id/iv_cover"
-        tools:text="Composition name" />
+        android:layout_marginEnd="@dimen/widget_medium_content_margin_horizontal"
+        android:layout_toEndOf="@id/ivCover"
+        android:paddingEnd="@dimen/widget_medium_title_padding_end"
+        android:text="@string/title"
+        tools:text="Composition namenamenamenamenamenamenamenamenamename"
+        tools:ignore="RtlSymmetry" />
 
     <TextView
         android:id="@+id/tvCompositionAuthor"
@@ -40,32 +53,35 @@
         android:layout_alignStart="@id/tvComposition"
         android:layout_alignEnd="@+id/tvComposition"
         android:layout_marginTop="@dimen/widget_medium_content_spacing_margin_vertical"
-        tools:text="Composition artist" />
+        android:text="@string/artist"/>
 
     <ImageView
-        android:id="@+id/iv_shuffle_mode"
+        android:id="@+id/ivShuffleMode"
         style="@style/AppWidget_ImageButton"
-        android:layout_alignStart="@id/iv_cover"
+        android:layout_marginStart="@dimen/widget_medium_controls_margin_horizontal"
+        android:layout_alignParentStart="true"
         android:layout_alignTop="@id/ivPlayPause"
         android:layout_alignBottom="@+id/ivSkipToNext"
-        android:contentDescription="@string/previous_track"
+        android:contentDescription="@string/content_description_shuffle"
         android:src="@drawable/ic_shuffle" />
+
+    <ImageView
+        android:id="@+id/ivRewind"
+        style="@style/AppWidget_ImageButton"
+        android:layout_marginEnd="@dimen/widget_medium_controls_spacing_margin"
+        android:layout_alignBottom="@+id/ivSkipToNext"
+        android:layout_toStartOf="@+id/ivSkipToPrevious"
+        android:contentDescription="@string/rewind"
+        android:src="@drawable/ic_rewind" />
 
     <ImageView
         android:id="@+id/ivSkipToPrevious"
         style="@style/AppWidget_ImageButton"
-        android:layout_alignBottom="@+id/ivSkipToNext"
-        android:layout_toStartOf="@+id/iv_rewind"
-        android:contentDescription="@string/previous_track"
-        android:src="@drawable/ic_skip_previous" />
-
-    <ImageView
-        android:id="@+id/iv_rewind"
-        style="@style/AppWidget_ImageButton"
+        android:layout_marginEnd="@dimen/widget_medium_controls_spacing_margin"
         android:layout_alignBottom="@+id/ivSkipToNext"
         android:layout_toStartOf="@+id/ivPlayPause"
-        android:contentDescription="@string/rewind"
-        android:src="@drawable/ic_rewind" />
+        android:contentDescription="@string/previous_track"
+        android:src="@drawable/ic_skip_previous" />
 
     <ImageView
         android:id="@+id/ivPlayPause"
@@ -79,27 +95,30 @@
     <ImageView
         android:id="@+id/ivSkipToNext"
         style="@style/AppWidget_ImageButton"
+        android:layout_marginStart="@dimen/widget_medium_controls_spacing_margin"
         android:layout_marginBottom="@dimen/widget_medium_controls_bottom_margin"
         android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@id/iv_fast_forward"
+        android:layout_toEndOf="@id/ivPlayPause"
         android:contentDescription="@string/next_track"
         android:src="@drawable/ic_skip_next" />
 
     <ImageView
-        android:id="@+id/iv_fast_forward"
+        android:id="@+id/ivFastForward"
         style="@style/AppWidget_ImageButton"
+        android:layout_marginStart="@dimen/widget_medium_controls_spacing_margin"
         android:layout_alignBottom="@+id/ivSkipToNext"
-        android:layout_toEndOf="@id/ivPlayPause"
+        android:layout_toEndOf="@id/ivSkipToNext"
         android:contentDescription="@string/fast_forward"
         android:src="@drawable/ic_fast_forward" />
 
     <ImageView
         android:id="@+id/ivRepeatMode"
         style="@style/AppWidget_ImageButton"
+        android:layout_marginEnd="@dimen/widget_medium_controls_margin_horizontal"
         android:layout_alignTop="@id/ivPlayPause"
-        android:layout_alignEnd="@id/tvCompositionAuthor"
+        android:layout_alignParentEnd="true"
         android:layout_alignBottom="@+id/ivSkipToNext"
-        android:contentDescription="@string/previous_track"
+        android:contentDescription="@string/content_description_repeat_mode"
         android:src="@drawable/ic_repeat" />
 
 </RelativeLayout>

@@ -5,5 +5,6 @@ public enum CorruptionType {
     UNSUPPORTED,
     NOT_FOUND,
     SOURCE_NOT_FOUND,
-    TOO_LARGE_SOURCE
+    TOO_LARGE_SOURCE,
+    FILE_IS_CORRUPTED
 }

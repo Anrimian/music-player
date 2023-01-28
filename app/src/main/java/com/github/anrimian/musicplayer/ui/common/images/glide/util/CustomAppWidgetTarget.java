@@ -43,7 +43,6 @@ public class CustomAppWidgetTarget extends CustomTarget<Bitmap> {
    *     put because of RemoteViews limitations.)
    * @param viewId The id of the ImageView view that will load the image.
    * @param remoteViews RemoteViews object which contains the ImageView that will load the bitmap.
-   * @param widgetIds The int[] that contains the widget ids of an application.
    */
   public CustomAppWidgetTarget(
       Context context,
@@ -52,19 +51,37 @@ public class CustomAppWidgetTarget extends CustomTarget<Bitmap> {
       int viewId,
       RemoteViews remoteViews,
       int placeholder,
-      int... widgetIds) {
+      ComponentName componentName) {
     super(width, height);
-    if (widgetIds.length == 0) {
-      throw new IllegalArgumentException("WidgetIds must have length > 0");
-    }
     this.context = Preconditions.checkNotNull(context, "Context can not be null!");
     this.remoteViews =
         Preconditions.checkNotNull(remoteViews, "RemoteViews object can not be null!");
-    this.widgetIds = Preconditions.checkNotNull(widgetIds, "WidgetIds can not be null!");
     this.viewId = viewId;
     this.placeholder = placeholder;
-    componentName = null;
+    this.componentName = componentName;
+    widgetIds = null;
   }
+
+    public CustomAppWidgetTarget(
+            Context context,
+            int width,
+            int height,
+            int viewId,
+            RemoteViews remoteViews,
+            int placeholder,
+            int... widgetIds) {
+        super(width, height);
+        if (widgetIds.length == 0) {
+            throw new IllegalArgumentException("WidgetIds must have length > 0");
+        }
+        this.context = Preconditions.checkNotNull(context, "Context can not be null!");
+        this.remoteViews =
+                Preconditions.checkNotNull(remoteViews, "RemoteViews object can not be null!");
+        this.widgetIds = Preconditions.checkNotNull(widgetIds, "WidgetIds can not be null!");
+        this.viewId = viewId;
+        this.placeholder = placeholder;
+        componentName = null;
+    }
 
   /**
    * Constructor using an int array of widgetIds to get a handle on the Widget in order to update it
@@ -81,6 +98,14 @@ public class CustomAppWidgetTarget extends CustomTarget<Bitmap> {
                                int... widgetIds) {
     this(context, SIZE_ORIGINAL, SIZE_ORIGINAL, viewId, remoteViews, placeholder, widgetIds);
   }
+
+    public CustomAppWidgetTarget(Context context,
+                                 int viewId,
+                                 RemoteViews remoteViews,
+                                 int placeholder,
+                                 ComponentName componentName) {
+        this(context, SIZE_ORIGINAL, SIZE_ORIGINAL, viewId, remoteViews, placeholder, componentName);
+    }
 
   /** Updates the AppWidget after the ImageView has loaded the Bitmap. */
   private void update() {

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.domain.models.utils;
 import static com.github.anrimian.musicplayer.domain.Payloads.ALBUM;
 import static com.github.anrimian.musicplayer.domain.Payloads.ARTIST;
 import static com.github.anrimian.musicplayer.domain.Payloads.CORRUPTED;
+import static com.github.anrimian.musicplayer.domain.Payloads.COVER_MODIFY_TIME;
 import static com.github.anrimian.musicplayer.domain.Payloads.DATE_ADDED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DATE_MODIFIED;
 import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
@@ -28,6 +29,7 @@ public class CompositionHelper {
                 && Objects.equals(first.getArtist(), second.getArtist())
                 && Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && Objects.equals(first.getDateModified(), second.getDateModified())
+                && first.getCoverModifyTime() == second.getCoverModifyTime()
                 && first.getDuration() == second.getDuration()
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
@@ -52,6 +54,9 @@ public class CompositionHelper {
         }
         if (!Objects.equals(first.getDateModified(), second.getDateModified())) {
             payloads.add(DATE_MODIFIED);
+        }
+        if (first.getCoverModifyTime() != second.getCoverModifyTime()) {
+            payloads.add(COVER_MODIFY_TIME);
         }
         if (first.getDuration() != second.getDuration()) {
             payloads.add(DURATION);

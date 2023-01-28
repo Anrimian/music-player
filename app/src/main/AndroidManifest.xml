@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.github.anrimian.musicplayer">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"/>
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -30,7 +31,6 @@
         android:normalScreens="true"
         android:smallScreens="true" />
 
-    <!--suppress AndroidUnknownAttribute -->
     <application
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -38,7 +38,7 @@
         android:fullBackupContent="false"
         android:requestLegacyExternalStorage="true"
         android:localeConfig="@xml/locales_config"
-        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
+        tools:ignore="UnusedAttribute"
         tools:replace="android:allowBackup">
 
         <activity android:name=".ui.main.MainActivity"
@@ -70,6 +70,11 @@
                 <data android:mimeType="audio/*"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.widgets.menu.WidgetMenuActivity"
+            android:launchMode="singleInstance"
+            android:theme="@style/PopupActivityTheme"
+            android:excludeFromRecents="true"/>
 
         <activity android:name=".ui.editor.composition.CompositionEditorActivity"
             android:windowSoftInputMode="adjustNothing"
@@ -128,11 +133,13 @@
 
         <receiver
             android:name=".ui.widgets.providers.WidgetProviderSmall"
-            android:icon="@mipmap/ic_launcher_round"
             android:label="@string/widget_small_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.LOCALE_CHANGED"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -142,11 +149,13 @@
 
         <receiver
             android:name=".ui.widgets.providers.WidgetProviderSmallExt"
-            android:icon="@mipmap/ic_launcher_round"
             android:label="@string/widget_small_ext_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.LOCALE_CHANGED"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -156,11 +165,13 @@
 
         <receiver
             android:name=".ui.widgets.providers.WidgetProviderMedium"
-            android:icon="@mipmap/ic_launcher_round"
             android:label="@string/widget_medium_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.LOCALE_CHANGED"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

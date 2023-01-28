@@ -11,7 +11,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import com.github.anrimian.filesync.models.state.file.FormattedFileSyncState
+import com.github.anrimian.filesync.models.state.file.FileSyncState
+import com.github.anrimian.filesync.models.state.file.NotActive
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
@@ -53,6 +54,7 @@ import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositio
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment
 import com.github.anrimian.musicplayer.ui.library.folders.root.newLibraryFoldersRootFragment
 import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListFragment
+import com.github.anrimian.musicplayer.ui.main.setup.SetupFragment
 import com.github.anrimian.musicplayer.ui.player_screen.lyrics.LyricsFragment
 import com.github.anrimian.musicplayer.ui.player_screen.queue.PlayQueueFragment
 import com.github.anrimian.musicplayer.ui.player_screen.view.drawer.DrawerLockStateProcessor
@@ -65,7 +67,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.newPlayListF
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
-import com.github.anrimian.musicplayer.ui.start.StartFragment
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
@@ -239,7 +240,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         if (!Permissions.hasFilePermission(requireContext())) {
             parentFragmentManager
                 .beginTransaction()
-                .replace(R.id.main_activity_container, StartFragment())
+                .replace(R.id.main_activity_container,
+                    SetupFragment())
                 .commit()
         }
 
@@ -398,7 +400,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         panelBinding.tvError.text = errorCommand?.message
     }
 
-    override fun showCurrentQueueItem(item: PlayQueueItem?, showCover: Boolean) {
+    override fun showCurrentQueueItem(item: PlayQueueItem?) {
         animateVisibility(viewBinding.bottomSheetTopShadow, View.VISIBLE)
         setMusicControlsEnabled(item != null)
         if (item == null) {
@@ -407,7 +409,6 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             panelBinding.sbTrackState.progress = 0
             panelBinding.tvCurrentComposition.setText(R.string.no_current_composition)
             panelBinding.tvCurrentCompositionAuthor.setText(R.string.unknown_author)
-            panelBinding.ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder)
             val noCompositionMessage = getString(R.string.no_current_composition)
             panelBinding.topPanel.contentDescription =
                 getString(R.string.now_playing_template, noCompositionMessage)
@@ -424,21 +425,25 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             panelBinding.topPanel.contentDescription =
                 getString(R.string.now_playing_template, compositionName)
             panelBinding.sbTrackState.contentDescription = null
-            if (showCover) {
-                Components.getAppComponent()
-                    .imageLoader()
-                    .displayImageInReusableTarget(
-                        panelBinding.ivMusicIcon,
-                        composition,
-                        previousCoverComposition,
-                        R.drawable.ic_music_placeholder
-                    )
-                previousCoverComposition = composition
-            } else {
-                previousCoverComposition = null
-                panelBinding.ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder)
-            }
         }
+    }
+
+    override fun showCurrentItemCover(item: PlayQueueItem?) {
+        if (item == null) {
+            previousCoverComposition = null
+            panelBinding.ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder)
+            return
+        }
+        val composition = item.composition
+        Components.getAppComponent()
+            .imageLoader()
+            .displayImageInReusableTarget(
+                panelBinding.ivMusicIcon,
+                composition,
+                previousCoverComposition,
+                R.drawable.ic_music_placeholder
+            )
+        previousCoverComposition = composition
     }
 
     override fun showRepeatMode(mode: Int) {
@@ -586,10 +591,19 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         }
     }
 
-    override fun showCurrentCompositionSyncState(fileSyncState: FormattedFileSyncState) {
+    override fun showCurrentCompositionSyncState(syncState: FileSyncState, item: PlayQueueItem?) {
+        val isFileRemote: Boolean
+        val formattedState: FileSyncState
+        if (item == null) {
+            formattedState = NotActive
+            isFileRemote = false
+        } else {
+            formattedState = syncState
+            isFileRemote = CompositionHelper.isCompositionFileRemote(item.composition)
+        }
         showFileSyncState(
-            fileSyncState.fileSyncState,
-            fileSyncState.isFileRemote,
+            formattedState,
+            isFileRemote,
             panelBinding.pvFileState
         )
     }
@@ -684,7 +698,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
     private fun onRepeatModeButtonClicked(view: View, currentRepeatMode: Int) {
         val selectedItemId = when(currentRepeatMode) {
-            RepeatMode.REPEAT_PLAY_LIST -> R.id.menu_repeat_playlist
+            RepeatMode.REPEAT_PLAY_QUEUE -> R.id.menu_repeat_playlist
             RepeatMode.REPEAT_COMPOSITION -> R.id.menu_repeat_composition
             else -> R.id.menu_do_not_repeat
         }
@@ -693,7 +707,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
         PopupMenuWindow.showPopup(view, menu) { item ->
             val repeatMode = when (item.itemId) {
-                R.id.menu_repeat_playlist -> RepeatMode.REPEAT_PLAY_LIST
+                R.id.menu_repeat_playlist -> RepeatMode.REPEAT_PLAY_QUEUE
                 R.id.menu_repeat_composition -> RepeatMode.REPEAT_COMPOSITION
                 else -> RepeatMode.NONE
             }

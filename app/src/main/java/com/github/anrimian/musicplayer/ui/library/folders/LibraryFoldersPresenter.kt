@@ -19,7 +19,6 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
 
@@ -27,16 +26,16 @@ import java.util.*
  * Created on 23.10.2017.
  */
 
-class LibraryFoldersPresenter(private val folderId: Long?,
-                              private val interactor: LibraryFoldersScreenInteractor,
-                              private val playerInteractor: LibraryPlayerInteractor,
-                              private val displaySettingsInteractor: DisplaySettingsInteractor,
-                              errorParser: ErrorParser,
-                              uiScheduler: Scheduler)
-    : AppPresenter<LibraryFoldersView>(uiScheduler, errorParser) {
+class LibraryFoldersPresenter(
+    private val folderId: Long?,
+    private val interactor: LibraryFoldersScreenInteractor,
+    private val playerInteractor: LibraryPlayerInteractor,
+    private val displaySettingsInteractor: DisplaySettingsInteractor,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler
+) : AppPresenter<LibraryFoldersView>(uiScheduler, errorParser) {
 
-    private val presenterBatterySafeDisposable = CompositeDisposable()
-
+    private var filesDisposable: Disposable? = null
     private var currentCompositionDisposable: Disposable? = null
     private var fileActionDisposable: Disposable? = null
 
@@ -54,10 +53,10 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.showSearchMode(false)
         viewState.hideProgressDialog()
-        subscribeOnFolder()
-        subscribeOnChildFolders()
+        subscribeOnFolderInfo()
+        subscribeOnFolderFiles()
+        subscribeOnCurrentComposition()
         subscribeOnUiSettings()
         subscribeOnRepeatMode()
         subscribeOnMoveEnabledState()
@@ -68,19 +67,12 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         presenterDisposable.dispose()
     }
 
-    fun onStart() {
-        if (sourceList.isNotEmpty()) {
-            subscribeOnCurrentComposition()
-        }
-    }
-
     fun onStop(listPosition: ListPosition) {
         interactor.saveListPosition(folderId, listPosition)
-        presenterBatterySafeDisposable.clear()
     }
 
     fun onTryAgainButtonClicked() {
-        subscribeOnChildFolders()
+        subscribeOnFolderFiles()
     }
 
     fun onCompositionClicked(position: Int, musicFileSource: CompositionFileSource) {
@@ -89,23 +81,23 @@ class LibraryFoldersPresenter(private val folderId: Long?,
             if (composition == currentComposition) {
                 playerInteractor.playOrPause()
             } else {
-                interactor.play(folderId, composition)
+                interactor.play(sourceList, position)
                 viewState.showCurrentComposition(CurrentComposition(composition, true))
             }
         }
     }
 
-    fun onCompositionIconClicked(composition: Composition) {
+    fun onCompositionIconClicked(position: Int, composition: Composition) {
         if (composition == currentComposition) {
             playerInteractor.playOrPause()
         } else {
-            interactor.play(folderId, composition)
+            interactor.play(sourceList, position)
             viewState.showCurrentComposition(CurrentComposition(composition, true))
         }
     }
 
-    fun onPlayActionSelected(composition: Composition?) {
-        interactor.play(folderId, composition)
+    fun onPlayCompositionActionSelected(position: Int) {
+        interactor.play(sourceList, position)
     }
 
     fun onPlayNextSourceClicked(position: Int) {
@@ -125,19 +117,19 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     fun onPlayFolderClicked(folder: FolderFileSource) {
-        interactor.play(listOf(folder))
+        interactor.play(folder)
     }
 
     fun onPlayNextFolderClicked(folder: FolderFileSource) {
         interactor.getAllCompositionsInFolder(folder.id)
-                .flatMap(playerInteractor::addCompositionsToPlayNext)
-                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
+            .flatMap(playerInteractor::addCompositionsToPlayNext)
+            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
     }
 
     fun onAddToQueueFolderClicked(folder: FolderFileSource) {
         interactor.getAllCompositionsInFolder(folder.id)
-                .flatMap(playerInteractor::addCompositionsToEnd)
-                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
+            .flatMap(playerInteractor::addCompositionsToEnd)
+            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
     }
 
     fun onPlayAllButtonClicked() {
@@ -170,11 +162,11 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     fun onDeleteFolderDialogConfirmed(folder: FolderFileSource?) {
         lastDeleteAction = interactor.deleteFolder(folder)
-                .observeOn(uiScheduler)
-                .doOnSubscribe { viewState.showDeleteProgress() }
-                .doOnSuccess(this::onDeleteFolderSuccess)
-                .doFinally { viewState.hideProgressDialog() }
-                .ignoreElement()
+            .observeOn(uiScheduler)
+            .doOnSubscribe { viewState.showDeleteProgress() }
+            .doOnSuccess(this::onDeleteFolderSuccess)
+            .doFinally { viewState.hideProgressDialog() }
+            .ignoreElement()
 
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
     }
@@ -203,21 +195,17 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     fun onPlayListForFolderSelected(folderId: Long, playList: PlayList) {
         interactor.addCompositionsToPlayList(folderId, playList)
-                .subscribeOnUi(
-                        { addedCompositions -> viewState.showAddingToPlayListComplete(playList, addedCompositions) },
-                        this::onAddingToPlayListError
-                )
+            .subscribeOnUi(
+                { addedCompositions -> viewState.showAddingToPlayListComplete(playList, addedCompositions) },
+                this::onAddingToPlayListError
+            )
     }
 
     fun onSearchTextChanged(text: String?) {
         if (searchText != text) {
             searchText = text
-            subscribeOnChildFolders()
+            subscribeOnFolderFiles()
         }
-    }
-
-    fun onSearchButtonClicked() {
-        viewState.showSearchMode(true)
     }
 
     fun onShareFolderClicked(folder: FolderFileSource) {
@@ -236,8 +224,10 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         viewState.onItemSelected(folder, position)
     }
 
-    fun onFragmentDisplayed() {
-        interactor.saveCurrentFolder(folderId)
+    fun onFragmentDisplayed(inLockedSearchMode: Boolean) {
+        if (!inLockedSearchMode) {
+            interactor.saveCurrentFolder(folderId)
+        }
     }
 
     fun onRenameFolderClicked(folder: FolderFileSource) {
@@ -251,9 +241,9 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
         RxUtils.dispose(fileActionDisposable)
         lastEditAction = interactor.renameFolder(folderId, name)
-                .observeOn(uiScheduler)
-                .doOnSubscribe { viewState.showRenameProgress() }
-                .doFinally { viewState.hideProgressDialog() }
+            .observeOn(uiScheduler)
+            .doOnSubscribe { viewState.showRenameProgress() }
+            .doFinally { viewState.hideProgressDialog() }
         fileActionDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
     }
 
@@ -273,19 +263,19 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     private fun playSelectedCompositions() {
-        interactor.play(ArrayList(selectedFiles))
+        interactor.play(selectedFiles)
         closeSelectionMode()
     }
 
     fun onPlayNextSelectedSourcesClicked() {
         interactor.addCompositionsToPlayNext(ArrayList(selectedFiles))
-                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
+            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
         closeSelectionMode()
     }
 
     fun onAddToQueueSelectedSourcesClicked() {
         interactor.addCompositionsToEnd(ArrayList(selectedFiles))
-                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
+            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
         closeSelectionMode()
     }
 
@@ -303,10 +293,10 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         filesToDelete.clear()
         filesToDelete.addAll(selectedFiles)
         interactor.getAllCompositionsInFileSources(ArrayList(selectedFiles))
-                .observeOn(uiScheduler)
-                .doOnSubscribe { viewState.showDeleteProgress() }
-                .doFinally { viewState.hideProgressDialog() }
-                .subscribeOnUi(viewState::showConfirmDeleteDialog, this::onDefaultError)
+            .observeOn(uiScheduler)
+            .doOnSubscribe { viewState.showDeleteProgress() }
+            .doFinally { viewState.hideProgressDialog() }
+            .subscribeOnUi(viewState::showConfirmDeleteDialog, this::onDefaultError)
     }
 
     fun onMoveSelectedFoldersButtonClicked() {
@@ -331,10 +321,10 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
         RxUtils.dispose(fileActionDisposable)
         lastEditAction = interactor.moveFilesTo(folderId)
-                .observeOn(uiScheduler)
-                .doOnSubscribe { viewState.showMoveProgress() }
-                .doOnComplete { viewState.updateMoveFilesList() }
-                .doFinally { viewState.hideProgressDialog() }
+            .observeOn(uiScheduler)
+            .doOnSubscribe { viewState.showMoveProgress() }
+            .doOnComplete { viewState.updateMoveFilesList() }
+            .doFinally { viewState.hideProgressDialog() }
         fileActionDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
     }
 
@@ -348,37 +338,37 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
         RxUtils.dispose(fileActionDisposable)
         lastEditAction = interactor.moveFilesToNewFolder(folderId, name)
-                .observeOn(uiScheduler)
-                .doOnSubscribe { viewState.showMoveProgress() }
-                .doOnComplete { viewState.updateMoveFilesList() }
-                .doFinally { viewState.hideProgressDialog() }
+            .observeOn(uiScheduler)
+            .doOnSubscribe { viewState.showMoveProgress() }
+            .doOnComplete { viewState.updateMoveFilesList() }
+            .doFinally { viewState.hideProgressDialog() }
         fileActionDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
     }
 
     fun onExcludeFolderClicked(folder: FolderFileSource?) {
         interactor.addFolderToIgnore(folder)
-                .subscribeOnUi(this::onIgnoreFolderAdded, this::onDefaultError)
+            .subscribeOnUi(this::onIgnoreFolderAdded, this::onDefaultError)
     }
 
     fun onRemoveIgnoredFolderClicked() {
         interactor.deleteIgnoredFolder(recentlyAddedIgnoredFolder)
-                .justSubscribe(this::onDefaultError)
+            .justSubscribe(this::onDefaultError)
     }
 
     fun onRetryFailedEditActionClicked() {
         if (lastEditAction != null) {
             RxUtils.dispose(fileActionDisposable, presenterDisposable)
             fileActionDisposable = lastEditAction!!
-                    .doFinally { lastEditAction = null }
-                    .subscribe(viewState::updateMoveFilesList, this::onDefaultError, presenterDisposable)
+                .doFinally { lastEditAction = null }
+                .subscribe(viewState::updateMoveFilesList, this::onDefaultError, presenterDisposable)
         }
     }
 
     fun onRetryFailedDeleteActionClicked() {
         if (lastDeleteAction != null) {
-             lastDeleteAction!!
-                    .doFinally { lastDeleteAction = null }
-                    .justSubscribe(this::onDeleteCompositionsError)
+            lastDeleteAction!!
+                .doFinally { lastDeleteAction = null }
+                .justSubscribe(this::onDeleteCompositionsError)
         }
     }
 
@@ -390,6 +380,8 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     fun getSelectedFiles() = selectedFiles
 
+    fun getSearchText() = searchText
+
     private fun onIgnoreFolderAdded(folder: IgnoredFolder) {
         recentlyAddedIgnoredFolder = folder
         viewState.showAddedIgnoredFolderMessage(folder)
@@ -397,7 +389,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     private fun shareFileSources(fileSources: List<FileSource>) {
         interactor.getAllCompositionsInFileSources(fileSources)
-                .subscribeOnUi(viewState::sendCompositions, this::onReceiveCompositionsError)
+            .subscribeOnUi(viewState::sendCompositions, this::onReceiveCompositionsError)
     }
 
     private fun processMultiSelectClick(position: Int, folder: FileSource, onClick: () -> Unit) {
@@ -424,12 +416,12 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     private fun addCompositionsToPlayNext(compositions: List<Composition>) {
         playerInteractor.addCompositionsToPlayNext(compositions)
-                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
+            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
     }
 
     private fun addCompositionsToEnd(compositions: List<Composition>) {
         playerInteractor.addCompositionsToEnd(compositions)
-                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
+            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
     }
 
     private fun onDefaultError(throwable: Throwable) {
@@ -444,9 +436,9 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     private fun deletePreparedFiles() {
         lastDeleteAction = interactor.deleteFiles(filesToDelete)
-                .observeOn(uiScheduler)
-                .doOnSuccess(this::onDeleteCompositionsSuccess)
-                .ignoreElement()
+            .observeOn(uiScheduler)
+            .doOnSuccess(this::onDeleteCompositionsSuccess)
+            .ignoreElement()
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
     }
 
@@ -469,10 +461,10 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     private fun addPreparedCompositionsToPlayList(playList: PlayList) {
         interactor.addCompositionsToPlayList(filesForPlayList, playList)
-                .subscribeOnUi(
-                        { compositions -> onAddingToPlayListCompleted(compositions, playList) },
-                        this::onAddingToPlayListError
-                )
+            .subscribeOnUi(
+                { compositions -> onAddingToPlayListCompleted(compositions, playList) },
+                this::onAddingToPlayListError
+            )
     }
 
     private fun onAddingToPlayListError(throwable: Throwable) {
@@ -494,22 +486,28 @@ class LibraryFoldersPresenter(private val folderId: Long?,
         }
     }
 
-    private fun subscribeOnFolder() {
+    private fun subscribeOnFolderInfo() {
         if (folderId == null) {
-            viewState.hideFolderInfo()
+            viewState.showFolderInfo(null)
             return
         }
         interactor.getFolderObservable(folderId)
-                .subscribeOnUi(viewState::showFolderInfo, this::onDefaultError, this::goBackToPreviousScreen)
-
+            .subscribeOnUi(
+                viewState::showFolderInfo,
+                this::onDefaultError,
+                this::goBackToPreviousScreen
+            )
     }
 
-    private fun subscribeOnChildFolders() {
+    private fun subscribeOnFolderFiles() {
         if (sourceList.isEmpty()) {
             viewState.showLoading()
         }
-        interactor.getFoldersInFolder(folderId, searchText)
-                .subscribeOnUi(this::onFilesLoaded, this::onMusicLoadingError)
+        RxUtils.dispose(filesDisposable, presenterDisposable)
+        filesDisposable = interactor.getFoldersInFolder(folderId, searchText)
+            .observeOn(uiScheduler)
+            .subscribe(this::onFilesLoaded, this::onMusicLoadingError)
+        presenterDisposable.add(filesDisposable!!)
     }
 
     private fun onFilesLoaded(files: List<FileSource>) {
@@ -544,10 +542,8 @@ class LibraryFoldersPresenter(private val folderId: Long?,
     }
 
     private fun subscribeOnCurrentComposition() {
-        currentCompositionDisposable = playerInteractor.getCurrentCompositionObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
-        presenterBatterySafeDisposable.add(currentCompositionDisposable!!)
+        playerInteractor.getCurrentCompositionObservable()
+            .subscribeOnUi(this::onCurrentCompositionReceived, errorParser::logError)
     }
 
     private fun onCurrentCompositionReceived(currentComposition: CurrentComposition) {
@@ -557,7 +553,7 @@ class LibraryFoldersPresenter(private val folderId: Long?,
 
     private fun subscribeOnUiSettings() {
         displaySettingsInteractor.getCoversEnabledObservable()
-                .subscribeOnUi(this::onUiSettingsReceived, errorParser::logError)
+            .subscribeOnUi(this::onUiSettingsReceived, errorParser::logError)
     }
 
     private fun onUiSettingsReceived(isCoversEnabled: Boolean) {

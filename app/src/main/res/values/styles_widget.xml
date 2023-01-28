@@ -7,7 +7,7 @@
 
     <style name="AppWidget.Text.Primary">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/text_color_primary</item>
+        <item name="android:textColor">?attr/widgetTextColorPrimary</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -18,7 +18,7 @@
 
     <style name="AppWidget.Text.Secondary">
         <item name="android:textSize">13sp</item>
-        <item name="android:textColor">@color/text_color_secondary</item>
+        <item name="android:textColor">?attr/widgetTextColorSecondary</item>
     </style>
 
     <style name="AppWidget.Text.Secondary.Medium">
@@ -33,13 +33,23 @@
         <item name="android:tint">@color/color_remote_button</item>
         <item name="android:gravity">bottom</item>
         <item name="android:padding">4dp</item>
+        <item name="android:background">@drawable/bg_selectable_widget_button</item>
         <!--app widget button is disabled by default, will be enabled after widget provider call-->
         <item name="android:enabled">false</item>
     </style>
 
+    <style name="AppWidget_DotImageButton">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:src">@drawable/ic_dot</item>
+        <item name="android:tint">@color/color_remote_button</item>
+        <item name="android:enabled">false</item>
+    </style>
+
     <style name="WidgetImageStyle">
-        <item name="android:layout_width">40dp</item>
-        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_width">@dimen/widget_cover_size</item>
+        <item name="android:layout_height">@dimen/widget_cover_size</item>
     </style>
 
 </resources>

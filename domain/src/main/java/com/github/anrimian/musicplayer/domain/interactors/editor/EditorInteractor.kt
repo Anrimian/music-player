@@ -75,12 +75,30 @@ class EditorInteractor(
         }
     }
 
+    fun editCompositionTrackNumber(compositionId: Long, trackNumber: Long?): Completable {
+        return runEditAction(compositionId) { source ->
+            editorRepository.changeCompositionTrackNumber(compositionId, source, trackNumber)
+        }
+    }
+
+    fun editCompositionDiscNumber(compositionId: Long, discNumber: Long?): Completable {
+        return runEditAction(compositionId) { source ->
+            editorRepository.changeCompositionDiscNumber(compositionId, source, discNumber)
+        }
+    }
+
+    fun editCompositionComment(compositionId: Long, comment: String?): Completable {
+        return runEditAction(compositionId) { source ->
+            editorRepository.changeCompositionComment(compositionId, source, comment)
+        }
+    }
+
     fun editCompositionFileName(composition: FullComposition, newFileName: String): Completable {
         return editorRepository.changeCompositionFileName(composition, newFileName)
     }
 
     fun getCompositionObservable(id: Long): Observable<FullComposition> {
-        return libraryRepository.getCompositionObservable(id)
+        return libraryRepository.getFullCompositionObservable(id)
     }
 
     fun getShortGenresInComposition(compositionId: Long): Observable<List<ShortGenre>> {

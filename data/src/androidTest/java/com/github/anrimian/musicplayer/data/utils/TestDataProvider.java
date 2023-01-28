@@ -4,7 +4,6 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
-import com.github.anrimian.musicplayer.data.models.composition.AudioFileType;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
@@ -37,6 +36,9 @@ public class TestDataProvider {
                 folderId,
                 title,
                 null,
+                null,
+                null,
+                null,
 //                "test file name",
                 "test file path",
                 100L,
@@ -45,8 +47,8 @@ public class TestDataProvider {
                 new Date(),
                 new Date(),
                 new Date(),
+                new Date(),
                 null,
-                0,
                 InitialSource.LOCAL);
     }
 
@@ -95,6 +97,7 @@ public class TestDataProvider {
                 ++id,
                 new Date(0),
                 new Date(0),
+                null,
                 null,
                 true,
                 InitialSource.LOCAL);
@@ -228,7 +231,6 @@ public class TestDataProvider {
                     size,
                     id,
                     storageId,
-                    AudioFileType.MUSIC,
                     InitialSource.LOCAL,
                     folderId,
                     dateAdded,
@@ -286,8 +288,7 @@ public class TestDataProvider {
                     id,
                     createDate,
                     modifyDate,
-                    null,
-                    AudioFileType.MUSIC);
+                    null);
         }
     }
 }

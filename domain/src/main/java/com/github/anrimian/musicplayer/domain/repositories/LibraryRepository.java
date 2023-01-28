@@ -27,7 +27,9 @@ public interface LibraryRepository {
 
     Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText);
 
-    Observable<FullComposition> getCompositionObservable(long id);
+    Observable<Composition> getCompositionObservable(long id);
+
+    Observable<FullComposition> getFullCompositionObservable(long id);
 
     Observable<String> getLyricsObservable(long id);
 

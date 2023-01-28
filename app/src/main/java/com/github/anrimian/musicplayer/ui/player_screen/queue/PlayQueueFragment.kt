@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.ui.player_screen.queue
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -46,6 +44,17 @@ import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 import kotlin.math.abs
 
+/**
+ * Queue checklist:
+ *  + Press shuffle button multiple times. -> We should be on the right position
+ *  + Start playing with disabled random mode and with position in the middle.
+ *    -> We should be on the right position
+ *  + Remove current queue item. -> Scrolling should work correctly
+ *  + OnStop, then press shuffle button from widget, open again.
+ *    -> We should be on the right position
+ *    Repeat several times.
+ *  + Manually scroll to position, rotate screen -> We should be on the scrolled position
+ */
 class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
 
     private val presenter by moxyPresenter {
@@ -67,7 +76,6 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
     private lateinit var createPlayListFragmentRunner: DialogFragmentRunner<CreatePlayListDialogFragment>
     private lateinit var choosePlayListFragmentRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
 
-    private val secondScrollHandler = Handler(Looper.getMainLooper())
     private var currentPosition = -2 //for immediate first scroll
 
     private var isActionMenuEnabled = false
@@ -87,6 +95,8 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
         clPlayQueueContainer = requireActivity().findViewById(R.id.cl_play_queue_container)
         acvToolbar = requireActivity().findViewById(R.id.acvPlayQueue)
         tvQueueSubtitle = requireActivity().findViewById(R.id.tvQueueSubtitle)
+
+        viewBinding.progressStateView.onTryAgainClick(presenter::onLoadAgainQueueClicked)
 
         playQueueLayoutManager = LinearLayoutManager(requireContext())
         viewBinding.rvPlayQueue.layoutManager = playQueueLayoutManager
@@ -130,17 +140,6 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
         ) { fragment -> fragment.setOnCompleteListener(presenter::onPlayListForAddingSelected) }
     }
 
-    override fun onStart() {
-        super.onStart()
-        presenter.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        //battery saving
-        presenter.onStop()
-    }
-
     override fun showPlayerState(isPlaying: Boolean) {
         playQueueAdapter.showPlaying(isPlaying)
     }
@@ -153,7 +152,7 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
         }
     }
 
-    override fun showCurrentQueueItem(item: PlayQueueItem?, showCover: Boolean) {
+    override fun showCurrentQueueItem(item: PlayQueueItem?) {
         ViewUtils.animateVisibility(viewBinding.rvPlayQueue, View.VISIBLE)
         if (item == null) {
             viewBinding.rvPlayQueue.contentDescription = getString(R.string.no_current_composition)
@@ -221,10 +220,11 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
         playQueueAdapter.setCoversEnabled(isCoversEnabled)
     }
 
-    override fun updatePlayQueue(items: List<PlayQueueItem>) {
-        tvQueueSubtitle.text = FormatUtils.formatCompositionsCount(requireContext(), items.size)
-        playQueueAdapter.submitList(items)
-        val bgColor = if (items.isEmpty()) {
+    override fun showList(itemsCount: Int) {
+        tvQueueSubtitle.text = FormatUtils.formatCompositionsCount(requireContext(), itemsCount)
+
+        val isEmpty = itemsCount == 0
+        val bgColor = if (isEmpty) {
             viewBinding.progressStateView.showMessage(R.string.play_queue_is_empty)
             requireContext().colorFromAttr(android.R.attr.colorBackground)
         } else {
@@ -232,16 +232,25 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
             requireContext().colorFromAttr(R.attr.listBackground)
         }
         viewBinding.root.setBackgroundColor(bgColor)
-        isActionMenuEnabled = items.isNotEmpty()
+
+        isActionMenuEnabled = !isEmpty
         showMenuState()
     }
 
-    //check by:
-    //switch order mode(working)
-    //new queue(so-so, but pass)
-    //remove queue item(working)
+    override fun showListError(errorCommand: ErrorCommand) {
+        viewBinding.progressStateView.showMessage(errorCommand.message, true)
+    }
+
+    override fun updatePlayQueue(items: List<PlayQueueItem>?) {
+        playQueueAdapter.submitList(items)
+    }
+
     override fun scrollQueueToPosition(position: Int, isSmoothScrollAllowed: Boolean) {
-        secondScrollHandler.removeCallbacksAndMessages(null)
+        //hypothetically mis scroll still can happen when we get 2 fast list updates with scroll
+        playQueueAdapter.runSafeAction { scrollToPosition(position, isSmoothScrollAllowed) }
+    }
+
+    private fun scrollToPosition(position: Int, isSmoothScrollAllowed: Boolean) {
         val positionDiff = abs(position - currentPosition)
         currentPosition = position
         if (RecyclerViewUtils.isPositionVisible(playQueueLayoutManager, position)) {
@@ -257,18 +266,6 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
             position,
             isSmoothScrollAllowed && smooth
         )
-
-        //sometimes can not scroll, check twice
-        secondScrollHandler.postDelayed({
-            if (!RecyclerViewUtils.isPositionVisible(playQueueLayoutManager, position)) {
-                RecyclerViewUtils.scrollToPosition(
-                    viewBinding.rvPlayQueue,
-                    playQueueLayoutManager,
-                    position,
-                    false
-                )
-            }
-        }, 1600)
     }
 
     private fun onQueueMenuItemClicked(menuItem: MenuItem) {

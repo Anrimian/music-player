@@ -21,6 +21,7 @@ import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.utils.FileUtils
 import com.github.anrimian.musicplayer.ui.common.activity.PickImageContract
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
+import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
@@ -120,7 +121,7 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
             copyText(viewBinding.tvAlbumArtist, viewBinding.tvAlbumAuthorHint)
         }
         ViewUtils.onLongClick(viewBinding.changeLyricsClickableArea) {
-            copyText(viewBinding.tvLyricsHint, viewBinding.tvLyrics)
+            copyText(viewBinding.tvLyrics, viewBinding.tvLyricsHint)
         }
 
         SlidrPanel.attachWithNavBarChange(
@@ -245,70 +246,70 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
     }
 
     override fun showEnterAuthorDialog(composition: FullComposition, hints: Array<String>?) {
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.change_author_name,
             R.string.change,
             R.string.cancel,
             R.string.artist,
-            composition.artist
-        ).hints(hints)
-            .build()
+            composition.artist,
+            hints = hints
+        )
         authorDialogFragmentRunner.show(fragment)
     }
 
     override fun showEnterAlbumArtistDialog(composition: FullComposition, hints: Array<String>?) {
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.change_album_artist,
             R.string.change,
             R.string.cancel,
             R.string.artist,
-            composition.albumArtist
-        ).hints(hints)
-            .build()
+            composition.albumArtist,
+            hints = hints
+        )
         albumArtistDialogFragmentRunner.show(fragment)
     }
 
     override fun showEnterLyricsDialog(composition: FullComposition) {
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.edit_lyrics,
             R.string.change,
             R.string.cancel,
             R.string.lyrics,
-            composition.lyrics
-        ).completeOnEnterButton(false)
-            .build()
+            composition.lyrics,
+            completeOnEnterButton = false
+        )
         lyricsDialogFragmentRunner.show(fragment)
     }
 
     override fun showAddGenreDialog(genres: Array<String>?) {
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.add_composition_genre,
             R.string.add,
             R.string.cancel,
             R.string.genre,
-            null
-        ).hints(genres)
-            .canBeEmpty(false)
-            .build()
+            null,
+            hints = genres,
+            canBeEmpty = false
+        )
         addGenreDialogFragmentRunner.show(fragment)
     }
 
     override fun showEditGenreDialog(shortGenre: ShortGenre, genres: Array<String>?) {
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.change_composition_genre,
             R.string.change,
             R.string.cancel,
             R.string.genre,
-            shortGenre.name
-        ).hints(genres)
-            .extra(GenreSerializer.serialize(shortGenre))
-            .canBeEmpty(false)
-            .build()
+            shortGenre.name,
+            hints = genres,
+            canBeEmpty = false,
+            extra = GenreSerializer.serialize(shortGenre)
+        )
         editGenreDialogFragmentRunner.show(fragment)
     }
 
     override fun showEnterTitleDialog(composition: FullComposition) {
-        val fragment = InputTextDialogFragment.newInstance(
+        val fragment = newInputTextDialogFragment(
             R.string.change_title,
             R.string.change,
             R.string.cancel,
@@ -319,26 +320,26 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
     }
 
     override fun showEnterFileNameDialog(composition: FullComposition) {
-        val fragment = InputTextDialogFragment.newInstance(
+        val fragment = newInputTextDialogFragment(
             R.string.change_file_name,
             R.string.change,
             R.string.cancel,
             R.string.filename,
             FileUtils.formatFileName(composition.fileName),
-            false
+            canBeEmpty = false
         )
         filenameDialogFragmentRunner.show(fragment)
     }
 
     override fun showEnterAlbumDialog(composition: FullComposition, hints: Array<String>?) {
-        val fragment = InputTextDialogFragment.Builder(
+        val fragment = newInputTextDialogFragment(
             R.string.change_album_name,
             R.string.change,
             R.string.cancel,
             R.string.album,
-            composition.album
-        ).hints(hints)
-            .build()
+            composition.album,
+            hints = hints
+        )
         albumDialogFragmentRunner.show(fragment)
     }
 

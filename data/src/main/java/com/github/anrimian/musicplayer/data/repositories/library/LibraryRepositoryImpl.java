@@ -75,8 +75,14 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Observable<FullComposition> getCompositionObservable(long id) {
-        return compositionsDao.getCompositionObservable(id);
+    public Observable<Composition> getCompositionObservable(long id) {
+        return settingsPreferences.getDisplayFileNameObservable()
+                .switchMap(useFileName -> compositionsDao.getCompositionObservable(id, useFileName));
+    }
+
+    @Override
+    public Observable<FullComposition> getFullCompositionObservable(long id) {
+        return compositionsDao.getFullCompositionObservable(id);
     }
 
     @Override

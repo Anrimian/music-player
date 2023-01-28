@@ -171,6 +171,22 @@ public class FormatUtils {
         return sb;
     }
 
+    public static SpannableStringBuilder formatPlaylistAdditionalInfo(Context context,
+                                                                      PlayList playList) {
+        return formatPlaylistAdditionalInfo(context, playList, R.drawable.ic_description_text_circle);
+    }
+
+    public static SpannableStringBuilder formatPlaylistAdditionalInfo(Context context,
+                                                                      PlayList playList,
+                                                                      @DrawableRes int dividerDrawableRes) {
+        SpannableStringBuilder sb = new DescriptionSpannableStringBuilder(context,
+                FormatUtils.formatCompositionsCount(context, playList.getCompositionsCount()),
+                dividerDrawableRes
+        );
+        sb.append(FormatUtils.formatMilliseconds(playList.getTotalDuration()));
+        return sb;
+    }
+
     public static String formatAlbumAdditionalInfoForMediaBrowser(Context context, Album album) {
         SpannableStringBuilder sb = new DescriptionStringBuilder();
         String artist = album.getArtist();
@@ -229,7 +245,7 @@ public class FormatUtils {
             case RepeatMode.REPEAT_COMPOSITION: {
                 return R.drawable.ic_repeat_once;
             }
-            case RepeatMode.REPEAT_PLAY_LIST: {
+            case RepeatMode.REPEAT_PLAY_QUEUE: {
                 return R.drawable.ic_repeat;
             }
             default: return R.drawable.ic_repeat_off;
@@ -245,7 +261,7 @@ public class FormatUtils {
             case RepeatMode.REPEAT_COMPOSITION: {
                 return R.string.repeat_composition;
             }
-            case RepeatMode.REPEAT_PLAY_LIST: {
+            case RepeatMode.REPEAT_PLAY_QUEUE: {
                 return R.string.repeat_playlist;
             }
             default: return R.string.do_not_repeat;

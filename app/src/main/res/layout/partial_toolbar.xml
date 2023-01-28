@@ -103,6 +103,7 @@
         android:layout_marginStart="@dimen/toolbar_content_start">
 
         <EditText
+            android:theme="@style/EditTextStyle.Toolbar"
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -112,7 +113,8 @@
             android:imeOptions="actionSearch|flagNoExtractUi"
             android:importantForAutofill="no"
             android:background="@android:color/transparent"
-            android:textColorHint="?android:attr/textColorSecondaryInverse"
+            android:textColor="@color/color_text_toolbar_primary"
+            android:textColorHint="@color/color_text_secondary_inverse"
             android:textCursorDrawable="@drawable/bg_toolbar_text_cursor"
             android:maxLines="1"
             tools:ignore="UnusedAttribute" />

@@ -40,6 +40,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static androidx.core.view.ViewCompat.isLaidOut;
+import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
+
 @SuppressWarnings("WeakerAccess")
 public class ViewUtils {
 

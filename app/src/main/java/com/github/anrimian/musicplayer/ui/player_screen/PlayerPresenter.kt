@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.player_screen
 
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
@@ -27,6 +28,7 @@ class PlayerPresenter(
     uiScheduler: Scheduler
 ) : AppPresenter<PlayerView>(uiScheduler, errorParser) {
 
+    //TODO remove all "batterySafe" disposables, they're doing nothing
     private val batterySafeDisposable = CompositeDisposable()
 
     private var currentItem: PlayQueueItem? = null
@@ -50,7 +52,7 @@ class PlayerPresenter(
         subscribeOnRepeatMode()
         subscribeOnPlayerStateChanges()
         subscribeOnErrorEvents()
-        subscribeOnCurrentCompositionChanging()
+        subscribeOnCurrentComposition()
         subscribeOnCurrentCompositionSyncState()
         subscribeOnTrackPositionChanging()
         subscribeOnSleepTimerTime()
@@ -237,10 +239,14 @@ class PlayerPresenter(
     private fun subscribeOnCurrentCompositionSyncState() {
         batterySafeDisposable.add(playerScreenInteractor.currentCompositionFileSyncState
             .observeOn(uiScheduler)
-            .subscribe(viewState::showCurrentCompositionSyncState))
+            .subscribe(this::onCurrentCompositionSyncStateReceived))
     }
 
-    private fun subscribeOnCurrentCompositionChanging() {
+    private fun onCurrentCompositionSyncStateReceived(fileSyncState: FileSyncState) {
+        viewState.showCurrentCompositionSyncState(fileSyncState, currentItem)
+    }
+
+    private fun subscribeOnCurrentComposition() {
         batterySafeDisposable.add(playerInteractor.getCurrentQueueItemObservable()
             .observeOn(uiScheduler)
             .subscribe(this::onPlayQueueEventReceived))
@@ -248,11 +254,30 @@ class PlayerPresenter(
 
     private fun onPlayQueueEventReceived(playQueueEvent: PlayQueueEvent) {
         val newItem = playQueueEvent.playQueueItem
+        val currentItem = this.currentItem
+
         if (currentItem == null
             || currentItem != newItem
-            || !CompositionHelper.areSourcesTheSame(newItem!!.composition, currentItem!!.composition)) {
-            currentItem = newItem
-            viewState.showCurrentQueueItem(newItem, isCoversEnabled)
+            || !CompositionHelper.areSourcesTheSame(newItem.composition, currentItem.composition)) {
+
+            var updateCover = false
+            if ((currentItem == null) != (newItem == null)) {
+                updateCover = true
+            } else if (currentItem != null && newItem != null)  {
+                val newComposition = newItem.composition
+                val currentComposition = currentItem.composition
+                updateCover = currentComposition.dateModified != newComposition.dateModified
+                    || currentComposition.coverModifyTime != newComposition.coverModifyTime
+                    || currentComposition.size != newComposition.size
+                    || currentComposition.isFileExists != newComposition.isFileExists
+            }
+
+            this.currentItem = newItem
+            viewState.showCurrentQueueItem(newItem)
+
+            if (updateCover) {
+                showCurrentItemCover(newItem)
+            }
         }
     }
 
@@ -297,7 +322,12 @@ class PlayerPresenter(
 
     private fun onUiSettingsReceived(isCoversEnabled: Boolean) {
         this.isCoversEnabled = isCoversEnabled
-        currentItem?.let { item -> viewState.showCurrentQueueItem(item, isCoversEnabled) }
+        showCurrentItemCover(currentItem)
+    }
+
+    private fun showCurrentItemCover(item: PlayQueueItem?) {
+        val currentItem = if (isCoversEnabled) item else null
+        viewState.showCurrentItemCover(currentItem)
     }
 
     private fun onDefaultError(throwable: Throwable) {

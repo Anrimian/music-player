@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteracto
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource
+import com.github.anrimian.musicplayer.domain.models.utils.isFileExists
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
@@ -180,6 +181,18 @@ class CompositionEditorPresenter(
         changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
+    fun onNewTrackNumberEntered(number: Long?) {
+        performChangeAction(editorInteractor.editCompositionTrackNumber(compositionId, number))
+    }
+
+    fun onNewDiscNumberEntered(number: Long?) {
+        performChangeAction(editorInteractor.editCompositionDiscNumber(compositionId, number))
+    }
+
+    fun onNewCommentEntered(text: String?) {
+        performChangeAction(editorInteractor.editCompositionComment(compositionId, text))
+    }
+
     fun onNewLyricsEntered(text: String?) {
         performChangeAction(editorInteractor.editCompositionLyrics(compositionId, text))
     }
@@ -274,7 +287,11 @@ class CompositionEditorPresenter(
         if (firstReceive) {
             checkCompositionTagsInSource(composition)
         }
-        if (firstReceive || this.composition.dateModified != composition.dateModified) {
+        if (firstReceive
+            || this.composition.dateModified != composition.dateModified
+            || this.composition.coverModifyTime != composition.coverModifyTime
+            || this.composition.size != composition.size
+            || this.composition.isFileExists() != composition.isFileExists()) {
             viewState.showCompositionCover(composition)
         }
         this.composition = composition

@@ -33,7 +33,6 @@ public class StorageComposition {
     private final long id;
     private final long storageId;
 
-    private final int audioFileType;
     private final InitialSource initialSource;
 
     @Nullable
@@ -56,7 +55,6 @@ public class StorageComposition {
                               long size,
                               long id,
                               long storageId,
-                              int audioFileType,
                               InitialSource initialSource,
                               @Nullable Long folderId,
                               @Nonnull Date dateAdded,
@@ -72,7 +70,6 @@ public class StorageComposition {
         this.size = size;
         this.id = id;
         this.storageId = storageId;
-        this.audioFileType = audioFileType;
         this.initialSource = initialSource;
         this.folderId = folderId;
         this.dateAdded = dateAdded;
@@ -129,10 +126,6 @@ public class StorageComposition {
 
     public long getId() {
         return id;
-    }
-
-    public int getAudioFileType() {
-        return audioFileType;
     }
 
     public InitialSource getInitialSource() {

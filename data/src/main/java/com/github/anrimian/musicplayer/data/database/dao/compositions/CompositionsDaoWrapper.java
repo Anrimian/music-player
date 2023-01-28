@@ -22,7 +22,8 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
+import com.github.anrimian.musicplayer.domain.models.composition.tags.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -62,8 +63,18 @@ public class CompositionsDaoWrapper {
         this.foldersDao = foldersDao;
     }
 
-    public Observable<FullComposition> getCompositionObservable(long id) {
-        return compositionsDao.getCompositionObservable(id)
+    public Observable<Composition> getCompositionObservable(long id, boolean useFileName) {
+        StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
+        query.append(" WHERE id = ? LIMIT 1");
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(),
+                new String[]{ String.valueOf(id) });
+        return compositionsDao.getCompositionsObservable(sqlQuery)
+                .takeWhile(list -> !list.isEmpty())
+                .map(list -> list.get(0));
+    }
+
+    public Observable<FullComposition> getFullCompositionObservable(long id) {
+        return compositionsDao.getFullCompositionObservable(id)
                 .takeWhile(list -> !list.isEmpty())
                 .map(list -> list.get(0));
     }
@@ -83,7 +94,7 @@ public class CompositionsDaoWrapper {
         query.append(CompositionsDao.getSearchWhereQuery(useFileName));
         query.append(getOrderQuery(order));
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 3));
-        return updateSubject.switchMap(o -> compositionsDao.getAllObservable(sqlQuery));
+        return updateSubject.switchMap(o -> compositionsDao.getCompositionsObservable(sqlQuery));
     }
 
     public void launchManualUpdate() {
@@ -96,15 +107,15 @@ public class CompositionsDaoWrapper {
                                                                            @Nullable String searchText) {
         StringBuilder query = CompositionsDao.getCompositionQuery(useFileName);
         query.append(CompositionsDao.getSearchWhereQuery(useFileName));
-        query.append(" AND ");
-        query.append("folderId = ");
+        query.append(" AND (? IS NOT NULL OR ");
+        query.append("(folderId = ");
         query.append(folderId);
         query.append(" OR (folderId IS NULL AND ");
         query.append(folderId);
-        query.append(" IS NULL)");
+        query.append(" IS NULL)))");
         query.append(getOrderQuery(order));
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 3));
-        return compositionsDao.getAllInFolderObservable(sqlQuery);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query.toString(), getSearchArgs(searchText, 4));
+        return compositionsDao.getCompositionsInFolderObservable(sqlQuery);
     }
 
     public List<Composition> getAllCompositionsInFolder(Long parentFolderId, boolean useFileName) {
@@ -202,7 +213,7 @@ public class CompositionsDaoWrapper {
 
             // if album not exists - create album
             if (albumId == null && !TextUtils.isEmpty(albumName)) {
-                albumId = albumsDao.insert(new AlbumEntity(artistId, albumName, 0, 0));
+                albumId = albumsDao.insertAlbum(artistId, albumName);
             }
 
             // set new albumId
@@ -260,12 +271,7 @@ public class CompositionsDaoWrapper {
             //if not exists, create
 
             if (newAlbumId == null) {
-                newAlbumId = albumsDao.insert(new AlbumEntity(
-                        artistId,
-                        albumEntity.getName(),
-                        albumEntity.getFirstYear(),
-                        albumEntity.getLastYear()
-                ));
+                newAlbumId = albumsDao.insertAlbum(artistId, albumEntity.getName());
             }
             //set new album to composition
             compositionsDao.setAlbumId(id, newAlbumId);
@@ -289,9 +295,44 @@ public class CompositionsDaoWrapper {
         });
     }
 
+    public void updateDuration(long id, long duration) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.updateDuration(id, duration);
+            compositionsDao.setUpdateTime(id, new Date());
+        });
+    }
+
+    public void updateTrackNumber(long id, Long trackNumber) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.updateTrackNumber(id, trackNumber);
+            compositionsDao.setUpdateTime(id, new Date());
+        });
+    }
+
+    public void updateDiscNumber(long id, Long discNumber) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.updateDiscNumber(id, discNumber);
+            compositionsDao.setUpdateTime(id, new Date());
+        });
+    }
+
+    public void updateComment(long id, String text) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.updateComment(id, text);
+            compositionsDao.setUpdateTime(id, new Date());
+        });
+    }
+
     public void updateLyrics(long id, String text) {
         appDatabase.runInTransaction(() -> {
             compositionsDao.updateLyrics(id, text);
+            compositionsDao.setUpdateTime(id, new Date());
+        });
+    }
+
+    public void updateFileSize(long id, long fileSize) {
+        appDatabase.runInTransaction(() -> {
+            compositionsDao.updateFileSize(id, fileSize);
             compositionsDao.setUpdateTime(id, new Date());
         });
     }
@@ -300,8 +341,12 @@ public class CompositionsDaoWrapper {
         compositionsDao.setUpdateTime(id, date);
     }
 
-    public void updateModifyTimeAndSize(long id, long size, Date date) {
-        compositionsDao.setModifyTimeAndSize(id, size, date);
+    public void updateCoverModifyTimeAndSize(long id, long size, Date date) {
+        compositionsDao.setCoverModifyTimeAndSize(id, size, date);
+    }
+
+    public void updateCoverModifyTime(long id, long time) {
+        compositionsDao.setCoverModifyTime(id, time);
     }
 
     public void updateCompositionFileName(long id, String fileName) {
@@ -312,8 +357,9 @@ public class CompositionsDaoWrapper {
         compositionsDao.setCorruptionType(corruptionType, id);
     }
 
-    public Maybe<FullComposition> selectNextCompositionToScan(long lastCompleteScanTime) {
-        return compositionsDao.selectNextCompositionToScan(lastCompleteScanTime);
+    public Single<List<FullComposition>> selectNextCompositionsToScan(long lastCompleteScanTime,
+                                                                      int filesCount) {
+        return compositionsDao.selectNextCompositionsToScan(lastCompleteScanTime, filesCount);
     }
 
     public void setCompositionLastFileScanTime(FullComposition composition, Date time) {
@@ -324,33 +370,93 @@ public class CompositionsDaoWrapper {
         compositionsDao.cleanLastFileScanTime();
     }
 
-    public void updateCompositionBySourceTags(FullComposition composition, CompositionSourceTags tags) {
+    public void updateCompositionsByFileInfo(
+            List<kotlin.Pair<FullComposition, AudioFileInfo>> scannedCompositions,
+            List<FullComposition> allCompositions
+    ) {
+        appDatabase.runInTransaction(() -> {
+            for (kotlin.Pair<FullComposition, AudioFileInfo> scannedComposition: scannedCompositions) {
+                updateCompositionByFileInfo(scannedComposition.getFirst(), scannedComposition.getSecond());
+            }
+            Date currentDate = new Date();
+            for (FullComposition composition: allCompositions) {
+                setCompositionLastFileScanTime(composition, currentDate);
+            }
+        });
+    }
+
+    public void updateCompositionByFileInfo(FullComposition composition, AudioFileInfo fileInfo) {
         appDatabase.runInTransaction(() -> {
             long id = composition.getId();
+            CompositionSourceTags tags = fileInfo.getAudioTags();
+
+            boolean wasChanges = false;
 
             String tagTitle = tags.getTitle();
             if (!isEmpty(tagTitle) && !Objects.equals(composition.getTitle(), tagTitle)) {
-                updateTitle(id, tagTitle);
+                compositionsDao.updateTitle(id, tagTitle);
+                wasChanges = true;
             }
 
             String tagArtist = tags.getArtist();
             if (!isEmpty(tagArtist) && !Objects.equals(composition.getArtist(), tagArtist)) {
                 updateArtist(id, tagArtist);
+                wasChanges = true;
             }
 
             String tagAlbum = tags.getAlbum();
             if (!isEmpty(tagAlbum) && !Objects.equals(composition.getAlbum(), tagAlbum)) {
                 updateAlbum(id, tagAlbum);
+                wasChanges = true;
             }
 
             String tagAlbumArtist = tags.getAlbumArtist();
             if (!isEmpty(tagAlbumArtist) && !Objects.equals(composition.getAlbumArtist(), tagAlbumArtist)) {
                 updateAlbumArtist(id, tagAlbumArtist);
+                wasChanges = true;
+            }
+
+            //if we just update duration, we'll lose milliseconds part. So just update 0 values
+            int tagDuration = tags.getDurationSeconds();
+            long duration = composition.getDuration();
+            if (duration == 0L && tagDuration != 0) {
+                long tagDurationMillis = tagDuration * 1000L;
+                compositionsDao.updateDuration(id, tagDurationMillis);
+                wasChanges = true;
+            }
+
+            Long tagTrackNumber = tags.getTrackNumber();
+            if (!Objects.equals(composition.getTrackNumber(), tagTrackNumber)) {
+                compositionsDao.updateTrackNumber(id, tagTrackNumber);
+                wasChanges = true;
+            }
+
+            Long tagDiscNumber = tags.getDiscNumber();
+            if (!Objects.equals(composition.getDiscNumber(), tagDiscNumber)) {
+                compositionsDao.updateDiscNumber(id, tagDiscNumber);
+                wasChanges = true;
+            }
+
+            String tagComment = tags.getComment();
+            if (!isEmpty(tagComment) && !Objects.equals(composition.getComment(), tagComment)) {
+                compositionsDao.updateComment(id, tagComment);
+                wasChanges = true;
             }
 
             String tagLyrics = tags.getLyrics();
             if (!isEmpty(tagLyrics) && !Objects.equals(composition.getLyrics(), tagLyrics)) {
-                updateLyrics(id, tagLyrics);
+                compositionsDao.updateLyrics(id, tagLyrics);
+                wasChanges = true;
+            }
+
+            long fileSize = fileInfo.getFileSize();
+            if (composition.getSize() != fileSize) {
+                compositionsDao.updateFileSize(id, fileSize);
+                wasChanges = true;
+            }
+
+            if (wasChanges) {
+                compositionsDao.setUpdateTime(id, new Date());
             }
         });
     }

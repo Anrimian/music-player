@@ -11,21 +11,10 @@
     <!--animation-->
     <integer name="button_animation_duration">300</integer>
 
-    <dimen name="text_size_xxsmall">12sp</dimen>
-    <dimen name="text_size_xsmall">13sp</dimen>
-    <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_small_2">15sp</dimen>
-    <dimen name="text_size_normal">16sp</dimen>
-    <dimen name="text_size_medium">18sp</dimen>
-    <dimen name="text_size_large">20sp</dimen>
-    <dimen name="text_size_xlarge">22sp</dimen>
-    <dimen name="text_size_xxlarge">24sp</dimen>
 
     <!--defaults-->
-    <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_normal">16dp</dimen>
-    <dimen name="margin_large">24dp</dimen>
-    <dimen name="margin_xlarge">32dp</dimen>
     <dimen name="padding_small">8dp</dimen>
 
     <dimen name="top_control_button_size">48dp</dimen>
@@ -51,11 +40,11 @@
     <dimen name="dialog_content_margin_start_text">24dp</dimen>
     <item name="dialog_min_width_major" type="dimen">65%</item>
     <item name="dialog_min_width_minor" type="dimen">95%</item>
+    <item name="popup_dialog_min_width_major" type="dimen">35%</item>
+    <item name="popup_dialog_min_width_minor" type="dimen">65%</item>
     <dimen name="floating_window_z">16dp</dimen>
     <dimen name="dialog_button_margin_vertical">8dp</dimen>
     <dimen name="dialog_button_margin_horizontal">12dp</dimen>
-
-    <dimen name="subtitle_height">48dp</dimen>
 
     <dimen name="icon_size">48dp</dimen>
 
@@ -108,18 +97,8 @@
     <dimen name="toolbar_control_offset">0dp</dimen>
     <!--toolbar has own offset on large screens, remove after toolbar removing-->
     <dimen name="toolbar_control_offset_2">0dp</dimen>
-
-    <!--widgets-->
-    <dimen name="widget_content_margin_vertical">0dp</dimen>
-    <dimen name="widget_content_spacing_margin">0dp</dimen>
-    <dimen name="widget_controls_bottom_margin">0dp</dimen>
-    <dimen name="widget_content_margin_horizontal">8dp</dimen>
-
-    <dimen name="widget_medium_content_margin_vertical">4dp</dimen>
-    <dimen name="widget_medium_content_margin_horizontal">4dp</dimen>
-    <dimen name="widget_medium_content_spacing_margin_vertical">2dp</dimen>
-    <dimen name="widget_medium_content_spacing_margin_horizontal">3dp</dimen>
-    <dimen name="widget_medium_controls_bottom_margin">0dp</dimen>
+    <dimen name="sub_toolbar_height">40dp</dimen>
+    <dimen name="sub_toolbar_elevation">4dp</dimen>
 
     <!--swipe panel-->
     <dimen name="swipe_panel_width">90dp</dimen>

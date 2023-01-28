@@ -7,8 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ItemPlayListBinding
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
-import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatPlaylistAdditionalInfo
 
 class PlayListViewHolder(
     inflater: LayoutInflater,
@@ -33,12 +32,7 @@ class PlayListViewHolder(
     }
 
     private fun showAdditionalInfo() {
-        val sb = DescriptionSpannableStringBuilder(
-            getContext(),
-            FormatUtils.formatCompositionsCount(getContext(), playList.compositionsCount)
-        )
-        sb.append(FormatUtils.formatMilliseconds(playList.totalDuration))
-        viewBinding.tvAdditionalInfo.text = sb
+        viewBinding.tvAdditionalInfo.text = formatPlaylistAdditionalInfo(getContext(), playList)
     }
 
     private fun getContext() = itemView.context

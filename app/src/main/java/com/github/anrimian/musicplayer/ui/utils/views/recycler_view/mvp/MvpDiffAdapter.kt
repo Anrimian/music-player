@@ -12,7 +12,8 @@ abstract class MvpDiffAdapter<T, VH : MvpDiffAdapter.MvpViewHolder>(
     lifecycleOwner: LifecycleOwner,
     recyclerView: RecyclerView,
     diffCallback: DiffUtil.ItemCallback<T>,
-): DiffListAdapter<T, VH>(recyclerView, diffCallback) {
+    detectMoves: Boolean = true
+): DiffListAdapter<T, VH>(recyclerView, diffCallback, detectMoves) {
 
     protected val viewHolders = HashSet<VH>()
 

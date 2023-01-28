@@ -31,7 +31,7 @@ class LibraryPlayerInteractor(
     private val playerCoordinatorInteractor: PlayerCoordinatorInteractor,
     private val settingsRepository: SettingsRepository,
     private val playQueueRepository: PlayQueueRepository,
-    private val musicProviderRepository: LibraryRepository,
+    private val libraryRepository: LibraryRepository,
     private val uiStateRepository: UiStateRepository,
     private val analytics: Analytics,
 ) {
@@ -68,9 +68,7 @@ class LibraryPlayerInteractor(
     ) {
         ignoredPreviousCurrentItem = currentItem
         playQueueRepository.setPlayQueue(compositions, firstPosition)
-            .doOnComplete {
-                playerCoordinatorInteractor.playAfterPrepare(PlayerType.LIBRARY)
-            }
+            .doOnComplete { playerCoordinatorInteractor.playAfterPrepare(PlayerType.LIBRARY) }
             .doOnError(analytics::processNonFatalError)
             .onErrorComplete()
             .subscribe()
@@ -135,8 +133,8 @@ class LibraryPlayerInteractor(
 
     fun changeRepeatMode() {
         settingsRepository.repeatMode = when (settingsRepository.repeatMode) {
-            RepeatMode.NONE -> RepeatMode.REPEAT_PLAY_LIST
-            RepeatMode.REPEAT_PLAY_LIST -> RepeatMode.REPEAT_COMPOSITION
+            RepeatMode.NONE -> RepeatMode.REPEAT_PLAY_QUEUE
+            RepeatMode.REPEAT_PLAY_QUEUE -> RepeatMode.REPEAT_COMPOSITION
             RepeatMode.REPEAT_COMPOSITION -> RepeatMode.NONE
             else -> RepeatMode.NONE
         }
@@ -182,6 +180,10 @@ class LibraryPlayerInteractor(
         return playerCoordinatorInteractor.getPlayerState(PlayerType.LIBRARY)
     }
 
+    fun getCompositionObservable(id: Long): Observable<Composition> {
+        return libraryRepository.getCompositionObservable(id)
+    }
+
     fun getCurrentQueueItemObservable(): Observable<PlayQueueEvent> {
         return playQueueRepository.currentQueueItemObservable
     }
@@ -197,7 +199,7 @@ class LibraryPlayerInteractor(
                 return@switchMap if (queueItem == null) {
                     Observable.fromCallable { Optional(null) }
                 } else {
-                    musicProviderRepository.getLyricsObservable(queueItem.composition.id)
+                    libraryRepository.getLyricsObservable(queueItem.composition.id)
                         .map(::Optional)
                 }
             }
@@ -212,11 +214,11 @@ class LibraryPlayerInteractor(
     }
 
     fun deleteComposition(composition: Composition): Completable {
-        return musicProviderRepository.deleteComposition(composition)
+        return libraryRepository.deleteComposition(composition)
     }
 
     fun deleteCompositions(compositions: List<Composition>): Completable {
-        return musicProviderRepository.deleteCompositions(compositions)
+        return libraryRepository.deleteCompositions(compositions)
     }
 
     fun removeQueueItem(item: PlayQueueItem): Completable {
@@ -383,7 +385,7 @@ class LibraryPlayerInteractor(
         composition: Composition,
         corruptionType: CorruptionType?,
     ) {
-        musicProviderRepository.writeErrorAboutComposition(corruptionType, composition)
+        libraryRepository.writeErrorAboutComposition(corruptionType, composition)
             .doOnError(analytics::processNonFatalError)
             .onErrorComplete()
             .subscribe()
@@ -406,6 +408,7 @@ class LibraryPlayerInteractor(
             is LocalSourceNotFoundException -> CorruptionType.NOT_FOUND
             is RemoteSourceNotFoundException -> CorruptionType.SOURCE_NOT_FOUND
             is TooLargeSourceException -> CorruptionType.TOO_LARGE_SOURCE
+            is CorruptedMediaFileException -> CorruptionType.FILE_IS_CORRUPTED
             else -> CorruptionType.UNKNOWN
         }
     }
@@ -421,8 +424,12 @@ class LibraryPlayerInteractor(
     }
 
     private fun onAutoSkipNextFinished(currentPosition: Int) {
-        if (currentPosition == 0 && settingsRepository.repeatMode != RepeatMode.REPEAT_PLAY_LIST) {
-            stop()
+        if (currentPosition == 0) {
+            if (settingsRepository.repeatMode == RepeatMode.NONE) {
+                stop()
+            } else {
+                onSeekFinished(0)
+            }
         }
     }
 

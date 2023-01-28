@@ -6,7 +6,8 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEdit
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags
+import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.domain.models.scanner.Idle
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
@@ -21,11 +22,11 @@ import java.io.FileNotFoundException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-//apply album order
 //apply genres data
 
-private const val RETRY_TIMES = 2L
-private const val READ_FILE_TIMEOUT_SECONDS = 2L
+private const val FILES_TO_SCAN_COUNT = 150
+private const val READ_RETRY_TIMES = 2L
+private const val READ_FILE_TIMEOUT_SECONDS = 6L
 
 class FileScanner(
     private val compositionsDao: CompositionsDaoWrapper,
@@ -46,23 +47,51 @@ class FileScanner(
         runFileScanner()
     }
 
+    fun runScanCompositionFile(composition: FullComposition) {
+        scanCompositionFile(composition)
+            .subscribeOn(scheduler)
+            .subscribe()
+    }
+
     fun getStateObservable(): Observable<FileScannerState> = stateSubject.distinctUntilChanged()
 
     private fun runFileScanner() {
         val lastCompleteScanTime = if (
             stateRepository.lastFileScannerVersion == stateRepository.currentFileScannerVersion
         ) 0L else stateRepository.lastCompleteScanTime
-        compositionsDao.selectNextCompositionToScan(lastCompleteScanTime)
-            .doOnComplete(this::onScanCompleted)
-            .retry(RETRY_TIMES)
+        compositionsDao.selectNextCompositionsToScan(lastCompleteScanTime, FILES_TO_SCAN_COUNT)
+            .retry(READ_RETRY_TIMES)
+            .flatMap(this::scanCompositionFiles)
+            .flatMapMaybe { compositions ->
+                if (compositions.size < FILES_TO_SCAN_COUNT) {
+                    onScanCompleted()
+                    return@flatMapMaybe Maybe.empty()
+                }
+                return@flatMapMaybe Maybe.just(compositions)
+            }
             .doOnError(this::processError)
-            .onErrorComplete()
-            .doOnSuccess { composition -> stateSubject.onNext(Running(composition))}
-            .flatMapSingle(this::scanCompositionFile)
+            .onErrorComplete()//represent db read error, in this case stop scan until next launch
             .doOnSuccess { runFileScanner() }
             .doOnComplete { stateSubject.onNext(Idle) }
             .subscribeOn(scheduler)
             .subscribe()
+    }
+
+    private fun scanCompositionFiles(compositions: List<FullComposition>): Single<List<FullComposition>> {
+        return Observable.fromIterable(compositions)
+            .flatMapMaybe { composition ->
+                getCompositionSource(composition)
+                    .doOnSuccess { stateSubject.onNext(Running(composition)) }
+                    .flatMap(this::getAudioFileInfo)
+                    .map { info -> Pair(composition, info) }
+            }
+            .collect(::ArrayList, ArrayList<Pair<FullComposition, AudioFileInfo>>::add)
+            .doOnSuccess { scannedCompositions ->
+                compositionsDao.updateCompositionsByFileInfo(scannedCompositions, compositions)
+            }
+            .map { compositions }
+            .doOnError(this::processError)
+            .onErrorReturnItem(compositions)//represent db write error, in this case run again
     }
 
     private fun onScanCompleted() {
@@ -72,9 +101,9 @@ class FileScanner(
 
     private fun scanCompositionFile(composition: FullComposition): Single<*> {
         return Single.just(composition)
-            .flatMapMaybe(this::getFullTags)
-            .doOnSuccess { tags -> compositionsDao.updateCompositionBySourceTags(composition, tags) }
-            .retry(RETRY_TIMES)
+            .flatMapMaybe(this::getCompositionSource)
+            .flatMap(this::getAudioFileInfo)
+            .doOnSuccess { info -> compositionsDao.updateCompositionByFileInfo(composition, info) }
             .doOnError(this::processError)
             .map { TRIGGER }
             .defaultIfEmpty(TRIGGER)
@@ -82,10 +111,17 @@ class FileScanner(
             .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition, Date()) }
     }
 
-    private fun getFullTags(composition: FullComposition): Maybe<CompositionSourceTags> {
-        return storageSourceRepository.getStorageSource(composition.id)
-            .flatMapSingle(compositionSourceEditor::getFullTags)
+    private fun getAudioFileInfo(source: CompositionContentSource): Maybe<AudioFileInfo> {
+        return compositionSourceEditor.getAudioFileInfo(source)
             .timeout(READ_FILE_TIMEOUT_SECONDS, TimeUnit.SECONDS, scheduler)
+            .retry(READ_RETRY_TIMES)
+            .doOnError(this::processError)
+            .onErrorComplete()//if we can't read the file - ignore and set last scan time anyway
+    }
+
+    private fun getCompositionSource(composition: FullComposition): Maybe<CompositionContentSource> {
+        return storageSourceRepository.getStorageSource(composition.id)
+            .observeOn(scheduler)
     }
 
     private fun processError(throwable: Throwable) {

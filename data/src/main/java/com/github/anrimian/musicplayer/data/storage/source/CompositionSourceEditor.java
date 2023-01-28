@@ -8,7 +8,8 @@ import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderExceptio
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSourceTags;
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
+import com.github.anrimian.musicplayer.domain.models.composition.tags.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
@@ -135,6 +136,18 @@ public class CompositionSourceEditor {
                 );
     }
 
+    public Completable setCompositionTrackNumber(CompositionContentSource source, Long trackNumber) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.TRACK, TextUtils.toString(trackNumber)));
+    }
+
+    public Completable setCompositionDiscNumber(CompositionContentSource source, Long discNumber) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.DISC_NO, TextUtils.toString(discNumber)));
+    }
+
+    public Completable setCompositionComment(CompositionContentSource source, String text) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.COMMENT, text));
+    }
+
     public Completable setCompositionsGenre(List<CompositionContentSource> sources,
                                             String oldName,
                                             String genre,
@@ -220,15 +233,24 @@ public class CompositionSourceEditor {
         return Single.fromCallable(() -> editAudioFileTag(source, Tag::deleteArtworkField));
     }
 
-    public Single<CompositionSourceTags> getFullTags(CompositionContentSource source) {
+    public Single<AudioFileInfo> getAudioFileInfo(CompositionContentSource source) {
         return Single.fromCallable(() -> {
             try {
-                Tag tag = getFileTag(source);
-                return new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
+                File file = contentSourceHelper.getAsFile(source);
+                AudioFile audioFile = getAudioFile(file);
+                Tag tag = audioFile.getTagOrCreateDefault();
+                long fileSize = file.length();
+                int durationSeconds = audioFile.getAudioHeader().getTrackLength();
+                CompositionSourceTags tags = new CompositionSourceTags(tag.getFirst(FieldKey.TITLE),
                         tag.getFirst(FieldKey.ARTIST),
                         tag.getFirst(FieldKey.ALBUM),
                         tag.getFirst(FieldKey.ALBUM_ARTIST),
+                        durationSeconds,
+                        TextUtils.safeParseLong(tag.getFirst(FieldKey.TRACK), null),
+                        TextUtils.safeParseLong(tag.getFirst(FieldKey.DISC_NO), null),
+                        tag.getFirst(FieldKey.COMMENT),
                         tag.getFirst(FieldKey.LYRICS));
+                return new AudioFileInfo(fileSize, tags);
             } catch (Exception e) {
                 throw new TagReaderException("Unable to read: " + source, e);
             }
@@ -274,8 +296,16 @@ public class CompositionSourceEditor {
     }
 
     private Tag getFileTag(CompositionContentSource source) {
+        return getFileTag(contentSourceHelper.getAsFile(source));
+    }
+
+    private Tag getFileTag(File file) {
+        return getAudioFile(file).getTagOrCreateDefault();
+    }
+
+    private AudioFile getAudioFile(File file) {
         try {
-            return readFile(contentSourceHelper.getAsFile(source)).getTagOrCreateDefault();
+            return readFile(file);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -22,8 +22,8 @@ class MusicFileViewHolder(
     parent: ViewGroup,
     onCompositionClickListener: (Int, CompositionFileSource) -> Unit,
     onLongClickListener: (Int, FileSource) -> Unit,
-    iconClickListener: (Composition) -> Unit,
-    menuClickListener: (View, CompositionFileSource) -> Unit
+    iconClickListener: (Int, Composition) -> Unit,
+    menuClickListener: (View, Int, CompositionFileSource) -> Unit
 ) : FileViewHolder(parent, R.layout.item_storage_music), SwipeListener {
 
     private val compositionItemWrapper: CompositionItemWrapper
@@ -36,10 +36,14 @@ class MusicFileViewHolder(
 
     init {
         val binding = ItemStorageMusicBinding.bind(itemView)
-        compositionItemWrapper = CompositionItemWrapper(itemView, iconClickListener) {
-            onCompositionClickListener(bindingAdapterPosition, fileSource)
+        compositionItemWrapper = CompositionItemWrapper(
+            itemView,
+            { composition -> iconClickListener(bindingAdapterPosition, composition) },
+            { onCompositionClickListener(bindingAdapterPosition, fileSource) }
+        )
+        binding.btnActionsMenu.setOnClickListener { v ->
+            menuClickListener(v, bindingAdapterPosition, fileSource)
         }
-        binding.btnActionsMenu.setOnClickListener { v -> menuClickListener(v, fileSource) }
         binding.clickableItem.setOnLongClickListener {
             if (selected) {
                 return@setOnLongClickListener false

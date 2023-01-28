@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.ui.player_screen
 
-import com.github.anrimian.filesync.models.state.file.FormattedFileSyncState
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
@@ -29,7 +29,10 @@ interface PlayerView : MvpView {
     fun showPlayerContentPage(position: Int)
 
     @AddToEndSingle
-    fun showCurrentQueueItem(item: PlayQueueItem?, showCover: Boolean)
+    fun showCurrentQueueItem(item: PlayQueueItem?)
+
+    @AddToEndSingle
+    fun showCurrentItemCover(item: PlayQueueItem?)
 
     @AddToEndSingle
     fun showRepeatMode(mode: Int)
@@ -92,6 +95,6 @@ interface PlayerView : MvpView {
     fun locateCompositionInFolders(composition: Composition)
 
     @AddToEndSingle
-    fun showCurrentCompositionSyncState(fileSyncState: FormattedFileSyncState)
+    fun showCurrentCompositionSyncState(syncState: FileSyncState, item: PlayQueueItem?)
 
 }

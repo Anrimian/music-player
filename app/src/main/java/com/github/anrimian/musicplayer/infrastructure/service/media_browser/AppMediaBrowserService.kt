@@ -26,6 +26,20 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 
+//TODO crash on android 12: foreground service not allowed to start
+// How to reproduce: start google assistant in driving mode,
+//  start play(from main screen or from app suggestions screen(open app from list, first screen)
+//            (do not use app browser screens)
+//  play, stop. Wait until media browser service will be unbound, play -> crash
+//  NOTE: crash happens when there are no bound services
+//  NOTE: If session was released - all starts normally
+//  A1: do not stop service when after latest bind time had passed less than 1h(configurable in advanced settings)
+//     ++! Check bind on assistant main screen
+//     ! Won't work because bind called not only here, also after widget start and so on
+//     + Keep service time setting for lower android versions(disabled by default)
+//   A2: when unbind or ondestroy was called and second service is not in foreground - release media session
+//    ! crash will disappear, but player panel in assistant will be closed too
+//    ? can we set media session in such state when service will be bound again
 
 const val PERMISSION_ERROR_ACTION_ID = "permission_error_action_id"
 const val DEFAULT_ERROR_ACTION_ID = "default_error_action_id"

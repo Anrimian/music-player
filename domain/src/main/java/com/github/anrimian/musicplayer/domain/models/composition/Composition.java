@@ -29,6 +29,8 @@ public class Composition {
     private final Date dateAdded;
     @Nonnull
     private final Date dateModified;
+    @Nonnull
+    private final Date coverModifyTime;
 
     @Nullable
     private final CorruptionType corruptionType;
@@ -47,6 +49,7 @@ public class Composition {
                        Long storageId,
                        Date dateAdded,
                        Date dateModified,
+                       Date coverModifyTime,
                        CorruptionType corruptionType,
                        boolean isFileExists,
                        InitialSource initialSource) {
@@ -59,6 +62,7 @@ public class Composition {
         this.storageId = storageId;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
+        this.coverModifyTime = coverModifyTime;
         this.corruptionType = corruptionType;
         this.isFileExists = isFileExists;
         this.initialSource = initialSource;
@@ -104,6 +108,11 @@ public class Composition {
     @Nonnull
     public Date getDateModified() {
         return dateModified;
+    }
+
+    @Nonnull
+    public Date getCoverModifyTime() {
+        return coverModifyTime;
     }
 
     @Nullable

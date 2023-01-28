@@ -154,6 +154,7 @@ class PlayerInteractor(
         isPlayingSubject.onNext(false)
         playerStateSubject.onNext(PlayerState.STOP)
         stopTracingTrackPosition()
+        seekTo(0)
         eventsDisposable.clear()
     }
 

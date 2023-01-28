@@ -64,14 +64,14 @@ class ArtistsListFragment : LibraryFragment(), ArtistsListView, FragmentLayerLis
         binding.progressStateView.onTryAgainClick(presenter::onTryAgainLoadCompositionsClicked)
 
         adapter = ArtistsAdapter(
-            binding.recyclerView,
+            binding.rvArtists,
             this::goToArtistScreen,
             this::onArtistMenuClicked
         )
-        binding.recyclerView.adapter = adapter
+        binding.rvArtists.adapter = adapter
         layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.layoutManager = layoutManager
-        RecyclerViewUtils.attachFastScroller(binding.recyclerView)
+        binding.rvArtists.layoutManager = layoutManager
+        RecyclerViewUtils.attachFastScroller(binding.rvArtists)
 
         val fm = childFragmentManager
         selectOrderDialogRunner = DialogFragmentRunner(fm, Tags.ORDER_TAG) { fragment ->

@@ -86,7 +86,6 @@ class StorageCompositionAnalyzer(
                 || first.artist != second.artist
                 || first.album != newAlbumName
                 || first.albumArtist != newAlbumArtist
-                || first.audioFileType != second.audioFileType
     }
 
     private fun FolderNode<Long>.excludeCompositions(

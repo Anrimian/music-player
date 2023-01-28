@@ -17,9 +17,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.annotation.RequiresApi
 
 fun Context.getDimensionPixelSize(@DimenRes resId: Int): Int {
     return resources.getDimensionPixelSize(resId)
@@ -56,6 +56,10 @@ fun pIntentFlag(flags: Int = 0): Int = if (Build.VERSION.SDK_INT >= Build.VERSIO
     flags
 }
 
+fun broadcastPendingIntentFlag(): Int {
+    return pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+}
+
 @SuppressLint("ClickableViewAccessibility")
 fun View.onMotionDown(callback: () -> Unit) {
     setOnTouchListener { _, event ->
@@ -63,6 +67,14 @@ fun View.onMotionDown(callback: () -> Unit) {
             callback()
         }
         return@setOnTouchListener false
+    }
+}
+
+inline fun <reified T> Intent.getParcelable(key: String): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableExtra(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION") getParcelableExtra(key) as? T
     }
 }
 

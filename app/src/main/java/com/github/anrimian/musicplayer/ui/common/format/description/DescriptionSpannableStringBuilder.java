@@ -33,6 +33,13 @@ public class DescriptionSpannableStringBuilder extends SpannableStringBuilder {
         dividerDrawableRes = DEFAULT_DIVIDER;
     }
 
+    public DescriptionSpannableStringBuilder(Context context, CharSequence text, @DrawableRes int dividerDrawableRes) {
+        super(text);
+        this.context = context;
+        this.dividerDrawableRes = dividerDrawableRes;
+    }
+
+
     public DescriptionSpannableStringBuilder(Context context, CharSequence text, int start, int end) {
         super(text, start, end);
         this.context = context;

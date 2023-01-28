@@ -43,6 +43,18 @@ public interface EditorRepository {
 
     Completable changeCompositionTitle(long compositionId, CompositionContentSource source, String title);
 
+    Completable changeCompositionTrackNumber(long compositionId,
+                                             CompositionContentSource source,
+                                             @Nullable Long trackNumber);
+
+    Completable changeCompositionDiscNumber(long compositionId,
+                                            CompositionContentSource source,
+                                            @Nullable Long trackNumber);
+
+    Completable changeCompositionComment(long compositionId,
+                                         CompositionContentSource source,
+                                         String text);
+
     Completable changeCompositionLyrics(long compositionId,
                                         CompositionContentSource source,
                                         String text);

@@ -185,8 +185,11 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
 
     override fun showPlayListInfo(playList: PlayList) {
         toolbar.title = playList.name
-        toolbar.subtitle =
-            FormatUtils.formatCompositionsCount(requireContext(), playList.compositionsCount)
+        toolbar.subtitle = FormatUtils.formatPlaylistAdditionalInfo(
+            requireContext(),
+            playList,
+            R.drawable.ic_description_text_circle_inverse
+        )
     }
 
     override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {

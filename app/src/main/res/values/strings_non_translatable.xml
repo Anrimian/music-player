@@ -61,4 +61,7 @@
     <string name="privacy_policy" translatable="false">Privacy policy</string>
     <string name="about_app_text_here_link" translatable="false">here</string>
 
+    <!--experimental one-->
+    <string name="app_has_no_system_permission_to_start" translatable="false">App has no system permission to start</string>
+
 </resources>

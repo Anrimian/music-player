@@ -14,7 +14,7 @@ public class DatabaseUtils {
             if (i == 0) {
                 result[i] = arg;
             } else {
-                result[i] = "%" + arg + "%";
+                result[i] = arg == null? null : "%" + arg + "%";
             }
         }
         return result;

@@ -46,7 +46,7 @@ fun showCompositionPopupMenu(
         binding.tvCompositionInfo.text = sb
     }
 
-    val recyclerView = popupView.findViewById<RecyclerView>(R.id.recycler_view)
+    val recyclerView = popupView.findViewById<RecyclerView>(R.id.rvMenuItems)
     recyclerView.layoutManager = LinearLayoutManager(anchorView.context)
 
     val popupWindow = AtomicReference<PopupWindow>()

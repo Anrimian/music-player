@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogSoundBalanceBinding
 import com.github.anrimian.musicplayer.databinding.PartialDeleteDialogBinding
@@ -70,14 +71,37 @@ fun shareComposition(fragment: Fragment, composition: Composition) {
 }
 
 fun shareCompositions(fragment: Fragment, compositions: Collection<Composition>) {
-    val ids = compositions.map(Composition::getId)
+    shareCompositions(
+        fragment.requireContext(),
+        fragment.childFragmentManager,
+        compositions.map(Composition::getId),
+        compositions.find { composition -> !composition.isFileExists } != null
+    )
+}
 
-    val nonExistentComposition = compositions.find { composition -> !composition.isFileExists }
-    if (nonExistentComposition != null) {
-        newShareCompositionsDialogFragment(ids.toLongArray()).safeShow(fragment.childFragmentManager)
+fun shareComposition(
+    ctx: Context,
+    fragmentManager: FragmentManager,
+    fullComposition: Composition
+) {
+    shareCompositions(
+        ctx,
+        fragmentManager,
+        listOf(fullComposition.id),
+        fullComposition.storageId == null
+    )
+}
+
+fun shareCompositions(
+    ctx: Context,
+    fragmentManager: FragmentManager,
+    ids: List<Long>,
+    hasNonExistComposition: Boolean
+) {
+    if (hasNonExistComposition) {
+        newShareCompositionsDialogFragment(ids.toLongArray()).safeShow(fragmentManager)
         return
     }
-    val ctx = fragment.requireContext()
     Components.getAppComponent().sourceInteractor()
         .getLibraryCompositionSources(ids)
         .observeOn(AndroidSchedulers.mainThread())

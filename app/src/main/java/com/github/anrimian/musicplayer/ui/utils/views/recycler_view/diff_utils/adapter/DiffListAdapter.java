@@ -102,8 +102,16 @@ public abstract class DiffListAdapter<T, VH extends RecyclerView.ViewHolder>
 
     @SuppressWarnings("unused")
     protected DiffListAdapter(RecyclerView recyclerView, @NonNull DiffUtil.ItemCallback<T> diffCallback) {
-        mDiffer = new CustomAsyncListDiffer<>(recyclerView, new AdapterListUpdateCallback(this),
-                new AsyncDifferConfig.Builder<>(diffCallback).build());
+        this(recyclerView, diffCallback, true);
+    }
+
+    protected DiffListAdapter(RecyclerView recyclerView,
+                              @NonNull DiffUtil.ItemCallback<T> diffCallback,
+                              boolean detectMoves) {
+        mDiffer = new CustomAsyncListDiffer<>(recyclerView,
+                new AdapterListUpdateCallback(this),
+                new AsyncDifferConfig.Builder<>(diffCallback).build(),
+                detectMoves);
         mDiffer.addListListener(mListener);
     }
 

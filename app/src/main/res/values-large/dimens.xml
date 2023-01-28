@@ -3,6 +3,8 @@
     <!--dialogs-->
     <item name="dialog_min_width_major" type="dimen">55%</item>
     <item name="dialog_min_width_minor" type="dimen">80%</item>
+    <item name="popup_dialog_min_width_major" type="dimen">35%</item>
+    <item name="popup_dialog_min_width_minor" type="dimen">60%</item>
 
     <!--player bottom sheet-->
     <dimen name="bottom_sheet_expand_height">210dp</dimen>
@@ -30,13 +32,4 @@
     <dimen name="toolbar_player_content_start_padding">16dp</dimen>
     <!--    -->
     <dimen name="toolbar_control_offset">8dp</dimen>
-
-    <!--widgets-->
-    <dimen name="widget_content_spacing_margin">8dp</dimen>
-    <dimen name="widget_controls_bottom_margin">8dp</dimen>
-
-    <dimen name="widget_medium_content_margin_vertical">8dp</dimen>
-    <dimen name="widget_medium_content_margin_horizontal">8dp</dimen>
-    <dimen name="widget_medium_content_spacing_margin_vertical">4dp</dimen>
-    <dimen name="widget_medium_content_spacing_margin_horizontal">6dp</dimen>
 </resources>

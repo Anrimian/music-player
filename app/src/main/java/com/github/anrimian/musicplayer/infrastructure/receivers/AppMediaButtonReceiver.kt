@@ -2,13 +2,13 @@ package com.github.anrimian.musicplayer.infrastructure.receivers
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.view.KeyEvent
 import androidx.media.session.MediaButtonReceiver
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.utils.Permissions
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
+import com.github.anrimian.musicplayer.ui.utils.getParcelable
 
 private const val UNSUPPORTED_EVENT_PROCESS_WINDOW_MILLIS = 1000L
 
@@ -89,11 +89,4 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
         }
     }
 
-    private inline fun <reified T> Intent.getParcelable(key: String): T? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getParcelableExtra(key, T::class.java)
-        } else {
-            @Suppress("DEPRECATION") getParcelableExtra(key) as? T
-        }
-    }
 }

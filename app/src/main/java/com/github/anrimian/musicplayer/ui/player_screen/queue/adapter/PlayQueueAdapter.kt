@@ -22,8 +22,12 @@ class PlayQueueAdapter(
 ) : MvpDiffAdapter<PlayQueueItem, PlayQueueViewHolder>(
     lifecycleOwner,
     recyclerView,
-    SimpleDiffItemCallback(PlayQueueItemHelper::areSourcesTheSame, PlayQueueItemHelper::getChangePayload)
+    SimpleDiffItemCallback(PlayQueueItemHelper::areSourcesTheSame, PlayQueueItemHelper::getChangePayload),
+    detectMoves = false//performance optimization, seems queue diff can have too many moves
 ) {
+
+    private var isListAccessible = true
+    private var listDelayedAction: (() -> Unit)? = null
 
     private var currentItem: PlayQueueItem? = null
     private var play = false
@@ -59,6 +63,29 @@ class PlayQueueAdapter(
             onBindViewHolder(holder, position)
         } else {
             holder.update(getItem(position), payloads)
+        }
+    }
+
+    override fun submitList(list: List<PlayQueueItem>?) {
+        isListAccessible = false
+        super.submitList(list) {
+            listDelayedAction?.invoke()
+            listDelayedAction = null
+            isListAccessible = true
+        }
+    }
+
+    /**
+     * When submitList() is in progress, scrolling to position is bugged.
+     * It doesn't scroll and then RecyclerView wrongly thinks that we're on the target position.
+     * So we delay possible action when submitList() is running.
+     * Helpful only for single submitList() call case.
+     */
+    fun runSafeAction(action: () -> Unit) {
+        if (isListAccessible) {
+            action.invoke()
+        } else {
+            this.listDelayedAction = action
         }
     }
 
