@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ItemStorageMusicBinding
 import com.github.anrimian.musicplayer.domain.Payloads
@@ -127,6 +128,10 @@ class MusicFileViewHolder(
 
     fun runHighlightAnimation() {
         compositionItemWrapper.runHighlightAnimation()
+    }
+
+    fun setFileSyncStates(fileSyncStates: Map<Long, FileSyncState>) {
+        compositionItemWrapper.showFileSyncState(fileSyncStates[fileSource.composition.id])
     }
 
     private fun showAsCurrentComposition(isCurrent: Boolean) {

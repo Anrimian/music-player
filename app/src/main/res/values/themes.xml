@@ -103,6 +103,7 @@
     <style name="DarkOrangeTheme" parent="@style/PrimaryDarkTheme">
         <item name="colorAccent">@color/colorOrangeAccent</item>
         <item name="colorPrimaryVariant">@color/colorGreenDarkAccent</item>
+        <item name="colorAttention">@color/colorGreenDarkAccent</item>
 
         <!--text-->
         <item name="dialogButtonColor">@color/colorOrangeAccent</item>

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper
@@ -51,5 +52,9 @@ class PlayListItemViewHolder(
         this.item = item
         val composition = item.composition
         compositionItemWrapper.bind(composition, coversEnabled)
+    }
+
+    fun setFileSyncStates(fileSyncStates: Map<Long, FileSyncState>) {
+        compositionItemWrapper.showFileSyncState(fileSyncStates[item.composition.id])
     }
 }

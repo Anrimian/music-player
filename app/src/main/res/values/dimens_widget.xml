@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--devices checklist:
+        phone, api >= 31, portrait(h>=600dp) & landscape
+        phone, api < 31, portrait(h<600dp/ h>=600dp) & landscape
+        tablet, api >= 31, portrait(large/xlarge) & landscape(large/xlarge)
+        tablet, api < 31, portrait & landscape
+    -->
+    <!--widget config: phone, landscape-->
+    <dimen name="widget_background_radius">6dp</dimen>
+    <dimen name="widget_cover_size">40dp</dimen>
+
+    <dimen name="widget_menu_vertical_margin">18dp</dimen>
+    <dimen name="widget_menu_horizontal_margin">36dp</dimen>
+    <dimen name="widget_title_padding_end">12dp</dimen>
+
+    <dimen name="widget_small_content_margin_vertical">0dp</dimen>
+    <dimen name="widget_small_content_margin_horizontal">8dp</dimen>
+    <dimen name="widget_small_controls_margin_horizontal">8dp</dimen>
+    <dimen name="widget_small_controls_bottom_margin">0dp</dimen>
+    <dimen name="widget_small_controls_spacing_margin">2dp</dimen>
+    <dimen name="widget_small_content_spacing_margin">0dp</dimen>
+
+    <dimen name="widget_medium_content_margin_vertical">4dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">4dp</dimen>
+    <dimen name="widget_medium_controls_margin_horizontal">2dp</dimen>
+    <dimen name="widget_medium_controls_bottom_margin">0dp</dimen>
+    <dimen name="widget_medium_controls_spacing_margin">2dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_vertical">2dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_horizontal">8dp</dimen>
+    <dimen name="widget_medium_title_padding_end">12dp</dimen>
+
+</resources>

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.common.compositions
 
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
@@ -65,5 +66,8 @@ interface BaseLibraryCompositionsView : ListMvpView<Composition> {
 
     @OneExecution
     fun restoreListPosition(listPosition: ListPosition)
+
+    @AddToEndSingle
+    fun showFilesSyncState(states: Map<Long, FileSyncState>)
 
 }

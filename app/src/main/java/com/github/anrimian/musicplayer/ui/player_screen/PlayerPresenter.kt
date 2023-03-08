@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen
 
 import com.github.anrimian.filesync.models.state.file.FileSyncState
+import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
@@ -14,7 +15,6 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.util.*
 
 /**
@@ -27,9 +27,6 @@ class PlayerPresenter(
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : AppPresenter<PlayerView>(uiScheduler, errorParser) {
-
-    //TODO remove all "batterySafe" disposables, they're doing nothing
-    private val batterySafeDisposable = CompositeDisposable()
 
     private var currentItem: PlayQueueItem? = null
 
@@ -46,9 +43,6 @@ class PlayerPresenter(
         subscribeOnRandomMode()
         subscribeOnSpeedAvailableState()
         subscribeOnSpeedState()
-    }
-
-    fun onStart() {
         subscribeOnRepeatMode()
         subscribeOnPlayerStateChanges()
         subscribeOnErrorEvents()
@@ -57,10 +51,6 @@ class PlayerPresenter(
         subscribeOnTrackPositionChanging()
         subscribeOnSleepTimerTime()
         subscribeOnFileScannerState()
-    }
-
-    fun onStop() {
-        batterySafeDisposable.clear()
     }
 
     fun onSetupScreenStateRequested() {
@@ -200,9 +190,7 @@ class PlayerPresenter(
     }
 
     private fun subscribeOnRepeatMode() {
-        batterySafeDisposable.add(playerInteractor.getRepeatModeObservable()
-            .observeOn(uiScheduler)
-            .subscribe(viewState::showRepeatMode))
+        playerInteractor.getRepeatModeObservable().unsafeSubscribeOnUi(viewState::showRepeatMode)
     }
 
     private fun addPreparedCompositionsToPlayList(playList: PlayList) {
@@ -213,12 +201,9 @@ class PlayerPresenter(
     private fun deletePreparedCompositions(compositionsToDelete: List<Composition>) {
         lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
             .observeOn(uiScheduler)
-            .doOnComplete { onDeleteCompositionsSuccess(compositionsToDelete) }
+            .doOnSuccess(viewState::showDeleteCompositionMessage)
+            .ignoreElement()
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionError)
-    }
-
-    private fun onDeleteCompositionsSuccess(compositionsToDelete: List<Composition>) {
-        viewState.showDeleteCompositionMessage(compositionsToDelete)
     }
 
     private fun onDeleteCompositionError(throwable: Throwable) {
@@ -237,9 +222,8 @@ class PlayerPresenter(
     }
 
     private fun subscribeOnCurrentCompositionSyncState() {
-        batterySafeDisposable.add(playerScreenInteractor.currentCompositionFileSyncState
-            .observeOn(uiScheduler)
-            .subscribe(this::onCurrentCompositionSyncStateReceived))
+        playerScreenInteractor.currentCompositionFileSyncState
+            .unsafeSubscribeOnUi(this::onCurrentCompositionSyncStateReceived)
     }
 
     private fun onCurrentCompositionSyncStateReceived(fileSyncState: FileSyncState) {
@@ -247,9 +231,8 @@ class PlayerPresenter(
     }
 
     private fun subscribeOnCurrentComposition() {
-        batterySafeDisposable.add(playerInteractor.getCurrentQueueItemObservable()
-            .observeOn(uiScheduler)
-            .subscribe(this::onPlayQueueEventReceived))
+        playerInteractor.getCurrentQueueItemObservable()
+            .unsafeSubscribeOnUi(this::onPlayQueueEventReceived)
     }
 
     private fun onPlayQueueEventReceived(playQueueEvent: PlayQueueEvent) {
@@ -267,9 +250,9 @@ class PlayerPresenter(
                 val newComposition = newItem.composition
                 val currentComposition = currentItem.composition
                 updateCover = currentComposition.dateModified != newComposition.dateModified
-                    || currentComposition.coverModifyTime != newComposition.coverModifyTime
-                    || currentComposition.size != newComposition.size
-                    || currentComposition.isFileExists != newComposition.isFileExists
+                        || currentComposition.coverModifyTime != newComposition.coverModifyTime
+                        || currentComposition.size != newComposition.size
+                        || currentComposition.isFileExists != newComposition.isFileExists
             }
 
             this.currentItem = newItem
@@ -282,30 +265,33 @@ class PlayerPresenter(
     }
 
     private fun subscribeOnPlayerStateChanges() {
-        batterySafeDisposable.add(playerInteractor.getIsPlayingStateObservable()
-            .observeOn(uiScheduler)
-            .subscribe(viewState::showPlayerState))
+        playerInteractor.getIsPlayingStateObservable()
+            .unsafeSubscribeOnUi(viewState::showPlayerState)
     }
 
     private fun subscribeOnErrorEvents() {
-        batterySafeDisposable.add(playerInteractor.getPlayerStateObservable()
-            .observeOn(uiScheduler)
-            .subscribe(this::onPlayerStateReceived))
+        playerInteractor.getPlayerStateObservable()
+            .unsafeSubscribeOnUi(this::onPlayerStateReceived)
     }
 
     private fun onPlayerStateReceived(playerState: PlayerState) {
         if (playerState is PlayerState.Error) {
-            val errorCommand = errorParser.parseError(playerState.throwable)
-            viewState.showPlayErrorState(errorCommand)
+            if (playerState.throwable is UnavailableMediaStoreException) {
+                //after lazy-prepare implementation this case can be removed.
+                // Do not forget to check after remove.
+                viewState.showPlayErrorState(null)
+            } else {
+                val errorCommand = errorParser.parseError(playerState.throwable)
+                viewState.showPlayErrorState(errorCommand)
+            }
         } else {
             viewState.showPlayErrorState(null)
         }
     }
 
     private fun subscribeOnTrackPositionChanging() {
-        batterySafeDisposable.add(playerInteractor.getTrackPositionObservable()
-            .observeOn(uiScheduler)
-            .subscribe(this::onTrackPositionChanged))
+        playerInteractor.getTrackPositionObservable()
+            .unsafeSubscribeOnUi(this::onTrackPositionChanged)
     }
 
     private fun onTrackPositionChanged(currentPosition: Long) {
@@ -351,14 +337,12 @@ class PlayerPresenter(
     }
 
     private fun subscribeOnSleepTimerTime() {
-        batterySafeDisposable.add(playerScreenInteractor.sleepTimerCountDownObservable
-            .observeOn(uiScheduler)
-            .subscribe(viewState::showSleepTimerRemainingTime))
+        playerScreenInteractor.sleepTimerCountDownObservable
+            .unsafeSubscribeOnUi(viewState::showSleepTimerRemainingTime)
     }
 
     private fun subscribeOnFileScannerState() {
-        batterySafeDisposable.add(playerScreenInteractor.fileScannerStateObservable
-            .observeOn(uiScheduler)
-            .subscribe(viewState::showFileScannerState))
+        playerScreenInteractor.fileScannerStateObservable
+            .unsafeSubscribeOnUi(viewState::showFileScannerState)
     }
 }

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback
@@ -25,6 +26,8 @@ class PlayListItemAdapter(
     SimpleDiffItemCallback(PlayListItemHelper::areSourcesTheSame, PlayListItemHelper::getChangePayload)
 ) {
 
+    private var syncStates = emptyMap<Long, FileSyncState>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayListItemViewHolder {
         return PlayListItemViewHolder(
             LayoutInflater.from(parent.context),
@@ -38,5 +41,13 @@ class PlayListItemAdapter(
         super.onBindViewHolder(holder, position)
         val composition = getItem(position)
         holder.bind(composition, coversEnabled)
+        holder.setFileSyncStates(syncStates)
+    }
+
+    fun showFileSyncStates(states: Map<Long, FileSyncState>) {
+        this.syncStates = states
+        forEachHolder { holder ->
+            holder.setFileSyncStates(syncStates)
+        }
     }
 }

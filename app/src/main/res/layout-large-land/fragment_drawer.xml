@@ -96,7 +96,7 @@
             <View
                 android:layout_width="8dp"
                 android:layout_height="0dp"
-                android:background="@drawable/bg_shadow_left"
+                android:background="@drawable/bg_shadow_start"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="@id/guideline_center"
                 app:layout_constraintBottom_toBottomOf="parent"/>

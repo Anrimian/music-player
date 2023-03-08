@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.Payloads
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
@@ -30,6 +31,7 @@ class CompositionsAdapter(
 
     private var currentComposition: CurrentComposition? = null
     private var isCoversEnabled = false
+    private var syncStates = emptyMap<Long, FileSyncState>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
         return MusicViewHolder(
@@ -50,6 +52,7 @@ class CompositionsAdapter(
         val selected = selectedCompositions.contains(composition)
         holder.setSelected(selected)
         holder.showCurrentComposition(currentComposition, false)
+        holder.setFileSyncStates(syncStates)
     }
 
     override fun onBindViewHolder(
@@ -97,6 +100,13 @@ class CompositionsAdapter(
         this.isCoversEnabled = isCoversEnabled
         forEachHolder { holder ->
             holder.setCoversVisible(isCoversEnabled)
+        }
+    }
+
+    fun showFileSyncStates(states: Map<Long, FileSyncState>) {
+        this.syncStates = states
+        forEachHolder { holder ->
+            holder.setFileSyncStates(syncStates)
         }
     }
 }

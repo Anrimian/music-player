@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.annotation.MenuRes
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
@@ -28,6 +29,7 @@ import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
+import com.github.anrimian.musicplayer.ui.main.MainActivity
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment
@@ -306,6 +308,10 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
         touchHelperCallback.setDragEnabled(enabled)
     }
 
+    override fun showFilesSyncState(states: Map<Long, FileSyncState>) {
+        adapter.showFileSyncStates(states)
+    }
+
     private fun onItemMenuClicked(view: View, position: Int, playListItem: PlayListItem) {
         val composition = playListItem.composition
         showCompositionPopupMenu(view, R.menu.play_list_item_menu, composition) { item ->
@@ -326,6 +332,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
             R.id.menu_add_to_playlist -> presenter.onAddToPlayListButtonClicked(composition)
             R.id.menu_edit ->
                 startActivity(newCompositionEditorIntent(requireContext(), composition.id))
+            R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), composition)
             R.id.menu_share -> shareComposition(this, composition)
             R.id.menu_delete_from_play_list -> presenter.onDeleteFromPlayListButtonClicked(item)
             R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(composition)

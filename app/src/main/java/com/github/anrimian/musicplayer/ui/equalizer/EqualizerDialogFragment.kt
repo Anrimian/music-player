@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.equalizer
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.os.Bundle
 import android.util.Pair
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -21,7 +22,7 @@ import com.github.anrimian.musicplayer.domain.models.equalizer.Band
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig
 import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.AppBottomSheetDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
@@ -47,6 +48,10 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
 
     private val bandsViewList = LinkedList<Pair<PartialEqualizerBandBinding, Band>>()
     private var inAppEqualizerSettingsEnabled = false
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AppBottomSheetDialog(requireContext(), theme)
+    }
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
@@ -92,7 +97,6 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
 
     override fun onResume() {
         super.onResume()
-        DialogUtils.setupBottomSheetDialogMaxWidth(this)
         val textResId: Int
         val enabled: Boolean
         if (ExternalEqualizer.isExternalEqualizerExists(requireContext())) {

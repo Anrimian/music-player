@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLibraryCompositionsBinding
@@ -115,11 +116,6 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         choosePlayListDialogRunner = DialogFragmentRunner(fm, Tags.SELECT_PLAYLIST_TAG) {
                 f -> f.setOnCompleteListener(presenter::onPlayListToAddingSelected)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        presenter.onStart()
     }
 
     override fun onFragmentMovedOnTop() {
@@ -280,6 +276,10 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
     override fun onCompositionsAddedToQueue(compositions: List<Composition>) {
         val message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions)
         MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
+    }
+
+    override fun showFilesSyncState(states: Map<Long, FileSyncState>) {
+        adapter.showFileSyncStates(states)
     }
 
     private fun onOptionsItemClicked(item: MenuItem) {

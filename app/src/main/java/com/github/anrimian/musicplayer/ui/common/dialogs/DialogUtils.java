@@ -1,35 +1,17 @@
 package com.github.anrimian.musicplayer.ui.common.dialogs;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.Window;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.DialogSpeedSelectorBinding;
 import com.github.anrimian.musicplayer.databinding.PartialNumberPickerDialogBinding;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class DialogUtils {
-
-    /**
-     * Call in onResume()
-     */
-    public static void setupBottomSheetDialogMaxWidth(BottomSheetDialogFragment fragment) {
-        int width = fragment.requireContext().getResources().getDimensionPixelSize(R.dimen.bottom_sheet_width);
-        Dialog dialog = fragment.getDialog();
-        if (dialog != null) {
-            Window window = dialog.getWindow();
-            if (window != null) {
-                window.setLayout(width > 0 ? width : MATCH_PARENT, MATCH_PARENT);
-            }
-        }
-    }
 
     public static void showSpeedSelectorDialog(Context context,
                                                float currentSpeed,

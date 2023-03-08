@@ -26,6 +26,7 @@
         <item name="colorControlHighlightInverse">@color/color_control_highlight_dark</item>
         <item name="colorControlThird">@color/color_control_third</item>
         <item name="colorAccentDark">?attr/colorAccent</item>
+        <item name="colorAttention">@color/colorOrangeAccent</item>
 
         <!--text colors-->
         <item name="android:textColorPrimary">@color/text_color_primary</item>

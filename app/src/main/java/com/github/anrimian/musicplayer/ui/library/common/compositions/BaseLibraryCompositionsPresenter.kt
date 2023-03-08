@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.common.compositions
 
+import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
@@ -15,7 +16,6 @@ import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
 
@@ -23,11 +23,10 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     private val playerInteractor: LibraryPlayerInteractor,
     private val playListsInteractor: PlayListsInteractor,
     private val displaySettingsInteractor: DisplaySettingsInteractor,
+    private val syncInteractor: SyncInteractor<*, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler,
 ) : AppPresenter<T>(uiScheduler, errorParser) {
-
-    private val presenterBatterySafeDisposable = CompositeDisposable()
 
     private var currentCompositionDisposable: Disposable? = null
     private var compositionsDisposable: Disposable? = null
@@ -49,17 +48,13 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         subscribeOnUiSettings()
         subscribeOnRepeatMode()
         subscribeOnCompositions()
-    }
-
-    fun onStart() {
-        if (compositions.isNotEmpty()) {
-            subscribeOnCurrentComposition()
-        }
+        subscribeOnCurrentComposition()
+        syncInteractor.getFilesSyncStateObservable()
+            .unsafeSubscribeOnUi(viewState::showFilesSyncState)
     }
 
     fun onStop(listPosition: ListPosition) {
         saveListPosition(listPosition)
-        presenterBatterySafeDisposable.clear()
     }
 
     fun onTryAgainLoadCompositionsClicked() {
@@ -154,10 +149,10 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
 
     fun onPlayListToAddingSelected(playList: PlayList) {
         playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
-                .subscribeOnUi(
-                        { onAddingToPlayListCompleted(playList) },
-                        this::onAddingToPlayListError
-                )
+            .subscribeOnUi(
+                { onAddingToPlayListCompleted(playList) },
+                this::onAddingToPlayListError
+            )
     }
 
     fun onSelectionModeBackPressed() {
@@ -203,8 +198,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     fun onRetryFailedDeleteActionClicked() {
         if (lastDeleteAction != null) {
             lastDeleteAction!!
-                    .doFinally { lastDeleteAction = null }
-                    .justSubscribe(this::onDeleteCompositionError)
+                .doFinally { lastDeleteAction = null }
+                .justSubscribe(this::onDeleteCompositionError)
         }
     }
 
@@ -222,8 +217,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         }
         RxUtils.dispose(compositionsDisposable, presenterDisposable)
         compositionsDisposable = getCompositionsObservable(searchText)
-                .observeOn(uiScheduler)
-                .subscribe(this::onCompositionsReceived, this::onCompositionsReceivingError)
+            .observeOn(uiScheduler)
+            .subscribe(this::onCompositionsReceived, this::onCompositionsReceivingError)
         presenterDisposable.add(compositionsDisposable!!)
     }
 
@@ -252,12 +247,12 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
 
     private fun addCompositionsToPlayNext(compositions: List<Composition>) {
         playerInteractor.addCompositionsToPlayNext(compositions)
-                .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
+            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
     }
 
     private fun addCompositionsToEnd(compositions: List<Composition>) {
         playerInteractor.addCompositionsToEnd(compositions)
-                .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
+            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
     }
 
     private fun playSelectedCompositions() {
@@ -273,14 +268,14 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
 
     private fun deletePreparedCompositions() {
         lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
-                .observeOn(uiScheduler)
-                .doOnComplete(this::onDeleteCompositionsSuccess)
-
+            .observeOn(uiScheduler)
+            .doOnSuccess(this::onDeleteCompositionsSuccess)
+            .ignoreElement()
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionError)
     }
 
-    private fun onDeleteCompositionsSuccess() {
-        viewState.showDeleteCompositionMessage(compositionsToDelete)
+    private fun onDeleteCompositionsSuccess(compositions: List<Composition>) {
+        viewState.showDeleteCompositionMessage(compositions)
         compositionsToDelete.clear()
         if (selectedCompositions.isNotEmpty()) {
             closeSelectionMode()
@@ -288,10 +283,8 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     private fun subscribeOnCurrentComposition() {
-        currentCompositionDisposable = playerInteractor.getCurrentCompositionObservable()
-                .observeOn(uiScheduler)
-                .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
-        presenterBatterySafeDisposable.add(currentCompositionDisposable!!)
+        playerInteractor.getCurrentCompositionObservable()
+            .subscribeOnUi(this::onCurrentCompositionReceived, errorParser::logError)
     }
 
     private fun onCompositionsReceivingError(throwable: Throwable) {

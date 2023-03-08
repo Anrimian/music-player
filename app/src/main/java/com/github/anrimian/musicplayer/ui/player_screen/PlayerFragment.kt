@@ -330,16 +330,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         return processed
     }
 
-    override fun onStart() {
-        super.onStart()
-        presenter.onStart()
-    }
-
     override fun onStop() {
         super.onStop()
-        //battery saving
-        presenter.onStop()
-
         AndroidUtils.clearVectorAnimationInfo(panelBinding.ivPlayPause)
     }
 
@@ -456,12 +448,13 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     }
 
     override fun showRandomPlayingButton(active: Boolean) {
-        panelBinding.btnRandomPlay.isSelected = active
         if (active) {
+            AndroidUtils.setAnimatedVectorDrawable(panelBinding.btnRandomPlay, R.drawable.anim_shuffle_off_to_on)
             panelBinding.btnRandomPlay.setOnClickListener {
                 presenter.onRandomPlayingButtonClicked(false)
             }
         } else {
+            AndroidUtils.setAnimatedVectorDrawable(panelBinding.btnRandomPlay, R.drawable.anim_shuffle_on_to_off)
             panelBinding.btnRandomPlay.setOnClickListener {
                 presenter.onRandomPlayingButtonClicked(true)
             }

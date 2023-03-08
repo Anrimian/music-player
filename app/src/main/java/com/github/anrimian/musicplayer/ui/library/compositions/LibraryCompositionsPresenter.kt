@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.compositions
 
+import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
@@ -17,12 +18,14 @@ class LibraryCompositionsPresenter(
     playListsInteractor: PlayListsInteractor,
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
+    syncInteractor: SyncInteractor<*, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : BaseLibraryCompositionsPresenter<LibraryCompositionsView>(
     playerInteractor,
     playListsInteractor,
     displaySettingsInteractor,
+    syncInteractor,
     errorParser,
     uiScheduler
 ) {

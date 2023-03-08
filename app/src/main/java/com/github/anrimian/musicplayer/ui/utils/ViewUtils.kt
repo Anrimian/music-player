@@ -65,3 +65,7 @@ fun ViewPager2.reduceDragSensitivityBy(f: Int) {
 fun Context.createStyledButton(@StyleRes styleRes: Int): Button {
     return Button(ContextThemeWrapper(this, styleRes), null, styleRes)
 }
+
+fun Context.linkify(schema: String, textResId: Int, linkResId: Int): String {
+    return "<a href=\"" + schema + getString(linkResId) + "\">" + getString(textResId) + "</a>"
+}

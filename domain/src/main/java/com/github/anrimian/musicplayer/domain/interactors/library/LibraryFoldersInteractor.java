@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.library;
 
+import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
@@ -35,6 +36,7 @@ public class LibraryFoldersInteractor {
     private final EditorRepository editorRepository;
     private final LibraryPlayerInteractor musicPlayerInteractor;
     private final PlayListsInteractor playListsInteractor;
+    private final SyncInteractor<?, ?, Long> syncInteractor;
     private final SettingsRepository settingsRepository;
     private final UiStateRepository uiStateRepository;
     private final MediaScannerRepository mediaScannerRepository;
@@ -43,6 +45,7 @@ public class LibraryFoldersInteractor {
                                     EditorRepository editorRepository,
                                     LibraryPlayerInteractor musicPlayerInteractor,
                                     PlayListsInteractor playListsInteractor,
+                                    SyncInteractor<?, ?, Long> syncInteractor,
                                     SettingsRepository settingsRepository,
                                     UiStateRepository uiStateRepository,
                                     MediaScannerRepository mediaScannerRepository) {
@@ -50,6 +53,7 @@ public class LibraryFoldersInteractor {
         this.editorRepository = editorRepository;
         this.musicPlayerInteractor = musicPlayerInteractor;
         this.playListsInteractor = playListsInteractor;
+        this.syncInteractor = syncInteractor;
         this.settingsRepository = settingsRepository;
         this.uiStateRepository = uiStateRepository;
         this.mediaScannerRepository = mediaScannerRepository;
@@ -110,12 +114,14 @@ public class LibraryFoldersInteractor {
                 .flatMap(musicPlayerInteractor::addCompositionsToEnd);
     }
 
-    public Single<List<Composition>> deleteCompositions(List<FileSource> fileSources) {
-        return libraryRepository.deleteFolders(fileSources);
+    public Single<List<Composition>> deleteFiles(List<FileSource> fileSources) {
+        return libraryRepository.deleteFolders(fileSources)
+                .doOnSuccess(this::onCompositionsDeleted);
     }
 
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
-        return libraryRepository.deleteFolder(folder);
+        return libraryRepository.deleteFolder(folder)
+                .doOnSuccess(this::onCompositionsDeleted);
     }
 
     public Single<List<Composition>> addCompositionsToPlayList(Long folderId, PlayList playList) {
@@ -186,6 +192,10 @@ public class LibraryFoldersInteractor {
                     musicPlayerInteractor.startPlaying(compositions, firstPosition);
                 })
                 .subscribe();
+    }
+
+    private void onCompositionsDeleted(List<Composition> compositions) {
+        syncInteractor.onLocalFilesDeleted(ListUtils.mapList(compositions, Composition::getId));
     }
 
 }

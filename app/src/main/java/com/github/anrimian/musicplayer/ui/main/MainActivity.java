@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.R;
@@ -22,6 +23,7 @@ import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.databinding.DialogErrorReportBinding;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.ui.main.setup.SetupFragment;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment;
@@ -34,6 +36,14 @@ import com.github.anrimian.musicplayer.utils.logger.AppLogger;
 import com.github.anrimian.musicplayer.utils.logger.FileLog;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static void showInFolders(FragmentActivity activity, Composition composition) {
+        Fragment currentFragment = activity.getSupportFragmentManager()
+                .findFragmentById(R.id.main_activity_container);
+        if (currentFragment instanceof PlayerFragment) {
+            ((PlayerFragment) currentFragment).locateCompositionInFolders(composition);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

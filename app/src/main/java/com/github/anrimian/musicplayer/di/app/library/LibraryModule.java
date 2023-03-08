@@ -55,11 +55,13 @@ public class LibraryModule {
     PlayQueuePresenter playQueuePresenter(LibraryPlayerInteractor musicPlayerInteractor,
                                           PlayListsInteractor playListsInteractor,
                                           PlayerScreenInteractor playerScreenInteractor,
+                                          SyncInteractor<?, ?, Long> syncInteractor,
                                           ErrorParser errorParser,
                                           @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new PlayQueuePresenter(musicPlayerInteractor,
                 playListsInteractor,
                 playerScreenInteractor,
+                syncInteractor,
                 errorParser,
                 uiScheduler);
     }

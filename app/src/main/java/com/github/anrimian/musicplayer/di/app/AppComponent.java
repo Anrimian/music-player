@@ -34,6 +34,7 @@ import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepositor
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
+import com.github.anrimian.musicplayer.ui.about.AboutTextBinder;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.locale.LocaleController;
@@ -119,4 +120,5 @@ public interface AppComponent {
 
     SystemServiceController systemServiceController();
     SpecialNavigation specificNavigation();
+    AboutTextBinder aboutTextBinder();
 }

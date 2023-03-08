@@ -32,7 +32,7 @@ fun <T : Any> Single<T>.mapError(mapper: (Throwable) -> Throwable): Single<T> {
     return onErrorResumeNext { t -> Single.error(mapper(t)) }
 }
 
-fun <T> Maybe<T>.mapError(mapper: (Throwable) -> Throwable): Maybe<T> {
+fun <T : Any> Maybe<T>.mapError(mapper: (Throwable) -> Throwable): Maybe<T> {
     return onErrorResumeNext { t -> Maybe.error(mapper(t)) }
 }
 

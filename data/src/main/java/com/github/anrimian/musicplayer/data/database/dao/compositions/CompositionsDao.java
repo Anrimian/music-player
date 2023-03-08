@@ -311,7 +311,7 @@ public interface CompositionsDao {
             "coverModifyTime as coverModifyTime, " +
             "storageId IS NOT NULL AS isFileExists " +
             "FROM compositions ")
-    Single<List<ExternalComposition>> getAllAsExternalCompositions();
+    List<ExternalComposition> getAllAsExternalCompositions();
 
     @Query("SELECT id FROM compositions WHERE fileName = :fileName ")
     long[] findCompositionsByFileName(String fileName);

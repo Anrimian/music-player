@@ -78,12 +78,12 @@ public class MusicModule {
     @NonNull
     @Singleton
     PlayerInteractor playerInteractor(MusicPlayerController musicPlayerController,
-                                       CompositionSourceInteractor compositionSourceInteractor,
-                                       PlayerErrorParser playerErrorParser,
-                                       SystemMusicController systemMusicController,
-                                       SystemServiceController systemServiceController,
-                                       SettingsRepository settingsRepository,
-                                       Analytics analytics) {
+                                      CompositionSourceInteractor compositionSourceInteractor,
+                                      PlayerErrorParser playerErrorParser,
+                                      SystemMusicController systemMusicController,
+                                      SystemServiceController systemServiceController,
+                                      SettingsRepository settingsRepository,
+                                      Analytics analytics) {
         return new PlayerInteractor(musicPlayerController,
                 compositionSourceInteractor,
                 playerErrorParser,
@@ -106,7 +106,7 @@ public class MusicModule {
     @NonNull
     @Singleton
     PlayerCoordinatorInteractor playerCoordinatorInteractor(PlayerInteractor playerInteractor,
-                                                              UiStateRepository uiStateRepository) {
+                                                            UiStateRepository uiStateRepository) {
         return new PlayerCoordinatorInteractor(playerInteractor, uiStateRepository);
     }
 
@@ -114,7 +114,7 @@ public class MusicModule {
     @NonNull
     @Singleton
     ExternalPlayerInteractor externalPlayerInteractor(PlayerCoordinatorInteractor interactor,
-                                                       SettingsRepository settingsRepository) {
+                                                      SettingsRepository settingsRepository) {
         return new ExternalPlayerInteractor(interactor, settingsRepository);
     }
 
@@ -122,12 +122,14 @@ public class MusicModule {
     @NonNull
     @Singleton
     LibraryPlayerInteractor libraryPlayerInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
-                                                     SettingsRepository settingsRepository,
-                                                     PlayQueueRepository playQueueRepository,
-                                                     LibraryRepository musicProviderRepository,
-                                                     UiStateRepository uiStateRepository,
-                                                     Analytics analytics) {
+                                                    SyncInteractor<?, ?, Long> syncInteractor,
+                                                    SettingsRepository settingsRepository,
+                                                    PlayQueueRepository playQueueRepository,
+                                                    LibraryRepository musicProviderRepository,
+                                                    UiStateRepository uiStateRepository,
+                                                    Analytics analytics) {
         return new LibraryPlayerInteractor(playerCoordinatorInteractor,
+                syncInteractor,
                 settingsRepository,
                 playQueueRepository,
                 musicProviderRepository,
@@ -159,11 +161,11 @@ public class MusicModule {
     @NonNull
     @Singleton
     MusicPlayerController musicPlayerController(SettingsRepository settingsRepository,
-                                                 Context context,
-                                                 @Named(UI_SCHEDULER) Scheduler uiScheduler,
-                                                 EqualizerController equalizerController,
-                                                 ExoPlayerMediaItemBuilder exoPlayerMediaItemBuilder,
-                                                 MediaPlayerDataSourceBuilder mediaPlayerSourceBuilder) {
+                                                Context context,
+                                                @Named(UI_SCHEDULER) Scheduler uiScheduler,
+                                                EqualizerController equalizerController,
+                                                ExoPlayerMediaItemBuilder exoPlayerMediaItemBuilder,
+                                                MediaPlayerDataSourceBuilder mediaPlayerSourceBuilder) {
         return new MusicPlayerControllerImpl(settingsRepository,
                 context,
                 uiScheduler,
@@ -312,6 +314,7 @@ public class MusicModule {
                                                     EditorRepository editorRepository,
                                                     LibraryPlayerInteractor musicPlayerInteractor,
                                                     PlayListsInteractor playListsInteractor,
+                                                    SyncInteractor<?, ?, Long> syncInteractor,
                                                     SettingsRepository settingsRepository,
                                                     UiStateRepository uiStateRepository,
                                                     MediaScannerRepository mediaScannerRepository) {
@@ -319,6 +322,7 @@ public class MusicModule {
                 editorRepository,
                 musicPlayerInteractor,
                 playListsInteractor,
+                syncInteractor,
                 settingsRepository,
                 uiStateRepository,
                 mediaScannerRepository);

@@ -22,6 +22,8 @@ public class SchedulerModule {
 
     public static final String IO_SCHEDULER = "io_scheduler";
     public static final String UI_SCHEDULER = "ui_scheduler";
+    //replace db scheduler with io scheduler. Check sequential write operations
+    //+play queue skipTo
     public static final String DB_SCHEDULER = "db_scheduler";
     public static final String SLOW_BG_SCHEDULER = "slow_bg_scheduler";
 

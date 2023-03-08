@@ -6,6 +6,7 @@
     <attr name="colorPrimaryVariant" format="color"/>
     <attr name="colorAccentContrast" format="color"/>
     <attr name="colorAccentDark" format="color"/>
+    <attr name="colorAttention" format="color"/>
 
     <!--action mode-->
     <attr name="actionModeBackgroundColor" format="color"/>

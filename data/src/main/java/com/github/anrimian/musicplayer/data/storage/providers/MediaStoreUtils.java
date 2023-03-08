@@ -24,6 +24,8 @@ public class MediaStoreUtils {
             Set<String> volumes = MediaStore.getExternalVolumeNames(context);
             if (!volumes.contains(MediaStore.VOLUME_EXTERNAL_PRIMARY)) {
                 //can crash in rare weird cases on android 10 so we check for existence
+                //reproduce: restart device and we'll get this error
+                // (likely we're trying to read it before media store initialization)
                 //https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android
                 throw new UnavailableMediaStoreException();
             }

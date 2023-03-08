@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app.library.albums.items;
 
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
+import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
@@ -31,6 +32,7 @@ public class AlbumItemsModule {
                                             PlayListsInteractor playListsInteractor,
                                             LibraryPlayerInteractor playerInteractor,
                                             DisplaySettingsInteractor displaySettingsInteractor,
+                                            SyncInteractor<?, ?, Long> syncInteractor,
                                             ErrorParser errorParser,
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new AlbumItemsPresenter(id,
@@ -38,6 +40,7 @@ public class AlbumItemsModule {
                 playListsInteractor,
                 playerInteractor,
                 displaySettingsInteractor,
+                syncInteractor,
                 errorParser,
                 uiScheduler);
     }

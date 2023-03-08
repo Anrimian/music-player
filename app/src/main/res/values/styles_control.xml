@@ -13,6 +13,11 @@
         <item name="android:textSize">@dimen/text_size_small_2</item>
     </style>
 
+    <style name="SwitchViewStyle">
+        <item name="android:textSize">@dimen/text_size_small_2</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
     <style name="SeekBarStyle" parent="@style/Widget.AppCompat.SeekBar"/>
 
     <style name="SliderStyle">

@@ -40,6 +40,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 //   A2: when unbind or ondestroy was called and second service is not in foreground - release media session
 //    ! crash will disappear, but player panel in assistant will be closed too
 //    ? can we set media session in such state when service will be bound again
+//   A3: do something with media session before service launch?
 
 const val PERMISSION_ERROR_ACTION_ID = "permission_error_action_id"
 const val DEFAULT_ERROR_ACTION_ID = "default_error_action_id"

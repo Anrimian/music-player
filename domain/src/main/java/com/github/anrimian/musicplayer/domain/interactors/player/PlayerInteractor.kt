@@ -90,9 +90,7 @@ class PlayerInteractor(
 
     fun play(delay: Long = 0L) {
         val currentSource = this.currentSource
-        if (playerStateSubject.value == PlayerState.PLAY
-            || currentSource == null
-            || pausedTransient) {
+        if (playerStateSubject.value == PlayerState.PLAY || currentSource == null) {
             return
         }
         this.resumeDelay = delay
@@ -167,10 +165,7 @@ class PlayerInteractor(
             return
         }
         if (isPrepared) {
-            if (pausedTransient) {
-                pausedTransient = false
-                return
-            }
+            pausedTransient = false
             pauseInternal()
             playerStateSubject.onNext(PlayerState.PAUSE)
         }

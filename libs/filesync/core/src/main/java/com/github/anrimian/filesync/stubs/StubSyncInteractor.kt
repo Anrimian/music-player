@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.core.Single
 class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
     override fun onAppStarted() {}
     override fun requestFileSync() {}
+    override fun runFileTasks() {}
     override fun addRemoteRepository(
         type: RemoteRepoType,
         credentials: RemoteRepoCredentials
@@ -31,7 +32,8 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
         return Completable.never()
     }
     override fun onLocalFileAdded() {}
-    override fun onLocalFileDeleted() {}
+    override fun onLocalFileDeleted(id: I) {}
+    override fun onLocalFilesDeleted(ids: List<I>) {}
     override fun notifyLocalFileChanged() {}
     override fun isSyncEnabled() = false
     override fun setSyncEnabled(enabled: Boolean) {}
@@ -63,6 +65,14 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
     }
 
     override fun getFileSyncStateObservable(fileId: I): Observable<FileSyncState> {
+        return Observable.never()
+    }
+
+    override fun getFilesSyncStateObservable(): Observable<Map<I, FileSyncState>> {
+        return Observable.never()
+    }
+
+    override fun getHasScheduledTasksObservable(): Observable<Boolean> {
         return Observable.never()
     }
 

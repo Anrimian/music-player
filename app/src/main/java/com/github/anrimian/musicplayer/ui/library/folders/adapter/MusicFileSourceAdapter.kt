@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.Payloads
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
@@ -39,6 +40,7 @@ class MusicFileSourceAdapter(
 
     private var currentComposition: CurrentComposition? = null
     private var isCoversEnabled = false
+    private var syncStates = emptyMap<Long, FileSyncState>()
 
     override fun onCreateViewHolder(parent: ViewGroup, type: Int): FileViewHolder {
         return when (type) {
@@ -75,6 +77,7 @@ class MusicFileSourceAdapter(
                 val musicFileSource = fileSource as CompositionFileSource
                 musicViewHolder.bind(musicFileSource, isCoversEnabled)
                 musicViewHolder.showCurrentComposition(currentComposition, false)
+                holder.setFileSyncStates(syncStates)
             }
             TYPE_FILE -> {
                 val folderViewHolder = holder as FolderViewHolder
@@ -161,6 +164,15 @@ class MusicFileSourceAdapter(
             if (holder is MusicFileViewHolder && holder.bindingAdapterPosition == position) {
                 holder.runHighlightAnimation()
                 return
+            }
+        }
+    }
+
+    fun showFileSyncStates(states: Map<Long, FileSyncState>) {
+        this.syncStates = states
+        forEachHolder { holder ->
+            if (holder is MusicFileViewHolder) {
+                holder.setFileSyncStates(syncStates)
             }
         }
     }

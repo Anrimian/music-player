@@ -54,7 +54,9 @@ dependencies {
     implementation deps.appCompat
     implementation deps.rxJava
     implementation deps.exoPlayerCore
+
     compileOnly deps.javaxAnnotation
+    compileOnly deps.javaxGeneratedAnnotation
 
     implementation deps.room
     implementation deps.roomRx

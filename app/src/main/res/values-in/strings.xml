@@ -1,0 +1,301 @@
+<resources>
+
+    <string name="open_drawer">Buka peramban</string>
+    <string name="close_drawer">Tutup peramban</string>
+    <string name="try_again">Coba lagi</string>
+    <string name="can_not_work_without_file_permission">Aplikasi tidak dapat bekerja tanpa izin berkas.</string>
+    <string name="close">Tutup</string>
+    <string name="library">Perpustakaan</string>
+    <string name="settings">Pengaturan</string>
+    <string name="internal_app_error">Terjadi kesalahan di lingkup aplikasi</string>
+    <string name="unexpected_error">Kesalahan: %s</string>
+    <string name="file_not_found">Berkas tidak ditemukan</string>
+    <string name="compositions_on_device_not_found">Tidak ada satu lagu pun yang ditemukan pada perangkat ini</string>
+    <string name="compositions_and_folders_for_search_not_found">Hasil pencarian Lagu dan Pelipat yang cocok tidak ditemukan.</string>
+    <string name="compositions_for_search_not_found">Hasil pencarian lagu yang cocok tidak ditemukan.</string>
+    <string name="foreground_channel_description">Pemberitahu pemutar latar depan</string>
+    <string name="previous_track">Lagu sebelumnya</string>
+    <string name="next_track">Lagu berikutnya</string>
+    <string name="folder">Pelipat</string>
+    <string name="content_description_menu">Buka daftar lagu saat ini</string>
+    <string name="content_description_menu_template">Buka daftar lagu: %s</string>
+    <string name="share">Bagikan</string>
+    <string name="content_description_repeat_mode">Ulangi daftar lagu</string>
+    <string name="content_description_shuffle">Acak</string>
+    <string name="unknown_author">Penggubah tidak diketahui</string>
+    <string name="delete">Hapus</string>
+    <string name="delete_folder">Hapus pelipat</string>
+    <string name="add_date_order">Berdasarkan tanggal ditambahkan</string>
+    <string name="order">Urutkan</string>
+    <string name="folders">Pelipat</string>
+    <string name="compositions">Lagu</string>
+    <string name="play_lists">Daftar Putar</string>
+    <string name="play_lists_on_device_not_found">Tidak ada daftar putar di perangkat ini</string>
+    <string name="name">Nama</string>
+    <string name="create">Buat</string>
+    <string name="create_playlist">Buat daftar putar</string>
+    <string name="create_playlist_error_template">Tidak dapat membuat daftar putar: %1$s</string>
+    <string name="change_playlist_name_error_template">Tidak dapat mengubah nama daftar putar: %1$s</string>
+    <string name="name_can_not_be_empty">Nama tidak boleh kosong</string>
+    <string name="create_progress">Membuat…</string>
+    <string name="play_list_with_this_name_already_exists">Daftar putar dengan nama ini sudah ada</string>
+    <string name="add_to_playlist">Tambahkan ke daftar putar</string>
+    <string name="select_play_list">Pilih daftar putar</string>
+    <string name="add_to_playlist_error_template">Tidak dapat menambahkan lagu ke daftar putar: %1$s</string>
+    <string name="delete_composition_error_template">Tidak dapat menghapus lagu: %1$s</string>
+    <string name="add_to_playlist_success_template">Lagu \"%1$s\" telah ditambahkan ke daftar putar \"%2$s\"</string>
+    <string name="save_as_play_list">Simpan sebagai daftar putar</string>
+    <string name="cancel">Batalkan</string>
+    <string name="deleting">Menghapus</string>
+
+    <string name="delete_composition_success">Lagu \"%1$s\" dihapus</string>
+    <string name="search">Cari</string>
+    <string name="play_queue">Putar antrian</string>
+    <string name="pause">Jeda</string>
+    <string name="play">Putar</string>
+    <string name="play_all">Putar semus</string>
+    <string name="repeat_playlist">Ulangi antrian pemutaran</string>
+    <string name="repeat_composition">Ulangi lagu</string>
+    <string name="do_not_repeat">Jangan diulang</string>
+    <string name="delete_from_queue">Hapus dari antrian</string>
+    <string name="delete_from_play_list">Hapus dari daftar putar</string>
+    <string name="add_item_to_playlist_error_template">Tidak dapat menambahkan lagu ke daftar putar: %1$s</string>
+    <string name="delete_from_playlist_success_template">Lagu \"%1$s\" telah dihapus dari daftar putar \"%2$s\"</string>
+    <string name="delete_playlist_template">Hapus daftar putar \"%1$s\"?</string>
+    <string name="play_list_delete_error">Tidak dapat menghapus daftar putar: %1$s </string>
+    <string name="play_not_exists">Daftar putar tidak ada</string>
+    <string name="play_list_deleted">Daftar putar \"%1$s\" dihapus</string>
+    <string name="can_not_receive_file_for_send">Tidak dapat mendapatkan berkas untuk dikirim: %1$s</string>
+    <string name="position_template">Waktu putar saat ini: %1$s</string>
+    <string name="now_playing_template">Diputar saat ini: %1$s. Buka antrian pemutaran.</string>
+    <string name="play_all_in_folder">Putar semua yang ada di pelipat ini</string>
+    <string name="delete_playlist">Hapus daftar putar</string>
+    <string name="storage_timeout_error_message">
+        Penyimpanan media perangkat tidak menanggapi.
+        Ini permasalahan yang agak langka dan aneh
+        Coba matikan dan hidupkan kembali hp kentang anda, untuk mengatasi masalah ini.
+    </string>
+    <string name="select_all">Pilih semua</string>
+    <string name="file_uri_extract_error">
+        Tidak dapat mendapatkan jalur berkas \"%s\" untuk dikirim.
+        Sepertinya ini berada di folder tersembunyi pada sistem.
+    </string>
+    <string name="loading_progress">Memuat…</string>
+    <string name="alphabetical_order_desc_title">A - Z</string>
+    <string name="add_date_order_desc_title">Lawas terlebih dahulu</string>
+    <string name="play_action">Putar</string>
+    <string name="play_next">Putar berikutnya</string>
+    <string name="add_to_play_queue">Tambahkan ke antrian</string>
+    <string name="edit_name">Ubah nama</string>
+    <string name="change">Ubah</string>
+    <string name="no_current_composition">Lagu saat ini tidak ada</string>
+    <string name="show_covers">Tampilkan sampul</string>
+    <string name="show_covers_in_notification">Tampilkan sampul pada bilah pemberitahuan</string>
+    <string name="colored_notification">Warna pemberitahuan mengikuti warna sampul </string>
+    <string name="display">Tampilan</string>
+    <string name="decrease_volume_on_notification">Kurangi kekuatan suara saat menerima pemberitahuan</string>
+    <string name="playing">Pemutar</string>
+    <string name="error_channel_description">Pemberitahuan kesalahan pemutar</string>
+    <string name="playing_error">Kesalahan dalam pemutaran</string>
+    <string name="no_file_permission">Tidak mendapat izin baca tulis berkas</string>
+    <string name="about_app">Tentang</string>
+    <string name="version_template">Jilid %1$s(Bentukan %2$d)</string>
+    <string name="theme">Nuansa Warna</string>
+    <string name="dark_theme">Gelap</string>
+    <string name="edit">Ubah</string>
+    <string name="edit_tags">Ubah penanda</string>
+    <string name="change_author_name">Ubah seniman</string>
+    <string name="change_title">Ubah judul</string>
+    <string name="title">Judul</string>
+    <string name="filename">Nama berkas</string>
+    <string name="artist">Seniman</string>
+    <string name="change_file_name">Ubah nama berkas</string>
+    <string name="copied_message">Tulisan disalin</string>
+    <string name="folder_name">Nama pelipat</string>
+    <string name="rename_folder">Ubah nama pelipat</string>
+    <string name="copy">Salin</string>
+    <string name="paste">Tempel</string>
+    <string name="paste_in_new_folder">Tempel pada pelipat baru</string>
+    <string name="move_in_the_same_folder_error">Sumber dan tujuan pelipat sama.</string>
+    <string name="file_already_exists">Berkas dengan nama ini sudah ada</string>
+    <string name="new_folder">Pelipat baru</string>
+    <string name="play_on_connect_bluetooth_device">Langsung putar musik saat terhubung pada bluetooth</string>
+    <string name="headset">Headset</string>
+    <string name="scan_storage">Pindai ulang penyimpanan media</string>
+    <string name="auto_night_mode">Mode malam terkendali</string>
+    <string name="unsupported_format_hint">Jenis format tidak didukung</string>
+    <string name="artists">Seniman</string>
+    <string name="no_artists_in_library">Tidak ada seniman di pustaka</string>
+    <string name="albums">Album</string>
+    <string name="no_albums_in_library">Tidak ada kumpulan di pustaka</string>
+    <string name="genres">Aliran</string>
+    <string name="no_genres_in_library">Tidak ada daftar aliran di pustaka</string>
+    <string name="no_items_in_genre">Tidak ada  lagu untuk aliran yang dipillih</string>
+    <string name="no_compositions">Tidak ada lagu</string>
+    <string name="change_album_name">Ubah album</string>
+    <string name="album">Album</string>
+    <string name="genre">Aliran</string>
+    <string name="change_composition_genre">Ubah alliran lagu</string>
+    <string name="change_name">Ubah nama</string>
+    <string name="rename_progress">Mengubah nama…</string>
+    <string name="album_artist">Kumpulan seniman</string>
+    <string name="change_album_artist">Ubah kumpulan seniman</string>
+    <string name="edit_album_tags">Ubah penanda album</string>
+    <string name="by_composition_count">Berdasarkan nomor urut lagu</string>
+    <string name="by_duration">Berdasarkan panjangnya lagu</string>
+    <string name="longest_first">Paling panjang terlebih dahulu</string>
+    <string name="more_first">Lainnya terlebih dahulu</string>
+    <string name="artist_already_exists">Seniman dengan nama ini sudah ada</string>
+    <string name="album_already_exists">Kumpulan dengan nama ini sudah ada</string>
+    <string name="genre_already_exists">Aliran dengan nama ini sudah ada </string>
+    <string name="remove_genre">Hapus aliran</string>
+    <string name="add_composition_genre">Tambahkan aliran</string>
+    <string name="add">Tambahkan</string>
+    <string name="edit_genre">Ubah aliran</string>
+    <string name="genre_removed_message">Aliran \"%s\" dihapus.</string>
+    <string name="exclude_from_scanning">Sembunyiksn</string>
+    <string name="ignored_folder_added">Pelipat \'%s\' ditambahkan kedalam daftar pengecualian </string>
+    <string name="excluded_folders">Pengecualian pelipat</string>
+    <string name="remove_excluded_folder">Hapus pelipat yang dikecualikan</string>
+    <string name="ignored_folder_removed">Pelipat yang dikecualikan, dihapus</string>
+    <string name="moving_and_destination_folders_matches">Jalur tujuan dan pemindahan pelipat, sama</string>
+    <string name="folder_with_this_name_already_exists_in_dest_folder">Pelipat dengan nama ini sudah ada di jalur tujuan</string>
+    <string name="move_progress">Memindahkan…</string>
+    <string name="delete_progress">Menghapus…</string>
+    <string name="play_next_message_single">Lagu \"%s\" akan diputar setelah ini</string>
+    <string name="added_to_queue_message_single">Lagu \"%s\" ditambahkan pada urutan akhir antrian</string>
+    <string name="queue_item_removed">Berkas antrian dihapus</string>
+    <string name="by_size">Berdasarkan ukuran</string>
+    <string name="largest_first">Paling besar dahulu</string>
+    <string name="log_info_text">Terjadi beberapa kesalahan yang tidak cukup parah. Aplikasi tidak mengirim laporan secara terkendalikan, namun kamu anda mengirimkannya dengan cara mandiri. Guna pengembangan lebih lanjut untuk meningkatkan mutu Aplikasi. Ukuran berkas catatan: %d kB</string>
+    <string name="view_file">Lihat berkas</string>
+    <string name="send_file">Kirim berkas</string>
+    <string name="delete_file">Hapus berkas</string>
+    <string name="log_file_deleted">Berkas pencatatan dihapus</string>
+    <string name="pick_email_app_to_send">Pilih aplikasi surel yang digunakan untuk mengirim</string>
+    <string name="clear_play_queue">Bersihkan antrian</string>
+    <string name="no_excluded_folders">Pelipat yang dikecualikan dari pemindaian akan muncul di sini</string>
+    <string name="keep_playing_after_window_close">Tetap putar walaupun jendela sudah ditutup</string>
+    <string name="equalizer">Pengatur Gelombang</string>
+    <string name="system_equalizer">Bawaan perangkat</string>
+    <string name="no_equalizer">Tidak ada</string>
+    <string name="external_equalizer_description">Pengatur gelombang suara bawaan perangkat, mungkin tidak dapat bekerja dengan baik jika menggunakan pengatur gelombang suara dari aplikasi ini.</string>
+    <string name="external_equalizer_not_found">Pengatur gelombang suara yang terpasang tidak ditemukan</string>
+    <string name="open">Buka</string>
+    <string name="cover">Sampul</string>
+    <string name="change_cover">Ubah sampul</string>
+    <string name="pick_from_gallery">Ambil dari galeri</string>
+    <string name="remove_cover">Remove cover</string>
+    <string name="editor_timeout_error">Permintaan waktu untuk suntingan penanda, habis. Mungkin format berkas tidak didukung</string>
+    <string name="lyrics">Lirik</string>
+    <string name="check_tags_error">Gagal memeriksa penanda lagu: %s</string>
+    <string name="changing_file_progress">Menyunting berkas…</string>
+    <string name="android_r_edit_file_permission_denied">
+        Sejak Android 11, penyuntingan dan penghapusan berkas membutuhkan izin sistem tersendiri
+    </string>
+    <string name="error_report">Laporkan kesalahan</string>
+    <string name="critical_error_report_message">Terjadi kesalahan yang cukup parah karena aplikasi ini sama sekali tidak dapat dimulai. Munculnya kesalahan ini sangat tidak diinginkan. Aplikasi tidak mengirim laporan apa pun secara terkendalikan, tetapi kamu dapat mengirim berkas dengan catatan laporan kesalahan secara mandiri.</string>
+    <string name="error_report_message">Terjadi kesalahan yang cukup parah. Aplikasi tidak mengirim laporan apa pun secara terkendalikan, tetapi kamu dapat mengirim berkas dengan catatan laporan kesalahan secara mandiri.</string>
+    <string name="show_error_report_dialog_on_start">Tampilkan jendela laporan kesalahan ketika aplikasi dimulai</string>
+    <string name="do_not_show_confirm_delete_dialog">Jangan tampilkan jendela pertanyaan untuk menghapus berkas</string>
+    <string name="app_equalizer">Pengatur gelombang</string>
+    <string name="presets">Pra-atur</string>
+    <string name="playback_speed">Kecepatan pemutaran</string>
+    <string name="reset">Atur ulang</string>
+    <string name="apply">Terapkan</string>
+    <string name="sleep_timer">Waktu Tidur</string>
+    <string name="start">Mulai</string>
+    <string name="resume">Lanjutkan</string>
+    <string name="sleep_timer_message">Pemutaran akan dihentikan dalam:</string>
+    <string name="stop">Hentikan</string>
+    <string name="exclude_compositions_with_duration_less_than">Kecualikan lagu dari pemindaian</string>
+    <string name="with_duration_less_than">Dengan panjang kurang dari %s</string>
+    <string name="pause_on_audiofocus_loss">Hentikan pemutaran ketika menerima panggilan masuk atau memutar Video</string>
+    <string name="show_cover_stub_in_notification">Tampilkan rintisan sampul di jendela pemberitahuan saat sampul tidak ditemukan</string>
+    <string name="write_to_this_is_not_allowed">Tidak ada izin untuk menyentuh berkas ini, coba lakukan di pengelola berkas.</string>
+    <string name="shuffle_all_and_play">Putar dan Acak</string>
+    <string name="rewind">Memutar Ulang</string>
+    <string name="fast_forward">Cepatkan laju</string>
+    <string name="show_covers_on_lock_screen">Tampilkan sampul di Layar Kunci dan Android Auto</string>
+    <string name="equalizer_initialization_error">Tidak dapat menggunakan pengatur gelombang didalam aplikasi. Coba tutup dan buka aplikasi.</string>
+    <string name="restart">Mulai ulang</string>
+    <string name="scan_storage_description">Biasanya semua perubahan berkas pada perangkat akan muncul secara terkendalikan. Tetapi pada beberapa perangkat atau sistem operasi, itu tidak dapat bekerja. Tombol ini menjalankan pemindaian berkas secara mandiri.</string>
+    <string name="scanning_completed">Pemindaian selesai</string>
+    <string name="pause_on_zero_volume_level">Hentikan pemutaran ketika tingkat kekuatan suara mencapai tingkat nol</string>
+    <string name="covers">Sampul</string>
+    <string name="display_composition_file_name">Tampilkan nama berkas lagu ketimbang judul</string>
+    <string name="name_order">Berdasarkan nama</string>
+    <string name="file_name_order">Berdasarkan nama berkas</string>
+    <string name="play_list_is_empty">Daftar putar kosong. Lagu dapat ditambahkan ke daftar putar di layar perpustakaan.</string>
+    <string name="file_scanner_state">Memindai penanda berkas: %s</string>
+    <string name="show_all_audio_files">Tampilkan semua berkas suara</string>
+    <string name="enabled_media_players">Nyalakan Pemutar Media</string>
+    <string name="advanced_settings">Selengkapnya</string>
+    <string name="media_players_setting_description">Aplikasi menggunakan beberapa pemutar media untuk memutar musik. Itu  dapat dimatikan atau mengubah pengutamaan penggunaan. Semua perubahan hanya akan berubah setelah aplikasi dimulai ulang.</string>
+    <string name="sound_balance">Keseimbangan suara</string>
+    <string name="sound_balance_state">Kiri: %1$d%%, Kanan: %2$d%%</string>
+    <string name="language">Bahasa</string>
+    <string name="follow_system_language">Ikuti bahasa perangkat</string>
+    <string name="move">Pindahkan</string>
+    <string name="no_compositions_in_folder">Tidak ada lagu didalam pelipat</string>
+    <string name="follow_system_theme">Ikuti nuansa warna perangkat</string>
+    <string name="play_queue_is_empty">Antrian pemutaran kosong</string>
+    <string name="no_lyrics_for_current_composition">Lagu saat ini tidak mempunyai lirik</string>
+    <string name="edit_lyrics">Ubah lirik</string>
+    <string name="show_in_folders">Tampilkan didalam pelipat</string>
+    <string name="file_source_not_found">Berkas sumber tidak ditemukan</string>
+    <string name="file_is_too_large">Berkasnya gede banget</string>
+    <string name="preparing_files">Menyiapkan berkas</string>
+    <string name="downloading">Mengunduh: %1$d/%2$d</string>
+    <string name="downloading_progress">Sedang mengunduh(%d%%)</string>
+    <string name="rename_progress_count">Mengubah nama (%1$d/%2$d)…</string>
+    <string name="undone_action_template">%s? Tindakan ini tidak dapat diurungkan.</string>
+    <string name="delete_composition_template">Hapus lagu \"%1$s\"</string>
+    <string name="delete_empty_folder">Hapus lagu \"%s\"</string>
+    <string name="delete_folder_template">%2$s dari pelipat \"%1$s\"</string>
+    <string name="android_r_editor_restriction_error">Sejak Android 11 menyalin/memindahkan/mengubah nama berkas hanya diperbolehkan pada pelipat: \"%s\".
+        Tempatkan file audio ke dalam pelipat ini, dan tindakan harusnya dapat berjalan dengan benar.
+    </string>
+    <string name="folder_already_excluded_from_scanning">Pelipat ini sudah dikecualikan dari pemindaian</string>
+
+    <plurals name="compositions_count">
+        <item quantity="other">%1$s Lagu</item>
+    </plurals>
+
+    <plurals name="files_count">
+        <item quantity="other">%1$s Berkas</item>
+    </plurals>
+
+    <plurals name="albums_count">
+        <item quantity="other">%1$s Album</item>
+    </plurals>
+
+    <plurals name="play_next_message">
+        <item quantity="other"> Setelah ini, %s akan diputar</item>
+    </plurals>
+
+    <plurals name="added_to_queue_message">
+        <item quantity="other">%s Lagu ditambahkan ke bagian akhir antrian pemutar</item>
+    </plurals>
+
+    <plurals name="add_to_playlist_count_success_template">
+        <item quantity="other">%1$d lagu ditambahkan ke daftar putar \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_from_playlist_count_success_template">
+        <item quantity="other">%1$d lagu dihapus dari daftar putar \"%2$s\"</item>
+    </plurals>
+
+    <plurals name="delete_compositions_success">
+        <item quantity="other">%1$d Lagu telah dihapus</item>
+    </plurals>
+
+    <plurals name="seconds_template">
+        <item quantity="other">%1$d Detik</item>
+    </plurals>
+
+    <plurals name="delete_compositions_template">
+        <item quantity="other">Hapus %d lagu</item>
+    </plurals>
+
+</resources>

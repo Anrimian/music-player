@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--widget config: tablet, portrait-->
+    <dimen name="widget_menu_vertical_margin">18dp</dimen>
+    <dimen name="widget_menu_horizontal_margin">18dp</dimen>
+    <dimen name="widget_title_padding_end">12dp</dimen>
+
+    <dimen name="widget_small_content_margin_vertical">16dp</dimen>
+    <dimen name="widget_small_content_margin_horizontal">16dp</dimen>
+    <dimen name="widget_small_controls_margin_horizontal">8dp</dimen>
+    <dimen name="widget_small_controls_bottom_margin">8dp</dimen>
+    <dimen name="widget_small_controls_spacing_margin">0dp</dimen>
+    <dimen name="widget_small_content_spacing_margin">8dp</dimen>
+
+    <dimen name="widget_medium_content_margin_vertical">16dp</dimen>
+    <dimen name="widget_medium_content_margin_horizontal">16dp</dimen>
+    <dimen name="widget_medium_controls_margin_horizontal">8dp</dimen>
+    <dimen name="widget_medium_controls_bottom_margin">8dp</dimen>
+    <dimen name="widget_medium_controls_spacing_margin">-6dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_vertical">4dp</dimen>
+    <dimen name="widget_medium_content_spacing_margin_horizontal">12dp</dimen>
+    <dimen name="widget_medium_title_padding_end">12dp</dimen>
+
+</resources>

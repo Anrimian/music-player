@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.player_screen.queue
 
+import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.Constants.NO_POSITION
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
@@ -23,6 +24,7 @@ class PlayQueuePresenter(
     private val playerInteractor: LibraryPlayerInteractor,
     private val playListsInteractor: PlayListsInteractor,
     private val playerScreenInteractor: PlayerScreenInteractor,
+    private val syncInteractor: SyncInteractor<*, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ): AppPresenter<PlayQueueView>(uiScheduler, errorParser) {
@@ -50,6 +52,8 @@ class PlayQueuePresenter(
         launchPlayQueueSubscription()
         subscribeOnPlayerStateChanges()
         subscribeOnCurrentCompositionChanging()
+        syncInteractor.getFilesSyncStateObservable()
+            .unsafeSubscribeOnUi(viewState::showFilesSyncState)
     }
 
     fun onLoadAgainQueueClicked() {
@@ -168,12 +172,9 @@ class PlayQueuePresenter(
     private fun deletePreparedCompositions(compositionsToDelete: List<Composition>) {
         lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
             .observeOn(uiScheduler)
-            .doOnComplete { onDeleteCompositionsSuccess(compositionsToDelete) }
+            .doOnSuccess(viewState::showDeleteCompositionMessage)
+            .ignoreElement()
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionError)
-    }
-
-    private fun onDeleteCompositionsSuccess(compositionsToDelete: List<Composition>) {
-        viewState.showDeleteCompositionMessage(compositionsToDelete)
     }
 
     private fun onDeleteCompositionError(throwable: Throwable) {

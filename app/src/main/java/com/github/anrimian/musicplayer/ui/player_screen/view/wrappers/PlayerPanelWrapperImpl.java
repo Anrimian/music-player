@@ -135,6 +135,11 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
 
         if (bottomSheetBehavior.getState() != STATE_COLLAPSED) {
             bottomSheetBehavior.setState(STATE_COLLAPSED);
+        } else {
+            if (collapseDelayedAction != null) {
+                collapseDelayedAction.run();
+                collapseDelayedAction = null;
+            }
         }
     }
 

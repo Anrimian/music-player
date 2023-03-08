@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
+import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
@@ -18,23 +19,21 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilt
 import com.github.anrimian.musicplayer.ui.utils.wrappers.DeferredObject2
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
 
-class PlayListPresenter(private val playListId: Long,
-                        private val playerInteractor: LibraryPlayerInteractor,
-                        private val playListsInteractor: PlayListsInteractor,
-                        private val displaySettingsInteractor: DisplaySettingsInteractor,
-                        errorParser: ErrorParser,
-                        uiScheduler: Scheduler)
-    : AppPresenter<PlayListView>(uiScheduler, errorParser) {
-
-    private val presenterBatterySafeDisposable = CompositeDisposable()
+class PlayListPresenter(
+    private val playListId: Long,
+    private val playerInteractor: LibraryPlayerInteractor,
+    private val playListsInteractor: PlayListsInteractor,
+    private val displaySettingsInteractor: DisplaySettingsInteractor,
+    private val syncInteractor: SyncInteractor<*, *, Long>,
+    errorParser: ErrorParser,
+    uiScheduler: Scheduler
+) : AppPresenter<PlayListView>(uiScheduler, errorParser) {
 
     private val listDragFilter = ListDragFilter()
 
-    private var currentItemDisposable: Disposable? = null
     private var itemsDisposable: Disposable? = null
 
     private var items: List<PlayListItem> = ArrayList()
@@ -56,6 +55,8 @@ class PlayListPresenter(private val playListId: Long,
         subscribePlayList()
         subscribeOnCurrentComposition()
         subscribeOnRepeatMode()
+        syncInteractor.getFilesSyncStateObservable()
+            .unsafeSubscribeOnUi(viewState::showFilesSyncState)
     }
 
     override fun onDestroy() {
@@ -63,15 +64,8 @@ class PlayListPresenter(private val playListId: Long,
         presenterDisposable.dispose()
     }
 
-    fun onStart() {
-        if (items.isNotEmpty()) {
-            subscribeOnCurrentComposition()
-        }
-    }
-
     fun onStop(listPosition: ListPosition) {
         playListsInteractor.saveListPosition(listPosition)
-        presenterBatterySafeDisposable.clear()
     }
 
     fun onItemIconClicked(position: Int) {
@@ -259,13 +253,9 @@ class PlayListPresenter(private val playListId: Long,
     private fun deletePreparedCompositions() {
         lastDeleteAction = playerInteractor.deleteCompositions(compositionsToDelete)
             .observeOn(uiScheduler)
-            .doOnComplete(this::onDeleteCompositionsSuccess)
-
+            .doOnSuccess(viewState::showDeletedCompositionMessage)
+            .ignoreElement()
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
-    }
-
-    private fun onDeleteCompositionsSuccess() {
-        viewState.showDeletedCompositionMessage(compositionsToDelete)
     }
 
     private fun onDeleteCompositionsError(throwable: Throwable) {
@@ -322,18 +312,12 @@ class PlayListPresenter(private val playListId: Long,
                     viewState.restoreListPosition(listPosition)
                 }
             }
-
-            if (RxUtils.isInactive(currentItemDisposable)) {
-                subscribeOnCurrentComposition()
-            }
         }
     }
 
     private fun subscribeOnCurrentComposition() {
-        currentItemDisposable = playerInteractor.getCurrentQueueItemObservable()
-            .observeOn(uiScheduler)
-            .subscribe(this::onCurrentCompositionReceived, errorParser::logError)
-        presenterBatterySafeDisposable.add(currentItemDisposable!!)
+        playerInteractor.getCurrentQueueItemObservable()
+            .subscribeOnUi(this::onCurrentCompositionReceived, errorParser::logError)
     }
 
     private fun onCurrentCompositionReceived(playQueueEvent: PlayQueueEvent) {

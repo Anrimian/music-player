@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.di.app.library.files.folder;
 
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
+import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
@@ -35,12 +36,14 @@ public class FolderModule {
     LibraryFoldersPresenter libraryFoldersPresenter(LibraryFoldersScreenInteractor interactor,
                                                     LibraryPlayerInteractor playerInteractor,
                                                     DisplaySettingsInteractor displaySettingsInteractor,
+                                                    SyncInteractor<?, ?, Long> syncInteractor,
                                                     ErrorParser errorParser,
                                                     @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new LibraryFoldersPresenter(folderId,
                 interactor,
                 playerInteractor,
                 displaySettingsInteractor,
+                syncInteractor,
                 errorParser,
                 uiScheduler);
     }

@@ -17,8 +17,8 @@ android {
         testInstrumentationRunnerArguments["runnerBuilder"] = config.testJunit5Builder
 
         vectorDrawables.useSupportLibrary = true
-
         resConfigs 'en', 'be', 'cs', 'de', 'el', 'es', 'fr', 'pt', 'ru', 'tr', 'uk'
+
     }
     buildTypes {
         release {
@@ -101,6 +101,7 @@ dependencies {
     implementation deps.chipsLayoutManager
 
     compileOnly deps.javaxAnnotation
+    compileOnly deps.javaxGeneratedAnnotation
 
     testImplementation deps.junit5
     testImplementation deps.junit5Params

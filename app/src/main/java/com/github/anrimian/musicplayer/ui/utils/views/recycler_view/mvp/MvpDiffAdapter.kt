@@ -40,7 +40,7 @@ abstract class MvpDiffAdapter<T, VH : MvpDiffAdapter.MvpViewHolder>(
         holder.release()
     }
 
-    protected fun forEachHolder(action: (VH) -> Unit) {
+    protected inline fun forEachHolder(action: (VH) -> Unit) {
         viewHolders.forEach(action)
     }
 

@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.genres.items
 
+import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
@@ -20,12 +21,14 @@ class GenreItemsPresenter(
     playListsInteractor: PlayListsInteractor,
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
+    syncInteractor: SyncInteractor<*, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : BaseLibraryCompositionsPresenter<GenreItemsView>(
     playerInteractor,
     playListsInteractor,
     displaySettingsInteractor,
+    syncInteractor,
     errorParser,
     uiScheduler
 ) {

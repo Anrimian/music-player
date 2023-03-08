@@ -14,7 +14,7 @@ import com.github.anrimian.musicplayer.databinding.DialogSelectPlayListBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.AppBottomSheetDialog
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
@@ -62,6 +62,10 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
     private var onCompleteListener: OnCompleteListener<PlayList>? = null
     private var complexCompleteListener: BiCallback<PlayList, Bundle>? = null
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AppBottomSheetDialog(requireContext(), theme)
+    }
+
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
@@ -100,11 +104,6 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
         viewBinding.ivCreatePlaylist.setOnClickListener { onCreatePlayListButtonClicked() }
 
         AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        DialogUtils.setupBottomSheetDialogMaxWidth(this)
     }
 
     override fun onDismiss(dialog: DialogInterface) {

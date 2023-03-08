@@ -60,7 +60,7 @@
         android:id="@+id/bottom_sheet_left_shadow"
         android:layout_width="3dp"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_shadow_left"/>
+        android:background="@drawable/bg_shadow_start"/>
 
     <View
         android:id="@+id/bottom_sheet_top_left_shadow"

@@ -757,19 +757,25 @@ class PlayerInteractorTest {
                 PlayerState.PAUSE,
                 PlayerState.PLAY,
                 PlayerState.PAUSE,
+                PlayerState.PAUSE,
             )
             isPlayingStateSubscriber.assertValues(false, true, false)
         }
 
         @Test
-        fun `then audio focus loss transient and play`() {
+        fun `then audio focus loss transient and play and pause`() {
             audioFocusSubject.onNext(AudioFocusEvent.LOSS_TRANSIENT)
 
             inOrder.verify(musicPlayerController).pause()
 
             playerInteractor.play()
 
-            inOrder.verify(musicPlayerController, never()).resume()
+            inOrder.verify(musicPlayerController).resume()
+
+            playerInteractor.pause()
+
+            inOrder.verify(musicPlayerController).pause()
+
             playerStateSubscriber.assertValues(
                 PlayerState.IDLE,
                 PlayerState.LOADING,
@@ -777,8 +783,10 @@ class PlayerInteractorTest {
                 PlayerState.PAUSE,
                 PlayerState.PLAY,
                 PlayerState.PAUSE,
+                PlayerState.PLAY,
+                PlayerState.PAUSE,
             )
-            isPlayingStateSubscriber.assertValues(false, true, false)
+            isPlayingStateSubscriber.assertValues(false, true, false, true, false)
         }
 
         @Test

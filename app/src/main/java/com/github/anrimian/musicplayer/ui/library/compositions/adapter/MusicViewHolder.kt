@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ItemStorageMusicBinding
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
@@ -68,6 +69,10 @@ class MusicViewHolder(
 
     fun setCoversVisible(isCoversEnabled: Boolean) {
         compositionItemWrapper.showCompositionImage(isCoversEnabled)
+    }
+
+    fun setFileSyncStates(fileSyncStates: Map<Long, FileSyncState>) {
+        compositionItemWrapper.showFileSyncState(fileSyncStates[composition.id])
     }
 
     override fun setSelected(selected: Boolean) {

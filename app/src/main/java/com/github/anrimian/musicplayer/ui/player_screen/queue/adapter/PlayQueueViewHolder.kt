@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.player_screen.queue.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper
@@ -69,6 +70,10 @@ class PlayQueueViewHolder(
 
     fun showAsPlaying(playing: Boolean, animate: Boolean) {
         compositionItemWrapper.showAsPlaying(playing, animate)
+    }
+
+    fun setFileSyncStates(fileSyncStates: Map<Long, FileSyncState>) {
+        compositionItemWrapper.showFileSyncState(fileSyncStates[playQueueItem.composition.id])
     }
 
     fun getPlayQueueItem() = playQueueItem

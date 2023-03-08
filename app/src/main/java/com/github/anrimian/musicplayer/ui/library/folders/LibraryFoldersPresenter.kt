@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders
 
+import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
@@ -31,6 +32,7 @@ class LibraryFoldersPresenter(
     private val interactor: LibraryFoldersScreenInteractor,
     private val playerInteractor: LibraryPlayerInteractor,
     private val displaySettingsInteractor: DisplaySettingsInteractor,
+    private val syncInteractor: SyncInteractor<*, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : AppPresenter<LibraryFoldersView>(uiScheduler, errorParser) {
@@ -60,6 +62,8 @@ class LibraryFoldersPresenter(
         subscribeOnUiSettings()
         subscribeOnRepeatMode()
         subscribeOnMoveEnabledState()
+        syncInteractor.getFilesSyncStateObservable()
+            .unsafeSubscribeOnUi(viewState::showFilesSyncState)
     }
 
     override fun onDestroy() {

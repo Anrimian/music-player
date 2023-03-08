@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
@@ -96,5 +97,8 @@ interface PlayListView : MvpView {
 
     @AddToEndSingle
     fun setDragEnabled(enabled: Boolean)
+
+    @AddToEndSingle
+    fun showFilesSyncState(states: Map<Long, FileSyncState>)
 
 }

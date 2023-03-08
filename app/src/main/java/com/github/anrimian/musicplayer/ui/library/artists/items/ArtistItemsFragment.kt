@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
@@ -355,6 +356,10 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     override fun showRenameArtistDialog(artist: Artist) {
         newRenameArtistDialog(artist.id, artist.name).safeShow(childFragmentManager)
+    }
+
+    override fun showFilesSyncState(states: Map<Long, FileSyncState>) {
+        adapter.showFileSyncStates(states)
     }
 
     //scroll horizontally then scroll to bottom issue

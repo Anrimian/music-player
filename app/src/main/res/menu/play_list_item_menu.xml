@@ -21,6 +21,10 @@
         android:icon="@drawable/ic_circle_edit_outline"
         android:title="@string/edit_tags"
         app:iconTint="?android:attr/textColorPrimary"/>
+    <item android:id="@+id/menu_show_in_folders"
+        android:title="@string/show_in_folders"
+        android:icon="@drawable/ic_show_in_folders"
+        app:iconTint="?android:attr/textColorPrimary"/>
     <item android:id="@+id/menu_share"
         android:icon="@drawable/ic_share_variant"
         android:title="@string/share"

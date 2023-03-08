@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
@@ -316,6 +317,10 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
 
     override fun closeScreen() {
         FragmentNavigation.from(parentFragmentManager).goBack()
+    }
+
+    override fun showFilesSyncState(states: Map<Long, FileSyncState>) {
+        adapter.showFileSyncStates(states)
     }
 
     private fun getGenreId() = requireArguments().getLong(Constants.Arguments.ID_ARG)

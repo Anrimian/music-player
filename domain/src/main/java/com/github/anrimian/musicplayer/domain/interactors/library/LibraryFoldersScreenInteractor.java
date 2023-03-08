@@ -101,7 +101,7 @@ public class LibraryFoldersScreenInteractor {
     }
 
     public Single<List<Composition>> deleteFiles(List<FileSource> fileSources) {
-        return foldersInteractor.deleteCompositions(fileSources);
+        return foldersInteractor.deleteFiles(fileSources);
     }
 
     public Single<List<Composition>> deleteFolder(FolderFileSource folder) {

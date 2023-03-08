@@ -13,7 +13,6 @@ import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.filesync.models.state.file.Uploading
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.R
-import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
@@ -21,8 +20,6 @@ import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
 import com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressView
 import com.google.android.material.progressindicator.BaseProgressIndicator
 import com.google.android.material.progressindicator.BaseProgressIndicatorSpec
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 
 @StringRes
 fun getMediaPlayerName(mediaPlayerId: Int) = when(mediaPlayerId) {
@@ -53,13 +50,6 @@ fun showFileSyncState(
             }
         }
     }
-}
-
-fun getFileSyncStateObservable(id: Long): Observable<FileSyncState> {
-    return Components.getAppComponent()
-        .syncInteractor()
-        .getFileSyncStateObservable(id)
-        .observeOn(AndroidSchedulers.mainThread())
 }
 
 fun ProgressBar.setProgressInfo(progressInfo: ProgressInfo) {

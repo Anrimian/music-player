@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!--don't touch color, otherwise widget dot button on api<23 won't be colored-->
+    <solid android:color="@color/color_remote_button"/>
+    <size android:width="6dp" android:height="6dp"/>
+</shape>

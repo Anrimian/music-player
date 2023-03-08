@@ -1,12 +1,10 @@
 package com.github.anrimian.musicplayer.ui.about
 
 import android.os.Bundle
-import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentAboutBinding
@@ -38,9 +36,10 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
         setHasOptionsMenu(true)
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
 
-        fileLog = Components.getAppComponent().fileLog()
-        val appLogger = Components.getAppComponent().appLogger()
-        val loggerRepository = Components.getAppComponent().loggerRepository()
+        val appComponent = Components.getAppComponent()
+        fileLog = appComponent.fileLog()
+        val appLogger = appComponent.appLogger()
+        val loggerRepository = appComponent.loggerRepository()
 
         val isLogExists = fileLog.isFileExists
         setLogActionsVisibility(isLogExists)
@@ -50,18 +49,8 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
                 fileLog.fileSize / 1024
             )
         }
-        //TODO split descriptions for lite and sync apps
-        // Sync app text: "This is...   ... . With cloud sync feature (in early stages)"
-        // Linkify "cloud sync" and navigate to setup sync screen.
-        val aboutText = getString(
-            R.string.about_app_text,
-            linkify("mailto:", R.string.about_app_text_write, R.string.feedback_email),
-            linkify("", R.string.privacy_policy, R.string.privacy_policy_link),
-            linkify("mailto:", R.string.about_app_text_here, R.string.feedback_email),
-            linkify("", R.string.about_app_text_here_link, R.string.source_code_link)
-        )
-        viewBinding.tvAbout.text = HtmlCompat.fromHtml(aboutText, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        viewBinding.tvAbout.movementMethod = LinkMovementMethod.getInstance()
+        appComponent.aboutTextBinder().bind(this, viewBinding.tvAbout)
+
         viewBinding.btnDelete.setOnClickListener { deleteLogFile() }
         viewBinding.btnView.setOnClickListener { appLogger.startViewLogScreen(requireActivity()) }
         viewBinding.btnSend.setOnClickListener { appLogger.startSendLogScreen(requireActivity()) }
@@ -94,9 +83,5 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
         val logActionsVisibility = if (isLogExists) View.VISIBLE else View.GONE
         viewBinding.logActionsContainer.visibility = logActionsVisibility
         viewBinding.tvLogInfo.visibility = logActionsVisibility
-    }
-
-    private fun linkify(schema: String, textResId: Int, linkResId: Int): String {
-        return "<a href=\"" + schema + getString(linkResId) + "\">" + getString(textResId) + "</a>"
     }
 }

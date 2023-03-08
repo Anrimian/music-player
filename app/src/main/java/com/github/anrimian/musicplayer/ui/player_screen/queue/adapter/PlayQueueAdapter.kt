@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback
@@ -32,6 +33,7 @@ class PlayQueueAdapter(
     private var currentItem: PlayQueueItem? = null
     private var play = false
     private var isCoversEnabled = false
+    private var syncStates = emptyMap<Long, FileSyncState>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayQueueViewHolder {
         return PlayQueueViewHolder(
@@ -52,6 +54,7 @@ class PlayQueueAdapter(
         val isCurrentItem = item == currentItem
         holder.showAsCurrentItem(isCurrentItem)
         holder.showAsPlaying(isCurrentItem && play, false)
+        holder.setFileSyncStates(syncStates)
     }
 
     override fun onBindViewHolder(
@@ -80,6 +83,8 @@ class PlayQueueAdapter(
      * It doesn't scroll and then RecyclerView wrongly thinks that we're on the target position.
      * So we delay possible action when submitList() is running.
      * Helpful only for single submitList() call case.
+     *  + can be solved by using call counter(activeSubmitsCount) instead of boolean flag.
+     *  + reproduce problem and implement
      */
     fun runSafeAction(action: () -> Unit) {
         if (isListAccessible) {
@@ -110,6 +115,13 @@ class PlayQueueAdapter(
         this.isCoversEnabled = isCoversEnabled
         forEachHolder { holder ->
             holder.setCoversVisible(isCoversEnabled)
+        }
+    }
+
+    fun showFileSyncStates(states: Map<Long, FileSyncState>) {
+        this.syncStates = states
+        forEachHolder { holder ->
+            holder.setFileSyncStates(syncStates)
         }
     }
 }

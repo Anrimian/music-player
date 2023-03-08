@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.player
 
+import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
@@ -29,6 +30,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 class LibraryPlayerInteractor(
     private val playerCoordinatorInteractor: PlayerCoordinatorInteractor,
+    private val syncInteractor: SyncInteractor<*, *, Long>,
     private val settingsRepository: SettingsRepository,
     private val playQueueRepository: PlayQueueRepository,
     private val libraryRepository: LibraryRepository,
@@ -112,15 +114,19 @@ class LibraryPlayerInteractor(
                 return@subscribe
             }
             playQueueRepository.skipToPrevious()
+            uiStateRepository.trackPosition = 0
         }
     }
 
     fun skipToNext() {
-        playQueueRepository.skipToNext().subscribe()
+        playQueueRepository.skipToNext().subscribe { _ ->
+            uiStateRepository.trackPosition = 0
+        }
     }
 
     fun skipToItem(itemId: Long) {
         playQueueRepository.skipToItem(itemId)
+        uiStateRepository.trackPosition = 0
     }
 
     fun getRepeatModeObservable(): Observable<Int> = settingsRepository.repeatModeObservable
@@ -213,12 +219,16 @@ class LibraryPlayerInteractor(
         return playQueueRepository.playQueueObservable
     }
 
-    fun deleteComposition(composition: Composition): Completable {
+    fun deleteComposition(composition: Composition): Single<Composition> {
         return libraryRepository.deleteComposition(composition)
+            .doOnComplete { syncInteractor.onLocalFileDeleted(composition.id) }
+            .toSingleDefault(composition)
     }
 
-    fun deleteCompositions(compositions: List<Composition>): Completable {
+    fun deleteCompositions(compositions: List<Composition>): Single<List<Composition>> {
         return libraryRepository.deleteCompositions(compositions)
+            .doOnComplete { syncInteractor.onLocalFilesDeleted(compositions.map(Composition::getId)) }
+            .toSingleDefault(compositions)
     }
 
     fun removeQueueItem(item: PlayQueueItem): Completable {

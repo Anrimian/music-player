@@ -17,6 +17,7 @@ interface SyncInteractor<K, T, I> {
 
     fun onAppStarted()
     fun requestFileSync()
+    fun runFileTasks()
     fun addRemoteRepository(
         type: RemoteRepoType,
         credentials: RemoteRepoCredentials
@@ -24,7 +25,8 @@ interface SyncInteractor<K, T, I> {
     fun removeRemoteRepository(repo: RemoteRepoInfo): Completable
     fun setRemoteRepositoryEnabled(repo: RemoteRepoInfo): Completable
     fun onLocalFileAdded()
-    fun onLocalFileDeleted()
+    fun onLocalFileDeleted(id: I)
+    fun onLocalFilesDeleted(ids: List<I>)
     fun notifyLocalFileChanged()
     fun isSyncEnabled(): Boolean
     fun setSyncEnabled(enabled: Boolean)
@@ -37,5 +39,7 @@ interface SyncInteractor<K, T, I> {
     fun getTasksListObservable(): Observable<List<FileTaskInfo<K>>>
     fun getTasksCountObservable(): Observable<Int>
     fun getFileSyncStateObservable(fileId: I): Observable<FileSyncState>
+    fun getFilesSyncStateObservable(): Observable<Map<I, FileSyncState>>
+    fun getHasScheduledTasksObservable(): Observable<Boolean>
     fun requestFileSource(fileId: I): Single<RemoteFileSource>
 }

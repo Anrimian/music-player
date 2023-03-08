@@ -466,7 +466,7 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getFolderId(id);
     }
 
-    public Single<List<ExternalComposition>> getAllAsExternalCompositions() {
+    public List<ExternalComposition> getAllAsExternalCompositions() {
         return compositionsDao.getAllAsExternalCompositions();
     }
 

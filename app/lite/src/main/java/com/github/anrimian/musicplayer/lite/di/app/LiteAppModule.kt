@@ -10,7 +10,9 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.source.ContentSourceHelper
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser
+import com.github.anrimian.musicplayer.lite.ui.AboutTextBinderImpl
 import com.github.anrimian.musicplayer.lite.ui.SpecialNavigationImpl
+import com.github.anrimian.musicplayer.ui.about.AboutTextBinder
 import com.github.anrimian.musicplayer.ui.common.error.parser.DefaultErrorParser
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.navigation.SpecialNavigation
@@ -60,5 +62,8 @@ class LiteAppModule {
     fun provideErrorParser(context: Context, analytics: Analytics): ErrorParser {
         return DefaultErrorParser(context, analytics)
     }
+
+    @Provides
+    fun aboutTextBinder(): AboutTextBinder = AboutTextBinderImpl()
 
 }

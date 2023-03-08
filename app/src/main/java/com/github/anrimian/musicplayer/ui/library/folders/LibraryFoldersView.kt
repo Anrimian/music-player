@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders
 
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
@@ -144,5 +145,8 @@ interface LibraryFoldersView : MvpView {
 
     @OneExecution
     fun restoreListPosition(listPosition: ListPosition)
+
+    @AddToEndSingle
+    fun showFilesSyncState(states: Map<Long, FileSyncState>)
 
 }

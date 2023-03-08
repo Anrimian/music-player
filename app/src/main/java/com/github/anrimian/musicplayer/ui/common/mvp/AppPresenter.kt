@@ -13,7 +13,7 @@ import moxy.MvpView
 /**
  * - name1 (subscribe, ignore success case, and transform throwable)
  * - name2 (subscribe on ui scheduler, add to presenter disposable)
- * - name3 (subscribe on ui scheduler, add to presenter disposable, transform throwable)
+ * - run (subscribe on ui scheduler, add to presenter disposable, transform throwable)
  * - unsafeSubscribeOnUi ((..onUi)subscribe on ui scheduler, (...subscribe...)add to presenter disposable, (unsafe...)ignore error case)
  * - name5 (subscribe on ui scheduler, add to presenter disposable, ()ignore success case)
  * - name6 (subscribe on ui scheduler, add to presenter disposable, ()ignore success case, (..)and transform throwable)
@@ -27,18 +27,36 @@ abstract class AppPresenter<T : MvpView>(
 
     //--Observable
 
-    protected fun <K: Any> Observable<K>.subscribeOnUi(onNext: (K) -> Unit, onError: (Throwable) -> Unit) {
+    protected fun <K: Any> Observable<K>.runOnUi(
+        onNext: (K) -> Unit,
+        onError: (ErrorCommand) -> Unit,
+        onComplete: () -> Unit
+    ) {
+        this.subscribeOnUi(onNext, { t -> onError(errorParser.parseError(t)) }, onComplete)
+    }
+
+    protected fun <K: Any> Observable<K>.runOnUi(
+        onNext: (K) -> Unit,
+        onError: (ErrorCommand) -> Unit
+    ) {
+        this.subscribeOnUi(onNext) { t -> onError(errorParser.parseError(t)) }
+    }
+
+    protected fun <K: Any> Observable<K>.subscribeOnUi(
+        onNext: (K) -> Unit,
+        onError: (Throwable) -> Unit
+    ) {
         this.observeOn(uiScheduler)
             .subscribe(onNext, onError)
             .autoDispose()
     }
 
-    protected fun <K: Any> Observable<K>.subscribeOnUi(onNext: (K) -> Unit,
-                                                       onError: (Throwable) -> Unit,
-                                                       onComplete: () -> Unit) {
-        this.observeOn(uiScheduler)
-            .subscribe(onNext, onError, onComplete)
-            .autoDispose()
+    protected fun <K: Any> Observable<K>.subscribeOnUi(
+        onNext: (K) -> Unit,
+        onError: (Throwable) -> Unit,
+        onComplete: () -> Unit
+    ) {
+        this.observeOn(uiScheduler).subscribe(onNext, onError, onComplete, presenterDisposable)
     }
 
     protected fun <K: Any> Observable<K>.unsafeSubscribeOnUi(onNext: (K) -> Unit) {
@@ -49,21 +67,19 @@ abstract class AppPresenter<T : MvpView>(
 
     //--Single
 
+    protected fun <K: Any> Single<K>.runOnUi(onNext: (K) -> Unit, onError: (ErrorCommand) -> Unit) {
+        this.observeOn(uiScheduler)
+            .subscribe(onNext, { t -> onError(errorParser.parseError(t)) }, presenterDisposable)
+    }
+
+    protected fun <K: Any> Single<K>.launchOnUi(onNext: (K) -> Unit, onError: (ErrorCommand) -> Unit) {
+        this.subscribeOnUi(onNext) { t -> onError(errorParser.parseError(t)) }
+    }
+
     protected fun <K: Any> Single<K>.subscribeOnUi(onNext: (K) -> Unit, onError: (Throwable) -> Unit) {
         this.observeOn(uiScheduler)
             .subscribe(onNext, onError)
             .ignoreDisposable()
-    }
-
-    protected fun <K: Any> Single<K>.launchOnUi(onNext: (K) -> Unit, onError: (ErrorCommand) -> Unit) {
-        this.observeOn(uiScheduler)
-            .subscribe(onNext) { t -> onError(errorParser.parseError(t)) }
-            .ignoreDisposable()
-    }
-
-    protected fun <K: Any> Single<K>.runOnUi(onNext: (K) -> Unit, onError: (ErrorCommand) -> Unit) {
-        this.observeOn(uiScheduler)
-            .subscribe(onNext, { t -> onError(errorParser.parseError(t)) }, presenterDisposable)
     }
 
     protected fun <K: Any> Single<K>.unsafeSubscribeOnUi(onNext: (K) -> Unit) {
@@ -82,8 +98,11 @@ abstract class AppPresenter<T : MvpView>(
 
     protected fun Completable.justSubscribeOnUi(onError: (Throwable) -> Unit) {
         this.observeOn(uiScheduler)
-            .subscribe({}, onError)
-            .autoDispose()
+            .subscribe({}, onError, presenterDisposable)
+    }
+
+    protected fun Completable.runOnUi(onError: (ErrorCommand) -> Unit) {
+        this.justSubscribeOnUi { t -> onError(errorParser.parseError(t)) }
     }
 
     protected fun Completable.subscribe(

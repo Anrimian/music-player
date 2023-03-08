@@ -15,6 +15,7 @@ import androidx.core.animation.addListener
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants.Arguments.HIGHLIGHT_COMPOSITION_ID
 import com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG
 import com.github.anrimian.musicplayer.Constants.Tags
@@ -538,6 +539,10 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         showProgressDialog(R.string.rename_progress)
     }
 
+    override fun showFilesSyncState(states: Map<Long, FileSyncState>) {
+        adapter.showFileSyncStates(states)
+    }
+
     fun getFolderId(): Long? {
         val id = requireArguments().getLong(ID_ARG)
         return if (id == 0L) null else id
@@ -567,7 +572,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     private fun onCompositionMenuClicked(view: View, position: Int, source: CompositionFileSource) {
         val composition = source.composition
-        showCompositionPopupMenu(view, R.menu.composition_actions_menu, composition) { item ->
+        showCompositionPopupMenu(view, R.menu.composition_folder_actions_menu, composition) { item ->
             onCompositionActionSelected(position, composition, item.itemId)
         }
     }

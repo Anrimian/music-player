@@ -10,6 +10,7 @@ import androidx.appcompat.widget.ActionMenuView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentPlayQueueBinding
@@ -27,7 +28,7 @@ import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
-import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment
+import com.github.anrimian.musicplayer.ui.main.MainActivity
 import com.github.anrimian.musicplayer.ui.player_screen.queue.adapter.PlayQueueAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment
@@ -250,6 +251,10 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
         playQueueAdapter.runSafeAction { scrollToPosition(position, isSmoothScrollAllowed) }
     }
 
+    override fun showFilesSyncState(states: Map<Long, FileSyncState>) {
+        playQueueAdapter.showFileSyncStates(states)
+    }
+
     private fun scrollToPosition(position: Int, isSmoothScrollAllowed: Boolean) {
         val positionDiff = abs(position - currentPosition)
         currentPosition = position
@@ -285,17 +290,12 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
             when (item.itemId) {
                 R.id.menu_add_to_playlist -> presenter.onAddQueueItemToPlayListButtonClicked(composition)
                 R.id.menu_edit -> startActivity(newCompositionEditorIntent(requireContext(), composition.id))
-                R.id.menu_show_in_folders -> onShowInFolderCompositionClicked(composition)
+                R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), composition)
                 R.id.menu_share -> shareComposition(this, composition)
                 R.id.menu_delete_from_queue -> presenter.onDeleteQueueItemClicked(playQueueItem)
                 R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(composition)
             }
         }
-    }
-
-    private fun onShowInFolderCompositionClicked(composition: Composition) {
-        val parentFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.main_activity_container)
-        (parentFragment as? PlayerFragment)?.locateCompositionInFolders(composition)
     }
 
     private fun showMenuState() {

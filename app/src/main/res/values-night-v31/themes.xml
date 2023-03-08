@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="WidgetTheme">
+        <item name="widgetBackground">@android:color/system_accent2_800</item>
+        <item name="widgetTextColorPrimary">@android:color/system_neutral1_50</item>
+        <item name="widgetTextColorSecondary">@android:color/system_neutral1_200</item>
+        <item name="widgetButtonColor">@android:color/system_neutral1_50</item>
+        <item name="widgetDisabledColor">@android:color/system_neutral1_300</item>
+        <item name="widgetSelectableColor">@color/color_control_highlight_dark</item>
+    </style>
+
+</resources>
