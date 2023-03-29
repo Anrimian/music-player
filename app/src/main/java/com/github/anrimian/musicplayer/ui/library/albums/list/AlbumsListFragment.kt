@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
@@ -24,6 +25,7 @@ import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.library.LibraryFragment
 import com.github.anrimian.musicplayer.ui.library.albums.items.newAlbumItemsFragment
 import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.AlbumsAdapter
+import com.github.anrimian.musicplayer.ui.library.albums.list.adapter.RecyclerRowMoveCallback
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
@@ -34,6 +36,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.google.android.material.snackbar.Snackbar
 import moxy.ktx.moxyPresenter
+
 
 class AlbumsListFragment : LibraryFragment(), AlbumsListView, FragmentLayerListener,
     BackButtonListener {
@@ -71,6 +74,11 @@ class AlbumsListFragment : LibraryFragment(), AlbumsListView, FragmentLayerListe
             this::goToAlbumScreen,
             this::onAlbumMenuClicked
         )
+
+
+        val callback: ItemTouchHelper.Callback = RecyclerRowMoveCallback(adapter)
+        val touchHelper = ItemTouchHelper(callback)
+        touchHelper.attachToRecyclerView(viewBinding.rvAlbums)
         viewBinding.rvAlbums.adapter = adapter
         layoutManager = LinearLayoutManager(context)
         viewBinding.rvAlbums.layoutManager = layoutManager
