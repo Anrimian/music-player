@@ -270,6 +270,7 @@ public class CustomAsyncListDiffer<T> {
      * @param commitCallback Optional runnable that is executed when the List is committed, if
      *                       it is committed.
      */
+
     @SuppressWarnings("WeakerAccess")
     public void submitList(@Nullable final List<T> newList,
                            @Nullable final Runnable commitCallback) {

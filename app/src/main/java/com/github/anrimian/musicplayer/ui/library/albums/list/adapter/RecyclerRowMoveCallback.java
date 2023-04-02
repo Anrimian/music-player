@@ -40,8 +40,8 @@ public class RecyclerRowMoveCallback extends ItemTouchHelper.Callback {
     public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
         if(actionState != ItemTouchHelper.ACTION_STATE_IDLE)
         {
-            if(viewHolder instanceof AlbumsAdapter.MyViewModel){
-                AlbumsAdapter.MyViewModel myViewHolder = (AlbumsAdapter.MyViewModel)viewHolder;
+            if(viewHolder instanceof AlbumViewHolder ){
+                AlbumViewHolder myViewHolder = (AlbumViewHolder)viewHolder;
                 touchHelperContract.onRowSelected(myViewHolder);
             }
         }
@@ -52,8 +52,8 @@ public class RecyclerRowMoveCallback extends ItemTouchHelper.Callback {
     public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
 
-        if(viewHolder instanceof AlbumsAdapter.MyViewModel){
-            AlbumsAdapter.MyViewModel myViewHolder = (AlbumsAdapter.MyViewModel)viewHolder;
+        if(viewHolder instanceof AlbumViewHolder){
+            AlbumViewHolder myViewHolder = (AlbumViewHolder)viewHolder;
             touchHelperContract.onRowClear(myViewHolder);
         }
     }
@@ -65,7 +65,7 @@ public class RecyclerRowMoveCallback extends ItemTouchHelper.Callback {
 
     public interface RecyclerViewRowTouchHelperContract{
         void onRowMoved(int from,int to);
-        void onRowSelected(AlbumsAdapter.MyViewModel myViewHolder);
-        void onRowClear(AlbumsAdapter.MyViewModel myViewHolder);
+        void onRowSelected(AlbumViewHolder myViewHolder);
+        void onRowClear(AlbumViewHolder myViewHolder);
     }
 }

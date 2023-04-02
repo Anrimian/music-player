@@ -15,14 +15,22 @@
  */
 package com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.adapter;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.AdapterListUpdateCallback;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.anrimian.musicplayer.domain.models.albums.Album;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -121,6 +129,9 @@ public abstract class DiffListAdapter<T, VH extends RecyclerView.ViewHolder>
         mDiffer.addListListener(mListener);
     }
 
+    public void clear(){
+        mDiffer.getCurrentList().clear();
+    }
     /**
      * Submits a new list to be diffed, and displayed.
      * <p>
@@ -149,6 +160,18 @@ public abstract class DiffListAdapter<T, VH extends RecyclerView.ViewHolder>
      */
     public void submitList(@Nullable List<T> list, @Nullable final Runnable commitCallback) {
         mDiffer.submitList(list, commitCallback);
+    }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+
+    public void swap(int from , int to){
+        var list = new ArrayList< Album >();
+        for (int i = 0; i < getCurrentList().size(); i++) {
+            list.add((Album) getCurrentList().get(i));
+        }
+        Collections.swap(list,from,to );
+        mDiffer.submitList((List<T>) list);
+
+
     }
 
     protected T getItem(int position) {
@@ -190,7 +213,9 @@ public abstract class DiffListAdapter<T, VH extends RecyclerView.ViewHolder>
      *
      * @see #getCurrentList()
      */
+
     public void onCurrentListChanged(@NonNull List<T> previousList, @NonNull List<T> currentList) {
+
     }
 }
 

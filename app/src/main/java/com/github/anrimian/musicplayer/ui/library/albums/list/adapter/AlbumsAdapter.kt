@@ -1,7 +1,11 @@
 package com.github.anrimian.musicplayer.ui.library.albums.list.adapter
 
+import android.annotation.SuppressLint
+import android.os.Build
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.domain.models.utils.AlbumHelper
@@ -24,11 +28,13 @@ class AlbumsAdapter(
 
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
         holder.bind(getItem(position))
+
     }
 
     class MyViewModel(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     }
+
     override fun onBindViewHolder(
         holder: AlbumViewHolder,
         position: Int,
@@ -46,27 +52,42 @@ class AlbumsAdapter(
         holder.release()
     }
 
+
+    @SuppressLint("NotifyDataSetChanged")
     override fun onRowMoved(from: Int, to: Int) {
-        var list= currentList;
+//        val list= ArrayList<Album>();
+//        currentList.forEach {
+//            list.add(it);
+//        }
+
         if (from < to) {
             for (i in from until to) {
-
-                submitList(list);
+//                Log.i("AlbumsAdapter swap", "from: "  + list[from] + "to: " + list[to])
+//
+//                Collections.swap(list , from , to)
+                swap(from  , to)
+                notifyDataSetChanged()
             }
         } else {
             for (i in from downTo to + 1) {
-
-                submitList(list)
+//                Log.i("AlbumsAdapter swap", "from: "  + list[from] + "to: " + list[to])
+//
+//                Collections.swap(list , from , to)
+                swap(from  , to)
+                notifyDataSetChanged()
             }
         }
         notifyItemMoved(from, to)
     }
 
-    override fun onRowSelected(myViewHolder: MyViewModel?) {
-        TODO("Not yet implemented")
+    override fun onRowSelected(myViewHolder: AlbumViewHolder?) {
+        return
     }
 
-    override fun onRowClear(myViewHolder: MyViewModel?) {
-        TODO("Not yet implemented")
+    override fun onRowClear(myViewHolder: AlbumViewHolder?) {
+
+        return
     }
+
+
 }

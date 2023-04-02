@@ -80,6 +80,7 @@ class AlbumsListFragment : LibraryFragment(), AlbumsListView, FragmentLayerListe
         val touchHelper = ItemTouchHelper(callback)
         touchHelper.attachToRecyclerView(viewBinding.rvAlbums)
         viewBinding.rvAlbums.adapter = adapter
+
         layoutManager = LinearLayoutManager(context)
         viewBinding.rvAlbums.layoutManager = layoutManager
         RecyclerViewUtils.attachFastScroller(viewBinding.rvAlbums)
@@ -135,6 +136,7 @@ class AlbumsListFragment : LibraryFragment(), AlbumsListView, FragmentLayerListe
     }
 
     override fun submitList(albums: List<Album>) {
+        //TODO::SORT LIST
         adapter.submitList(albums)
     }
 
