@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--light theme(purple)-->
-    <color name="colorPrimary">#673AB7</color>
-    <color name="colorPrimaryDark">#512DA8</color>
+    <color name="color_purple_primary">#673AB7</color>
+    <color name="color_purple_primary_dark">#512DA8</color>
     <color name="colorAccent">#009688</color>
     <color name="colorAccentContrast">#4DB6AC</color>
 
@@ -88,8 +88,8 @@
     <color name="fakeShadowColor">#33000000</color>
 
     <!--light theme(indigo)-->
-    <color name="colorBluePrimary">#3F51B5</color>
-    <color name="colorBluePrimaryDark">#303F9F</color>
+    <color name="color_indigo_primary">#3F51B5</color>
+    <color name="color_indigo_primary_dark">#303F9F</color>
     <color name="colorGreenAccent">#4CAF50</color>
     <color name="colorGreenAccentContrast">#81C784</color>
 
@@ -104,13 +104,24 @@
     <color name="colorRedPrimaryDark">#9b0000</color>
     <color name="colorRedAccentContrast">#FF5252</color>
 
+    <!--light theme(orange)-->
+    <color name="colorOrangePrimary">#FB8C00</color>
+    <color name="colorOrangePrimaryDark">#EF6C00</color>
+    <color name="colorOrangeAccentContrast">#FFA726</color>
+
+    <!--light theme(blue_orange)-->
+    <color name="color_blue_primary">#039BE5</color>
+    <color name="color_blue_primary_dark">#0288D1</color>
+    <color name="color_orange_accent">#FF9800</color>
+    <color name="color_orange_accent_contrast">#FFA726</color>
+
     <!--completely white theme-->
     <color name="colorPrimaryWhiteGray">#848282</color>
     <color name="colorAccentBlue">#2196F3</color>
     <color name="colorAccentBlueContrast">#64B5F6</color>
 
     <!--dark theme(orange)-->
-    <color name="colorOrangeAccent">#e65100</color>
+    <color name="color_orange_dark_accent">#e65100</color>
 
     <!--dark theme(green)-->
     <color name="colorGreenDarkAccent">#00c853</color>

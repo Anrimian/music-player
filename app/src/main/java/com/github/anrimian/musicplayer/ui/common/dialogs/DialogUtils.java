@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.DialogSpeedSelectorBinding;
-import com.github.anrimian.musicplayer.databinding.PartialNumberPickerDialogBinding;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper;
 
@@ -54,25 +53,4 @@ public class DialogUtils {
         dialog.show();
     }
 
-    public static void showNumberPickerDialog(Context context,
-                                              int minValue,
-                                              int maxValue,
-                                              int currentValue,
-                                              Callback<Integer> pickCallback) {
-        PartialNumberPickerDialogBinding binding = PartialNumberPickerDialogBinding.inflate(
-                LayoutInflater.from(context)
-        );
-
-        binding.numberPicker.setMinValue(minValue);
-        binding.numberPicker.setMaxValue(maxValue);
-        binding.numberPicker.setValue(currentValue);
-
-        new AlertDialog.Builder(context)
-                .setView(binding.getRoot())
-                .setPositiveButton(
-                        android.R.string.ok,
-                        (dialog, which) -> pickCallback.call(binding.numberPicker.getValue())
-                ).setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
-                .show();
-    }
 }

@@ -250,6 +250,32 @@
         Перемістіть аудіо файли в ці папки і дія повинна працювати коректно.
     </string>
     <string name="folder_already_excluded_from_scanning">Цю папку вже виключено зі сканування</string>
+    <string name="no_file_modify_permission">Відсутній дозвіл для модифікації файлу</string>
+    <string name="interface_settings">Інтерфейс</string>
+    <string name="enable_player_screens_swipe">Увімкнути переключення жестами між екранами черги відтворювання і тексту композиції</string>
+    <string name="no_enough_data_to_play">Недостатньо даних для відтворення композиції</string>
+    <string name="permission_required">Потрібен дозвіл</string>
+    <string name="open_app_settings">Відкрити налаштування додатку</string>
+    <string name="file_is_corrupted">Файл пошкоджено</string>
+    <string name="keep_notification_after_pause">Запобігати автоматичному закриттю сповіщення про відтворення після паузи</string>
+    <string name="unknown_play_error">Невідома помилка відтворення файлу</string>
+    <string name="file_read_timeout">Перевищено час читання файлу</string>
+    <string name="tag_reading_error">Помилка читання тегів: %s</string>
+    <string name="track_number">Номер треку</string>
+    <string name="change_track_number">	Змінити номер треку</string>
+    <string name="disc_number">Номер диску</string>
+    <string name="change_disc_number">Змінити номер диску</string>
+    <string name="comment">Комментар</string>
+    <string name="change_comment">Змінити комментар</string>
+    <string name="disc_short">Диск %d</string>
+    <string name="track_short">Трек %d</string>
+    <string name="with_delay">Через %.1fс</string>
+    <string name="insert_to_playlist_beginning">Вставляти нові композиції на початок плейлиста</string>
+    <string name="export_playlist">Зберегти як .m3u файл</string>
+    <string name="import_playlist">Імпортувати плейлист</string>
+    <string name="overwrite_playlist">Плейлист з таки іменем вже існує. \nПерезаписати його?</string>
+    <string name="playlist_has_no_records">Плейлист не має композицій</string>
+    <string name="export_playlists_success">Файл \"%1$s.m3u\" було збережено у внутрішнє сховище</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиція</item>
@@ -319,6 +345,27 @@
         <item quantity="few">Видалити %1$s композиції</item>
         <item quantity="many">Видалити %1$s композицій</item>
         <item quantity="other">Видалити %d композицій</item>
+    </plurals>
+
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">Протягом не менше %d хвилини</item>
+        <item quantity="few">Протягом не менше %d хвилин</item>
+        <item quantity="many">Протягом не менше %d хвилин</item>
+        <item quantity="other">Протягом не менше %d хвилин</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d плейлист було збережено у внутрішнє сховище</item>
+        <item quantity="few">%d плейлиста були збережені у внутрішнє сховище</item>
+        <item quantity="many">%d плейлистів були збережені у внутрішнє сховище</item>
+        <item quantity="other">%d плейлистів були збережені у внутрішнє сховище</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">Плейлист було імпортовано успішно, але %d файл був не знайдений в бібліотеці</item>
+        <item quantity="few">Плейлист було імпортовано успішно, але %d файли були не знайдені в бібліотеці</item>
+        <item quantity="many">Плейлист було імпортовано успішно, але %d файлів були не знайдені в бібліотеці</item>
+        <item quantity="other">Плейлист було імпортовано успішно, але %d файлів були не знайдені в бібліотеці</item>
     </plurals>
 
 </resources>

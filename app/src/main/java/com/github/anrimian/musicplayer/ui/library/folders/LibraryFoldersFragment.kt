@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.databinding.FragmentLibraryFoldersBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
@@ -59,8 +60,8 @@ import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragmen
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
@@ -94,7 +95,7 @@ fun newFolderFragment(
 }
 
 class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackButtonListener,
-    FragmentLayerListener {
+    FragmentNavigationListener {
 
     private val presenter by moxyPresenter {
         Components.getLibraryFolderComponent(getFolderId()).storageLibraryPresenter()
@@ -258,7 +259,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         fragmentDisposable.clear()
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
         val inLockedSearchMode = requireArguments().getBoolean(LOCKED_SEARCH_MODE)
         presenter.onFragmentDisplayed(inLockedSearchMode)
         val act = requireActivity()
@@ -401,7 +402,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         }
     }
 
-    override fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>) {
+    override fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
         MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }

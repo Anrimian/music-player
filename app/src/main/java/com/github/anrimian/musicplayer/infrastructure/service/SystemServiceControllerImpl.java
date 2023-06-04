@@ -21,6 +21,7 @@ import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -29,16 +30,20 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 public class SystemServiceControllerImpl implements SystemServiceController {
 
     private final Context context;
+    private final SettingsRepository settingsRepository;
 
     private final PublishSubject<Object> stopForegroundSubject = PublishSubject.create();
 
     private static final Handler handler = new Handler(Looper.getMainLooper());
+    private static final Handler stopHandler = new Handler(Looper.getMainLooper());
 
     public static void startPlayForegroundService(Context context) {
         startPlayForegroundService(context, 0);
     }
 
-    public static void startPlayForegroundService(Context context, int playDelay) {
+    public static void startPlayForegroundService(Context context, long playDelay) {
+        stopHandler.removeCallbacksAndMessages(null);
+
         Intent intent = new Intent(context, MusicService.class);
         intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, true);
         intent.putExtra(MusicService.REQUEST_CODE, Constants.Actions.PLAY);
@@ -46,12 +51,15 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         checkPermissionsAndStartServiceFromBg(context, intent);
     }
 
-    public SystemServiceControllerImpl(Context context) {
+    public SystemServiceControllerImpl(Context context,
+                                       SettingsRepository settingsRepository) {
         this.context = context;
+        this.settingsRepository = settingsRepository;
     }
 
     @Override
     public void startMusicService() {
+        stopHandler.removeCallbacksAndMessages(null);
         handler.post(() -> {
             Intent intent = new Intent(context, MusicService.class);
             checkPermissionsAndStartServiceSafe(context, intent);
@@ -59,9 +67,13 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     }
 
     @Override
-    public void stopMusicService() {
-        handler.removeCallbacksAndMessages(null);
-        stopForegroundSubject.onNext(TRIGGER);
+    public void stopMusicService(boolean forceStop) {
+        long stopDelayMillis = settingsRepository.getKeepNotificationTime();
+        if (forceStop || stopDelayMillis == 0L) {
+            stopForegroundService();
+            return;
+        }
+        stopHandler.postDelayed(this::stopForegroundService, stopDelayMillis);
     }
 
     @Override
@@ -120,6 +132,11 @@ public class SystemServiceControllerImpl implements SystemServiceController {
             }
             throw e;
         }
+    }
+
+    private void stopForegroundService() {
+        handler.removeCallbacksAndMessages(null);
+        stopForegroundSubject.onNext(TRIGGER);
     }
 
     private static class ForegroundServiceStarterConnection implements ServiceConnection {

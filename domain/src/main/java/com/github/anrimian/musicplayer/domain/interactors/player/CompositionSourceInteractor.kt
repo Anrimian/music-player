@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.content.Composi
 import com.github.anrimian.musicplayer.domain.models.composition.content.RemoteCompositionSource
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -12,7 +13,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class CompositionSourceInteractor(
     private val storageSourceRepository: StorageSourceRepository,
-    private val syncInteractor: SyncInteractor<*, *, Long>
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>
 ) {
 
     fun getCompositionSource(source: CompositionSource): Single<CompositionContentSource> {

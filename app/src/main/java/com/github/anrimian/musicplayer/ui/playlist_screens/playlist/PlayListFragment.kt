@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.MenuRes
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,9 +13,11 @@ import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.data.models.folders.UriFileReference
 import com.github.anrimian.musicplayer.databinding.FragmentBaseFabListBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
@@ -24,6 +27,8 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.getExportedPlaylistsMessage
+import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
@@ -36,8 +41,8 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayList
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
@@ -54,7 +59,8 @@ fun newPlayListFragment(playListId: Long) = PlayListFragment().apply {
 }
 
 
-class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListener, FragmentLayerListener {
+class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListener,
+    FragmentNavigationListener {
 
     private val presenter by moxyPresenter {
         Components.getPlayListComponent(getPlayListId()).playListPresenter()
@@ -71,6 +77,14 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
     private lateinit var deletingErrorHandler: ErrorHandler
 
     private lateinit var touchHelperCallback: DragAndSwipeTouchHelperCallback
+
+    private val pickFolderLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            presenter.onFolderForExportSelected(UriFileReference(uri))
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -133,7 +147,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
         ) { fragment -> fragment.setOnCompleteListener(presenter::onPlayListToAddingSelected) }
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
         requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar).setup { config ->
             config.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText())
             config.setupOptionsMenu(R.menu.play_list_toolbar_menu, this::onOptionsItemClicked)
@@ -216,7 +230,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
         }
     }
 
-    override fun showDeletedCompositionMessage(compositionsToDelete: List<Composition>) {
+    override fun showDeletedCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
         MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }
@@ -312,6 +326,12 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
         adapter.showFileSyncStates(states)
     }
 
+    override fun showPlaylistExportSuccess(playlist: PlayList) {
+        viewBinding.listContainer.showSnackbar(
+            getExportedPlaylistsMessage(requireContext(), listOf(playlist))
+        )
+    }
+
     private fun onItemMenuClicked(view: View, position: Int, playListItem: PlayListItem) {
         val composition = playListItem.composition
         showCompositionPopupMenu(view, R.menu.play_list_item_menu, composition) { item ->
@@ -345,6 +365,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
         when (item.itemId) {
             R.id.menu_search -> toolbar.setSearchModeEnabled(true)
             R.id.menu_change_play_list_name -> presenter.onChangePlayListNameButtonClicked()
+            R.id.menu_export_playlist -> pickFolderLauncher.launch(null)
             R.id.menu_delete_play_list -> presenter.onDeletePlayListButtonClicked()
         }
     }

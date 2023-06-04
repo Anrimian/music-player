@@ -258,6 +258,34 @@
         Placer les fichiers audio dans ces dossiers et l\'operation fonctionnera correctement
     </string>
     <string name="folder_already_excluded_from_scanning">The dossier est déjà exclus de la liste des dossiers à analyser</string>
+    <!--not verified-->
+    <string name="no_file_modify_permission">Aucune autorisation de modifier le fichier</string>
+    <string name="interface_settings">Interface</string>
+    <string name="enable_player_screens_swipe">Activer le geste de balayage pour basculer entre la file d\'attente de lecture et l\'écran des paroles</string>
+    <string name="no_enough_data_to_play">Pas assez de données pour lire la composition</string>
+    <string name="permission_required">L\'autorisation est requise</string>
+    <string name="open_app_settings">Ouvrir les paramètres de l\'application</string>
+    <string name="file_is_corrupted">Le fichier est corrompu</string>
+    <string name="keep_notification_after_pause">Empêcher la notification du joueur de se fermer automatiquement après une pause</string>
+    <string name="unknown_play_error">Erreur de lecture de fichier inconnue</string>
+    <string name="file_read_timeout">Délai de lecture du fichier</string>
+    <string name="tag_reading_error">Erreur de lecture de balise: %s</string>
+    <string name="track_number">Numéro de piste</string>
+    <string name="change_track_number">Changer le numéro de piste</string>
+    <string name="disc_number">Numéro de disque</string>
+    <string name="change_disc_number">Modifier le numéro de disque</string>
+    <string name="comment">Commentaire</string>
+    <string name="change_comment">Modifier le commentaire</string>
+    <string name="disc_short">Disque %d</string>
+    <string name="track_short">Piste %d</string>
+    <string name="with_delay">Avec %.1fs de retard</string>
+    <string name="insert_to_playlist_beginning">Insérer de nouvelles compositions au début de la playlist</string>
+    <string name="export_playlist">Enregistrer en tant que fichier .m3u</string>
+    <string name="import_playlist">Importer une liste de lecture</string>
+    <string name="overwrite_playlist">La liste de lecture portant ce nom existe déjà. \nEcraser?</string>
+    <string name="playlist_has_no_records">La liste de lecture n\'a aucun enregistrement</string>
+    <string name="export_playlists_success">Le fichier \"%1$s.m3u\" a été enregistré dans le stockage interne</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s morceau</item>
@@ -319,4 +347,24 @@
         <item quantity="other">Supprimer %d titres</item>
     </plurals>
 
+    <!--not verified-->
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">Pendant au moins % dminute</item>
+        <item quantity="many">Pendant au moins %d minutes</item>
+        <item quantity="other">Pendant au moins %d minutes</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d liste de lecture a été enregistrée dans la mémoire de stockage interne</item>
+        <item quantity="many">%d listes de lecture ont été enregistrées dans la mémoire de stockage interne</item>
+        <item quantity="other">%d listes de lecture ont été enregistrées dans la mémoire de stockage interne</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">La liste de lecture a été importée avec succès, mais %d fichier n\'a pas été trouvé dans la bibliothèque</item>
+        <item quantity="many">La liste de lecture a été importée avec succès, mais %d fichiers n\'ont pas été trouvés dans la bibliothèque</item>
+        <item quantity="other">La liste de lecture a été importée avec succès, mais %d fichiers n\'ont pas été trouvés dans la bibliothèque</item>
+    </plurals>
+    <!---->
+    
 </resources>

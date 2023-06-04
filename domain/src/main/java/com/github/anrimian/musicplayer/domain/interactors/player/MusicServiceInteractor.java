@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryComposi
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
@@ -124,7 +125,7 @@ public class MusicServiceInteractor {
                 .firstOrError()
                 .doOnSuccess(compositions -> {
                     libraryPlayerInteractor.setRandomPlayingEnabled(true);
-                    libraryPlayerInteractor.startPlaying(compositions);
+                    libraryPlayerInteractor.startPlayingCompositions(compositions);
                 })
                 .ignoreElement();
     }
@@ -136,7 +137,7 @@ public class MusicServiceInteractor {
     public Completable playFromSearch(@Nullable String searchQuery, int position) {
         return libraryCompositionsInteractor.getCompositionsObservable(searchQuery)
                 .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlayingCompositions(compositions, position))
                 .ignoreElement();
     }
 
@@ -185,7 +186,7 @@ public class MusicServiceInteractor {
     public Completable startPlayingFromCompositions(int position) {
         return libraryCompositionsInteractor.getCompositionsObservable(null)
                 .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlayingCompositions(compositions, position))
                 .ignoreElement();
     }
 
@@ -208,7 +209,7 @@ public class MusicServiceInteractor {
     public Completable startPlayingFromArtistCompositions(long artistId, int position) {
         return getCompositionsByArtist(artistId)
                 .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlayingCompositions(compositions, position))
                 .ignoreElement();
     }
 
@@ -216,14 +217,14 @@ public class MusicServiceInteractor {
         return libraryAlbumsInteractor.getAlbumsObservable(null);
     }
 
-    public Observable<List<Composition>> getAlbumItemsObservable(long albumId) {
+    public Observable<List<AlbumComposition>> getAlbumItemsObservable(long albumId) {
         return libraryAlbumsInteractor.getAlbumItemsObservable(albumId);
     }
 
     public Completable startPlayingFromAlbumCompositions(long albumId, int position) {
         return getAlbumItemsObservable(albumId)
                 .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlaying(compositions, position))
+                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlayingCompositions(compositions, position))
                 .ignoreElement();
     }
 
@@ -239,7 +240,7 @@ public class MusicServiceInteractor {
         return getPlaylistItemsObservable(playListId)
                 .firstOrError()
                 .doOnSuccess(compositions ->
-                        libraryPlayerInteractor.startPlaying(
+                        libraryPlayerInteractor.startPlayingCompositions(
                                 ListUtils.mapList(compositions, PlayListItem::getComposition),
                                 position
                         )

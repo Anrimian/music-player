@@ -9,11 +9,11 @@
 
     <style name="AppTheme" parent="AppBaseTheme">
         <!--primary colors-->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/color_purple_primary</item>
+        <item name="colorPrimaryDark">@color/color_purple_primary_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimaryDarkSecondary">@color/colorPrimaryDarkSecondary</item>
-        <item name="colorPrimaryVariant">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/color_purple_primary</item>
         <item name="colorAccentContrast">?attr/colorAccent</item>
 
         <!--control colors-->
@@ -26,7 +26,7 @@
         <item name="colorControlHighlightInverse">@color/color_control_highlight_dark</item>
         <item name="colorControlThird">@color/color_control_third</item>
         <item name="colorAccentDark">?attr/colorAccent</item>
-        <item name="colorAttention">@color/colorOrangeAccent</item>
+        <item name="colorAttention">@color/color_orange_dark_accent</item>
 
         <!--text colors-->
         <item name="android:textColorPrimary">@color/text_color_primary</item>
@@ -57,7 +57,7 @@
         <item name="snackbarBackground">@color/snackbar_color</item>
 
         <!--navigation view-->
-        <item name="navigationViewPrimaryColor">@color/colorPrimary</item>
+        <item name="navigationViewPrimaryColor">@color/color_purple_primary</item>
 
         <!--other-->
         <item name="android:dividerHorizontal">@color/divider_color</item>
@@ -135,6 +135,10 @@
     <style name="Divider.Vertical" parent="Divider">
         <item name="android:layout_width">1px</item>
         <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="Divider.Vertical.Constraint" parent="Divider.Vertical">
+        <item name="android:layout_height">0dp</item>
     </style>
 
 </resources>

@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener
 
@@ -51,16 +52,12 @@ internal class FolderViewHolder(
         }
         viewBinding.btnActionsMenu.setOnClickListener { v -> onMenuClickListener(v, folder) }
 
-        backgroundDrawable.setColor(
-            AndroidUtils.getColorFromAttr(context, R.attr.listItemBackground)
-        )
+        backgroundDrawable.setColor(context.colorFromAttr(R.attr.listItemBackground))
         itemView.background = backgroundDrawable
         stateDrawable.setColor(Color.TRANSPARENT)
         viewBinding.clickableItem.background = stateDrawable
         viewBinding.clickableItem.foreground = RippleDrawable(
-            ColorStateList.valueOf(
-                AndroidUtils.getColorFromAttr(context, android.R.attr.colorControlHighlight)
-            ),
+            ColorStateList.valueOf(context.colorFromAttr(android.R.attr.colorControlHighlight)),
             null,
             rippleMaskDrawable
         )
@@ -86,9 +83,6 @@ internal class FolderViewHolder(
 
     override fun onSwipeStateChanged(swipeOffset: Float) {
         val swiping = swipeOffset > 0.0f
-
-        viewBinding.divider.translationX = swipeOffset
-
         if (isSwiping != swiping) {
             isSwiping = swiping
             val swipedCorners = context.resources.getDimension(R.dimen.swiped_item_corners)

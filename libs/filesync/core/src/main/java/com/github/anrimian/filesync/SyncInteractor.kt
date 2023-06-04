@@ -2,10 +2,10 @@ package com.github.anrimian.filesync
 
 import com.github.anrimian.filesync.models.RemoteFileSource
 import com.github.anrimian.filesync.models.SyncEnvCondition
-import com.github.anrimian.filesync.models.repo.RemoteRepoCredentials
 import com.github.anrimian.filesync.models.repo.RemoteRepoFullInfo
 import com.github.anrimian.filesync.models.repo.RemoteRepoInfo
 import com.github.anrimian.filesync.models.repo.RemoteRepoType
+import com.github.anrimian.filesync.models.repo.RepoSetupTemplate
 import com.github.anrimian.filesync.models.state.SyncState
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.filesync.models.task.FileTaskInfo
@@ -18,15 +18,12 @@ interface SyncInteractor<K, T, I> {
     fun onAppStarted()
     fun requestFileSync()
     fun runFileTasks()
-    fun addRemoteRepository(
-        type: RemoteRepoType,
-        credentials: RemoteRepoCredentials
-    ): Completable
+    fun addRemoteRepository(template: RepoSetupTemplate): Completable
     fun removeRemoteRepository(repo: RemoteRepoInfo): Completable
     fun setRemoteRepositoryEnabled(repo: RemoteRepoInfo): Completable
     fun onLocalFileAdded()
-    fun onLocalFileDeleted(id: I)
-    fun onLocalFilesDeleted(ids: List<I>)
+    fun onLocalFileDeleted(key: K)
+    fun onLocalFilesDeleted(keys: List<K>)
     fun notifyLocalFileChanged()
     fun isSyncEnabled(): Boolean
     fun setSyncEnabled(enabled: Boolean)

@@ -42,61 +42,55 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
         val albumId = intent.getLongExtra(Constants.Arguments.ALBUM_ID_ARG, 0)
         Components.getAlbumEditorComponent(albumId).albumEditorPresenter()
     }
-    
-    private lateinit var viewBinding: ActivityAlbumEditBinding
-    
+
+    private lateinit var binding: ActivityAlbumEditBinding
+
     private lateinit var authorDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var nameDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
-    
+
     private lateinit var errorHandler: ErrorHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Components.getAppComponent().themeController().applyCurrentSlidrTheme(this)
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityAlbumEditBinding.inflate(layoutInflater)
-        setContentView(viewBinding.root)
+        binding = ActivityAlbumEditBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         AndroidUtils.setNavigationBarColorAttr(this, android.R.attr.colorBackground)
 
-        setToolbar(viewBinding.toolbar, R.string.edit_album_tags)
-        
-        viewBinding.changeAuthorClickableArea.setOnClickListener { presenter.onChangeAuthorClicked() }
-        viewBinding.changeNameClickableArea.setOnClickListener { presenter.onChangeNameClicked() }
-        
-        ViewUtils.onLongClick(viewBinding.changeAuthorClickableArea) {
-            copyText(viewBinding.tvAuthor, viewBinding.tvAuthorHint)
+        setToolbar(binding.toolbar, R.string.edit_album_tags)
+
+        binding.changeAuthorClickableArea.setOnClickListener { presenter.onChangeAuthorClicked() }
+        binding.changeNameClickableArea.setOnClickListener { presenter.onChangeNameClicked() }
+
+        ViewUtils.onLongClick(binding.changeAuthorClickableArea) {
+            copyText(binding.tvAuthor, binding.tvAuthorHint)
         }
-        ViewUtils.onLongClick(viewBinding.changeNameClickableArea) {
-            copyText(viewBinding.tvName, viewBinding.tvNameHint)
+        ViewUtils.onLongClick(binding.changeNameClickableArea) {
+            copyText(binding.tvName, binding.tvNameHint)
         }
-        
+
         SlidrPanel.attachWithNavBarChange(
             this,
             R.attr.playerPanelBackground,
             android.R.attr.colorBackground
         )
-        
-        val fm = supportFragmentManager
+
         errorHandler = ErrorHandler(
             this,
             presenter::onRetryFailedEditActionClicked,
             this::showEditorRequestDeniedMessage
         )
-        authorDialogFragmentRunner = DialogFragmentRunner(
-            fm,
-            Tags.AUTHOR_TAG
-        ) { fragment -> fragment.setOnCompleteListener(presenter::onNewAuthorEntered) }
-        nameDialogFragmentRunner = DialogFragmentRunner(
-            fm,
-            Tags.NAME_TAG
-        ) { fragment -> fragment.setOnCompleteListener(presenter::onNewNameEntered) }
-        progressDialogRunner = DialogFragmentDelayRunner(
-            fm,
-            Tags.PROGRESS_DIALOG_TAG,
-            fragmentInitializer = { fragment -> fragment.setCancellationListener {
-                presenter.onEditActionCancelled()
-            } }
-        )
+        val fm = supportFragmentManager
+        authorDialogFragmentRunner = DialogFragmentRunner(fm, Tags.AUTHOR_TAG) { fragment ->
+            fragment.setOnCompleteListener(presenter::onNewAuthorEntered)
+        }
+        nameDialogFragmentRunner = DialogFragmentRunner(fm, Tags.NAME_TAG) { fragment ->
+            fragment.setOnCompleteListener(presenter::onNewNameEntered)
+        }
+        progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG, { fragment ->
+            fragment.setCancellationListener { presenter.onEditActionCancelled() }
+        })
     }
 
     override fun attachBaseContext(base: Context) {
@@ -110,18 +104,18 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
     }
 
     override fun showAlbumLoadingError(errorCommand: ErrorCommand) {
-        viewBinding.tvAuthor.text = errorCommand.message
+        binding.tvAuthor.text = errorCommand.message
     }
 
     override fun showAlbum(album: Album) {
-        viewBinding.tvName.text = album.name
-        viewBinding.tvAuthor.text = FormatUtils.formatAuthor(album.artist, this)
+        binding.tvName.text = album.name
+        binding.tvAuthor.text = FormatUtils.formatAuthor(album.artist, this)
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {
         errorHandler.handleError(errorCommand) {
             MessagesUtils.makeSnackbar(
-                viewBinding.root, errorCommand.message, Snackbar.LENGTH_LONG
+                binding.root, errorCommand.message, Snackbar.LENGTH_LONG
             ).show()
         }
     }
@@ -188,7 +182,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
 
     private fun onTextCopied() {
         MessagesUtils.makeSnackbar(
-            viewBinding.root,
+            binding.root,
             R.string.copied_message,
             Snackbar.LENGTH_SHORT
         ).show()
@@ -196,7 +190,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
 
     private fun showEditorRequestDeniedMessage() {
         MessagesUtils.makeSnackbar(
-            viewBinding.root,
+            binding.root,
             R.string.android_r_edit_file_permission_denied,
             Snackbar.LENGTH_LONG
         ).show()

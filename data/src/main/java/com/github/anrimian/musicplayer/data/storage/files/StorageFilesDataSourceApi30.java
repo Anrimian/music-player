@@ -11,6 +11,7 @@ import androidx.core.util.Pair;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
@@ -26,7 +27,7 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
     private final StorageMusicProvider storageMusicProvider;
 
     @Nullable
-    private List<Composition> latestCompositionsToDelete;
+    private List<DeletedComposition> latestCompositionsToDelete;
     @Nullable
     private Object tokenForDelete;
 
@@ -121,15 +122,15 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
 
     //empty root folder will be not deleted, but I didn't find solution for that
     @Override
-    public List<Composition> deleteCompositionFiles(List<Composition> compositions,
-                                                    Object tokenForDelete) {
+    public List<DeletedComposition> deleteCompositionFiles(List<DeletedComposition> compositions,
+                                                           Object tokenForDelete) {
         // From android 11 delete actions are started twice.
         // Moreover, files will be deleted by the system after dialog confirmation.
         // So, on second attempt composition list can be null when it is received from folder by db query
         // So token for delete represent folder object that is not changed on second attempt
 
         if (tokenForDelete.equals(this.tokenForDelete)) {
-            List<Composition> listToReturn = latestCompositionsToDelete;
+            List<DeletedComposition> listToReturn = latestCompositionsToDelete;
             latestCompositionsToDelete = null;
             this.tokenForDelete = null;
             return listToReturn;
@@ -138,7 +139,7 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
         this.tokenForDelete = tokenForDelete;
         storageMusicProvider.deleteCompositions(mapListNotNull(
                 compositions,
-                Composition::getStorageId)
+                DeletedComposition::getStorageId)
         );
         // we are always expecting exception from deleteCompositions() here. But
         // deleteCompositions() can be executed successfully on first attempt when we have created these files
@@ -150,8 +151,8 @@ public class StorageFilesDataSourceApi30 implements StorageFilesDataSource {
     }
 
     @Override
-    public void deleteCompositionFile(Composition composition) {
-        deleteCompositionFiles(asList(composition), composition);
+    public DeletedComposition deleteCompositionFile(DeletedComposition composition) {
+        return deleteCompositionFiles(asList(composition), composition).get(0);
     }
 
     @Override

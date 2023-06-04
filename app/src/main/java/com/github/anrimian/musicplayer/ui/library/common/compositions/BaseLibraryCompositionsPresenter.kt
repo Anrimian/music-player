@@ -6,7 +6,9 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
@@ -17,22 +19,22 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
-import java.util.*
+import java.util.LinkedList
 
-abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>(
+abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibraryCompositionsView<C>>(
     private val playerInteractor: LibraryPlayerInteractor,
     private val playListsInteractor: PlayListsInteractor,
     private val displaySettingsInteractor: DisplaySettingsInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler,
-) : AppPresenter<T>(uiScheduler, errorParser) {
+) : AppPresenter<V>(uiScheduler, errorParser) {
 
     private var currentCompositionDisposable: Disposable? = null
     private var compositionsDisposable: Disposable? = null
 
-    private var compositions: List<Composition> = ArrayList()
-    private val selectedCompositions = LinkedHashSet<Composition>()
+    private var compositions: List<C> = ArrayList()
+    private val selectedCompositions = LinkedHashSet<C>()
     private val compositionsForPlayList: MutableList<Composition> = LinkedList()
     private val compositionsToDelete: MutableList<Composition> = LinkedList()
 
@@ -61,12 +63,12 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         subscribeOnCompositions()
     }
 
-    fun onCompositionClicked(position: Int, composition: Composition) {
+    fun onCompositionClicked(position: Int, composition: C) {
         if (selectedCompositions.isEmpty()) {
             if (composition == currentComposition) {
                 playerInteractor.playOrPause()
             } else {
-                playerInteractor.startPlaying(compositions, position)
+                playerInteractor.startPlayingCompositions(compositions, position)
                 viewState.showCurrentComposition(CurrentComposition(composition, true))
             }
             return
@@ -81,16 +83,16 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         viewState.showSelectionMode(selectedCompositions.size)
     }
 
-    fun onCompositionIconClicked(position: Int, composition: Composition) {
+    fun onCompositionIconClicked(position: Int, composition: C) {
         if (composition == currentComposition) {
             playerInteractor.playOrPause()
         } else {
-            playerInteractor.startPlaying(compositions, position)
+            playerInteractor.startPlayingCompositions(compositions, position)
             viewState.showCurrentComposition(CurrentComposition(composition, true))
         }
     }
 
-    fun onCompositionLongClick(position: Int, composition: Composition) {
+    fun onCompositionLongClick(position: Int, composition: C) {
         selectedCompositions.add(composition)
         viewState.showSelectionMode(selectedCompositions.size)
         viewState.onCompositionSelected(composition, position)
@@ -98,7 +100,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
 
     fun onPlayAllButtonClicked() {
         if (selectedCompositions.isEmpty()) {
-            playerInteractor.startPlaying(compositions)
+            playerInteractor.startPlayingCompositions(compositions)
         } else {
             playSelectedCompositions()
         }
@@ -185,7 +187,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     fun onPlayActionSelected(position: Int) {
-        playerInteractor.startPlaying(compositions, position)
+        playerInteractor.startPlayingCompositions(compositions, position)
     }
 
     fun onSearchTextChanged(text: String?) {
@@ -207,7 +209,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
     }
 
-    fun getSelectedCompositions(): HashSet<Composition> = selectedCompositions
+    fun getSelectedCompositions(): HashSet<C> = selectedCompositions
 
     fun getSearchText() = searchText
 
@@ -256,7 +258,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
     }
 
     private fun playSelectedCompositions() {
-        playerInteractor.startPlaying(ArrayList(selectedCompositions))
+        playerInteractor.startPlayingCompositions(ArrayList(selectedCompositions))
         closeSelectionMode()
     }
 
@@ -274,7 +276,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionError)
     }
 
-    private fun onDeleteCompositionsSuccess(compositions: List<Composition>) {
+    private fun onDeleteCompositionsSuccess(compositions: List<DeletedComposition>) {
         viewState.showDeleteCompositionMessage(compositions)
         compositionsToDelete.clear()
         if (selectedCompositions.isNotEmpty()) {
@@ -292,7 +294,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
         viewState.showLoadingError(errorCommand)
     }
 
-    private fun onCompositionsReceived(compositions: List<Composition>) {
+    private fun onCompositionsReceived(compositions: List<C>) {
         val firstReceive = this.compositions.isEmpty()
 
         this.compositions = compositions
@@ -333,7 +335,7 @@ abstract class BaseLibraryCompositionsPresenter<T : BaseLibraryCompositionsView>
             .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
     }
 
-    protected abstract fun getCompositionsObservable(searchText: String?): Observable<List<Composition>>
+    protected abstract fun getCompositionsObservable(searchText: String?): Observable<List<C>>
     protected abstract fun getSavedListPosition(): ListPosition?
     protected abstract fun saveListPosition(listPosition: ListPosition)
 

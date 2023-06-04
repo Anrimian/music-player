@@ -13,7 +13,7 @@ import com.github.anrimian.musicplayer.ui.main.MainActivity
 
 abstract class BaseLibraryCompositionsFragment : LibraryFragment() {
     
-    protected abstract fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<*>
+    protected abstract fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<*, *>
 
     protected fun onActionModeItemClicked(menuItem: MenuItem) {
         when (menuItem.itemId) {

@@ -30,11 +30,14 @@ import com.github.anrimian.musicplayer.di.app.library.genres.GenresComponent;
 import com.github.anrimian.musicplayer.di.app.library.genres.GenresModule;
 import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsComponent;
 import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsModule;
+import com.github.anrimian.musicplayer.di.app.order.OrderComponent;
+import com.github.anrimian.musicplayer.di.app.order.OrderModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 import com.github.anrimian.musicplayer.di.app.share.ShareComponent;
 import com.github.anrimian.musicplayer.di.app.share.ShareModule;
+import com.github.anrimian.musicplayer.domain.models.order.Order;
 
 import javax.annotation.Nullable;
 
@@ -138,6 +141,10 @@ public class Components {
 
     public static ShareComponent getShareComponent(long[] ids) {
         return getAppComponent().shareComponent(new ShareModule(ids));
+    }
+
+    public static OrderComponent getOrderComponent(Order order) {
+        return getAppComponent().orderComponent(new OrderModule(order));
     }
 
     private LibraryComponent buildLibraryComponent() {

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <AutoCompleteTextView
-        android:id="@+id/edit_text"
+        android:id="@+id/editText"
         style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

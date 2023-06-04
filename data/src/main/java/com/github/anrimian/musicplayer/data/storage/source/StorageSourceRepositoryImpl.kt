@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCo
 import com.github.anrimian.musicplayer.data.models.composition.source.UriContentSource
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
+import com.github.anrimian.musicplayer.domain.models.composition.content.FileReadTimeoutException
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository
 import io.reactivex.rxjava3.core.Maybe
@@ -25,7 +26,7 @@ class StorageSourceRepositoryImpl(
 
     override fun getStorageSource(compositionId: Long): Maybe<CompositionContentSource> {
         return getStorageCompositionSource(compositionId)
-            .timeout(STORAGE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .timeout(STORAGE_TIMEOUT_SECONDS, TimeUnit.SECONDS, Maybe.error(FileReadTimeoutException()))
             .subscribeOn(scheduler)
     }
 

@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.database.AppDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -53,10 +54,16 @@ public class AlbumsDaoWrapper {
         return albumsDao.getAllAlbumsForArtistObservable(artistId);
     }
 
-    public Observable<List<Composition>> getCompositionsInAlbumObservable(long albumId, boolean useFileName) {
-        String query = AlbumsDao.getCompositionsQuery(useFileName);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {albumId} );
+    public Observable<List<AlbumComposition>> getCompositionsInAlbumObservable(long albumId, boolean useFileName) {
+        String query = AlbumsDao.getAlbumCompositionsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] { albumId } );
         return albumsDao.getCompositionsInAlbumObservable(sqlQuery);
+    }
+
+    public List<Composition> getCompositionsInAlbum(long albumId, boolean useFileName) {
+        String query = AlbumsDao.getCompositionsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] { albumId } );
+        return albumsDao.getCompositionsInAlbum(sqlQuery);
     }
 
     public Single<List<Long>> getCompositionIdsInAlbum(long albumId) {

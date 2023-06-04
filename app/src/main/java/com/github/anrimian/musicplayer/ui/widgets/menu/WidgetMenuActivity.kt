@@ -13,6 +13,7 @@ import com.github.anrimian.musicplayer.databinding.ActivityWidgetMenuBinding
 import com.github.anrimian.musicplayer.databinding.PartialWidgetMenuHeaderBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -109,7 +110,7 @@ class WidgetMenuActivity: MvpAppCompatActivity(), WidgetMenuView {
         finish()
     }
 
-    override fun showDeleteCompositionMessage(composition: Composition) {
+    override fun showDeleteCompositionMessage(composition: DeletedComposition) {
         val text = MessagesUtils.getDeleteCompleteMessage(this, listOf(composition))
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }

@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
@@ -21,10 +22,10 @@ class GenreItemsPresenter(
     playListsInteractor: PlayListsInteractor,
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
-    syncInteractor: SyncInteractor<*, *, Long>,
+    syncInteractor: SyncInteractor<FileKey, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
-) : BaseLibraryCompositionsPresenter<GenreItemsView>(
+) : BaseLibraryCompositionsPresenter<Composition, GenreItemsView>(
     playerInteractor,
     playListsInteractor,
     displaySettingsInteractor,

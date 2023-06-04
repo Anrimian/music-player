@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.IdPair;
 import com.github.anrimian.musicplayer.data.repositories.scanner.files.FileScanner;
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.StoragePlaylistsAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.exceptions.ContentResolverQueryException;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenre;
 import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenreItem;
@@ -46,9 +47,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
     private final CompositionsDaoWrapper compositionsDao;
     private final GenresDaoWrapper genresDao;
     private final SettingsRepository settingsRepository;
-//    private final StorageCompositionAnalyzer compositionAnalyzer;
     private final StorageCompositionAnalyzer compositionAnalyzer;
-    private final StoragePlaylistAnalyzer playlistAnalyzer;
+    private final StoragePlaylistsAnalyzer playlistAnalyzer;
     private final FileScanner fileScanner;
     private final LoggerRepository loggerRepository;
     private final Analytics analytics;
@@ -63,9 +63,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                                       CompositionsDaoWrapper compositionsDao,
                                       GenresDaoWrapper genresDao,
                                       SettingsRepository settingsRepository,
-//                                      StorageCompositionAnalyzer compositionAnalyzer,
                                       StorageCompositionAnalyzer compositionAnalyzer,
-                                      StoragePlaylistAnalyzer playlistAnalyzer,
+                                      StoragePlaylistsAnalyzer playlistAnalyzer,
                                       FileScanner fileScanner,
                                       LoggerRepository loggerRepository,
                                       Analytics analytics,
@@ -124,7 +123,8 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 .subscribe(o -> {}));
         mediaStoreDisposable.add(playListsProvider.getPlayListsObservable()
                 .subscribeOn(scheduler)
-                .doOnNext(playlistAnalyzer::applyPlayListData)
+                .observeOn(scheduler)
+                .doOnNext(playlistAnalyzer::applyPlayListsData)
                 .retry(RETRY_COUNT, this::isStandardError)
                 .onErrorComplete(this::isStandardError)
                 .subscribe(o -> {}));
@@ -159,11 +159,11 @@ public class MediaScannerRepositoryImpl implements MediaScannerRepository {
                 return;
             }
             compositionAnalyzer.applyCompositionsData(compositions);
-            LongSparseArray<StoragePlayList> playlists = playListsProvider.getPlayLists();
+            Map<String, StoragePlayList> playlists = playListsProvider.getPlayLists();
             if (playlists == null) {
                 return;
             }
-            playlistAnalyzer.applyPlayListData(playlists);
+            playlistAnalyzer.applyPlayListsData(playlists);
             fileScanner.scheduleFileScanner();
 
             //<return genres after deep scan implementation>

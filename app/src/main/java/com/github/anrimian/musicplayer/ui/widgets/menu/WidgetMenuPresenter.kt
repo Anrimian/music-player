@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.widgets.menu
 
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Completable
@@ -63,7 +64,7 @@ class WidgetMenuPresenter(
         }
     }
 
-    private fun onDeleteCompositionsSuccess(compositionsToDelete: Composition) {
+    private fun onDeleteCompositionsSuccess(compositionsToDelete: DeletedComposition) {
         viewState.showDeleteCompositionMessage(compositionsToDelete)
         viewState.closeScreen()
     }

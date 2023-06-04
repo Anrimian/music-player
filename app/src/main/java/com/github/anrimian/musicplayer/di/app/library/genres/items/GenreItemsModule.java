@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresI
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.genres.items.GenreItemsPresenter;
 
@@ -32,7 +33,7 @@ public class GenreItemsModule {
                                             PlayListsInteractor playListsInteractor,
                                             LibraryPlayerInteractor playerInteractor,
                                             DisplaySettingsInteractor displaySettingsInteractor,
-                                            SyncInteractor<?, ?, Long> syncInteractor,
+                                            SyncInteractor<FileKey, ?, Long> syncInteractor,
                                             ErrorParser errorParser,
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new GenreItemsPresenter(id,

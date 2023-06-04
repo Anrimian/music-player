@@ -257,6 +257,32 @@
         Vložte audio soubory do těchto složek a operace by měly proběhnout.
     </string>
     <string name="folder_already_excluded_from_scanning">Tato složka je už vyloučena z prohledávání</string>
+    <string name="no_file_modify_permission">Bez oprávnění upravit soubotr</string>
+    <string name="interface_settings">Rozhraní</string>
+    <string name="enable_player_screens_swipe">Povolit gesto swipnutí pro přepunutí mezi frontou přehrávání a texty</string>
+    <string name="no_enough_data_to_play">Málo dat pro přehrání skladby</string>
+    <string name="permission_required">Vyžadováno oprávnění</string>
+    <string name="open_app_settings">Otevřít nastavení aplikace</string>
+    <string name="file_is_corrupted">Soubor je poškozen</string>
+    <string name="keep_notification_after_pause">Zabránit automatickému zavření upozornění přehrávače po pauze</string>
+    <string name="unknown_play_error">Chyba přehrávání neznámého souboru</string>
+    <string name="file_read_timeout">Překročen časový limit čtení souboru</string>
+    <string name="tag_reading_error">Chyba čtení značky: %s</string>
+    <string name="track_number">Číslo skladby</string>
+    <string name="change_track_number">Změnit číslo skladby</string>
+    <string name="disc_number">Číslo disku</string>
+    <string name="change_disc_number">Změnit číslo disku</string>
+    <string name="comment">Komentář</string>
+    <string name="change_comment">Změnit omentář</string>
+    <string name="disc_short">Disk %d</string>
+    <string name="track_short">Skladba %d</string>
+    <string name="with_delay">S %.1fs prodlevou</string>
+    <string name="insert_to_playlist_beginning">Vložit novou skladbu na začátek seznamu skladeb</string>
+    <string name="export_playlist">Uložit jako .m3u soubor</string>
+    <string name="import_playlist">Importovat seznam sladeb</string>
+    <string name="overwrite_playlist">Seznam skladeb s tímto názvem již existuje. \nPřepsat?</string>
+    <string name="playlist_has_no_records">Seznam skladeb neobsahuje žádné skladby</string>
+    <string name="export_playlists_success">Soubor \"%1$s.m3u\" byl uložen do vnitřního úložiště</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s píseň</item>
@@ -326,6 +352,27 @@
         <item quantity="few">Smazat %d písně</item>
         <item quantity="many">Smazat %d písní</item>
         <item quantity="other">Smazat %d písní</item>
+    </plurals>
+
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">Pro alespoň %d minutu</item>
+        <item quantity="few">Pro alespoň %d minuty</item>
+        <item quantity="many">Pro alespoň %d minut</item>
+        <item quantity="other">Pro alespoň %d minut</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d seznam skladeb byl uložen do vnitřního úložiště</item>
+        <item quantity="few">%d seznamy skladeb byly uložen do vnitřního úložiště</item>
+        <item quantity="many">%d seznamů skladeb bylo uložen do vnitřního úložiště</item>
+        <item quantity="other">%d seznamů skladeb bylo uložen do vnitřního úložiště</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">Seznam skladeb byl úspěšně importován, ale %d soubor nebyl nalezen v knihovně</item>
+        <item quantity="few">Seznam skladeb byly úspěšně importován, ale %d soubory nebyl nalezen v knihovně</item>
+        <item quantity="many">Seznam skladeb byly úspěšně importován, ale %d souborů nebyl nalezen v knihovně</item>
+        <item quantity="other">Seznam skladeb byly úspěšně importován, ale %d souborů nebyl nalezen v knihovně</item>
     </plurals>
 
 </resources>

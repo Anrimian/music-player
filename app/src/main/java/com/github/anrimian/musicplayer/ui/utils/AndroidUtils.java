@@ -381,4 +381,10 @@ public class AndroidUtils {
             pb.setProgress(progress);
         }
     }
+
+    public static boolean isLaunchedFromHistory(Activity activity) {
+        Intent intent = activity.getIntent();
+        return intent != null && (intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0;
+    }
+
 }

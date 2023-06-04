@@ -1,11 +1,14 @@
 package com.github.anrimian.musicplayer.data.storage.files;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
+
 import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
@@ -15,8 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapListNotNull;
 
 //on android 9 check move file by relative path renaming
 //check rename file by update display name column
@@ -125,30 +126,31 @@ public class StorageFilesDataSourceImpl implements StorageFilesDataSource {
     }
 
     @Override
-    public List<Composition> deleteCompositionFiles(List<Composition> compositions, Object tokenForDelete) {
-        for (Composition composition: compositions) {
+    public List<DeletedComposition> deleteCompositionFiles(List<DeletedComposition> compositions, Object tokenForDelete) {
+        for (DeletedComposition composition: compositions) {
             deleteFile(composition);
         }
         storageMusicProvider.deleteCompositions(mapListNotNull(
                 compositions,
-                Composition::getStorageId)
+                DeletedComposition::getStorageId)
         );
         return compositions;
     }
 
     @Override
-    public void deleteCompositionFile(Composition composition) {
+    public DeletedComposition deleteCompositionFile(DeletedComposition composition) {
         deleteFile(composition);
         Long storageId = composition.getStorageId();
         if (storageId != null) {
             storageMusicProvider.deleteComposition(storageId);
         }
+        return composition;
     }
 
     @Override
     public void clearDeleteData() {}
 
-    private void deleteFile(Composition composition) {
+    private void deleteFile(DeletedComposition composition) {
         Long storageId = composition.getStorageId();
         if (storageId == null) {
             return;

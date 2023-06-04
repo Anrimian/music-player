@@ -257,6 +257,32 @@
         Τοποθετήστε τα αρχεία ήχου σε αυτούς τους φακέλους και η εργασία αυτή θα λειτουργήσει σωστά.
     </string>
     <string name="folder_already_excluded_from_scanning">Αυτός ο φάκελος εξαιρείται ήδη από την αναζήτηση</string>
+    <string name="no_file_modify_permission">Χωρίς άδεια επεξεργασίας αρχείου</string>
+    <string name="interface_settings">Διεπαφή χρήστη</string>
+    <string name="enable_player_screens_swipe">Ενεργοποίηση χειρονομιών για εναλλαγή μεταξύ της ουράς αναπαραγωγής και της οθόνης στίχων</string>
+    <string name="no_enough_data_to_play">Ανεπαρκή δεδομένα για αναπαραγωγή τραγουδιού</string>
+    <string name="permission_required">Απαιτείται παραχώρηση δικαιώματος</string>
+    <string name="open_app_settings">Άνοιγμα ρυθμήσεων εφαρμογής</string>
+    <string name="file_is_corrupted">Το αρχείο είναι κατεστραμμένο</string>
+    <string name="keep_notification_after_pause">Αποτροπή αυτόματου κλεισίματος ειδοποίησης εφαρμογής κατά την παύση</string>
+    <string name="unknown_play_error">Άγνωστο σφάλμα αναπαραγωγής αρχείου</string>
+    <string name="file_read_timeout">Λήξη χρονικού ορίου ανάγνωσης αρχείου</string>
+    <string name="tag_reading_error">Σφάλμα ανάγνωσης ετικέτας: %s</string>
+    <string name="track_number">Αριθμός κομματιού</string>
+    <string name="change_track_number">Αλλαγή αριθμού κομματιού</string>
+    <string name="disc_number">Αριθμός δίσκου</string>
+    <string name="change_disc_number">Αλλαγή αριθμού δίσκου</string>
+    <string name="comment">Σχόλιο</string>
+    <string name="change_comment">Αλλαγή σχολίου</string>
+    <string name="disc_short">Δίσκος %d</string>
+    <string name="track_short">Κομμάτι %d</string>
+    <string name="with_delay">Με %.1fs καθυστέρηση</string>
+    <string name="insert_to_playlist_beginning">Εισαγωγή νέων τραγουδιών στην αρχή της λίστας αναπαραγωγής</string>
+    <string name="export_playlist">Αποθήκευση ως αρχείο .m3u</string>
+    <string name="import_playlist">Εισαγωγή λίστας αναπαραγωγής</string>
+    <string name="overwrite_playlist">Υπάρχει ήδη μια λίστα αναπαραγωγής με το ίδιο όνομα. \nΝα αντικατασταθεί;</string>
+    <string name="playlist_has_no_records">Η λίστα αναπαραγωγής δεν έχει καμία καταχώρηση</string>
+    <string name="export_playlists_success">Το αρχείο \"%1$s.m3u\" αποθηκεύτηκε στον εσωτερικό χώρο αποθήκευσης</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s τραγούδι</item>
@@ -306,6 +332,21 @@
     <plurals name="delete_compositions_template">
         <item quantity="one">Διαγραφή %d τραγουδιού</item>
         <item quantity="other">Διαγραφή %d τραγιυδιών</item>
+    </plurals>
+
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">Για τουλάχιστον %d λεπτό</item>
+        <item quantity="other">Για τουλάχιστον %d λεπτά</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d λίστα αναπαραγωγής αποθηκεύτηκε στον εσωτερικό χώρο αποθήκευσης</item>
+        <item quantity="other">%d λίστες αναπαραγωγής αποθηκεύτηκαν στον εσωτερικό χώρο αποθήκευσης</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">Έγινε εισαγωγή της λίστας αναπαραγωγής επιτυχώς, αλλά %d αρχείο δεν βρέθηκε στη συλλογή</item>
+        <item quantity="other">Έγινε εισαγωγή της λίστας αναπαραγωγής επιτυχώς, αλλά %d αρχεία δεν βρέθηκαν στη συλλογή</item>
     </plurals>
 
 </resources>

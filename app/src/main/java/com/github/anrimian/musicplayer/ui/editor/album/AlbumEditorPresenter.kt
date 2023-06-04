@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.editor.album
 import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor
 import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
@@ -15,7 +16,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 class AlbumEditorPresenter(
     private val albumId: Long,
     private val editorInteractor: EditorInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     uiScheduler: Scheduler,
     errorParser: ErrorParser
 ) : AppPresenter<AlbumEditorView>(uiScheduler, errorParser) {

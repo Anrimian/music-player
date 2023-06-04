@@ -6,6 +6,7 @@ import android.os.Build;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.EqInitializationException;
+import com.github.anrimian.musicplayer.data.models.exceptions.NoPlaylistItemsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
@@ -14,14 +15,15 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.M3UEditorException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.NotAllowedPathException;
+import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CorruptedMediaFileException;
 import com.github.anrimian.musicplayer.domain.models.composition.content.LocalSourceNotFoundException;
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException;
-import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FolderAlreadyIgnoredException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
@@ -56,6 +58,9 @@ public class DefaultErrorParser extends ErrorParser {
                     case EMPTY_NAME: {
                         return error(R.string.name_can_not_be_empty);
                     }
+                    case TOO_LONG_NAME: {
+                        return error(R.string.name_is_too_long);
+                    }
                 }
             }
         }
@@ -65,6 +70,9 @@ public class DefaultErrorParser extends ErrorParser {
         }
         if (throwable instanceof PlayListAlreadyDeletedException) {
             return error(R.string.play_not_exists);
+        }
+        if (throwable instanceof NoPlaylistItemsException) {
+            return error(R.string.playlist_has_no_records);
         }
         if (throwable instanceof FileNotFoundException || throwable instanceof LocalSourceNotFoundException) {
             return error(R.string.file_not_found);
@@ -83,7 +91,7 @@ public class DefaultErrorParser extends ErrorParser {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
                 && (throwable instanceof RecoverableSecurityException || throwable instanceof RecoverableSecurityExceptionExt)) {
-            return new EditorErrorCommand(throwable);
+            return new EditorErrorCommand(getString(R.string.no_file_modify_permission), throwable);
         }
         if (throwable instanceof EqInitializationException) {
             return error(R.string.equalizer_initialization_error);
@@ -91,8 +99,8 @@ public class DefaultErrorParser extends ErrorParser {
         if (throwable instanceof EditorTimeoutException) {
             return error(R.string.editor_timeout_error);
         }
-        if (throwable instanceof EditorReadException) {
-            return new ErrorCommand(throwable.getMessage());
+        if (throwable instanceof TagReaderException) {
+            return new ErrorCommand(getString(R.string.tag_reading_error, throwable.getMessage()));
         }
         if (throwable instanceof NullPointerException) {
             logException(throwable);
@@ -108,7 +116,7 @@ public class DefaultErrorParser extends ErrorParser {
             return error(R.string.unsupported_format_hint);
         }
         if (throwable instanceof CorruptedMediaFileException) {
-            return error(R.string.unsupported_format_hint);
+            return error(R.string.file_is_corrupted);
         }
         if (throwable instanceof FolderAlreadyIgnoredException) {
             return error(R.string.folder_already_excluded_from_scanning);
@@ -117,6 +125,9 @@ public class DefaultErrorParser extends ErrorParser {
             return new ErrorCommand(
                     getString(R.string.android_r_editor_restriction_error, throwable.getMessage())
             );
+        }
+        if (throwable instanceof M3UEditorException) {
+            return new ErrorCommand(getString(R.string.unexpected_error, throwable.getMessage()));
         }
         if (throwable instanceof FileWriteNotAllowedException) {
             logException(throwable);

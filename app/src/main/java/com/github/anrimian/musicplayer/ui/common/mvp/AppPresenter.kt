@@ -72,6 +72,11 @@ abstract class AppPresenter<T : MvpView>(
             .subscribe(onNext, { t -> onError(errorParser.parseError(t)) }, presenterDisposable)
     }
 
+    protected fun <K: Any> Single<K>.justSubscribeOnUi(onNext: (K) -> Unit, onError: (Throwable) -> Unit) {
+        this.observeOn(uiScheduler)
+            .subscribe(onNext, onError, presenterDisposable)
+    }
+
     protected fun <K: Any> Single<K>.launchOnUi(onNext: (K) -> Unit, onError: (ErrorCommand) -> Unit) {
         this.subscribeOnUi(onNext) { t -> onError(errorParser.parseError(t)) }
     }
@@ -109,7 +114,8 @@ abstract class AppPresenter<T : MvpView>(
         onComplete: () -> Unit,
         onError: (ErrorCommand) -> Unit
     ): Disposable {
-        return subscribe(onComplete, { t -> onError(errorParser.parseError(t)) }, presenterDisposable)
+        return observeOn(uiScheduler)
+            .subscribe(onComplete, { t -> onError(errorParser.parseError(t)) }, presenterDisposable)
     }
 
     protected fun Completable.subscribe(onError: (ErrorCommand) -> Unit): Disposable {

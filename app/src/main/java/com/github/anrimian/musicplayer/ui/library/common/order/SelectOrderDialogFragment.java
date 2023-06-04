@@ -36,7 +36,7 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
     @InjectPresenter
     SelectOrderPresenter presenter;
 
-    private DialogOrderBinding viewBinding;
+    private DialogOrderBinding binding;
 
     private OrderAdapter orderAdapter;
 
@@ -45,7 +45,7 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
 
     @ProvidePresenter
     SelectOrderPresenter providePresenter() {
-        return Components.getLibraryComponent().selectOrderPresenter();
+        return Components.getOrderComponent(getOrder()).selectOrderPresenter();
     }
 
     public static SelectOrderDialogFragment newInstance(Order selectedOrder,
@@ -68,13 +68,9 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            presenter.setOrder(getOrder());
-        }
-
-        viewBinding = DialogOrderBinding.inflate(LayoutInflater.from(requireContext()));
-        RecyclerView rvOrder = viewBinding.rvOrder;
-        View view = viewBinding.getRoot();
+        binding = DialogOrderBinding.inflate(LayoutInflater.from(requireContext()));
+        RecyclerView rvOrder = binding.rvOrder;
+        View view = binding.getRoot();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         rvOrder.setLayoutManager(layoutManager);
@@ -96,13 +92,13 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
         Button btnOk = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         btnOk.setOnClickListener(v -> presenter.onCompleteButtonClicked());
 
-        viewBinding.cbDesc.setOnCheckedChangeListener((buttonView, isChecked) ->
+        binding.cbDesc.setOnCheckedChangeListener((buttonView, isChecked) ->
                 presenter.onReverseTypeSelected(isChecked)
         );
         if (requireArguments().getBoolean(FILE_NAME_SETTING_ARG)) {
-            onCheckChanged(viewBinding.cbUseFileName, presenter::onFileNameChecked);
+            onCheckChanged(binding.cbUseFileName, presenter::onFileNameChecked);
         } else {
-            viewBinding.cbUseFileName.setVisibility(View.GONE);
+            binding.cbUseFileName.setVisibility(View.GONE);
         }
         return dialog;
 
@@ -111,17 +107,17 @@ public class SelectOrderDialogFragment extends MvpAppCompatDialogFragment implem
     @Override
     public void showSelectedOrder(OrderType orderType) {
         orderAdapter.setCheckedItem(orderType);
-        viewBinding.cbDesc.setText(getReversedOrderText(orderType));
+        binding.cbDesc.setText(getReversedOrderText(orderType));
     }
 
     @Override
     public void showReverse(boolean selected) {
-        viewBinding.cbDesc.setChecked(selected);
+        binding.cbDesc.setChecked(selected);
     }
 
     @Override
     public void showFileNameEnabled(boolean checked) {
-        setChecked(viewBinding.cbUseFileName, checked);
+        setChecked(binding.cbUseFileName, checked);
     }
 
     @Override

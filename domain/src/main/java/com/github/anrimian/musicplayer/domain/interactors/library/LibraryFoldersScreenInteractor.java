@@ -4,6 +4,7 @@ import static com.github.anrimian.musicplayer.domain.utils.ListUtils.asList;
 
 import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
@@ -100,11 +101,11 @@ public class LibraryFoldersScreenInteractor {
         return foldersInteractor.addCompositionsToEnd(fileSources);
     }
 
-    public Single<List<Composition>> deleteFiles(List<FileSource> fileSources) {
+    public Single<List<DeletedComposition>> deleteFiles(List<FileSource> fileSources) {
         return foldersInteractor.deleteFiles(fileSources);
     }
 
-    public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
+    public Single<List<DeletedComposition>> deleteFolder(FolderFileSource folder) {
         return foldersInteractor.deleteFolder(folder);
     }
 

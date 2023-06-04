@@ -39,34 +39,34 @@ class RenameArtistDialogFragment: MvpAppCompatDialogFragment(), RenameArtistView
         Components.getArtistEditorComponent(id, name).renameArtistPresenter()
     }
 
-    private lateinit var viewBinding: DialogCommonInputBinding
+    private lateinit var binding: DialogCommonInputBinding
     private lateinit var btnChange: Button
 
     private lateinit var errorHandler: ErrorHandler
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        viewBinding = DialogCommonInputBinding.inflate(LayoutInflater.from(context))
+        binding = DialogCommonInputBinding.inflate(LayoutInflater.from(context))
         val dialog = AlertDialog.Builder(activity)
             .setTitle(R.string.edit_name)
             .setPositiveButton(R.string.change, null)
             .setNegativeButton(R.string.cancel) { _, _ -> }
-            .setView(viewBinding.root)
+            .setView(binding.root)
             .create()
         AndroidUtils.setSoftInputVisible(dialog.window)
         dialog.show()
 
         if (savedInstanceState == null) {
-            ViewUtils.setEditableText(viewBinding.etInput, requireArguments().getString(NAME_ARG))
+            ViewUtils.setEditableText(binding.etInput, requireArguments().getString(NAME_ARG))
         }
 
-        viewBinding.etInput.imeOptions = EditorInfo.IME_ACTION_DONE
-        viewBinding.etInput.setRawInputType(InputType.TYPE_CLASS_TEXT)
-        viewBinding.etInput.setOnEditorActionListener { _, _, _ ->
+        binding.etInput.imeOptions = EditorInfo.IME_ACTION_DONE
+        binding.etInput.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.etInput.setOnEditorActionListener { _, _, _ ->
             presenter.onChangeButtonClicked()
             true
         }
-        SimpleTextWatcher.onTextChanged(viewBinding.etInput, presenter::onInputTextChanged)
-        viewBinding.etInput.requestFocus()
+        SimpleTextWatcher.onTextChanged(binding.etInput, presenter::onInputTextChanged)
+        binding.etInput.requestFocus()
 
         btnChange = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         btnChange.setOnClickListener { presenter.onChangeButtonClicked() }
@@ -81,19 +81,19 @@ class RenameArtistDialogFragment: MvpAppCompatDialogFragment(), RenameArtistView
 
     override fun showProgress() {
         btnChange.isEnabled = false
-        viewBinding.etInput.isEnabled = false
-        viewBinding.tvError.visibility = View.GONE
-        viewBinding.tvProgress.visibility = View.VISIBLE
-        viewBinding.tvProgress.setText(R.string.rename_progress)
-        viewBinding.progressBar.visibility = View.VISIBLE
+        binding.etInput.isEnabled = false
+        binding.tvError.visibility = View.GONE
+        binding.tvProgress.visibility = View.VISIBLE
+        binding.tvProgress.setText(R.string.rename_progress)
+        binding.progressBar.visibility = View.VISIBLE
     }
 
     override fun showInputState() {
         btnChange.isEnabled = true
-        viewBinding.etInput.isEnabled = true
-        viewBinding.tvError.visibility = View.GONE
-        viewBinding.tvProgress.visibility = View.GONE
-        viewBinding.progressBar.visibility = View.GONE
+        binding.etInput.isEnabled = true
+        binding.tvError.visibility = View.GONE
+        binding.tvProgress.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
     }
 
     override fun showError(errorCommand: ErrorCommand) {
@@ -107,11 +107,11 @@ class RenameArtistDialogFragment: MvpAppCompatDialogFragment(), RenameArtistView
     }
 
     override fun showPreparedFilesCount(processed: Int, total: Int) {
-        viewBinding.tvProgress.text = getString(R.string.downloading, processed, total)
+        binding.tvProgress.text = getString(R.string.downloading, processed, total)
     }
 
     override fun showDownloadingFileInfo(progressInfo: ProgressInfo) {
-        viewBinding.progressBar.setExtProgress(progressInfo.asInt())
+        binding.progressBar.setExtProgress(progressInfo.asInt())
     }
 
     override fun showEditedFilesCount(processed: Int, total: Int) {
@@ -120,7 +120,7 @@ class RenameArtistDialogFragment: MvpAppCompatDialogFragment(), RenameArtistView
         } else {
             getString(R.string.rename_progress)
         }
-        viewBinding.tvProgress.text = message
+        binding.tvProgress.text = message
     }
 
     override fun showChangeAllowed(enabled: Boolean) {
@@ -129,11 +129,11 @@ class RenameArtistDialogFragment: MvpAppCompatDialogFragment(), RenameArtistView
 
     private fun showError(message: String) {
         btnChange.isEnabled = true
-        viewBinding.etInput.isEnabled = true
-        viewBinding.tvProgress.visibility = View.GONE
-        viewBinding.progressBar.visibility = View.GONE
-        viewBinding.tvError.visibility = View.VISIBLE
-        viewBinding.tvError.text = message
+        binding.etInput.isEnabled = true
+        binding.tvProgress.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+        binding.tvError.visibility = View.VISIBLE
+        binding.tvError.text = message
     }
 
 }

@@ -4,6 +4,7 @@ import androidx.core.util.Pair;
 
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 
 import java.util.List;
@@ -26,9 +27,9 @@ public interface StorageFilesDataSource {
                                        String directoryName,
                                        List<FilePathComposition> updatedCompositions);
 
-    List<Composition> deleteCompositionFiles(List<Composition> compositions, Object tokenForDelete);
+    List<DeletedComposition> deleteCompositionFiles(List<DeletedComposition> compositions, Object tokenForDelete);
 
-    void deleteCompositionFile(Composition composition);
+    DeletedComposition deleteCompositionFile(DeletedComposition composition);
 
     void clearDeleteData();
 }

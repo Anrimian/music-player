@@ -26,6 +26,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.CompositeCallback;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteItemDecorator;
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.swipe_to_delete.SwipeToDeleteTouchHelperCallback;
 
+import me.zhanghai.android.fastscroll.DefaultAnimationHelper;
 import me.zhanghai.android.fastscroll.FastScrollerBuilder;
 import me.zhanghai.android.fastscroll.PublicRecyclerViewHelper;
 
@@ -142,11 +143,17 @@ public class RecyclerViewUtils {
                 0,
                 thumbVerticalPadding + listBottomPadding);
 
-        new FastScrollerBuilder(recyclerView)
+        FastScrollerBuilder builder = new FastScrollerBuilder(recyclerView)
                 .setTrackDrawable(trackDrawable)
                 .setThumbDrawable(thumbDrawable)
                 .setPadding(padding)
-                .setViewHelper(new PublicRecyclerViewHelper(recyclerView))
-                .build();
+                .setViewHelper(new PublicRecyclerViewHelper(recyclerView));
+        builder.setAnimationHelper(new DefaultAnimationHelper(recyclerView) {
+            @Override
+            public int getScrollbarAutoHideDelayMillis() {
+                return 250;
+            }
+        });
+        builder.build();
     }
 }

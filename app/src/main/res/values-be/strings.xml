@@ -229,7 +229,6 @@
     <string name="sound_balance_state">Левы: %1$d%%, Правы: %2$d%%</string>
     <string name="language">Мова</string>
     <string name="follow_system_language">Выкарыстоўваць мову сістэмы</string>
-
     <string name="move">Перамясціць</string>
     <string name="no_compositions_in_folder">Кампазіцыі ў тэчцы не знойдзены</string>
     <string name="follow_system_theme">Ужываць сістэмную тэму</string>
@@ -251,6 +250,32 @@
         Перамесціце аўдыё файлы ў гэтыя тэчкі і дзеянне павінна будзе працаваць карэктна.
     </string>
     <string name="folder_already_excluded_from_scanning">Гэтая тэчка ўжо выключана з сканавання</string>
+    <string name="no_file_modify_permission">Адсутнічае дазвол для мадыфікацыі файла</string>
+    <string name="interface_settings">Інтэрфейс</string>
+    <string name="enable_player_screens_swipe">Уключыць пераключэнне жэстамі паміж экранамі чаргі прайгравання і тэксту кампазіцыі</string>
+    <string name="no_enough_data_to_play">Недастаткова дадзеных для прайгравання кампазіцыі</string>
+    <string name="permission_required">Патрабуецца дазвол</string>
+    <string name="open_app_settings">Адкрыць налады прыкладання</string>
+    <string name="file_is_corrupted">Файл пашкоджаны</string>
+    <string name="keep_notification_after_pause">Прадухіляць аўтаматычнае закрыццё апавяшчэння аб прайграванні пасля паўзы</string>
+    <string name="unknown_play_error">Невядомая памылка прайгравання файла</string>
+    <string name="file_read_timeout">Перавышаны час чытання файла</string>
+    <string name="tag_reading_error">Памылка чытання тэгаў: %s</string>
+    <string name="track_number">Нумар трэка</string>
+    <string name="change_track_number">Змяніць нумар трэка</string>
+    <string name="disc_number">Нумар дыска</string>
+    <string name="change_disc_number">Змяніць нумар дыска</string>
+    <string name="comment">Каментар</string>
+    <string name="change_comment">Змяніць каментар</string>
+    <string name="disc_short">Дыск %d</string>
+    <string name="track_short">Трэк %d</string>
+    <string name="with_delay">Праз %.1fс</string>
+    <string name="insert_to_playlist_beginning">Устаўляць новыя кампазіцыі ў пачатак плэйліста</string>
+    <string name="export_playlist">Захаваць як .m3u файл</string>
+    <string name="import_playlist">Імпартаваць плэйліст</string>
+    <string name="overwrite_playlist">Плэйліст з такім імем ужо існуе. \nПеразапісаць яго?</string>
+    <string name="playlist_has_no_records">Плейліст не мае кампазіцый</string>
+    <string name="export_playlists_success">Файл \"%1$s.m3u\" быў захаваны ва ўнутранае сховішча</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s кампазіцыя</item>
@@ -320,6 +345,27 @@
         <item quantity="few">Выдаліць %1$s кампазіцыі</item>
         <item quantity="many">Выдаліць %1$s кампазіцый</item>
         <item quantity="other">Выдаліць %d кампазіцый</item>
+    </plurals>
+
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">На працягу не менш %d хвіліны</item>
+        <item quantity="few">На працягу не менш %d хвілін</item>
+        <item quantity="many">На працягу не менш %d хвілін</item>
+        <item quantity="other">На працягу не менш %d хвілін</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d плэйліст быў захаваны ва ўнутранае сховішча</item>
+        <item quantity="few">%d плэйліста былі захаваныя ва ўнутранае сховішча</item>
+        <item quantity="many">%d плэйлістоў былі захаваныя ва ўнутранае сховішча</item>
+        <item quantity="other">%d плэйлістоў былі захаваныя ва ўнутранае сховішча</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">Плэйліст быў імпартаваны паспяхова, але %d файл быў не знойдзены ў бібліятэцы</item>
+        <item quantity="few">Плэйліст быў імпартаваны паспяхова, але %d файла былі не знойдзены ў бібліятэцы</item>
+        <item quantity="many">Плэйліст быў імпартаваны паспяхова, але %d файлаў былі не знойдзены ў бібліятэцы</item>
+        <item quantity="other">Плэйліст быў імпартаваны паспяхова, але %d файлаў былі не знойдзены ў бібліятэцы</item>
     </plurals>
 
 </resources>

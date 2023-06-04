@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils
 
+import android.animation.Animator
+import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.Context
@@ -8,6 +10,7 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.Button
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
@@ -19,17 +22,33 @@ import androidx.viewpager2.widget.ViewPager2
 
 
 fun View.runHighlightAnimation(@ColorInt highlightColor: Int) {
-    val colorAnimator = getHighlightAnimator(Color.TRANSPARENT, highlightColor)
-    colorAnimator.addUpdateListener { animator -> setBackgroundColor(animator.animatedValue as Int) }
-    colorAnimator.start()
+    getHighlightAnimator(Color.TRANSPARENT, highlightColor, ::setBackgroundColor).start()
 }
 
-fun getHighlightAnimator(@ColorInt colorFrom: Int, @ColorInt highlightColor: Int): ValueAnimator {
-    val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, highlightColor, colorFrom)
-    colorAnimation.interpolator = AccelerateInterpolator()
-    colorAnimation.duration = 600
-    colorAnimation.repeatCount = 2
-    return colorAnimation
+fun getHighlightAnimator(
+    @ColorInt colorFrom: Int,
+    @ColorInt highlightColor: Int,
+    updateListener: (Int) -> Unit
+): Animator {
+    val animatorUpdateListener = ValueAnimator.AnimatorUpdateListener { animator ->
+        updateListener(animator.animatedValue as Int)
+    }
+    return AnimatorSet().apply {
+        playSequentially(
+            ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, highlightColor).apply {
+                startDelay = 50
+                duration = 300
+                interpolator = AccelerateInterpolator()
+                addUpdateListener(animatorUpdateListener)
+            },
+            ValueAnimator.ofObject(ArgbEvaluator(), highlightColor, colorFrom).apply {
+                startDelay = 1300
+                duration = 300
+                interpolator = DecelerateInterpolator()
+                addUpdateListener(animatorUpdateListener)
+            }
+        )
+    }
 }
 
 fun View.moveToParent(newParent: ViewGroup) {
@@ -59,7 +78,7 @@ fun ViewPager2.reduceDragSensitivityBy(f: Int) {
         val touchSlop = touchSlopField.get(recyclerView) as Int
         touchSlopField.set(recyclerView, touchSlop * f)
     } catch (ignored: NoSuchFieldException) {}
-      catch (ignored: IllegalAccessException) {}
+    catch (ignored: IllegalAccessException) {}
 }
 
 fun Context.createStyledButton(@StyleRes styleRes: Int): Button {

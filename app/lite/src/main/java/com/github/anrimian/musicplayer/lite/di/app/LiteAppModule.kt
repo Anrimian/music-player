@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusic
 import com.github.anrimian.musicplayer.data.storage.source.ContentSourceHelper
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.lite.ui.AboutTextBinderImpl
 import com.github.anrimian.musicplayer.lite.ui.SpecialNavigationImpl
 import com.github.anrimian.musicplayer.ui.about.AboutTextBinder
@@ -29,7 +30,7 @@ class LiteAppModule {
 
     @Provides
     @Singleton
-    fun syncInteractor(): SyncInteractor<*, *, Long> = StubSyncInteractor<Any, Any, Long>()
+    fun syncInteractor(): SyncInteractor<FileKey, *, Long> = StubSyncInteractor<FileKey, Any, Long>()
 
     @Provides
     @Singleton

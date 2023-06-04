@@ -5,12 +5,15 @@ import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelperKt;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
@@ -36,7 +39,7 @@ public class LibraryFoldersInteractor {
     private final EditorRepository editorRepository;
     private final LibraryPlayerInteractor musicPlayerInteractor;
     private final PlayListsInteractor playListsInteractor;
-    private final SyncInteractor<?, ?, Long> syncInteractor;
+    private final SyncInteractor<FileKey, ?, Long> syncInteractor;
     private final SettingsRepository settingsRepository;
     private final UiStateRepository uiStateRepository;
     private final MediaScannerRepository mediaScannerRepository;
@@ -45,7 +48,7 @@ public class LibraryFoldersInteractor {
                                     EditorRepository editorRepository,
                                     LibraryPlayerInteractor musicPlayerInteractor,
                                     PlayListsInteractor playListsInteractor,
-                                    SyncInteractor<?, ?, Long> syncInteractor,
+                                    SyncInteractor<FileKey, ?, Long> syncInteractor,
                                     SettingsRepository settingsRepository,
                                     UiStateRepository uiStateRepository,
                                     MediaScannerRepository mediaScannerRepository) {
@@ -70,7 +73,7 @@ public class LibraryFoldersInteractor {
 
     public void playAllMusicInFolder(@Nullable Long folderId) {
         libraryRepository.getAllCompositionsInFolder(folderId)
-                .doOnSuccess(musicPlayerInteractor::startPlaying)
+                .doOnSuccess(musicPlayerInteractor::startPlayingCompositions)
                 .subscribe();
     }
 
@@ -99,7 +102,7 @@ public class LibraryFoldersInteractor {
                     int firstPosition = ListUtils.findPosition(
                             compositions,
                             composition -> composition.getId() == compositionId);
-                    musicPlayerInteractor.startPlaying(compositions, firstPosition);
+                    musicPlayerInteractor.startPlayingCompositions(compositions, firstPosition);
                 })
                 .subscribe();
     }
@@ -114,12 +117,12 @@ public class LibraryFoldersInteractor {
                 .flatMap(musicPlayerInteractor::addCompositionsToEnd);
     }
 
-    public Single<List<Composition>> deleteFiles(List<FileSource> fileSources) {
+    public Single<List<DeletedComposition>> deleteFiles(List<FileSource> fileSources) {
         return libraryRepository.deleteFolders(fileSources)
                 .doOnSuccess(this::onCompositionsDeleted);
     }
 
-    public Single<List<Composition>> deleteFolder(FolderFileSource folder) {
+    public Single<List<DeletedComposition>> deleteFolder(FolderFileSource folder) {
         return libraryRepository.deleteFolder(folder)
                 .doOnSuccess(this::onCompositionsDeleted);
     }
@@ -189,13 +192,13 @@ public class LibraryFoldersInteractor {
                     // so compare by references too
                     int firstPosition = ListUtils.findPosition(compositions,
                             c -> c.equals(composition) && c == composition);
-                    musicPlayerInteractor.startPlaying(compositions, firstPosition);
+                    musicPlayerInteractor.startPlayingCompositions(compositions, firstPosition);
                 })
                 .subscribe();
     }
 
-    private void onCompositionsDeleted(List<Composition> compositions) {
-        syncInteractor.onLocalFilesDeleted(ListUtils.mapList(compositions, Composition::getId));
+    private void onCompositionsDeleted(List<DeletedComposition> compositions) {
+        syncInteractor.onLocalFilesDeleted(CompositionHelperKt.toFileKeys(compositions));
     }
 
 }

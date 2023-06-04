@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.domain.interactors.player
 
+import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
@@ -10,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
@@ -28,6 +30,7 @@ import org.mockito.kotlin.*
 class LibraryPlayerInteractorTest {
 
     private val playerCoordinatorInteractor: PlayerCoordinatorInteractor = mock()
+    private val syncInteractor: SyncInteractor<FileKey, *, Long> = mock()
     private val settingsRepository: SettingsRepository = mock()
     private val playQueueRepository: PlayQueueRepository = mock()
     private val musicProviderRepository: LibraryRepository = mock()
@@ -62,7 +65,6 @@ class LibraryPlayerInteractorTest {
 
     @BeforeEach
     fun setUp() {
-        whenever(playQueueRepository.setPlayQueue(any())).thenReturn(Completable.complete())
         whenever(playQueueRepository.setPlayQueue(any(), anyInt())).thenReturn(Completable.complete())
         whenever(playQueueRepository.currentQueueItemObservable).thenReturn(currentCompositionSubject)
         whenever(playQueueRepository.skipToNext()).thenReturn(Single.just(1))
@@ -76,13 +78,14 @@ class LibraryPlayerInteractorTest {
         whenever(musicProviderRepository.writeErrorAboutComposition(any(), any()))
             .thenReturn(Completable.complete())
         whenever(musicProviderRepository.deleteComposition(any()))
-            .thenReturn(Completable.complete())
+            .thenReturn(Single.just(mock()))
 
         whenever(settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled).thenReturn(true)
         whenever(settingsRepository.isPauseOnAudioFocusLossEnabled).thenReturn(true)
 
         libraryPlayerInteractor = LibraryPlayerInteractor(
             playerCoordinatorInteractor,
+            syncInteractor,
             settingsRepository,
             playQueueRepository,
             musicProviderRepository,
@@ -93,7 +96,7 @@ class LibraryPlayerInteractorTest {
 
     @Test
     fun `start playing test`() {
-        val queue: List<Composition> = mock()
+        val queue: List<Long> = mock()
         libraryPlayerInteractor.startPlaying(queue, 0)
 
         playQueueRepository.setPlayQueue(eq(queue), eq(0))

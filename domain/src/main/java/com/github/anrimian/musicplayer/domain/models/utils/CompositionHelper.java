@@ -14,6 +14,7 @@ import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileN
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
@@ -77,6 +78,10 @@ public class CompositionHelper {
     }
 
     public static String formatCompositionName(Composition composition) {
+        return composition.getTitle();
+    }
+
+    public static String formatCompositionName(DeletedComposition composition) {
         return composition.getTitle();
     }
 

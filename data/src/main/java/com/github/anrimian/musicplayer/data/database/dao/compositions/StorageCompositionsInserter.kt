@@ -96,7 +96,7 @@ class StorageCompositionsInserter(
 
         //if we had not found composition - just remove not_found mark
         val id = compositionsDao.findCompositionByFileName(composition.fileName, folderId)
-        if (id != 0L) {
+        if (id != null) {
             val storageId = compositionsDao.selectStorageId(id)
             val actualStorageId = composition.storageId
             if (storageId != actualStorageId) {

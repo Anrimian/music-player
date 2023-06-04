@@ -6,7 +6,7 @@ import io.reactivex.rxjava3.core.Observable
 
 class LibrarySettingsInteractor(
     private val settingsRepository: SettingsRepository,
-    private val mediaScannerRepository: MediaScannerRepository
+    private val mediaScannerRepository: MediaScannerRepository,
 ) {
 
     fun getAppConfirmDeleteDialogEnabledObservable(): Observable<Boolean> = settingsRepository.appConfirmDeleteDialogEnabledObservable
@@ -33,5 +33,11 @@ class LibrarySettingsInteractor(
 
     fun getShowAllAudioFilesEnabledObservable(): Observable<Boolean> =
         settingsRepository.showAllAudioFilesEnabledObservable
+
+    fun setPlaylistInsertStartEnabled(enabled: Boolean) {
+        settingsRepository.isPlaylistInsertStartEnabled = enabled
+    }
+
+    fun isPlaylistInsertStartEnabled(): Boolean = settingsRepository.isPlaylistInsertStartEnabled
 
 }

@@ -653,10 +653,12 @@ public class StorageMusicProvider {
             if (filePath == null) {
                 filePath = "";
             }
-            int lastCharIndex = filePath.length() - 1;
-            char lastChar = filePath.charAt(lastCharIndex);
-            if (lastChar == '/') {
-                filePath = filePath.substring(0, lastCharIndex);
+            if (!filePath.isEmpty()) {
+                int lastCharIndex = filePath.length() - 1;
+                char lastChar = filePath.charAt(lastCharIndex);
+                if (lastChar == '/') {
+                    filePath = filePath.substring(0, lastCharIndex);
+                }
             }
         } else {
             filePath = cursorWrapper.getString(filePathIndex);
@@ -812,12 +814,7 @@ public class StorageMusicProvider {
         if (e instanceof IllegalArgumentException
                 && message != null
                 && message.contains("not allowed for content")) {
-            int indexOfFirstQuotes = message.indexOf('[') + 1;
-            String allowedFolders = message.substring(
-                    indexOfFirstQuotes,
-                    message.indexOf(']', indexOfFirstQuotes)
-            );
-            throw new NotAllowedPathException(allowedFolders);
+            throw new NotAllowedPathException();
         }
     }
 }

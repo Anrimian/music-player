@@ -1,8 +1,9 @@
 package com.github.anrimian.musicplayer.ui.common.dialogs.share
 
 import com.github.anrimian.filesync.SyncInteractor
-import com.github.anrimian.filesync.models.state.file.Downloading
+import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.interactors.player.CompositionSourceInteractor
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
@@ -11,7 +12,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 class ShareCompositionsPresenter(
     private val ids: LongArray,
     private val sourceInteractor: CompositionSourceInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     uiScheduler: Scheduler,
     errorParser: ErrorParser,
 ): AppPresenter<ShareCompositionsView>(uiScheduler, errorParser) {
@@ -37,7 +38,7 @@ class ShareCompositionsPresenter(
                     .doOnSubscribe { viewState.showProcessedFileCount(++preparedCount, ids.size) }
             }
             .subscribe { fileSyncState ->
-                if (fileSyncState is Downloading) {
+                if (fileSyncState is FileSyncState.Downloading) {
                     viewState.showDownloadingFileInfo(fileSyncState.getProgress())
                 }
             }

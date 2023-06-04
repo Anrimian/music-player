@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.mvp.MvpDiffAdapter
@@ -23,7 +24,7 @@ class PlayQueueViewHolder(
 ) : MvpDiffAdapter.MvpViewHolder(inflater.inflate(R.layout.item_play_queue, parent, false)),
     DragListener, SwipeListener {
 
-    private val compositionItemWrapper: CompositionItemWrapper
+    private val compositionItemWrapper: CompositionItemWrapper<Composition>
 
     private lateinit var playQueueItem: PlayQueueItem
 

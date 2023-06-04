@@ -3,10 +3,10 @@ package com.github.anrimian.filesync.stubs
 import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.filesync.models.RemoteFileSource
 import com.github.anrimian.filesync.models.SyncEnvCondition
-import com.github.anrimian.filesync.models.repo.RemoteRepoCredentials
 import com.github.anrimian.filesync.models.repo.RemoteRepoFullInfo
 import com.github.anrimian.filesync.models.repo.RemoteRepoInfo
 import com.github.anrimian.filesync.models.repo.RemoteRepoType
+import com.github.anrimian.filesync.models.repo.RepoSetupTemplate
 import com.github.anrimian.filesync.models.state.SyncState
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.filesync.models.task.FileTaskInfo
@@ -18,12 +18,11 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
     override fun onAppStarted() {}
     override fun requestFileSync() {}
     override fun runFileTasks() {}
-    override fun addRemoteRepository(
-        type: RemoteRepoType,
-        credentials: RemoteRepoCredentials
-    ): Completable {
+
+    override fun addRemoteRepository(template: RepoSetupTemplate): Completable {
         return Completable.never()
     }
+
     override fun removeRemoteRepository(repo: RemoteRepoInfo): Completable {
         return Completable.never()
     }
@@ -32,8 +31,8 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
         return Completable.never()
     }
     override fun onLocalFileAdded() {}
-    override fun onLocalFileDeleted(id: I) {}
-    override fun onLocalFilesDeleted(ids: List<I>) {}
+    override fun onLocalFileDeleted(key: K) {}
+    override fun onLocalFilesDeleted(keys: List<K>) {}
     override fun notifyLocalFileChanged() {}
     override fun isSyncEnabled() = false
     override fun setSyncEnabled(enabled: Boolean) {}

@@ -1,12 +1,13 @@
 package com.github.anrimian.musicplayer.ui.library.albums.items
 
 import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsView
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 import moxy.viewstate.strategy.alias.Skip
 
-interface AlbumItemsView : BaseLibraryCompositionsView {
+interface AlbumItemsView : BaseLibraryCompositionsView<AlbumComposition> {
 
     @AddToEndSingle
     fun showAlbumInfo(album: Album)

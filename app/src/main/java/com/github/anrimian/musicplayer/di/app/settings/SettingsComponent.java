@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app.settings;
 
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsPresenter;
+import com.github.anrimian.musicplayer.ui.settings.headset.HeadsetSettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersPresenter;
@@ -13,6 +14,7 @@ public interface SettingsComponent {
     DisplaySettingsPresenter displaySettingsPresenter();
     PlayerSettingsPresenter playerSettingsPresenter();
     LibrarySettingsPresenter librarySettingsPresenter();
+    HeadsetSettingsPresenter headsetSettingsPresenter();
 
     EnabledMediaPlayersPresenter enabledMediaPlayersPresenter();
 }

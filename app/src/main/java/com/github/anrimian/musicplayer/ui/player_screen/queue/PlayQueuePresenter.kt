@@ -10,6 +10,7 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
@@ -18,13 +19,14 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilt
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
-import java.util.*
+import java.util.Collections
+import java.util.LinkedList
 
 class PlayQueuePresenter(
     private val playerInteractor: LibraryPlayerInteractor,
     private val playListsInteractor: PlayListsInteractor,
     private val playerScreenInteractor: PlayerScreenInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ): AppPresenter<PlayQueueView>(uiScheduler, errorParser) {
@@ -130,7 +132,7 @@ class PlayQueuePresenter(
         if (lastDeleteAction != null) {
             lastDeleteAction!!
                 .doFinally { lastDeleteAction = null }
-                .subscribe({}, this::onDeleteCompositionError)
+                .justSubscribe(this::onDeleteCompositionError)
         }
     }
 
@@ -138,7 +140,7 @@ class PlayQueuePresenter(
         playerInteractor.restoreDeletedItem().justSubscribe(this::onDefaultError)
     }
 
-    fun onPlayListForAddingCreated(playList: PlayList?) {
+    fun onPlayListForAddingCreated(playList: PlayList) {
         val compositionsToAdd = playQueue.map(PlayQueueItem::getComposition)
         playListsInteractor.addCompositionsToPlayList(compositionsToAdd, playList)
             .subscribeOnUi(

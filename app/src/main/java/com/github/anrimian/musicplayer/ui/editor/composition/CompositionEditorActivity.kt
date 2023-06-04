@@ -3,11 +3,11 @@ package com.github.anrimian.musicplayer.ui.editor.composition
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
-import com.github.anrimian.filesync.models.state.file.Downloading
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.Constants.Tags
@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.utils.FileUtils
+import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.activity.PickImageContract
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
@@ -68,6 +69,9 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
     private lateinit var addGenreDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var editGenreDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var lyricsDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
+    private lateinit var trackNumberDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
+    private lateinit var discNumberDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
+    private lateinit var commentDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
     private lateinit var coverMenuDialogRunner: DialogFragmentRunner<MenuDialogFragment>
     private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
 
@@ -103,24 +107,27 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         viewBinding.changeAlbumArtistClickableArea.setOnClickListener { presenter.onChangeAlbumArtistClicked() }
         viewBinding.changeGenreClickableArea.setOnClickListener { presenter.onAddGenreItemClicked() }
         viewBinding.changeCoverClickableArea.setOnClickListener { presenter.onChangeCoverClicked() }
+        viewBinding.changeTrackNumberClickableArea.setOnClickListener { presenter.onChangeTrackNumberClicked() }
+        viewBinding.changeDiscNumberClickableArea.setOnClickListener { presenter.onChangeDiscNumberClicked() }
+        viewBinding.changeCommentClickableArea.setOnClickListener { presenter.onChangeCommentClicked() }
         viewBinding.changeLyricsClickableArea.setOnClickListener { presenter.onChangeLyricsClicked() }
 
-        ViewUtils.onLongClick(viewBinding.changeAuthorClickableArea) {
+        viewBinding.changeAuthorClickableArea.setOnLongClickListener {
             copyText(viewBinding.tvAuthor, viewBinding.tvAuthorHint)
         }
-        ViewUtils.onLongClick(viewBinding.changeTitleClickableArea) {
+        viewBinding.changeTitleClickableArea.setOnLongClickListener {
             copyText(viewBinding.tvTitle, viewBinding.tvTitleHint)
         }
         ViewUtils.onLongClick(viewBinding.changeFilenameClickableArea) {
             presenter.onCopyFileNameClicked()
         }
-        ViewUtils.onLongClick(viewBinding.changeAlbumClickableArea) {
+        viewBinding.changeAlbumClickableArea.setOnLongClickListener {
             copyText(viewBinding.tvAlbum, viewBinding.tvAlbumHint)
         }
-        ViewUtils.onLongClick(viewBinding.changeAlbumArtistClickableArea) {
+        viewBinding.changeAlbumArtistClickableArea.setOnLongClickListener {
             copyText(viewBinding.tvAlbumArtist, viewBinding.tvAlbumAuthorHint)
         }
-        ViewUtils.onLongClick(viewBinding.changeLyricsClickableArea) {
+        viewBinding.changeLyricsClickableArea.setOnLongClickListener {
             copyText(viewBinding.tvLyrics, viewBinding.tvLyricsHint)
         }
 
@@ -176,6 +183,20 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
                 presenter.onNewGenreNameEntered(name, GenreSerializer.deserializeShort(extra))
             }
         }
+        trackNumberDialogFragmentRunner = DialogFragmentRunner(fm, Tags.TRACK_NUMBER_TAG) { fragment ->
+            fragment.setOnCompleteListener { text ->
+                presenter.onNewTrackNumberEntered(text.toLongOrNull())
+            }
+        }
+        discNumberDialogFragmentRunner = DialogFragmentRunner(fm, Tags.DISC_NUMBER_TAG) { fragment ->
+            fragment.setOnCompleteListener { text ->
+                presenter.onNewDiscNumberEntered(text.toLongOrNull())
+            }
+        }
+        commentDialogFragmentRunner = DialogFragmentRunner(fm, Tags.DISC_NUMBER_TAG) { fragment ->
+            fragment.setOnCompleteListener(presenter::onNewCommentEntered)
+        }
+
         coverMenuDialogRunner = DialogFragmentRunner(
             fm,
             Tags.EDIT_COVER_TAG
@@ -216,19 +237,31 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         val album = composition.album
         viewBinding.tvAlbum.text = album
 
-        val albumArtistVisibility = if (album == null) View.GONE else View.VISIBLE
-        viewBinding.tvAlbumArtist.visibility = albumArtistVisibility
-        viewBinding.tvAlbumAuthorHint.visibility = albumArtistVisibility
-        viewBinding.ivAlbumArtist.visibility = albumArtistVisibility
-        viewBinding.dividerAlbumArtist.visibility = albumArtistVisibility
+        val albumFieldsVisibility = if (album == null) View.GONE else View.VISIBLE
+        viewBinding.tvAlbumArtist.visibility = albumFieldsVisibility
+        viewBinding.tvAlbumAuthorHint.visibility = albumFieldsVisibility
+        viewBinding.ivAlbumArtist.visibility = albumFieldsVisibility
+        viewBinding.dividerAlbumArtist.visibility = albumFieldsVisibility
+
+        viewBinding.tvTrackNumber.visibility = albumFieldsVisibility
+        viewBinding.tvTrackNumberHint.visibility = albumFieldsVisibility
+        viewBinding.ivTrackNumber.visibility = albumFieldsVisibility
+        viewBinding.dividerTrackNumber.visibility = albumFieldsVisibility
+
+        viewBinding.tvDiscNumber.visibility = albumFieldsVisibility
+        viewBinding.tvDiscNumberHint.visibility = albumFieldsVisibility
+        viewBinding.dividerTrackNumberVertical.visibility = albumFieldsVisibility
 
         //<return genres after deep scan implementation>
-//        dividerLyrics.setVisibility(albumArtistVisibility);
+//        dividerLyrics.setVisibility(albumFieldsVisibility);
 
         viewBinding.tvAlbumArtist.text = composition.albumArtist
         viewBinding.tvLyrics.text = composition.lyrics
         viewBinding.tvAuthor.text = FormatUtils.formatAuthor(composition.artist, this)
         viewBinding.tvFilename.text = FileUtils.formatFileName(composition.fileName, true)
+        viewBinding.tvTrackNumber.text = TextUtils.toString(composition.trackNumber)
+        viewBinding.tvDiscNumber.text = TextUtils.toString(composition.discNumber)
+        viewBinding.tvComment.text = composition.comment
     }
 
     override fun showCompositionCover(composition: FullComposition) {
@@ -343,6 +376,44 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         albumDialogFragmentRunner.show(fragment)
     }
 
+    override fun showEnterTrackNumberDialog(composition: FullComposition) {
+        val fragment = newInputTextDialogFragment(
+            R.string.change_track_number,
+            R.string.change,
+            R.string.cancel,
+            R.string.track_number,
+            composition.trackNumber?.toString(),
+            inputType = InputType.TYPE_CLASS_NUMBER,
+            digits = "123456789"
+        )
+        trackNumberDialogFragmentRunner.show(fragment)
+    }
+
+    override fun showEnterDiscNumberDialog(composition: FullComposition) {
+        val fragment = newInputTextDialogFragment(
+            R.string.change_disc_number,
+            R.string.change,
+            R.string.cancel,
+            R.string.disc_number,
+            composition.discNumber?.toString(),
+            inputType = InputType.TYPE_CLASS_NUMBER,
+            digits = "123456789"
+        )
+        discNumberDialogFragmentRunner.show(fragment)
+    }
+
+    override fun showEnterCommentDialog(composition: FullComposition) {
+        val fragment = newInputTextDialogFragment(
+            R.string.change_comment,
+            R.string.change,
+            R.string.cancel,
+            R.string.comment,
+            composition.comment,
+            completeOnEnterButton = false
+        )
+        commentDialogFragmentRunner.show(fragment)
+    }
+
     override fun showErrorMessage(errorCommand: ErrorCommand) {
         errorHandler.handleError(errorCommand) {
             MessagesUtils.makeSnackbar(
@@ -390,7 +461,7 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         val isFileRemote = composition.storageId == null && composition.initialSource == InitialSource.REMOTE
         showFileSyncState(fileSyncState, isFileRemote, viewBinding.pvFileState)
         progressDialogRunner.runAction { dialog ->
-            val message = if (fileSyncState is Downloading) {
+            val message = if (fileSyncState is FileSyncState.Downloading) {
                 val progress = fileSyncState.getProgress()
                 val progressPercentage = progress.asInt()
                 dialog.setProgress(progressPercentage)
@@ -415,9 +486,14 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
         onTextCopied()
     }
 
-    private fun copyText(textView: TextView, tvLabel: TextView) {
-        AndroidUtils.copyText(this, textView.text.toString(), tvLabel.text.toString())
+    private fun copyText(textView: TextView, tvLabel: TextView): Boolean {
+        val text = textView.text.toString()
+        if (text.isEmpty()) {
+            return false
+        }
+        AndroidUtils.copyText(this, text, tvLabel.text.toString())
         onTextCopied()
+        return true
     }
 
     private fun onTextCopied() {

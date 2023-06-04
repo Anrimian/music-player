@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 
 import java.util.Date;
@@ -31,9 +32,13 @@ public interface AlbumsDao {
     Observable<List<Album>> getAllObservable(SupportSQLiteQuery query);
 
     @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
-    Observable<List<Composition>> getCompositionsInAlbumObservable(SimpleSQLiteQuery query);
+    Observable<List<AlbumComposition>> getCompositionsInAlbumObservable(SimpleSQLiteQuery query);
 
-    @Query("SELECT id FROM compositions WHERE albumId = :albumId")
+    @RawQuery
+    List<Composition> getCompositionsInAlbum(SimpleSQLiteQuery query);
+
+    @Query("SELECT id FROM compositions WHERE albumId = :albumId " +
+            "ORDER BY discNumber, trackNumber, fileName")
     Single<List<Long>> getCompositionIdsInAlbum(long albumId);
 
     @Query("SELECT id as id," +
@@ -101,12 +106,26 @@ public interface AlbumsDao {
             ")")
     void updateAlbumCompositionsModifyTime(long albumId, Date dateModified);
 
+    static String getAlbumCompositionsQuery(boolean useFileName) {
+        return "SELECT " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                ", trackNumber AS trackNumber, " +
+                "discNumber AS discNumber " +
+                "FROM compositions " +
+                "WHERE albumId = ? " +
+                getAlbumItemsOrder();
+    }
+
     static String getCompositionsQuery(boolean useFileName) {
         return "SELECT " +
                 CompositionsDao.getCompositionSelectionQuery(useFileName) +
                 "FROM compositions " +
                 "WHERE albumId = ? " +
-                "ORDER BY fileName";
+                getAlbumItemsOrder();
+    }
+
+    private static String getAlbumItemsOrder() {
+        return "ORDER BY discNumber, trackNumber, fileName";
     }
 
 }

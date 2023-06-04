@@ -6,20 +6,14 @@ import com.github.anrimian.musicplayer.domain.models.order.OrderType
 import moxy.MvpPresenter
 
 class SelectOrderPresenter(
+    private var orderType: OrderType,
+    private var reverse: Boolean,
     private val settingsInteractor: DisplaySettingsInteractor
 ) : MvpPresenter<SelectOrderView>() {
-
-    private lateinit var orderType: OrderType
-    private var reverse = false
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.showFileNameEnabled(settingsInteractor.isDisplayFileNameEnabled())
-    }
-
-    fun setOrder(order: Order) {
-        orderType = order.orderType
-        reverse = order.isReversed
         viewState.showReverse(reverse)
         viewState.showSelectedOrder(orderType)
     }

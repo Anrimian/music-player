@@ -27,6 +27,8 @@ public interface SettingsRepository {
 
     void setCompositionsOrder(Order order);
 
+    Observable<Order> getCompositionsOrderObservable();
+
     Observable<Order> getFolderOrderObservable();
 
     Observable<Boolean> getCoversEnabledObservable();
@@ -129,9 +131,19 @@ public interface SettingsRepository {
 
     long getAudioFileMinDurationMillis();
 
+    void setPlaylistInsertStartEnabled(boolean enabled);
+
+    boolean isPlaylistInsertStartEnabled();
+
     void setPauseOnZeroVolumeLevelEnabled(boolean enabled);
 
     boolean isPauseOnZeroVolumeLevelEnabled();
+
+    Observable<Boolean> getPlayerScreensSwipeObservable();
+
+    void setPlayerScreensSwipeEnabled(boolean isEnabled);
+
+    boolean isPlayerScreensSwipeEnabled();
 
     Observable<Boolean> getDisplayFileNameObservable();
 
@@ -152,4 +164,12 @@ public interface SettingsRepository {
     SoundBalance getSoundBalance();
 
     void setSoundBalance(SoundBalance soundBalance);
+
+    long getKeepNotificationTime();
+
+    void setKeepNotificationTime(long millis);
+
+    long getBluetoothConnectAutoPlayDelay();
+
+    void setBluetoothConnectAutoPlayDelay(long millis);
 }

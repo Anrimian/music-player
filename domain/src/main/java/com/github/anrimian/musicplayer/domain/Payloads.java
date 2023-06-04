@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.domain;
 
 public interface Payloads {
-    Object CREATE_DATE = new Object();
     Object FILES_COUNT = new Object();
     Object FILE_NAME = new Object();
     Object ALBUM = new Object();
@@ -18,4 +17,6 @@ public interface Payloads {
     Object NAME = new Object();
     Object COMPOSITIONS_COUNT = new Object();
     Object FILE_EXISTS = new Object();
+    Object DISC_NUMBER = new Object();
+    Object TRACK_NUMBER = new Object();
 }

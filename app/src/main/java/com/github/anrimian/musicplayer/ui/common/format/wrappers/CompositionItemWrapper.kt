@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.format.wrappers
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.RippleDrawable
@@ -31,10 +32,10 @@ import com.github.anrimian.musicplayer.ui.utils.getHighlightAnimator
 import com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressView
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable
 
-class CompositionItemWrapper(
+open class CompositionItemWrapper<T: Composition>(
     itemView: View,
-    onIconClickListener: (Composition) -> Unit,
-    onClickListener: (Composition) -> Unit
+    onIconClickListener: (T) -> Unit,
+    onClickListener: (T) -> Unit
 ) {
     private val tvMusicName: TextView = itemView.findViewById(R.id.tv_composition_name)
     private val tvAdditionalInfo: TextView = itemView.findViewById(R.id.tv_additional_info)
@@ -50,7 +51,7 @@ class CompositionItemWrapper(
     private val stateDrawable = ItemDrawable()
     private val rippleMaskDrawable = ItemDrawable()
 
-    private lateinit var composition: Composition
+    protected lateinit var composition: T
 
     private var showCovers = false
     private var isCurrent = false
@@ -63,18 +64,18 @@ class CompositionItemWrapper(
         iconClickableArea.setOnClickListener { onIconClickListener(composition) }
         clickableItem.setOnClickListener { onClickListener(composition) }
 
-        backgroundDrawable.setColor(getContext().colorFromAttr(R.attr.listItemBackground))
+        backgroundDrawable.setColor(this.getContext().colorFromAttr(R.attr.listItemBackground))
         itemView.background = backgroundDrawable
         stateDrawable.setColor(Color.TRANSPARENT)
         clickableItem.background = stateDrawable
         clickableItem.foreground = RippleDrawable(
-            ColorStateList.valueOf(getContext().colorFromAttr(android.R.attr.colorControlHighlight)),
+            ColorStateList.valueOf(this.getContext().colorFromAttr(android.R.attr.colorControlHighlight)),
             null,
             rippleMaskDrawable
         )
     }
 
-    fun bind(composition: Composition, showCovers: Boolean) {
+    fun bind(composition: T, showCovers: Boolean) {
         this.composition = composition
         this.showCovers = showCovers
 
@@ -86,31 +87,32 @@ class CompositionItemWrapper(
         updateFileSyncState()
     }
 
-    fun update(composition: Composition, payloads: List<*>) {
+    fun update(composition: T, payloads: List<*>) {
         this.composition = composition
         for (payload in payloads) {
             if (payload is List<*>) {
                 update(composition, payload)
             }
-            if (payload === Payloads.FILE_NAME || payload === Payloads.TITLE) {
+            if (payload == Payloads.FILE_NAME || payload == Payloads.TITLE) {
                 showCompositionName()
             }
-            if (payload === Payloads.ARTIST || payload === Payloads.DURATION) {
+            if (payload == Payloads.ARTIST || payload == Payloads.DURATION) {
                 showAdditionalInfo()
             }
-            if (payload === Payloads.DATE_MODIFIED
-                || payload === Payloads.SIZE
-                || payload === Payloads.FILE_EXISTS
-                || payload === Payloads.COVER_MODIFY_TIME) {
+            if (payload == Payloads.DATE_MODIFIED
+                || payload == Payloads.SIZE
+                || payload == Payloads.FILE_EXISTS
+                || payload == Payloads.COVER_MODIFY_TIME) {
                 showCompositionImage(showCovers)
             }
-            if (payload === Payloads.CORRUPTED) {
+            if (payload == Payloads.CORRUPTED) {
                 showCorrupted()
                 showAdditionalInfo()
             }
-            if (payload === Payloads.FILE_EXISTS) {
+            if (payload == Payloads.FILE_EXISTS) {
                 updateFileSyncState()
             }
+            onUpdate(payload)
         }
     }
 
@@ -184,20 +186,40 @@ class CompositionItemWrapper(
     }
 
     fun runHighlightAnimation() {
-        val colorAnimator = getHighlightAnimator(
+        getHighlightAnimator(
             getContext().colorFromAttr(R.attr.listItemBackground),
-            getContext().getHighlightColor()
-        )
-        colorAnimator.addUpdateListener { animator ->
-            backgroundDrawable.setColor(animator.animatedValue as Int)
-        }
-        colorAnimator.start()
+            getContext().getHighlightColor(),
+            backgroundDrawable::setColor
+        ).start()
     }
 
     fun showFileSyncState(fileSyncState: FileSyncState?) {
         this.fileSyncState = fileSyncState
         updateFileSyncState()
     }
+
+    protected fun showAdditionalInfo() {
+        val sb: SpannableStringBuilder = DescriptionSpannableStringBuilder(getContext())
+        getAdditionalInfo(sb)
+        tvAdditionalInfo.text = sb
+    }
+
+    protected open fun getAdditionalInfo(sb: SpannableStringBuilder) {
+        sb.append(FormatUtils.formatCompositionAuthor(composition, getContext()))
+        sb.append(FormatUtils.formatMilliseconds(composition.duration))
+        val corruptionHint = getCorruptionTypeHint(composition)
+        if (corruptionHint != null) {
+            sb.append(corruptionHint)
+            val start = sb.length - corruptionHint.length
+            val end = sb.length
+            val fcs = ForegroundColorSpan(getContext().colorFromAttr(R.attr.colorError))
+            sb.setSpan(fcs, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
+        }
+    }
+
+    protected open fun getContext(): Context = clickableItem.context
+
+    protected open fun onUpdate(payload: Any?) {}
 
     private fun onCoverImageLoadFinished(loaded: Boolean) {
         var tint = Color.TRANSPARENT
@@ -241,21 +263,6 @@ class CompositionItemWrapper(
         ViewUtils.animateItemDrawableColor(stateDrawable, endColor)
     }
 
-    private fun showAdditionalInfo() {
-        val sb: SpannableStringBuilder = DescriptionSpannableStringBuilder(getContext())
-        sb.append(FormatUtils.formatCompositionAuthor(composition, getContext()))
-        sb.append(FormatUtils.formatMilliseconds(composition.duration))
-        val corruptionHint = getCorruptionTypeHint(composition)
-        if (corruptionHint != null) {
-            sb.append(corruptionHint)
-            val start = sb.length - corruptionHint.length
-            val end = sb.length
-            val fcs = ForegroundColorSpan(getContext().colorFromAttr(R.attr.colorError))
-            sb.setSpan(fcs, start, end, Spannable.SPAN_INCLUSIVE_INCLUSIVE)
-        }
-        tvAdditionalInfo.text = sb
-    }
-
     private fun getCorruptionTypeHint(composition: Composition): String? {
         val corruptionType = composition.corruptionType ?: return null
         return when (corruptionType) {
@@ -263,8 +270,9 @@ class CompositionItemWrapper(
             CorruptionType.NOT_FOUND -> getContext().getString(R.string.file_not_found)
             CorruptionType.SOURCE_NOT_FOUND -> getContext().getString(R.string.file_source_not_found)
             CorruptionType.TOO_LARGE_SOURCE -> getContext().getString(R.string.file_is_too_large)
-            CorruptionType.FILE_IS_CORRUPTED -> getContext().getString(R.string.unsupported_format_hint)
-            else -> null
+            CorruptionType.FILE_IS_CORRUPTED -> getContext().getString(R.string.file_is_corrupted)
+            CorruptionType.FILE_READ_TIMEOUT -> getContext().getString(R.string.file_read_timeout)
+            else -> getContext().getString(R.string.unknown_play_error)
         }
     }
 
@@ -276,8 +284,6 @@ class CompositionItemWrapper(
             pvFileState
         )
     }
-
-    private fun getContext() = clickableItem.context
 
     private fun getResources() = getContext().resources
 }

@@ -17,9 +17,7 @@ import io.reactivex.rxjava3.core.Single;
  */
 public interface PlayQueueRepository {
 
-    Completable setPlayQueue(List<Composition> compositions);
-
-    Completable setPlayQueue(List<Composition> compositions, int startPosition);
+    Completable setPlayQueue(List<Long> compositionIds, int startPosition);
 
     Flowable<Integer> getCurrentItemPositionObservable();
 

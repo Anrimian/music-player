@@ -66,8 +66,8 @@ class LibraryFoldersRootFragment : LibraryFragment(), FolderRootView, BackButton
         setupFolderTree()
     }
 
-    override fun onFragmentMovedOnTop() {
-        super.onFragmentMovedOnTop()
+    override fun onFragmentResumed() {
+        super.onFragmentResumed()
         val toolbar = requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar)
         toolbar.setSubtitle(R.string.folders)
         val folderNavigation = FragmentNavigation.from(childFragmentManager)

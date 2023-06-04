@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.CompositionSourceTags;
-import com.github.anrimian.musicplayer.domain.models.exceptions.EditorReadException;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -28,11 +27,14 @@ import org.jaudiotagger.tag.images.Artwork;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Maybe;
@@ -266,7 +268,7 @@ public class CompositionSourceEditor {
         return Single.fromCallable(() -> {
             try {
                 File file = contentSourceHelper.getAsFile(source);
-                AudioFile audioFile = getAudioFile(file);
+                AudioFile audioFile = readFile(file);
                 Tag tag = audioFile.getTagOrCreateDefault();
                 long fileSize = file.length();
                 int durationSeconds = audioFile.getAudioHeader().getTrackLength();
@@ -280,8 +282,10 @@ public class CompositionSourceEditor {
                         tag.getFirst(FieldKey.COMMENT),
                         tag.getFirst(FieldKey.LYRICS));
                 return new AudioFileInfo(fileSize, tags);
+            } catch (FileNotFoundException e) {
+                throw e;
             } catch (Exception e) {
-                throw new TagReaderException("Unable to read: " + source, e);
+                throw new TagReaderException(e.getMessage(), e);
             }
         });
     }
@@ -350,10 +354,15 @@ public class CompositionSourceEditor {
 
     private void editFile(CompositionContentSource source,
                           FieldKey genericKey,
-                          String value) throws Exception {
-        editAudioFileTag(source, tag -> tag.setField(genericKey, value == null? "" : value));
+                          @Nullable String value) throws Exception {
+        editAudioFileTag(source, tag -> {
+            if (value == null) {
+                tag.deleteField(genericKey);
+            } else {
+                tag.setField(genericKey, value);
+            }
+        });
     }
-
 
     private long editAudioFileTag(CompositionContentSource source,
                                   ThrowsCallback<Tag> callback) throws Exception {
@@ -384,7 +393,7 @@ public class CompositionSourceEditor {
         try {
             return AudioFileIO.read(file);
         } catch (CannotReadException e) {
-            throw new EditorReadException(e.getMessage());
+            throw new TagReaderException(e.getMessage(), e);
         }
     }
 

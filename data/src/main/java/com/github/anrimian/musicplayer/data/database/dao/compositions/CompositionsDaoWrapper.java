@@ -16,19 +16,25 @@ import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.models.composition.ExternalComposition;
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotFoundException;
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListEntry;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.CollectionUtilsKt;
+import com.github.anrimian.musicplayer.domain.utils.FileUtils;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -178,7 +184,7 @@ public class CompositionsDaoWrapper {
         });
     }
 
-    public void deleteAll(List<Long> ids) {
+    public void deleteAll(Long[] ids) {
         appDatabase.runInTransaction(() -> {
             compositionsDao.delete(ids);
             albumsDao.deleteEmptyAlbums();
@@ -466,14 +472,20 @@ public class CompositionsDaoWrapper {
         return compositionsDao.getFolderId(id);
     }
 
-    public List<ExternalComposition> getAllAsExternalCompositions() {
-        return compositionsDao.getAllAsExternalCompositions();
+    public List<ExternalComposition> getAllAsExternalCompositions(String parentPath) {
+        Long folderId = findFolderId(parentPath);
+        return compositionsDao.getAllAsExternalCompositions(folderId);
     }
 
+    @Nullable
     public Long findCompositionIdByFilePath(String parentPath, String fileName) {
         Long folderId = findFolderId(parentPath);
-        long id = compositionsDao.findCompositionByFileName(fileName, folderId);
-        if (id == 0) {
+        return compositionsDao.findCompositionByFileName(fileName, folderId);
+    }
+
+    public long requireCompositionIdByFilePath(String parentPath, String fileName) {
+        Long id = findCompositionIdByFilePath(parentPath, fileName);
+        if (id == null) {
             throw new CompositionNotFoundException(fileName + " not found");
         }
         return id;
@@ -516,6 +528,28 @@ public class CompositionsDaoWrapper {
                                                InitialSource initialSource,
                                                InitialSource updateFrom) {
         compositionsDao.updateCompositionInitialSource(id, initialSource, updateFrom);
+    }
+
+    public List<DeletedComposition> selectDeletedComposition(Long[] ids, boolean useFileName) {
+        String query = CompositionsDao.getDeletedCompositionQuery(useFileName, ids.length).toString();
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, ids);
+        return compositionsDao.selectDeletedComposition(sqlQuery);
+    }
+
+    public DeletedComposition selectDeletedComposition(Long id, boolean useFileName) {
+        return selectDeletedComposition(new Long[]{ id }, useFileName).get(0);
+    }
+
+    public List<Long> getCompositionIds(List<PlayListEntry> fileEntries,
+                                        HashMap<String, Long> pathIdMapCache) {
+        return ListUtils.mapListNotNull(fileEntries, entry -> {
+            String path = entry.getFilePath();
+            return CollectionUtilsKt.getOrPut(pathIdMapCache, path, () -> {
+                String parentPath = FileUtils.getParentDirPath(path);
+                String fileName = FileUtils.getFileName(path);
+                return findCompositionIdByFilePath(parentPath, fileName);
+            });
+        });
     }
 
     @Nullable

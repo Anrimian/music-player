@@ -27,7 +27,7 @@ class MusicFileViewHolder(
     menuClickListener: (View, Int, CompositionFileSource) -> Unit
 ) : FileViewHolder(parent, R.layout.item_storage_music), SwipeListener {
 
-    private val compositionItemWrapper: CompositionItemWrapper
+    private val compositionItemWrapper: CompositionItemWrapper<Composition>
 
     private lateinit var fileSource: CompositionFileSource
 

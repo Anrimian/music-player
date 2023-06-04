@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.folders.FileReference;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
@@ -39,4 +40,8 @@ public interface PlayListsRepository {
     Completable moveItemInPlayList(PlayList playList, int from, int to);
 
     Completable updatePlayListName(long playListId, String name);
+
+    Completable exportPlaylistsToFolder(List<PlayList> playlists, FileReference folder);
+
+    Single<Long> importPlaylistFile(FileReference file, boolean overwriteExisting);
 }

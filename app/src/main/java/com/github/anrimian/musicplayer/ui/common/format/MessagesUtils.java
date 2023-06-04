@@ -1,26 +1,22 @@
 package com.github.anrimian.musicplayer.ui.common.format;
 
-import android.annotation.SuppressLint;
+import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
+
 import android.content.Context;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.snackbar.SnackbarContentLayout;
 
 import java.util.List;
-
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFromAttr;
 
 public class MessagesUtils {
 
@@ -59,7 +55,7 @@ public class MessagesUtils {
         }
     }
 
-    public static String getDeleteCompleteMessage(Context context, List<Composition> compositions) {
+    public static String getDeleteCompleteMessage(Context context, List<DeletedComposition> compositions) {
         int size = compositions.size();
         if (size == 1) {
             return context.getString(R.string.delete_composition_success,

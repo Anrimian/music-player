@@ -6,12 +6,14 @@ import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerIn
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
@@ -32,7 +34,7 @@ class LibraryFoldersPresenter(
     private val interactor: LibraryFoldersScreenInteractor,
     private val playerInteractor: LibraryPlayerInteractor,
     private val displaySettingsInteractor: DisplaySettingsInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : AppPresenter<LibraryFoldersView>(uiScheduler, errorParser) {
@@ -64,11 +66,6 @@ class LibraryFoldersPresenter(
         subscribeOnMoveEnabledState()
         syncInteractor.getFilesSyncStateObservable()
             .unsafeSubscribeOnUi(viewState::showFilesSyncState)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        presenterDisposable.dispose()
     }
 
     fun onStop(listPosition: ListPosition) {
@@ -446,11 +443,11 @@ class LibraryFoldersPresenter(
         lastDeleteAction!!.justSubscribe(this::onDeleteCompositionsError)
     }
 
-    private fun onDeleteFolderSuccess(deletedCompositions: List<Composition>) {
+    private fun onDeleteFolderSuccess(deletedCompositions: List<DeletedComposition>) {
         viewState.showDeleteCompositionMessage(deletedCompositions)
     }
 
-    private fun onDeleteCompositionsSuccess(compositions: List<Composition>) {
+    private fun onDeleteCompositionsSuccess(compositions: List<DeletedComposition>) {
         viewState.showDeleteCompositionMessage(compositions)
         filesToDelete.clear()
         if (!selectedFiles.isEmpty()) {

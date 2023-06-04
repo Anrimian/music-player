@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.data.database.dao.artist;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.toArgs;
 
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
@@ -45,12 +46,24 @@ public class ArtistsDaoWrapper {
 
     public Observable<List<Composition>> getCompositionsByArtistObservable(long artistId, boolean useFileName) {
         String query = ArtistsDao.getCompositionsQuery(useFileName);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] {artistId} );
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] { artistId } );
         return artistsDao.getCompositionsByArtistObservable(sqlQuery);
     }
 
-    public Single<List<Long>> getAllCompositionsByArtist(long artistId) {
-        return artistsDao.getAllCompositionsByArtist(artistId);
+    /**
+     * Selection logic should be the same as in getAllCompositionIdsByArtist()
+     */
+    public List<Composition> getAllCompositionsByArtist(long artistId, boolean useFileName) {
+        String query = ArtistsDao.getAllCompositionsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, toArgs(artistId, 2));
+        return artistsDao.getCompositionsByArtist(sqlQuery);
+    }
+
+    /**
+     * Selection logic should be the same as in getAllCompositionsByArtist()
+     */
+    public Single<List<Long>> getAllCompositionIdsByArtist(long artistId) {
+        return artistsDao.getAllCompositionIdsByArtist(artistId);
     }
 
     public Observable<Artist> getArtistObservable(long artistId) {

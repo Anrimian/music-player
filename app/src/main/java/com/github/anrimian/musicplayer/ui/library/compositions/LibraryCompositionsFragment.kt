@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.databinding.FragmentLibraryCompositionsBi
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
@@ -30,7 +31,6 @@ import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
-import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
@@ -38,7 +38,7 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayL
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback
@@ -46,7 +46,8 @@ import com.google.android.material.snackbar.Snackbar
 import moxy.ktx.moxyPresenter
 
 class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCompositionsView,
-    BackButtonListener, FragmentLayerListener {
+    BackButtonListener,
+    FragmentNavigationListener {
 
     private val presenter by moxyPresenter {
         Components.getLibraryCompositionsComponent().libraryCompositionsPresenter()
@@ -56,13 +57,13 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
     private lateinit var layoutManager: LinearLayoutManager
 
     private lateinit var toolbar: AdvancedToolbar
-    private lateinit var adapter: CompositionsAdapter
+    private lateinit var adapter: CompositionsAdapter<Composition>
 
     private lateinit var choosePlayListDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
     private lateinit var selectOrderDialogRunner: DialogFragmentRunner<SelectOrderDialogFragment>
     private lateinit var deletingErrorHandler: ErrorHandler
 
-    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<LibraryCompositionsView> = presenter
+    override fun getLibraryPresenter(): LibraryCompositionsPresenter = presenter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -118,8 +119,8 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         }
     }
 
-    override fun onFragmentMovedOnTop() {
-        super.onFragmentMovedOnTop()
+    override fun onFragmentResumed() {
+        super.onFragmentResumed()
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
         toolbar.setSubtitle(R.string.compositions)
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText())
@@ -242,7 +243,7 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         }
     }
 
-    override fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>) {
+    override fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
         MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }

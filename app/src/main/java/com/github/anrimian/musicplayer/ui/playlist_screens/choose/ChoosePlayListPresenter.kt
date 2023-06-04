@@ -7,11 +7,11 @@ import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
 
 class ChoosePlayListPresenter(
-        private val playListsInteractor: PlayListsInteractor,
-        uiScheduler: Scheduler,
-        errorParser: ErrorParser
+    private val playListsInteractor: PlayListsInteractor,
+    uiScheduler: Scheduler,
+    errorParser: ErrorParser
 ) : AppPresenter<ChoosePlayListView>(uiScheduler, errorParser) {
-    
+
     private var slideOffset = 0f
 
     override fun onFirstViewAttach() {
@@ -36,7 +36,7 @@ class ChoosePlayListPresenter(
 
     fun onDeletePlayListDialogConfirmed(playList: PlayList) {
         playListsInteractor.deletePlayList(playList.id)
-                .subscribeOnUi({ onPlayListDeleted(playList) }, this::onPlayListDeletingError)
+            .subscribeOnUi({ onPlayListDeleted(playList) }, this::onPlayListDeletingError)
     }
 
     fun onChangePlayListNameButtonClicked(playList: PlayList) {
@@ -54,8 +54,7 @@ class ChoosePlayListPresenter(
 
     private fun subscribeOnPlayLists() {
         viewState.showLoading()
-        playListsInteractor.playListsObservable
-                .unsafeSubscribeOnUi(this::onPlayListsReceived)
+        playListsInteractor.getPlayListsObservable().unsafeSubscribeOnUi(this::onPlayListsReceived)
     }
 
     private fun onPlayListsReceived(list: List<PlayList>) {

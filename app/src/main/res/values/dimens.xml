@@ -57,6 +57,7 @@
 
     <!--checkbox-->
     <dimen name="checkbox_text_vertical_padding">12dp</dimen>
+    <dimen name="checkbox_description_padding">56dp</dimen>
 
     <!--radio button-->
     <dimen name="radio_button_text_margin_start">16dp</dimen>
@@ -118,6 +119,7 @@
 
     <!--covers-->
     <integer name="icon_image_size">130</integer>
+    <integer name="icon_media_session_image_size">500</integer>
     <integer name="icon_image_full_size">1000</integer>
 
     <!--snackbar-->
@@ -154,5 +156,8 @@
 
     <!--gradient-->
     <integer name="gradient_angle_start">0</integer>
+
+    <!--fast scroller-->
+    <dimen name="afs_min_touch_target_size">48dp</dimen>
 
 </resources>

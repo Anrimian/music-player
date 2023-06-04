@@ -257,7 +257,32 @@
          Ses dosyalarını bu klasörlere yerleştirin ve işlemin doğru şekilde gerçekleştirilmesi gerekir.
      </string>
     <string name="folder_already_excluded_from_scanning">Bu klasör zaten tarama dışında bırakıldı</string>
-
+    <string name="no_file_modify_permission">Dosyayı değiştirme izni yok</string>
+    <string name="interface_settings">Arayüz</string>
+    <string name="enable_player_screens_swipe">Çalma sırası ile şarkı sözü ekranı arasında geçiş yapmak için kaydırma hareketini etkinleştir</string>
+    <string name="no_enough_data_to_play">Kompozisyon çalmak için yeterli veri yok</string>
+    <string name="permission_required">İzin gerekli</string>
+    <string name="open_app_settings">Uygulama ayarlarını aç</string>
+    <string name="file_is_corrupted">Dosya bozuk</string>
+    <string name="keep_notification_after_pause">Oynatıcı bildiriminin duraklatıldıktan sonra otomatik olarak kapanmasını engelle</string>
+    <string name="unknown_play_error">Bilinmeyen dosya yürütme hatası</string>
+    <string name="file_read_timeout">Dosya okuma zaman aşımı</string>
+    <string name="tag_reading_error">Etiket okuma hatası: %s</string>
+    <string name="track_number">Parça numarası</string>
+    <string name="change_track_number">Parça numarasını değiştir</string>
+    <string name="disc_number">Disk numarası</string>
+    <string name="change_disc_number">Disk numarasını değiştir</string>
+    <string name="comment">Yorum</string>
+    <string name="change_comment">Yorumu değiştir</string>
+    <string name="disc_short">Disk %d</string>
+    <string name="track_short">Parça %d</string>
+    <string name="with_delay">%.1fs gecikmeli</string>
+    <string name="insert_to_playlist_beginning">Çalma listesinin başına yeni besteler ekleyin</string>
+    <string name="export_playlist">.m3u dosyası olarak kaydet</string>
+    <string name="import_playlist">Çalma listesini içe aktar</string>
+    <string name="overwrite_playlist">Bu ada sahip oynatma listesi zaten var.  \nÜzerine yazılsın mı?</string>
+    <string name="playlist_has_no_records">Oynatma listesinde kayıt yok</string>
+    <string name="export_playlists_success">\"%1$s.m3u\" dosyası dahili depolamaya kaydedildi</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s şarkı</item>
@@ -307,6 +332,21 @@
     <plurals name="delete_compositions_template">
         <item quantity="one">%d şarkıyı sil</item>
         <item quantity="other">Sil %d</item>
+    </plurals>
+
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">En az %d dakika için</item>
+        <item quantity="other">En az %d dakika boyunca</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d oynatma listesi dahili depolamaya kaydedildi</item>
+        <item quantity="other">%d oynatma listeleri dahili depolamaya kaydedildi</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">Oynatma listesi başarıyla içe aktarıldı, ancak %d dosya kitaplıkta bulunamadı</item>
+        <item quantity="other">Oynatma listesi başarıyla içe aktarıldı, ancak kitaplıkta %d dosya bulunamadı</item>
     </plurals>
 
 </resources>

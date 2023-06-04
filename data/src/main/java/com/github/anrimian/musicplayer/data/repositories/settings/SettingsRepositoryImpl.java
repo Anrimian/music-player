@@ -40,16 +40,19 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String COLORED_NOTIFICATION = "colored_notification";
     private static final String SHOW_NOTIFICATION_COVER_STUB = "show_notification_cover_stub";
     private static final String SHOW_COVERS_ON_LOCK_SCREEN = "show_covers_on_lock_screen";
+    private static final String IS_PLAYER_SCREENS_SWIPE_ENABLED = "is_player_screens_swipe_enabled";
     private static final String SHOW_FILE_NAME = "show_file_name";
 
     private static final String SHOW_APP_CONFIRM_DELETE_DIALOG = "show_app_confirm_delete_dialog";
     private static final String AUDIO_FILE_MIN_DURATION = "audio_file_min_duration";
     private static final String SHOW_ALL_AUDIO_FILES = "show_all_audio_files";
+    private static final String PLAY_LIST_INSERT_START = "play_list_insert_start";
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
     private static final String PAUSE_ON_AUDIO_FOCUS_LOSS = "pause_on_audio_focus_loss";
     private static final String PAUSE_ON_ZERO_VOLUME_LEVEL = "pause_on_zero_volume_level";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
+    private static final String KEEP_NOTIFICATION_TIME = "keep_notification_time";
     private static final String VOLUME_LEFT = "volume_left";
     private static final String VOLUME_RIGHT = "volume_right";
 
@@ -61,8 +64,11 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     private static final String ENABLED_MEDIA_PLAYERS = "enabled_media_players";
 
+    private static final String BLUETOOTH_CONNECT_AUTO_PLAY_DELAY = "bluetooth_connect_auto_play_delay";
+
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Order> compositionsOrderSubject = BehaviorSubject.create();
     private final BehaviorSubject<Order> folderOrderSubject = BehaviorSubject.create();
     private final BehaviorSubject<Order> artistsOrderSubject = BehaviorSubject.create();
     private final BehaviorSubject<Order> albumsOrderSubject = BehaviorSubject.create();
@@ -72,6 +78,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> coloredNotificationSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showNotificationCoverStubSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showCoversOnLockScreenSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> playerScreenSwipeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showFileNameSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAllAudioFilesSubject = BehaviorSubject.create();
@@ -198,6 +205,12 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setCompositionsOrder(Order order) {
         preferences.putInt(COMPOSITIONS_ORDER, orderToInt(order));
+        compositionsOrderSubject.onNext(order);
+    }
+
+    @Override
+    public Observable<Order> getCompositionsOrderObservable() {
+        return withDefaultValue(compositionsOrderSubject, this::getCompositionsOrder);
     }
 
     @Override
@@ -402,6 +415,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
+    public void setPlaylistInsertStartEnabled(boolean enabled) {
+        preferences.putBoolean(PLAY_LIST_INSERT_START, enabled);
+    }
+
+    @Override
+    public boolean isPlaylistInsertStartEnabled() {
+        return preferences.getBoolean(PLAY_LIST_INSERT_START);
+    }
+
+    @Override
     public Observable<Boolean> getNotificationCoverStubEnabledObservable() {
         return withDefaultValue(showNotificationCoverStubSubject, this::isNotificationCoverStubEnabled);
     }
@@ -428,6 +451,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public boolean isPauseOnZeroVolumeLevelEnabled() {
         return preferences.getBoolean(PAUSE_ON_ZERO_VOLUME_LEVEL, true);
+    }
+
+    @Override
+    public Observable<Boolean> getPlayerScreensSwipeObservable() {
+        return withDefaultValue(playerScreenSwipeSubject, this::isPlayerScreensSwipeEnabled);
+    }
+
+    @Override
+    public void setPlayerScreensSwipeEnabled(boolean isEnabled) {
+        if (isEnabled != isPlayerScreensSwipeEnabled()) {
+            preferences.putBoolean(IS_PLAYER_SCREENS_SWIPE_ENABLED, isEnabled);
+            playerScreenSwipeSubject.onNext(isEnabled);
+        }
+    }
+
+    @Override
+    public boolean isPlayerScreensSwipeEnabled() {
+        return preferences.getBoolean(IS_PLAYER_SCREENS_SWIPE_ENABLED, true);
     }
 
     @Override
@@ -493,6 +534,26 @@ public class SettingsRepositoryImpl implements SettingsRepository {
                 .putFloat(VOLUME_LEFT, soundBalance.getLeft())
                 .putFloat(VOLUME_RIGHT, soundBalance.getRight())
                 .apply();
+    }
+
+    @Override
+    public long getKeepNotificationTime() {
+        return preferences.getLong(KEEP_NOTIFICATION_TIME);
+    }
+
+    @Override
+    public void setKeepNotificationTime(long millis) {
+        preferences.putLong(KEEP_NOTIFICATION_TIME, millis);
+    }
+
+    @Override
+    public long getBluetoothConnectAutoPlayDelay() {
+        return preferences.getLong(BLUETOOTH_CONNECT_AUTO_PLAY_DELAY, 1500);
+    }
+
+    @Override
+    public void setBluetoothConnectAutoPlayDelay(long millis) {
+        preferences.putLong(BLUETOOTH_CONNECT_AUTO_PLAY_DELAY, millis);
     }
 
     private Order orderFromInt(int order) {

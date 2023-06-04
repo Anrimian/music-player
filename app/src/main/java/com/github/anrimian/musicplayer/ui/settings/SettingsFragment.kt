@@ -15,15 +15,16 @@ import com.github.anrimian.musicplayer.ui.settings.headset.HeadsetSettingsFragme
 import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsFragment
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsFragment
 import com.github.anrimian.musicplayer.ui.settings.themes.ThemeSettingsFragment
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 
 /**
  * Created on 19.10.2017.
  */
-class SettingsFragment : Fragment(), FragmentLayerListener {
+class SettingsFragment : Fragment(),
+    FragmentNavigationListener {
     
     private lateinit var viewBinding: FragmentSettingsBinding
     private lateinit var navigation: FragmentNavigation
@@ -51,7 +52,7 @@ class SettingsFragment : Fragment(), FragmentLayerListener {
         SlidrPanel.simpleSwipeBack(viewBinding.flContainer, this, toolbar::onStackFragmentSlided)
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
         val toolbar = requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar)
         toolbar.setTitle(R.string.settings)
         toolbar.subtitle = null

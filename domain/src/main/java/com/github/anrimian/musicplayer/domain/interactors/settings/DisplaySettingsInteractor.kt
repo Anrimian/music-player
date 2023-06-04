@@ -45,4 +45,10 @@ class DisplaySettingsInteractor(private val settingsRepository: SettingsReposito
         settingsRepository.isNotificationCoverStubEnabled = enabled
     }
 
+    fun isPlayerScreensSwipeEnabled() = settingsRepository.isPlayerScreensSwipeEnabled
+
+    fun setPlayerScreensSwipeEnabled(enabled: Boolean) {
+        settingsRepository.isPlayerScreensSwipeEnabled = enabled
+    }
+
 }

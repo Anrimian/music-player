@@ -156,18 +156,13 @@ public class CoverImageLoader {
                 .into(imageView);
     }
 
-    public Runnable loadNotificationImage(@Nonnull Composition data,
-                                          Callback<Bitmap> onCompleted) {
-        return loadNotificationImage(
-                toImageRequest(data),
-                onCompleted);
+    public Runnable loadNotificationImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
+        return loadNotificationImage(toImageRequest(data), onCompleted);
     }
 
     public Runnable loadNotificationImage(@Nonnull ExternalCompositionSource source,
                                           Callback<Bitmap> onCompleted) {
-        return loadNotificationImage(
-                new UriCompositionImage(source),
-                onCompleted);
+        return loadNotificationImage(new UriCompositionImage(source), onCompleted);
     }
 
     public Bitmap getDefaultNotificationBitmap() {
@@ -193,6 +188,15 @@ public class CoverImageLoader {
 
     public void loadImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
         loadImage(toImageRequest(data), onCompleted);
+    }
+
+    public void loadMediaSessionImage(@Nonnull Composition data, Callback<Bitmap> onCompleted) {
+        GlideApp.with(context)
+                .asBitmap()
+                .load(toImageRequest(data))
+                .override(getCoverMediaSessionSize())
+                .timeout(TIMEOUT_MILLIS)
+                .into(simpleTarget(onCompleted));
     }
 
     public Single<Optional<Uri>> loadImageUri(@Nonnull Composition data) {
@@ -310,7 +314,7 @@ public class CoverImageLoader {
         GlideApp.with(context)
                 .asBitmap()
                 .load(compositionImage)
-                .override(getCoverSize())
+                .override(getCoverMediaSessionSize())
                 .timeout(NOTIFICATION_IMAGE_TIMEOUT_MILLIS)
                 .into(target);
 
@@ -344,6 +348,10 @@ public class CoverImageLoader {
 
     private int getCoverSize() {
         return context.getResources().getInteger(R.integer.icon_image_size);
+    }
+
+    private int getCoverMediaSessionSize() {
+        return context.getResources().getInteger(R.integer.icon_media_session_image_size);
     }
 
     private <T> CustomTarget<T> simpleTarget(Callback<T> callback) {

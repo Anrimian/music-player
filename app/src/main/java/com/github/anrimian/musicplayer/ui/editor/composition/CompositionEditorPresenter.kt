@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteracto
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.isFileExists
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
@@ -17,7 +18,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 class CompositionEditorPresenter(
     private val compositionId: Long,
     private val editorInteractor: EditorInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     uiScheduler: Scheduler,
     errorParser: ErrorParser
 ) : AppPresenter<CompositionEditorView>(uiScheduler, errorParser) {
@@ -209,6 +210,27 @@ class CompositionEditorPresenter(
             return
         }
         viewState.showCoverActionsDialog()
+    }
+
+    fun onChangeTrackNumberClicked() {
+        if (!::composition.isInitialized) {
+            return
+        }
+        viewState.showEnterTrackNumberDialog(composition)
+    }
+
+    fun onChangeDiscNumberClicked() {
+        if (!::composition.isInitialized) {
+            return
+        }
+        viewState.showEnterDiscNumberDialog(composition)
+    }
+
+    fun onChangeCommentClicked() {
+        if (!::composition.isInitialized) {
+            return
+        }
+        viewState.showEnterCommentDialog(composition)
     }
 
     fun onClearCoverClicked() {

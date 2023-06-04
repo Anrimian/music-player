@@ -5,7 +5,6 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.media.MediaMetadata;
 import android.os.Build;
 import android.support.v4.media.MediaMetadataCompat;
@@ -16,11 +15,9 @@ import com.github.anrimian.musicplayer.di.Components;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
+import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
-import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CompositionSourceModelHelper {
@@ -46,47 +43,57 @@ public class CompositionSourceModelHelper {
     public static void updateMediaSessionAlbumArt(@Nullable CompositionSource source,
                                                   MediaMetadataCompat.Builder metadataBuilder,
                                                   MediaSessionCompat mediaSession,
-                                                  boolean isEnabled) {
-        if (isEnabled && source != null) {
-            if (source instanceof LibraryCompositionSource) {
-                Composition composition = ((LibraryCompositionSource) source).getComposition();
+                                                  MusicNotificationSetting setting) {
+        boolean useAlbumArt = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && setting.isShowCovers()) || setting.isCoversOnLockScreen();
+        if (!useAlbumArt || source == null) {
+            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
+            metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, null);
+            mediaSession.setMetadata(metadataBuilder.build());
+            return;
+        }
+
+        if (source instanceof LibraryCompositionSource) {
+            Composition composition = ((LibraryCompositionSource) source).getComposition();
+            Components.getAppComponent()
+                    .imageLoader()
+                    .loadImageUri(composition, uri -> {
+                        String uriStr = null;
+                        if (uri != null) {
+                            uriStr = uri.toString();
+                        }
+                        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr);
+                        mediaSession.setMetadata(metadataBuilder.build());
+                    });
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 Components.getAppComponent()
                         .imageLoader()
-                        .loadImageUri(composition, uri -> {
-                            String uriStr = null;
-                            if (uri != null) {
-                                uriStr = uri.toString();
-                            }
-                            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr);
+                        .loadMediaSessionImage(composition, bitmap -> {
+                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
-
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
+                mediaSession.setMetadata(metadataBuilder.build());
+            } else {
                 //uri doesn't work for lock screen background, so put it here
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-                    Components.getAppComponent()
-                            .imageLoader()
-                            .loadImage(composition, bitmap -> {
-                                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
-                                mediaSession.setMetadata(metadataBuilder.build());
-                            });
-                } else {
-                    metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
-                    mediaSession.setMetadata(metadataBuilder.build());
-                }
-            }
-            if (source instanceof ExternalCompositionSource) {
                 Components.getAppComponent()
                         .imageLoader()
-                        .loadImage((ExternalCompositionSource) source, bitmap -> {
-                            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
+                        .loadImage(composition, bitmap -> {
                             metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
             }
-        } else {
-            metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
-            metadataBuilder.putBitmap(MediaMetadata.METADATA_KEY_ART, null);
-            mediaSession.setMetadata(metadataBuilder.build());
+        }
+        if (source instanceof ExternalCompositionSource) {
+            Components.getAppComponent()
+                    .imageLoader()
+                    .loadImage((ExternalCompositionSource) source, bitmap -> {
+                        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
+                        metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
+                        mediaSession.setMetadata(metadataBuilder.build());
+                    });
         }
     }
 
@@ -123,26 +130,4 @@ public class CompositionSourceModelHelper {
         mediaSession.setMetadata(builder.build());
     }
 
-    public static long getTrackPosition(@Nullable CompositionSource source) {
-        if (source instanceof LibraryCompositionSource) {
-            return ((LibraryCompositionSource) source).getTrackPosition();
-        }
-        if (source instanceof ExternalCompositionSource) {
-            return 0;
-        }
-        return 0;
-    }
-
-    public static Runnable getCompositionSourceCover(@Nonnull CompositionSource source,
-                                                     Callback<Bitmap> onCompleted,
-                                                     CoverImageLoader coverImageLoader) {
-        if (source instanceof LibraryCompositionSource) {
-            Composition composition = ((LibraryCompositionSource) source).getComposition();
-            return coverImageLoader.loadNotificationImage(composition, onCompleted);
-        }
-        if (source instanceof ExternalCompositionSource) {
-            return coverImageLoader.loadNotificationImage((ExternalCompositionSource) source, onCompleted);
-        }
-        throw new IllegalStateException();
-    }
 }

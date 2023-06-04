@@ -27,7 +27,8 @@
         <item name="dialogButtonColor">@android:color/system_accent1_500</item>
         <item name="android:textColorPrimary">@android:color/system_neutral1_800</item>
         <item name="android:textColorSecondary">@android:color/system_neutral1_500</item>
-        <item name="android:textColorSecondaryInverse">@android:color/system_neutral1_100</item>
+        <item name="android:textColorSecondaryInverse">@android:color/system_neutral1_10</item>
+        <item name="toolbarTextColorPrimary">@android:color/system_neutral1_0</item>
 
         <!--controls-->
         <item name="buttonColor">@android:color/system_neutral1_800</item>

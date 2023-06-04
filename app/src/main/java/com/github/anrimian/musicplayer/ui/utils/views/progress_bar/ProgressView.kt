@@ -16,10 +16,14 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
 import kotlin.math.min
 
+//TODO (?) change design, draw circular progress bar in cover.
+// but where to draw download/upload icon?
+
 //TODO check redraw engine, consider copying circular progress indicator
 //TODO short blinking (cloud icon after start)
 //TODO close animation is too fast or just not works
 //TODO when state is translucent overlap is visible
+// A: just set different color to corrupted composition
 //based on https://github.com/2hamed/ProgressCircula/blob/master/progresscircula/src/main/java/com/hmomeni/progresscircula/ProgressCircula.kt
 class ProgressView(
     context: Context,

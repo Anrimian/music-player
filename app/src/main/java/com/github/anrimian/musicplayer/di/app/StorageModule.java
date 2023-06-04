@@ -23,8 +23,9 @@ import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoW
 import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
-import com.github.anrimian.musicplayer.data.repositories.scanner.StoragePlaylistAnalyzer;
 import com.github.anrimian.musicplayer.data.repositories.scanner.files.FileScanner;
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.PlaylistFilesStorage;
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.StoragePlaylistsAnalyzer;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceApi30;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceImpl;
@@ -39,6 +40,7 @@ import com.github.anrimian.musicplayer.data.storage.source.StorageSourceReposito
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.CompositionSourceInteractor;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
@@ -136,7 +138,7 @@ public class StorageModule {
     @Provides
     @Nonnull
     EditorInteractor compositionEditorInteractor(CompositionSourceInteractor sourceInteractor,
-                                                 SyncInteractor<?, ?, Long> syncInteractor,
+                                                 SyncInteractor<FileKey, ?, Long> syncInteractor,
                                                  EditorRepository editorRepository,
                                                  LibraryRepository musicProviderRepository,
                                                  StorageSourceRepository storageSourceRepository) {
@@ -174,9 +176,8 @@ public class StorageModule {
                                                   CompositionsDaoWrapper compositionsDao,
                                                   GenresDaoWrapper genresDao,
                                                   SettingsRepository settingsRepository,
-//                                                  StorageCompositionAnalyzer compositionAnalyzer,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
-                                                  StoragePlaylistAnalyzer storagePlaylistAnalyzer,
+                                                  StoragePlaylistsAnalyzer storagePlaylistAnalyzer,
                                                   FileScanner fileScanner,
                                                   LoggerRepository loggerRepository,
                                                   Analytics analytics,
@@ -212,9 +213,17 @@ public class StorageModule {
 
     @Provides
     @Nonnull
-    StoragePlaylistAnalyzer storagePlaylistAnalyzer(PlayListsDaoWrapper playListsDao,
-                                                    StoragePlayListsProvider playListsProvider) {
-        return new StoragePlaylistAnalyzer(playListsDao, playListsProvider);
+    StoragePlaylistsAnalyzer storagePlaylistsAnalyzer2(CompositionsDaoWrapper compositionsDao,
+                                                        PlayListsDaoWrapper playListsDao,
+                                                        StoragePlayListsProvider playListsProvider,
+                                                        PlaylistFilesStorage playlistFilesStorage) {
+        return new StoragePlaylistsAnalyzer(compositionsDao, playListsDao, playListsProvider, playlistFilesStorage);
+    }
+
+    @Provides
+    @Nonnull
+    PlaylistFilesStorage playlistFilesStorage(Context context) {
+        return new PlaylistFilesStorage(context);
     }
 
     @Provides

@@ -24,6 +24,8 @@ import com.github.anrimian.musicplayer.ui.common.locale.LocaleControllerApi33;
 import com.github.anrimian.musicplayer.ui.common.locale.LocaleControllerImpl;
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.notifications.MediaNotificationsDisplayer;
+import com.github.anrimian.musicplayer.ui.notifications.MediaNotificationsDisplayerApi33;
+import com.github.anrimian.musicplayer.ui.notifications.MediaNotificationsDisplayerImpl;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationDisplayerApi33;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayerImpl;
@@ -65,9 +67,12 @@ public class AppModule {
     @Nonnull
     @Singleton
     MediaNotificationsDisplayer mediaNotificationsDisplayer(Context context,
-                                                             AppNotificationBuilder notificationBuilder,
-                                                             CoverImageLoader coverImageLoader) {
-        return new MediaNotificationsDisplayer(context, notificationBuilder, coverImageLoader);
+                                                            AppNotificationBuilder notificationBuilder,
+                                                            CoverImageLoader coverImageLoader) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return new MediaNotificationsDisplayerApi33(context, notificationBuilder);
+        }
+        return new MediaNotificationsDisplayerImpl(context, notificationBuilder, coverImageLoader);
     }
 
     @Provides
@@ -90,8 +95,8 @@ public class AppModule {
     @Provides
     @Nonnull
     @Singleton
-    SystemServiceController systemServiceController(Context context) {
-        return new SystemServiceControllerImpl(context);
+    SystemServiceController systemServiceController(Context context, SettingsRepository settingsRepository) {
+        return new SystemServiceControllerImpl(context, settingsRepository);
     }
 
     @Provides

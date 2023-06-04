@@ -8,6 +8,12 @@
         app:iconTint="?attr/toolbarTextColorPrimary"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/menu_export_playlist"
+        android:title="@string/export_playlist"
+        android:icon="@drawable/ic_save"
+        app:iconTint="?attr/toolbarTextColorPrimary"
+        app:showAsAction="never"/>
+
     <item android:id="@+id/menu_delete_play_list"
         android:title="@string/delete_playlist"
         android:icon="@drawable/ic_delete_outline"

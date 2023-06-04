@@ -82,4 +82,13 @@ interface CompositionEditorView : MvpView {
     @Skip
     fun showSelectImageFromGalleryScreen()
 
+    @Skip
+    fun showEnterTrackNumberDialog(composition: FullComposition)
+
+    @Skip
+    fun showEnterDiscNumberDialog(composition: FullComposition)
+
+    @Skip
+    fun showEnterCommentDialog(composition: FullComposition)
+
 }

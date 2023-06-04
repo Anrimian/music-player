@@ -2,6 +2,8 @@ package com.github.anrimian.musicplayer;
 
 public interface Constants {
 
+    String PLAYLIST_MIME_TYPE = "audio/x-mpegurl";
+
     interface Actions {
         int PLAY = 1;
         int PAUSE = 2;
@@ -39,6 +41,10 @@ public interface Constants {
         String IDS_ARG = "ids_arg";
         String NAME_ARG = "name_arg";
         String LAUNCH_PREPARE_ARG = "launch_prepare_arg";
+        String INPUT_TYPE_ARG = "input_type_arg";
+        String DIGITS_ARG = "digits_arg";
+        String CLOSE_MULTISELECT_ARG = "close_multiselect_arg";
+        String PLAYLIST_IMPORT_ARG = "playlist_import_arg";
     }
 
     interface Tags {
@@ -53,6 +59,9 @@ public interface Constants {
         String ALBUM_TAG = "album_tag";
         String ALBUM_ARTIST_TAG = "album_artist_tag";
         String LYRICS = "lyrics_tag";
+        String TRACK_NUMBER_TAG = "track_number_tag";
+        String DISC_NUMBER_TAG = "disc_number_tag";
+        String COMMENT_TAG = "comment_tag";
         String ADD_GENRE_TAG = "add_genre_tag";
         String EDIT_GENRE_TAG = "edit_genre_tag";
         String NEW_FOLDER_NAME_TAG = "new_folder_name_tag";

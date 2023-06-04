@@ -21,16 +21,20 @@ public class AppPlayList {
     @Nonnull
     private final Date dateModified;
 
+    private final int compositionsCount;
+
     public AppPlayList(long id,
                        long storageId,
                        @Nonnull String name,
                        @Nonnull Date dateAdded,
-                       @Nonnull Date dateModified) {
+                       @Nonnull Date dateModified,
+                       int compositionsCount) {
         this.id = id;
         this.storageId = storageId;
         this.name = name;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
+        this.compositionsCount = compositionsCount;
     }
 
     public long getId() {
@@ -56,19 +60,23 @@ public class AppPlayList {
         return dateModified;
     }
 
+    public int getCompositionsCount() {
+        return compositionsCount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AppPlayList playList = (AppPlayList) o;
+        AppPlayList that = (AppPlayList) o;
 
-        return storageId == playList.storageId;
+        return name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return (int) (storageId ^ (storageId >>> 32));
+        return name.hashCode();
     }
 
     @NonNull

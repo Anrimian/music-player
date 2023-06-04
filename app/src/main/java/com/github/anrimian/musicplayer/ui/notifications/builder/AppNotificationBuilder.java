@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.notifications.builder;
 
 import static androidx.core.content.ContextCompat.getColor;
-import static com.github.anrimian.musicplayer.ui.notifications.MediaNotificationsDisplayer.FOREGROUND_CHANNEL_ID;
+import static com.github.anrimian.musicplayer.ui.notifications.MediaNotificationsDisplayerImpl.FOREGROUND_CHANNEL_ID;
 
 import android.content.Context;
 import android.os.Build;

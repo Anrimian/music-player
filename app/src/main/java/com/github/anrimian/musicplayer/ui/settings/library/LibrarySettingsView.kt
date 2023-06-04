@@ -15,6 +15,9 @@ interface LibrarySettingsView : MvpView {
     @AddToEndSingle
     fun showAudioFileMinDurationMillis(millis: Long)
 
+    @AddToEndSingle
+    fun showPlaylistInsertStartEnabled(enabled: Boolean)
+
     @Skip
     fun showSelectMinAudioDurationDialog(currentValue: Long)
 

@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import androidx.room.testing.MigrationTestHelper;
 import androidx.sqlite.db.SupportSQLiteDatabase;
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.jupiter.api.Test;
@@ -26,8 +25,7 @@ public class MigrationsTest {
 
     public MigrationTestHelper testHelper = new MigrationTestHelper(
                     instrumentation,
-                    AppDatabase.class.getCanonicalName(),
-                    new FrameworkSQLiteOpenHelperFactory()
+                    AppDatabase.class.getCanonicalName()
     );
 
     @Test

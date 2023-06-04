@@ -254,6 +254,32 @@
         Переместите аудио файлы в эти папки и действие должно будет работать корректно.
     </string>
     <string name="folder_already_excluded_from_scanning">Эта папка уже исключена из сканирования</string>
+    <string name="no_file_modify_permission">Отсутствует разрешение для модификации файла</string>
+    <string name="interface_settings">Интерфейс</string>
+    <string name="enable_player_screens_swipe">Включить переключение жестами между экранами очереди воспроизведения и текста композиции</string>
+    <string name="no_enough_data_to_play">Недостаточно данных для проигрывания композиции</string>
+    <string name="permission_required">Требуется разрешение</string>
+    <string name="open_app_settings">Открыть настройки приложения</string>
+    <string name="file_is_corrupted">Файл повреждён</string>
+    <string name="keep_notification_after_pause">Предотвращать автоматическое закрытие уведомления о проигрывании после паузы</string>
+    <string name="unknown_play_error">Неизвестная ошибка проигрывания файла</string>
+    <string name="file_read_timeout">Превышено время чтения файла</string>
+    <string name="tag_reading_error">Ошибка чтения тегов: %s</string>
+    <string name="track_number">Номер трека</string>
+    <string name="change_track_number">Изменить номер трека</string>
+    <string name="disc_number">Номер диска</string>
+    <string name="change_disc_number">Изменить номер диска</string>
+    <string name="comment">Комментарий</string>
+    <string name="change_comment">Изменить комментарий</string>
+    <string name="disc_short">Диск %d</string>
+    <string name="track_short">Трек %d</string>
+    <string name="with_delay">Через %.1fс</string>
+    <string name="insert_to_playlist_beginning">Вставлять новые композиции в начало плейлиста</string>
+    <string name="export_playlist">Сохранить как .m3u файл</string>
+    <string name="import_playlist">Импортировать плейлист</string>
+    <string name="overwrite_playlist">Плейлист с таким именем уже существует. \nПерезаписать его?</string>
+    <string name="playlist_has_no_records">Плейлист не имеет композиций</string>
+    <string name="export_playlists_success">Файл \"%1$s.m3u\" был сохранён во внутреннее хранилище</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
@@ -323,6 +349,27 @@
         <item quantity="few">Удалить %1$s композиции</item>
         <item quantity="many">Удалить %1$s композиций</item>
         <item quantity="other">Удалить %d композиций</item>
+    </plurals>
+
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">В течении не менее %d минуты</item>
+        <item quantity="few">В течении не менее %d минут</item>
+        <item quantity="many">В течении не менее %d минут</item>
+        <item quantity="other">В течении не менее %d минут</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d плейлист был сохранён во внутреннее хранилище</item>
+        <item quantity="few">%d плейлиста были сохранены во внутреннее хранилище</item>
+        <item quantity="many">%d плейлистов были сохранены во внутреннее хранилище</item>
+        <item quantity="other">%d плейлистов были сохранены во внутреннее хранилище</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">Плейлист был импортирован успешно, но %d файл был не найден в библиотеке</item>
+        <item quantity="few">Плейлист был импортирован успешно, но %d файла были не найдены в библиотеке</item>
+        <item quantity="many">Плейлист был импортирован успешно, но %d файлов были не найдены в библиотеке</item>
+        <item quantity="other">Плейлист был импортирован успешно, но %d файлов были не найдены в библиотеке</item>
     </plurals>
 
 </resources>

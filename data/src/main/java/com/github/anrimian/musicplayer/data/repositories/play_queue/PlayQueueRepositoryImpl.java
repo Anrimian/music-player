@@ -1,9 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.play_queue;
 
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
-import static com.github.anrimian.musicplayer.domain.Constants.NO_POSITION;
-
-import android.util.Log;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -69,24 +66,19 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     @Override
-    public Completable setPlayQueue(List<Composition> compositions) {
-        return setPlayQueue(compositions, NO_POSITION);
-    }
-
-    @Override
-    public Completable setPlayQueue(List<Composition> compositions, int startPosition) {
-        if (compositions.isEmpty()) {
+    public Completable setPlayQueue(List<Long> compositionIds, int startPosition) {
+        if (compositionIds.isEmpty()) {
             return Completable.complete();
         }
-        return Completable.fromAction(() -> insertNewQueue(compositions, startPosition))
+        return Completable.fromAction(() -> insertNewQueue(compositionIds, startPosition))
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Flowable<Integer> getCurrentItemPositionObservable() {
         return Observable.combineLatest(uiStatePreferences.getCurrentItemIdObservable(),
-                settingsPreferences.getRandomPlayingObservable(),
-                playQueueDao::getIndexPositionObservable)
+                        settingsPreferences.getRandomPlayingObservable(),
+                        playQueueDao::getIndexPositionObservable)
                 .switchMap(observable -> observable)
                 .toFlowable(BackpressureStrategy.LATEST);
     }
@@ -104,7 +96,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public void setRandomPlayingEnabled(boolean enabled) {
         Completable.fromAction(() -> {
-            Log.d("KEK", "SET RANDOM MODE: " + enabled);
             playQueueObservable.clearCache();
             if (enabled) {
                 long itemId = uiStatePreferences.getCurrentQueueItemId();
@@ -130,11 +121,11 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public void skipToPrevious() {
         Completable.fromAction(() -> {
-            long currentItemId = uiStatePreferences.getCurrentQueueItemId();
-            boolean isShuffled = settingsPreferences.isRandomPlayingEnabled();
-            long nextQueueItemId = playQueueDao.getPreviousQueueItemId(currentItemId, isShuffled);
-            setCurrentItem(nextQueueItemId);
-        }).subscribeOn(scheduler)
+                    long currentItemId = uiStatePreferences.getCurrentQueueItemId();
+                    boolean isShuffled = settingsPreferences.isRandomPlayingEnabled();
+                    long nextQueueItemId = playQueueDao.getPreviousQueueItemId(currentItemId, isShuffled);
+                    setCurrentItem(nextQueueItemId);
+                }).subscribeOn(scheduler)
                 .subscribe();
     }
 
@@ -229,14 +220,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         uiStatePreferences.setCurrentQueueItemId(itemId);
     }
 
-    private void insertNewQueue(List<Composition> compositions, int startPosition) {
+    private void insertNewQueue(List<Long> compositionIds, int startPosition) {
         consumeDeletedItemEvent = true;
-        playQueueObservable.clearCache();
-        long itemId = playQueueDao.insertNewPlayQueue(compositions,
+        long itemId = playQueueDao.insertNewPlayQueue(compositionIds,
                 settingsPreferences.isRandomPlayingEnabled(),
                 startPosition);
         setCurrentItem(itemId);
-        playQueueCreateTimeSubject.onNext(System.currentTimeMillis());
         consumeDeletedItemEvent = false;
     }
 

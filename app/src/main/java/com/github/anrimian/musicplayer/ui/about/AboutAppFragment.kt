@@ -11,14 +11,15 @@ import com.github.anrimian.musicplayer.databinding.FragmentAboutBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.getAppInfo
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.utils.logger.FileLog
 
-class AboutAppFragment : Fragment(), FragmentLayerListener {
+class AboutAppFragment : Fragment(),
+    FragmentNavigationListener {
     
-    private lateinit var viewBinding: FragmentAboutBinding
+    private lateinit var binding: FragmentAboutBinding
     
     private lateinit var fileLog: FileLog
     
@@ -27,8 +28,8 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentAboutBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentAboutBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,24 +45,24 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
         val isLogExists = fileLog.isFileExists
         setLogActionsVisibility(isLogExists)
         if (isLogExists) {
-            viewBinding.tvLogInfo.text = getString(
+            binding.tvLogInfo.text = getString(
                 R.string.log_info_text,
                 fileLog.fileSize / 1024
             )
         }
-        appComponent.aboutTextBinder().bind(this, viewBinding.tvAbout)
+        appComponent.aboutTextBinder().bind(this, binding.tvAbout)
 
-        viewBinding.btnDelete.setOnClickListener { deleteLogFile() }
-        viewBinding.btnView.setOnClickListener { appLogger.startViewLogScreen(requireActivity()) }
-        viewBinding.btnSend.setOnClickListener { appLogger.startSendLogScreen(requireActivity()) }
+        binding.btnDelete.setOnClickListener { deleteLogFile() }
+        binding.btnView.setOnClickListener { appLogger.startViewLogScreen(requireActivity()) }
+        binding.btnSend.setOnClickListener { appLogger.startSendLogScreen(requireActivity()) }
 
-        viewBinding.cbShowReportDialogOnStart.isChecked = loggerRepository.isReportDialogOnStartEnabled
-        ViewUtils.onCheckChanged(viewBinding.cbShowReportDialogOnStart, loggerRepository::showReportDialogOnStart)
+        binding.cbShowReportDialogOnStart.isChecked = loggerRepository.isReportDialogOnStartEnabled
+        ViewUtils.onCheckChanged(binding.cbShowReportDialogOnStart, loggerRepository::showReportDialogOnStart)
 
-        SlidrPanel.simpleSwipeBack(viewBinding.containerView, this, toolbar::onStackFragmentSlided)
+        SlidrPanel.simpleSwipeBack(binding.containerView, this, toolbar::onStackFragmentSlided)
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
         requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar).setup { config ->
             config.setTitle(R.string.app_name)
             val appInfo = requireContext().getAppInfo()
@@ -81,7 +82,7 @@ class AboutAppFragment : Fragment(), FragmentLayerListener {
 
     private fun setLogActionsVisibility(isLogExists: Boolean) {
         val logActionsVisibility = if (isLogExists) View.VISIBLE else View.GONE
-        viewBinding.logActionsContainer.visibility = logActionsVisibility
-        viewBinding.tvLogInfo.visibility = logActionsVisibility
+        binding.logActionsContainer.visibility = logActionsVisibility
+        binding.tvLogInfo.visibility = logActionsVisibility
     }
 }

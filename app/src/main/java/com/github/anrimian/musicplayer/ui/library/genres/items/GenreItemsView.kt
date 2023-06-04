@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.genres.items
 
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsView
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
@@ -10,7 +11,7 @@ import moxy.viewstate.strategy.alias.Skip
 
 private const val RENAME_STATE = "rename_state"
 
-interface GenreItemsView : BaseLibraryCompositionsView {
+interface GenreItemsView : BaseLibraryCompositionsView<Composition> {
 
     @AddToEndSingle
     fun showGenreInfo(genre: Genre)

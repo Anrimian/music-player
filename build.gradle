@@ -6,7 +6,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.1'
+        classpath 'com.android.tools.build:gradle:8.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.8.2.1"
     }
@@ -37,3 +37,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)
                 ]
             }
         }
+
+subprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+}

@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLibrarySettingsBinding
 import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.showNumberPickerDialog
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
@@ -22,11 +22,12 @@ import moxy.ktx.moxyPresenter
 /**
  * Created on 19.10.2017.
  */
-class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, LibrarySettingsView {
+class LibrarySettingsFragment : MvpAppCompatFragment(),
+    FragmentNavigationListener, LibrarySettingsView {
 
     private val presenter by moxyPresenter { Components.getSettingsComponent().librarySettingsPresenter() }
 
-    private lateinit var viewBinding: FragmentLibrarySettingsBinding
+    private lateinit var binding: FragmentLibrarySettingsBinding
 
     private lateinit var navigation: FragmentNavigation
 
@@ -35,8 +36,8 @@ class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, L
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentLibrarySettingsBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentLibrarySettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,25 +46,26 @@ class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, L
 
         navigation = FragmentNavigation.from(parentFragmentManager)
 
-        viewBinding.tvExcludedFolders.setOnClickListener {
+        binding.tvExcludedFolders.setOnClickListener {
             navigation.addNewFragment(ExcludedFoldersFragment())
         }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            viewBinding.cbDoNotShowDeleteDialog.visibility = View.GONE
+            binding.cbDoNotShowDeleteDialog.visibility = View.GONE
         }
 
-        onCheckChanged(viewBinding.cbDoNotShowDeleteDialog, presenter::doNotAppConfirmDialogChecked)
-        onCheckChanged(viewBinding.cbShowAllAudioFiles, presenter::onShowAllAudioFilesChecked)
+        onCheckChanged(binding.cbDoNotShowDeleteDialog, presenter::doNotAppConfirmDialogChecked)
+        onCheckChanged(binding.cbShowAllAudioFiles, presenter::onShowAllAudioFilesChecked)
+        onCheckChanged(binding.cbPlaylistInsertStart, presenter::onPlaylistInsertStartChecked)
 
-        viewBinding.flAudioMinDurationClickableArea.setOnClickListener {
+        binding.flAudioMinDurationClickableArea.setOnClickListener {
             presenter.onSelectMinDurationClicked()
         }
 
-        SlidrPanel.simpleSwipeBack(viewBinding.flContainer, this, toolbar::onStackFragmentSlided)
+        SlidrPanel.simpleSwipeBack(binding.nsvContainer, this, toolbar::onStackFragmentSlided)
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
         toolbar.setTitle(R.string.settings)
         toolbar.setSubtitle(R.string.library)
@@ -71,27 +73,31 @@ class LibrarySettingsFragment : MvpAppCompatFragment(), FragmentLayerListener, L
     }
 
     override fun showAppConfirmDeleteDialogEnabled(enabled: Boolean) {
-        ViewUtils.setChecked(viewBinding.cbDoNotShowDeleteDialog, !enabled)
+        ViewUtils.setChecked(binding.cbDoNotShowDeleteDialog, !enabled)
     }
 
     override fun showAllAudioFilesEnabled(enabled: Boolean) {
-        ViewUtils.setChecked(viewBinding.cbShowAllAudioFiles, enabled)
+        ViewUtils.setChecked(binding.cbShowAllAudioFiles, enabled)
     }
 
     override fun showAudioFileMinDurationMillis(millis: Long) {
         val seconds = (millis/1000L).toInt()
-        viewBinding.tvAudioMinDurationValue.text = getString(
+        binding.tvAudioMinDurationValue.text = getString(
             R.string.with_duration_less_than,
             resources.getQuantityString(R.plurals.seconds_template, seconds, seconds)
         )
     }
 
+    override fun showPlaylistInsertStartEnabled(enabled: Boolean) {
+        ViewUtils.setChecked(binding.cbPlaylistInsertStart, enabled)
+    }
+
     override fun showSelectMinAudioDurationDialog(currentValue: Long) {
-        DialogUtils.showNumberPickerDialog(
+        showNumberPickerDialog(
             requireContext(),
             0,
             60,
-            (currentValue / 1000L).toInt()
+            currentValue / 1000L
         ) { value -> presenter.onAudioFileMinDurationMillisPicked(value * 1000L) }
     }
 

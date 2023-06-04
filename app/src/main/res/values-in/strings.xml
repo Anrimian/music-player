@@ -257,6 +257,34 @@
         Tempatkan file audio ke dalam pelipat ini, dan tindakan harusnya dapat berjalan dengan benar.
     </string>
     <string name="folder_already_excluded_from_scanning">Pelipat ini sudah dikecualikan dari pemindaian</string>
+    <!--not verified-->
+    <string name="no_file_modify_permission">Tidak ada izin untuk memodifikasi file</string>
+    <string name="interface_settings">Antarmuka</string>
+    <string name="enable_player_screens_swipe">Aktifkan gerakan gesek untuk beralih antara antrean putar dan layar lirik</string>
+    <string name="no_enough_data_to_play">Data tidak cukup untuk memainkan komposisi</string>
+    <string name="permission_required">Diperlukan izin</string>
+    <string name="open_app_settings">Buka pengaturan aplikasi</string>
+    <string name="file_is_corrupted">File rusak</string>
+    <string name="keep_notification_after_pause">Mencegah notifikasi pemain menutup otomatis setelah jeda</string>
+    <string name="unknown_play_error">Kesalahan pemutaran file tidak dikenal</string>
+    <string name="file_read_timeout">Waktu baca file habis</string>
+    <string name="tag_reading_error">Kesalahan membaca tag: %s</string>
+    <string name="track_number">Nomor lintasan</string>
+    <string name="change_track_number">Ubah nomor trek</string>
+    <string name="disc_number">Nomor cakram</string>
+    <string name="change_disc_number">Ubah nomor disk</string>
+    <string name="comment">Komentar</string>
+    <string name="change_comment">Ubah komentar</string>
+    <string name="disc_short">Disk %d</string>
+    <string name="track_short">Lacak %d</string>
+    <string name="with_delay">Dengan penundaan %.1fs</string>
+    <string name="insert_to_playlist_beginning">Sisipkan komposisi baru di awal daftar putar</string>
+    <string name="export_playlist">Simpan sebagai file .m3u</string>
+    <string name="import_playlist">Impor daftar putar</string>
+    <string name="overwrite_playlist">Daftar Putar dengan nama ini sudah ada. \nTimpa itu?</string>
+    <string name="playlist_has_no_records">Daftar putar tidak memiliki rekaman</string>
+    <string name="export_playlists_success">File \"%1$s.m3u\" disimpan ke penyimpanan internal</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="other">%1$s Lagu</item>
@@ -297,5 +325,19 @@
     <plurals name="delete_compositions_template">
         <item quantity="other">Hapus %d lagu</item>
     </plurals>
+
+    <!--not verified-->
+    <plurals name="for_at_least_minutes">
+        <item quantity="other">Setidaknya selama %d menit</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="other">%d playlist disimpan ke penyimpanan internal</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="other">Daftar putar berhasil diimpor, tetapi %d file tidak ditemukan di pustaka</item>
+    </plurals>
+    <!---->
 
 </resources>

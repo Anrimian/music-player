@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.widgets.menu
 
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
@@ -27,7 +28,7 @@ interface WidgetMenuView: MvpView {
     fun closeScreen()
 
     @OneExecution
-    fun showDeleteCompositionMessage(composition: Composition)
+    fun showDeleteCompositionMessage(composition: DeletedComposition)
 
     @OneExecution
     fun showDeleteCompositionError(errorCommand: ErrorCommand)

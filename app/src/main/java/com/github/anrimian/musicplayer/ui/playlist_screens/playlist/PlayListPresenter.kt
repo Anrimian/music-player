@@ -1,14 +1,17 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
 import com.github.anrimian.filesync.SyncInteractor
+import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.folders.FileReference
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
@@ -27,7 +30,7 @@ class PlayListPresenter(
     private val playerInteractor: LibraryPlayerInteractor,
     private val playListsInteractor: PlayListsInteractor,
     private val displaySettingsInteractor: DisplaySettingsInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : AppPresenter<PlayListView>(uiScheduler, errorParser) {
@@ -65,15 +68,15 @@ class PlayListPresenter(
     }
 
     fun onStop(listPosition: ListPosition) {
-        playListsInteractor.saveListPosition(listPosition)
+        playListsInteractor.saveItemsListPosition(playListId, listPosition)
     }
 
     fun onItemIconClicked(position: Int) {
-        playerInteractor.startPlaying(items.map(PlayListItem::getComposition), position)
+        startPlaying(position)
     }
 
     fun onPlayAllButtonClicked() {
-        playerInteractor.startPlaying(items.map(PlayListItem::getComposition))
+        startPlaying()
     }
 
     fun onDeleteCompositionButtonClicked(composition: Composition) {
@@ -153,7 +156,7 @@ class PlayListPresenter(
     }
 
     fun onPlayActionSelected(position: Int) {
-        playerInteractor.startPlaying(items.map(PlayListItem::getComposition), position)
+        startPlaying(position)
     }
 
     fun onRestoreRemovedItemClicked() {
@@ -182,6 +185,16 @@ class PlayListPresenter(
 
     fun onChangeRandomModePressed() {
         playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
+    }
+
+    fun onFolderForExportSelected(folder: FileReference) {
+        playList.call { playList ->
+            playListsInteractor.exportPlaylistsToFolder(listOf(playList), folder)
+                .subscribe(
+                    { viewState.showPlaylistExportSuccess(playList) },
+                    viewState::showErrorMessage
+                )
+        }
     }
 
     fun isCoversEnabled() = displaySettingsInteractor.isCoversEnabled()
@@ -307,7 +320,7 @@ class PlayListPresenter(
         } else {
             viewState.showList()
             if (firstReceive) {
-                val listPosition = playListsInteractor.savedListPosition
+                val listPosition = playListsInteractor.getSavedItemsListPosition(playListId)
                 if (listPosition != null) {
                     viewState.restoreListPosition(listPosition)
                 }
@@ -327,6 +340,10 @@ class PlayListPresenter(
     private fun subscribeOnRepeatMode() {
         playerInteractor.getRandomPlayingObservable()
             .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
+    }
+
+    private fun startPlaying(position: Int = Constants.NO_POSITION) {
+        playerInteractor.startPlaying(items.map { item -> item.composition.id }, position)
     }
 
 }

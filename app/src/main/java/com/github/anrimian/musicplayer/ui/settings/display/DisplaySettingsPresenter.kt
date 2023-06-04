@@ -13,6 +13,7 @@ class DisplaySettingsPresenter(private val interactor: DisplaySettingsInteractor
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        viewState.showPlayerScreensSwipeEnabled(interactor.isPlayerScreensSwipeEnabled())
         viewState.showFileNameEnabled(interactor.isDisplayFileNameEnabled())
         viewState.showCoversChecked(interactor.isCoversEnabled())
         viewState.showCoversInNotificationChecked(interactor.isCoversInNotificationEnabled())
@@ -26,6 +27,11 @@ class DisplaySettingsPresenter(private val interactor: DisplaySettingsInteractor
     fun onCoversChecked(checked: Boolean) {
         viewState.showCoversChecked(checked)
         interactor.setCoversEnabled(checked)
+    }
+
+    fun onSwipePlayerScreensChecked(checked: Boolean) {
+        viewState.showPlayerScreensSwipeEnabled(checked)
+        interactor.setPlayerScreensSwipeEnabled(checked)
     }
 
     fun onFileNameChecked(checked: Boolean) {

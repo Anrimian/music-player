@@ -92,7 +92,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:foreground="?selectableItemBackground"
-                android:contentDescription="@string/equalizer"
+                android:contentDescription="@string/sound_balance"
                 app:layout_constraintTop_toTopOf="@id/tvSoundBalance"
                 app:layout_constraintBottom_toBottomOf="@id/tvSoundBalanceState"
                 app:layout_constraintStart_toStartOf="parent"
@@ -159,6 +159,44 @@
 
             <TextView
                 style="@style/TextStyle.Medium"
+                android:id="@+id/tvKeepNotificationTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/toolbar_content_start"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_vertical_margin"
+                android:text="@string/keep_notification_after_pause"
+                app:layout_constraintTop_toBottomOf="@id/tvAdvanced"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                style="@style/TextStyle.Subtitle"
+                android:id="@+id/tvKeepNotificationTimeValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/toolbar_content_start"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_spacing_margin"
+                android:paddingBottom="@dimen/content_vertical_margin"
+                tools:text="for_at_least"
+                app:layout_constraintTop_toBottomOf="@id/tvKeepNotificationTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <FrameLayout
+                android:id="@+id/flKeepNotificationClickableArea"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:foreground="?selectableItemBackground"
+                android:contentDescription="@string/keep_notification_after_pause"
+                app:layout_constraintTop_toTopOf="@id/tvKeepNotificationTitle"
+                app:layout_constraintBottom_toBottomOf="@id/tvKeepNotificationTimeValue"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                style="@style/TextStyle.Medium"
                 android:id="@+id/tvMediaPlayers"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -166,7 +204,7 @@
                 android:paddingEnd="@dimen/content_horizontal_margin"
                 android:paddingTop="@dimen/content_vertical_margin"
                 android:text="@string/enabled_media_players"
-                app:layout_constraintTop_toBottomOf="@id/tvAdvanced"
+                app:layout_constraintTop_toBottomOf="@id/tvKeepNotificationTimeValue"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 

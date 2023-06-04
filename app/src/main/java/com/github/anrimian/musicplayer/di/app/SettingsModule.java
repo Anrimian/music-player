@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryIm
 import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl;
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.settings.HeadsetSettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
@@ -19,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsPresenter;
+import com.github.anrimian.musicplayer.ui.settings.headset.HeadsetSettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsPresenter;
 import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersPresenter;
@@ -66,10 +68,22 @@ public class SettingsModule {
 
     @Provides
     @Nonnull
+    HeadsetSettingsInteractor headsetSettingsInteractor(SettingsRepository settingsRepository) {
+        return new HeadsetSettingsInteractor(settingsRepository);
+    }
+
+    @Provides
+    @Nonnull
     DisplaySettingsPresenter displaySettingsPresenter(DisplaySettingsInteractor displaySettingsInteractor,
                                                       @Named(UI_SCHEDULER) Scheduler uiScheduler,
                                                       ErrorParser errorParser) {
         return new DisplaySettingsPresenter(displaySettingsInteractor, uiScheduler, errorParser);
+    }
+
+    @Provides
+    @Nonnull
+    HeadsetSettingsPresenter headsetSettingsPresenter(HeadsetSettingsInteractor interactor) {
+        return new HeadsetSettingsPresenter(interactor);
     }
 
     @Provides

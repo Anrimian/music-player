@@ -47,7 +47,6 @@
     <string name="save_as_play_list">Save as playlist</string>
     <string name="cancel">Cancel</string>
     <string name="deleting">Deleting</string>
-
     <string name="delete_composition_success">Song \"%1$s\" deleted</string>
     <string name="search">Search</string>
     <string name="play_queue">Play queue</string>
@@ -174,7 +173,7 @@
     <string name="log_file_deleted">Log file deleted</string>
     <string name="pick_email_app_to_send">Pick a email app to send</string>
     <string name="clear_play_queue">Clear play queue</string>
-    <string name="no_excluded_folders">Folders excluded from scanning will be appear here</string>
+    <string name="no_excluded_folders">Folders excluded from scanning will appear here</string>
     <string name="keep_playing_after_window_close">Keep playing after window closing</string>
     <string name="equalizer">Equalizer</string>
     <string name="system_equalizer">System equalizer</string>
@@ -257,6 +256,34 @@
         Place audio files into these folders and operation should perform correctly.
     </string>
     <string name="folder_already_excluded_from_scanning">This folder is already excluded from scanning</string>
+    <string name="no_file_modify_permission">No permission to modify file</string>
+    <string name="interface_settings">Interface</string>
+    <string name="enable_player_screens_swipe">Enable swipe gesture for switching between play queue and lyrics screen</string>
+    <string name="no_enough_data_to_play">Not enough data to play composition</string>
+    <string name="permission_required">Permission is required</string>
+    <string name="open_app_settings">Open app settings</string>
+    <string name="file_is_corrupted">File is corrupted</string>
+    <string name="keep_notification_after_pause">Prevent player notification from auto-closing after pause</string>
+    <string name="unknown_play_error">Unknown file play error</string>
+    <string name="file_read_timeout">File read timeout</string>
+    <string name="tag_reading_error">Tag reading error: %s</string>
+    <string name="track_number">Track number</string>
+    <string name="change_track_number">Change track number</string>
+    <string name="disc_number">Disc number</string>
+    <string name="change_disc_number">Change disc number</string>
+    <string name="comment">Comment</string>
+    <string name="change_comment">Change comment</string>
+    <string name="disc_short">Disc %d</string>
+    <string name="track_short">Track %d</string>
+    <string name="with_delay">With %.1fs delay</string>
+    <string name="insert_to_playlist_beginning">Insert new compositions at the beginning of the playlist</string>
+    <string name="export_playlist">Save as .m3u file</string>
+    <string name="import_playlist">Import playlist</string>
+    <string name="overwrite_playlist">Playlist with this name already exists. \nOverwrite it?</string>
+    <string name="playlist_has_no_records">Playlist has no records</string>
+    <string name="export_playlists_success">File \"%1$s.m3u\" was saved to internal storage</string>
+
+    <string name="name_is_too_long" translatable="false">name is too long</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
@@ -306,6 +333,21 @@
     <plurals name="delete_compositions_template">
         <item quantity="one">Delete %d song</item>
         <item quantity="other">Delete %d songs</item>
+    </plurals>
+
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">For at least %d minute</item>
+        <item quantity="other">For at least %d minutes</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d playlist was saved to internal storage</item>
+        <item quantity="other">%d playlists were saved to internal storage</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">Playlist was imported successfully, but %d file was not found in library</item>
+        <item quantity="other">Playlist was imported successfully, but %d files were not found in library</item>
     </plurals>
 
 </resources>

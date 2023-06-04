@@ -32,7 +32,7 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
 
     private val presenter by moxyPresenter { Components.getLibraryComponent().lyricsPresenter() }
 
-    private lateinit var viewBinding: FragmentLyricsBinding
+    private lateinit var binding: FragmentLyricsBinding
 
     private lateinit var clPlayQueueContainer: CoordinatorLayout
     private lateinit var acvToolbar: ActionMenuView
@@ -49,8 +49,8 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentLyricsBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentLyricsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,7 +59,7 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
         clPlayQueueContainer = requireActivity().findViewById(R.id.cl_play_queue_container)
         acvToolbar = requireActivity().findViewById(R.id.acvPlayQueue)
 
-        viewBinding.progressStateView.onTryAgainClick(presenter::onEditLyricsClicked)
+        binding.progressStateView.onTryAgainClick(presenter::onEditLyricsClicked)
 
         errorHandler = ErrorHandler(
             this,
@@ -68,10 +68,9 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
         )
 
         val fm = childFragmentManager
-        lyricsDialogFragmentRunner = DialogFragmentRunner(
-            fm,
-            Constants.Tags.LYRICS
-        ) { fragment -> fragment.setOnCompleteListener(presenter::onNewLyricsEntered) }
+        lyricsDialogFragmentRunner = DialogFragmentRunner(fm, Constants.Tags.LYRICS) { fragment ->
+            fragment.setOnCompleteListener(presenter::onNewLyricsEntered)
+        }
         progressDialogRunner = DialogFragmentDelayRunner(fm, Constants.Tags.PROGRESS_DIALOG_TAG)
     }
 
@@ -85,8 +84,8 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
 
     override fun showLyrics(text: String?) {
         if (text == null) {
-            viewBinding.progressStateView.showMessage(R.string.no_current_composition)
-            viewBinding.tvLyrics.visibility = View.GONE
+            binding.progressStateView.showMessage(R.string.no_current_composition)
+            binding.tvLyrics.visibility = View.GONE
             isActionMenuEnabled = false
             showMenuState()
             return
@@ -96,15 +95,15 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
         showMenuState()
 
         if (text.isEmpty()) {
-            viewBinding.progressStateView.showMessage(
+            binding.progressStateView.showMessage(
                 R.string.no_lyrics_for_current_composition,
                 R.string.edit_lyrics
             )
-            viewBinding.tvLyrics.visibility = View.GONE
+            binding.tvLyrics.visibility = View.GONE
         } else {
-            viewBinding.progressStateView.hideAll()
-            viewBinding.tvLyrics.visibility = View.VISIBLE
-            viewBinding.tvLyrics.text = text
+            binding.progressStateView.hideAll()
+            binding.tvLyrics.visibility = View.VISIBLE
+            binding.tvLyrics.text = text
         }
     }
 
@@ -138,7 +137,7 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
     }
 
     override fun resetTextPosition() {
-        viewBinding.nsvContainer.scrollTo(0, 0)
+        binding.nsvContainer.scrollTo(0, 0)
     }
 
     private fun onLyricsMenuItemClicked(menuItem: MenuItem) {

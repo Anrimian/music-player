@@ -212,10 +212,12 @@
     <!--not verified-->
     <string name="exclude_compositions_with_duration_less_than">Excluir composiciones del escaneo</string>
     <string name="with_duration_less_than">Con duración inferior a %s</string>
-    <string name="pause_on_audiofocus_loss">Deje de jugar en llamadas, reproducción de música / video, etc.</string>
+    <!---->
+    <string name="pause_on_audiofocus_loss">Dejar de reproducir en llamadas,  reproducción de música / video, etc.</string>
+    <!--not verified-->
     <string name="show_cover_stub_in_notification">Mostrar talón de portada en la notificación cuando no se encuentra la portada</string>
     <string name="write_to_this_is_not_allowed">Sin permiso para modificar este archivo. Pruebe a través del administrador de archivos.</string>
-    <string name="shuffle_all_and_play">Mezclar todo y jugar</string>
+    <string name="shuffle_all_and_play">Mezclar todo y reproducir</string>
     <string name="rewind">Rebobinar</string>
     <string name="fast_forward">Avance rápido</string>
     <string name="show_covers_on_lock_screen">Mostrar portadas en la pantalla de bloqueo y en Android Auto</string>
@@ -263,6 +265,34 @@
         Coloque los archivos de audio en estas carpetas y la operación debería funcionar correctamente.
     </string>
     <string name="folder_already_excluded_from_scanning">Esta carpeta ya está excluida del escaneo</string>
+    <!---->
+    <!--not verified-->
+    <string name="no_file_modify_permission">Sin permiso para modificar archivo</string>
+    <string name="interface_settings">Interfaz</string>
+    <string name="enable_player_screens_swipe">Habilite el gesto de deslizar para cambiar entre la cola de reproducción y la pantalla de letras</string>
+    <string name="no_enough_data_to_play">No hay suficientes datos para reproducir la composición</string>
+    <string name="permission_required">Se requiere permiso</string>
+    <string name="open_app_settings">Configuración de la aplicación abierta</string>
+    <string name="file_is_corrupted">El archivo está dañado</string>
+    <string name="keep_notification_after_pause">Evitar que la notificación del reproductor se cierre automáticamente después de la pausa</string>
+    <string name="unknown_play_error">Error de reproducción de archivo desconocido</string>
+    <string name="file_read_timeout">Tiempo de espera de lectura de archivo</string>
+    <string name="tag_reading_error">Error de lectura de etiqueta: %s</string>
+    <string name="track_number">Número de pista</string>
+    <string name="change_track_number">Cambiar número de pista</string>
+    <string name="disc_number">Número de disco</string>
+    <string name="change_disc_number">Cambiar número de disco</string>
+    <string name="comment">Comentario</string>
+    <string name="change_comment">Cambiar comentario</string>
+    <string name="disc_short">Disco %d</string>
+    <string name="track_short">Pista %d</string>
+    <string name="with_delay">Con %.1fs de retraso</string>
+    <string name="insert_to_playlist_beginning">Insertar nuevas composiciones al principio de la lista de reproducción</string>
+    <string name="export_playlist">Guardar como archivo .m3u</string>
+    <string name="import_playlist">Importar lista de reproducción</string>
+    <string name="overwrite_playlist">Ya existe una lista de reproducción con este nombre. \n¿Sobrescribirlo?</string>
+    <string name="playlist_has_no_records">La lista de reproducción no tiene registros</string>
+    <string name="export_playlists_success">El archivo \"%1$s.m3u\" se guardó en el almacenamiento interno</string>
     <!---->
 
     <plurals name="compositions_count">
@@ -316,6 +346,23 @@
     <plurals name="delete_compositions_template">
         <item quantity="one">Eliminar %d canción</item>
         <item quantity="other">Eliminar %d canciones</item>
+    </plurals>
+    <!---->
+
+    <!--not verified-->
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">Durante al menos %d minuto</item>
+        <item quantity="other">Durante al menos %d minutos</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d lista de reproducción se guardó en el almacenamiento interno</item>
+        <item quantity="other">%d listas de reproducción se guardaron en el almacenamiento interno</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">La lista de reproducción se importó correctamente, pero el archivo %d no se encontró en la biblioteca</item>
+        <item quantity="other">La lista de reproducción se importó con éxito, pero %d archivos no se encontraron en la biblioteca</item>
     </plurals>
     <!---->
 

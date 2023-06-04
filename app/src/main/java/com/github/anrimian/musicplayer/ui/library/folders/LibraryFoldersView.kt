@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.folders
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
@@ -84,7 +85,7 @@ interface LibraryFoldersView : MvpView {
     fun showDeleteCompositionError(errorCommand: ErrorCommand)
 
     @OneExecution
-    fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>)
+    fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>)
 
     @OneExecution
     fun showConfirmDeleteDialog(folder: FolderFileSource)

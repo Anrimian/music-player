@@ -13,11 +13,12 @@ import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment
 import com.github.anrimian.musicplayer.ui.library.folders.root.newLibraryFoldersRootFragment
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import moxy.MvpAppCompatFragment
 
-open class LibraryFragment : MvpAppCompatFragment(), FragmentLayerListener {
+open class LibraryFragment : MvpAppCompatFragment(),
+    FragmentNavigationListener {
     
     private lateinit var uiStateRepository: UiStateRepository
     
@@ -26,7 +27,7 @@ open class LibraryFragment : MvpAppCompatFragment(), FragmentLayerListener {
         uiStateRepository = Components.getAppComponent().uiStateRepository()
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
         //we can't use Toolbar.setup here. Because different fields are changed in different places
         // A: we can wrap setup into setupLibraryToolbar(parentFragmentManager, callback)
         //    and setup common part there and remove common method

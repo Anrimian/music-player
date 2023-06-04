@@ -1,18 +1,26 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlists
 
+import android.app.AlertDialog
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.Constants.PLAYLIST_MIME_TYPE
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.data.models.folders.UriFileReference
 import com.github.anrimian.musicplayer.databinding.FragmentPlayListsBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.getExportedPlaylistsMessage
+import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
@@ -20,54 +28,83 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.newPlayListFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
-import com.google.android.material.snackbar.Snackbar
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
-class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerListener {
+fun newPlaylistsFragment(playlistUri: String? = null) = PlayListsFragment().apply {
+    arguments = Bundle().apply {
+        putString(Constants.Arguments.PLAYLIST_IMPORT_ARG, playlistUri)
+    }
+}
+
+class PlayListsFragment : MvpAppCompatFragment(), PlayListsView,
+    FragmentNavigationListener {
 
     private val presenter by moxyPresenter { Components.getAppComponent().playListsPresenter() }
 
-    private lateinit var viewBinding: FragmentPlayListsBinding
+    private lateinit var binding: FragmentPlayListsBinding
 
     private lateinit var adapter: PlayListsAdapter
     private lateinit var layoutManager: LinearLayoutManager
 
+    private val pickFolderLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            presenter.onFolderForExportSelected(UriFileReference(uri))
+        }
+    }
+
+    private val pickPlaylistFileLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            presenter.onPlaylistFileReceived(UriFileReference(uri))
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
-        viewBinding = FragmentPlayListsBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentPlayListsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         layoutManager = LinearLayoutManager(context)
-        viewBinding.rvPlayLists.layoutManager = layoutManager
+        binding.rvPlayLists.layoutManager = layoutManager
 
-        RecyclerViewUtils.attachFastScroller(viewBinding.rvPlayLists)
+        RecyclerViewUtils.attachFastScroller(binding.rvPlayLists)
 
         adapter = PlayListsAdapter(
-            viewBinding.rvPlayLists,
+            binding.rvPlayLists,
             this::goToPlayListScreen,
             this::onPlaylistMenuClicked
         )
 
-        viewBinding.rvPlayLists.adapter = adapter
-        viewBinding.fab.setOnClickListener { onCreatePlayListButtonClicked() }
+        binding.rvPlayLists.adapter = adapter
+        binding.fab.setOnClickListener { onCreatePlayListButtonClicked() }
+
+        val playlistImportUri = requireArguments().getString(Constants.Arguments.PLAYLIST_IMPORT_ARG)
+        if (playlistImportUri != null) {
+            requireArguments().remove(Constants.Arguments.PLAYLIST_IMPORT_ARG)
+            importPlaylist(playlistImportUri)
+        }
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
         requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar).setup { config ->
             config.setTitle(R.string.play_lists)
             config.setSubtitle(null)
+            config.setupOptionsMenu(R.menu.play_lists_toolbar_menu, this::onOptionsItemClicked)
         }
         presenter.onFragmentMovedToTop()
     }
@@ -78,15 +115,15 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
     }
 
     override fun showEmptyList() {
-        viewBinding.progressStateView.showMessage(R.string.play_lists_on_device_not_found, false)
+        binding.progressStateView.showMessage(R.string.play_lists_on_device_not_found, false)
     }
 
     override fun showList() {
-        viewBinding.progressStateView.hideAll()
+        binding.progressStateView.hideAll()
     }
 
     override fun showLoading() {
-        viewBinding.progressStateView.showProgress()
+        binding.progressStateView.showProgress()
     }
 
     override fun updateList(lists: List<PlayList>) {
@@ -104,23 +141,58 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
     }
 
     override fun showPlayListDeleteSuccess(playList: PlayList) {
-        MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
-            getString(R.string.play_list_deleted, playList.name),
-            Snackbar.LENGTH_SHORT
-        ).show()
+        binding.listContainer.showSnackbar(getString(R.string.play_list_deleted, playList.name))
     }
 
     override fun showDeletePlayListError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
-            getString(R.string.play_list_delete_error, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
+        binding.listContainer.showSnackbar(getString(R.string.play_list_delete_error, errorCommand.message))
     }
 
     override fun showEditPlayListNameDialog(playList: PlayList) {
         RenamePlayListDialogFragment.newInstance(playList.id).safeShow(childFragmentManager)
+    }
+
+    override fun launchPickFolderScreen() {
+        pickFolderLauncher.launch(null)
+    }
+
+    override fun showErrorMessage(errorCommand: ErrorCommand) {
+        binding.listContainer.showSnackbar(errorCommand.message)
+    }
+
+    override fun showPlaylistExportSuccess(playlists: List<PlayList>) {
+        binding.listContainer.showSnackbar(getExportedPlaylistsMessage(requireContext(), playlists))
+    }
+
+    override fun launchPlayListScreen(playlistId: Long) {
+        FragmentNavigation.from(parentFragmentManager).addNewFragment(newPlayListFragment(playlistId))
+    }
+
+    override fun showOverwritePlaylistDialog() {
+        AlertDialog.Builder(requireContext())
+            .setMessage(R.string.overwrite_playlist)
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+            .setPositiveButton(android.R.string.ok) { _, _ -> presenter.onOverwritePlaylistConfirmed()}
+            .show()
+    }
+
+    override fun showNotCompletelyImportedPlaylistDialog(
+        playlistId: Long,
+        notFoundFilesCount: Int,
+    ) {
+        val message = resources.getQuantityString(
+            R.plurals.playlist_import_partial_success,
+            notFoundFilesCount,
+            notFoundFilesCount
+        )
+        AlertDialog.Builder(requireContext())
+            .setMessage(message)
+            .setPositiveButton(android.R.string.ok) { _, _ -> launchPlayListScreen(playlistId) }
+            .show()
+    }
+
+    fun importPlaylist(uriStr: String) {
+        presenter.onPlaylistFileReceived(UriFileReference(Uri.parse(uriStr)))
     }
 
     private fun onPlaylistMenuClicked(playList: PlayList, view: View) {
@@ -129,6 +201,9 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
                 R.id.menu_change_play_list_name -> {
                     presenter.onChangePlayListNameButtonClicked(playList)
                 }
+                R.id.menu_export_playlist -> {
+                    presenter.onExportPlaylistClicked(playList)
+                }
                 R.id.menu_delete_play_list -> {
                     presenter.onDeletePlayListButtonClicked(playList)
                 }
@@ -136,13 +211,17 @@ class PlayListsFragment : MvpAppCompatFragment(), PlayListsView, FragmentLayerLi
         }
     }
 
+    private fun onOptionsItemClicked(item: MenuItem) {
+        when (item.itemId) {
+            R.id.menu_import_playlist -> pickPlaylistFileLauncher.launch(PLAYLIST_MIME_TYPE)
+        }
+    }
+
     private fun onCreatePlayListButtonClicked() {
-        val fragment = CreatePlayListDialogFragment()
-        fragment.safeShow(childFragmentManager)
+        CreatePlayListDialogFragment().safeShow(childFragmentManager)
     }
 
     private fun goToPlayListScreen(playList: PlayList) {
-        FragmentNavigation.from(parentFragmentManager)
-            .addNewFragment(newPlayListFragment(playList.id))
+        launchPlayListScreen(playList.id)
     }
 }

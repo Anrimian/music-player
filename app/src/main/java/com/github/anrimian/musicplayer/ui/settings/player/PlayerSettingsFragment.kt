@@ -11,6 +11,9 @@ import com.github.anrimian.musicplayer.data.controllers.music.equalizer.Equalize
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
+import com.github.anrimian.musicplayer.domain.utils.millisToMinutes
+import com.github.anrimian.musicplayer.domain.utils.minutesToMillis
+import com.github.anrimian.musicplayer.ui.common.dialogs.showNumberPickerDialog
 import com.github.anrimian.musicplayer.ui.common.dialogs.showSoundBalanceSelectorDialog
 import com.github.anrimian.musicplayer.ui.common.format.getMediaPlayerName
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
@@ -53,6 +56,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
         viewBinding.flEqualizerClickableArea.setOnClickListener { showEqualizerDialog() }
         viewBinding.flMediaPlayersClickableArea.setOnClickListener { showMediaPlayersSettingScreen() }
+        viewBinding.flKeepNotificationClickableArea.setOnClickListener { presenter.onSelectKeepNotificationTimeClicked() }
         viewBinding.flSoundBalanceClickableArea.setOnClickListener { presenter.onSoundBalanceClicked() }
 
         SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided)
@@ -83,6 +87,24 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
     override fun showSelectedEqualizerType(type: Int) {
         viewBinding.tvEqualizerState.setText(getEqualizerTypeDescription(type))
+    }
+
+    override fun showKeepNotificationTime(millis: Long) {
+        val minutes = millis.millisToMinutes().toInt()
+        viewBinding.tvKeepNotificationTimeValue.text = resources.getQuantityString(
+            R.plurals.for_at_least_minutes,
+            minutes,
+            minutes
+        )
+    }
+
+    override fun showSelectKeepNotificationTimeDialog(currentValue: Long) {
+        showNumberPickerDialog(
+            requireContext(),
+            0,
+            15,
+            currentValue.millisToMinutes()
+        ) { value -> presenter.onKeepNotificationTimeSelected(value.minutesToMillis()) }
     }
 
     override fun showEnabledMediaPlayers(players: IntArray) {

@@ -36,9 +36,15 @@ public interface ArtistsDao {
     @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
     Observable<List<Composition>> getCompositionsByArtistObservable(SimpleSQLiteQuery query);
 
-    @Query("SELECT id FROM compositions WHERE artistId = :artistId OR " +
-            "albumId IN(SELECT id FROM albums WHERE artistId = :artistId)")
-    Single<List<Long>> getAllCompositionsByArtist(long artistId);
+    @RawQuery
+    List<Composition> getCompositionsByArtist(SimpleSQLiteQuery query);
+
+    @Query("WITH artistCompositions(id) AS (SELECT id FROM compositions WHERE artistId = :artistId) " +
+            "SELECT id FROM artistCompositions " +
+            "UNION " +
+            "SELECT compositions.id FROM compositions " +
+            "WHERE (SELECT count(*) FROM artistCompositions) = 0 AND albumId IN(SELECT id FROM albums WHERE artistId = :artistId)")
+    Single<List<Long>> getAllCompositionIdsByArtist(long artistId);
 
     @Query("SELECT id FROM albums WHERE artistId = :artistId")
     List<Long> getAllAlbumsWithArtist(long artistId);
@@ -85,5 +91,18 @@ public interface ArtistsDao {
                 CompositionsDao.getCompositionSelectionQuery(useFileName) +
                 "FROM compositions " +
                 "WHERE artistId = ?";
+    }
+
+    static String getAllCompositionsQuery(boolean useFileName) {
+        return "WITH artistCompositions AS (SELECT " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM compositions " +
+                "WHERE artistId = ?) " +
+                "SELECT * FROM artistCompositions " +
+                "UNION " +
+                "SELECT " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM compositions " +
+                "WHERE (SELECT count(*) FROM artistCompositions) = 0 AND albumId IN(SELECT id FROM albums WHERE artistId = ?)";
     }
 }

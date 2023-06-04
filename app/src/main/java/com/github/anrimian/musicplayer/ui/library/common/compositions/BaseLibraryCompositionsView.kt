@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.common.compositions
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -11,7 +12,7 @@ import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 import moxy.viewstate.strategy.alias.Skip
 
-interface BaseLibraryCompositionsView : ListMvpView<Composition> {
+interface BaseLibraryCompositionsView<C : Composition> : ListMvpView<C> {
 
     @OneExecution
     fun showSelectPlayListDialog()
@@ -29,13 +30,13 @@ interface BaseLibraryCompositionsView : ListMvpView<Composition> {
     fun showDeleteCompositionError(errorCommand: ErrorCommand)
 
     @OneExecution
-    fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>)
+    fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>)
 
     @Skip
-    fun onCompositionSelected(composition: Composition, position: Int)
+    fun onCompositionSelected(composition: C, position: Int)
 
     @Skip
-    fun onCompositionUnselected(composition: Composition, position: Int)
+    fun onCompositionUnselected(composition: C, position: Int)
 
     @Skip
     fun setItemsSelected(selected: Boolean)

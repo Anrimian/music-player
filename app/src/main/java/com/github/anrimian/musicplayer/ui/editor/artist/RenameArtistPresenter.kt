@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.editor.artist
 
 import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
@@ -14,7 +15,7 @@ class RenameArtistPresenter(
     private val artistId: Long,
     private val initialName: String,
     private val editorInteractor: EditorInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     uiScheduler: Scheduler,
     errorParser: ErrorParser
 ): AppPresenter<RenameArtistView>(uiScheduler, errorParser) {

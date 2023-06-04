@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.domain.models.artist.Artist
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
@@ -35,14 +36,13 @@ import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.library.albums.items.newAlbumItemsFragment
 import com.github.anrimian.musicplayer.ui.library.artists.items.adapter.AlbumsAdapter
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
-import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
@@ -52,25 +52,24 @@ import com.google.android.material.snackbar.Snackbar
 import com.r0adkll.slidr.model.SlidrInterface
 import moxy.ktx.moxyPresenter
 
-fun newInstance(artistId: Long): ArtistItemsFragment {
-    val args = Bundle()
-    args.putLong(Constants.Arguments.ID_ARG, artistId)
-    val fragment = ArtistItemsFragment()
-    fragment.arguments = args
-    return fragment
+fun newInstance(artistId: Long) = ArtistItemsFragment().apply {
+    arguments = Bundle().apply {
+        putLong(Constants.Arguments.ID_ARG, artistId)
+    }
 }
 
 class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
-    ArtistItemsView, FragmentLayerListener, BackButtonListener {
+    ArtistItemsView,
+    FragmentNavigationListener, BackButtonListener {
 
     private val presenter by moxyPresenter { Components.artistItemsComponent(getAlbumId()).artistItemsPresenter() }
 
-    private lateinit var viewBinding: FragmentBaseFabListBinding
+    private lateinit var binding: FragmentBaseFabListBinding
 
     private lateinit var toolbar: AdvancedToolbar
     private lateinit var albumsAdapter: AlbumsAdapter
     private lateinit var albumsHeaderWrapper: SingleItemAdapter<ItemAlbumsHorizontalBinding>
-    private lateinit var adapter: CompositionsAdapter
+    private lateinit var adapter: CompositionsAdapter<Composition>
     private lateinit var layoutManager: LinearLayoutManager
 
     private lateinit var choosePlayListDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
@@ -81,25 +80,23 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
     private var isCompositionsEmpty: Boolean = true
     private var isAlbumsEmpty: Boolean = true
 
-    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<ArtistItemsView> {
-        return presenter
-    }
+    override fun getLibraryPresenter(): ArtistItemsPresenter = presenter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentBaseFabListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar = requireActivity().findViewById(R.id.toolbar)
-        viewBinding.progressStateView.onTryAgainClick { presenter.onTryAgainLoadCompositionsClicked() }
+        binding.progressStateView.onTryAgainClick { presenter.onTryAgainLoadCompositionsClicked() }
 
-        RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView, true)
+        RecyclerViewUtils.attachFastScroller(binding.recyclerView, true)
 
         albumsHeaderWrapper = SingleItemAdapter { inflater, parent ->
             val binding = ItemAlbumsHorizontalBinding.inflate(inflater, parent, false)
@@ -119,16 +116,16 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
         }
         adapter = CompositionsAdapter(
             this,
-            viewBinding.recyclerView,
+            binding.recyclerView,
             presenter.getSelectedCompositions(),
             presenter::onCompositionClicked,
             presenter::onCompositionLongClick,
             presenter::onCompositionIconClicked,
             this::onCompositionMenuClicked
         )
-        viewBinding.recyclerView.adapter = ConcatAdapter(albumsHeaderWrapper, adapter)
+        binding.recyclerView.adapter = ConcatAdapter(albumsHeaderWrapper, adapter)
         layoutManager = LinearLayoutManager(context)
-        viewBinding.recyclerView.layoutManager = layoutManager
+        binding.recyclerView.layoutManager = layoutManager
         val callback = ShortSwipeCallback(
             requireContext(),
             R.drawable.ic_play_next,
@@ -139,13 +136,13 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
             swipeCallback = presenter::onPlayNextCompositionClicked
         )
         val itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
+        itemTouchHelper.attachToRecyclerView(binding.recyclerView)
 
-        viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
-        ViewUtils.onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
+        binding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        ViewUtils.onLongVibrationClick(binding.fab, presenter::onChangeRandomModePressed)
 
         slidrInterface = SlidrPanel.simpleSwipeBack(
-            viewBinding.listContainer,
+            binding.listContainer,
             this,
             toolbar::onStackFragmentSlided
         )
@@ -164,14 +161,14 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
         ) { f -> f.setOnCompleteListener(presenter::onPlayListToAddingSelected) }
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
 //        super.onFragmentMovedOnTop();
         presenter.onFragmentMovedToTop()
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
         toolbar.setupSearch(null, null)
         toolbar.setTitleClickListener(null)
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu, this::onActionModeItemClicked)
-        toolbar.setupOptionsMenu(R.menu.artist_menu, this::onOptionsItemClicked)
+        toolbar.setupOptionsMenu(R.menu.library_artist_items_menu, this::onOptionsItemClicked)
     }
 
     override fun onStop() {
@@ -201,26 +198,26 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
     }
 
     override fun showEmptyList() {
-        viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.hideAll()
+        binding.fab.visibility = View.GONE
+        binding.progressStateView.hideAll()
     }
 
     override fun showEmptySearchResult() {
-        viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.showMessage(R.string.compositions_for_search_not_found)
+        binding.fab.visibility = View.GONE
+        binding.progressStateView.showMessage(R.string.compositions_for_search_not_found)
     }
 
     override fun showList() {
-        viewBinding.fab.visibility = View.VISIBLE
-        viewBinding.progressStateView.hideAll()
+        binding.fab.visibility = View.VISIBLE
+        binding.progressStateView.hideAll()
     }
 
     override fun showLoading() {
-        viewBinding.progressStateView.showProgress()
+        binding.progressStateView.showProgress()
     }
 
     override fun showLoadingError(errorCommand: ErrorCommand) {
-        viewBinding.progressStateView.showMessage(errorCommand.message, true)
+        binding.progressStateView.showMessage(errorCommand.message, true)
     }
 
     override fun updateList(compositions: List<Composition>) {
@@ -277,7 +274,7 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
         MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
+            binding.listContainer,
             getString(R.string.add_to_playlist_error_template, errorCommand.message),
             Snackbar.LENGTH_SHORT
         ).show()
@@ -285,7 +282,7 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
 
     override fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>) {
         val text = MessagesUtils.getAddToPlayListCompleteMessage(requireActivity(), playList, compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun showSelectPlayListDialog() {
@@ -308,16 +305,16 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
     override fun showDeleteCompositionError(errorCommand: ErrorCommand) {
         deletingErrorHandler.handleError(errorCommand) {
             MessagesUtils.makeSnackbar(
-                viewBinding.listContainer,
+                binding.listContainer,
                 getString(R.string.delete_composition_error_template, errorCommand.message),
                 Snackbar.LENGTH_SHORT
             ).show()
         }
     }
 
-    override fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>) {
+    override fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun shareCompositions(selectedCompositions: Collection<Composition>) {
@@ -333,21 +330,21 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
     }
 
     override fun showRandomMode(isRandomModeEnabled: Boolean) {
-        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
+        FormatUtils.formatPlayAllButton(binding.fab, isRandomModeEnabled)
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, errorCommand.message, Snackbar.LENGTH_LONG).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, errorCommand.message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun onCompositionsAddedToPlayNext(compositions: List<Composition>) {
         val message = MessagesUtils.getPlayNextMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onCompositionsAddedToQueue(compositions: List<Composition>) {
         val message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun closeScreen() {
@@ -385,12 +382,12 @@ class ArtistItemsFragment : BaseLibraryCompositionsFragment(),
     }
 
     private fun showEditorRequestDeniedMessage() {
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, R.string.android_r_edit_file_permission_denied, Snackbar.LENGTH_LONG).show()
     }
 
     private fun updateEmptyMessage() {
         if (isCompositionsEmpty && isAlbumsEmpty) {
-            viewBinding.progressStateView.showMessage(R.string.no_compositions)
+            binding.progressStateView.showMessage(R.string.no_compositions)
         }
     }
 }

@@ -6,6 +6,7 @@ import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListPresenter;
@@ -31,7 +32,7 @@ public class PlayListModule {
     PlayListPresenter playListsPresenter(LibraryPlayerInteractor musicPlayerInteractor,
                                          PlayListsInteractor playListsInteractor,
                                          DisplaySettingsInteractor displaySettingsInteractor,
-                                         SyncInteractor<?, ?, Long> syncInteractor,
+                                         SyncInteractor<FileKey, ?, Long> syncInteractor,
                                          @Named(UI_SCHEDULER) Scheduler uiSchedule,
                                          ErrorParser errorParser) {
         return new PlayListPresenter(playListId,

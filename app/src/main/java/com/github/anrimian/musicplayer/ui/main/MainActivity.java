@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.DialogFragment;
@@ -69,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
             }
-
             startScreens();
         }
     }
@@ -82,10 +82,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (getOpenPlayerPanelArg(intent)) {
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_activity_container);
-            if (fragment instanceof PlayerFragment) {
-                ((PlayerFragment) fragment).openPlayerPanel();//non-smooth update, why...
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_activity_container);
+        if (fragment instanceof PlayerFragment) {
+            PlayerFragment playerFragment = (PlayerFragment) fragment;
+            if (getOpenPlayerPanelArg(intent)) {
+                playerFragment.openPlayerPanel();//non-smooth update, why...
+            }
+            String playlistUri = getPlaylistArg(intent);
+            if (playlistUri != null) {
+                playerFragment.openImportPlaylistScreen(playlistUri);
             }
         }
     }
@@ -118,8 +123,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToMainScreen() {
-        boolean openPlayQueue = getOpenPlayerPanelArg(getIntent());
-        startFragment(PlayerFragmentKt.newPlayerFragment(openPlayQueue));
+        Intent intent = getIntent();
+
+        boolean openPlayQueue = getOpenPlayerPanelArg(intent);
+
+        String playlistUri = null;
+        if (!AndroidUtils.isLaunchedFromHistory(this)) {
+            playlistUri = getPlaylistArg(intent);
+        }
+        startFragment(PlayerFragmentKt.newPlayerFragment(openPlayQueue, playlistUri));
     }
 
     private void startFragment(Fragment fragment) {
@@ -136,6 +148,15 @@ public class MainActivity extends AppCompatActivity {
         boolean openPlayerPanel = intent.getBooleanExtra(OPEN_PLAYER_PANEL_ARG, false);
         getIntent().removeExtra(OPEN_PLAYER_PANEL_ARG);
         return openPlayerPanel;
+    }
+
+    @Nullable
+    private String getPlaylistArg(Intent intent) {
+        String type = intent.getType();
+        if ("audio/x-mpegurl".equals(type) || "audio/mpegurl".equals(type)) {
+            return intent.getData().toString();
+        }
+        return null;
     }
 
     public static class ErrorReportDialogFragment extends DialogFragment {

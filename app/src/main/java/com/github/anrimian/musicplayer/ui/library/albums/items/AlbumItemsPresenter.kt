@@ -6,7 +6,8 @@ import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerIn
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.albums.Album
-import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
@@ -19,10 +20,10 @@ class AlbumItemsPresenter(
     playListsInteractor: PlayListsInteractor,
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
-    syncInteractor: SyncInteractor<*, *, Long>,
+    syncInteractor: SyncInteractor<FileKey, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
-) : BaseLibraryCompositionsPresenter<AlbumItemsView>(
+) : BaseLibraryCompositionsPresenter<AlbumComposition, AlbumItemsView>(
     playerInteractor,
     playListsInteractor,
     displaySettingsInteractor,
@@ -38,7 +39,7 @@ class AlbumItemsPresenter(
         subscribeOnAlbumInfo()
     }
 
-    override fun getCompositionsObservable(searchText: String?): Observable<List<Composition>> {
+    override fun getCompositionsObservable(searchText: String?): Observable<List<AlbumComposition>> {
         return interactor.getAlbumItemsObservable(albumId)
     }
 

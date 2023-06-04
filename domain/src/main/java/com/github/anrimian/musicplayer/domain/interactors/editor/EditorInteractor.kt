@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
 import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository
@@ -17,7 +18,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class EditorInteractor(
     private val sourceInteractor: CompositionSourceInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     private val editorRepository: EditorRepository,
     private val libraryRepository: LibraryRepository,
     private val storageSourceRepository: StorageSourceRepository,
@@ -150,7 +151,7 @@ class EditorInteractor(
         editingSubject: BehaviorSubject<Long>
     ): Completable {
         return runBatchEditAction(
-            libraryRepository.getAllCompositionsByArtist(artistId)
+            libraryRepository.getAllCompositionIdsByArtists(artistId)
                 .doOnSuccess { ids -> affectedFilesCount(ids.size) },
             downloadingSubject
         ) { ids, sources ->

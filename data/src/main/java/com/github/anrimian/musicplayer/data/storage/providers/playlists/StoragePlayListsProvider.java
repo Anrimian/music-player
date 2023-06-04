@@ -14,24 +14,26 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore.Audio.Playlists;
 
-import androidx.collection.LongSparseArray;
-
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
+import kotlin.text.StringsKt;
 
 public class StoragePlayListsProvider {
 
@@ -43,10 +45,10 @@ public class StoragePlayListsProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<LongSparseArray<StoragePlayList>> getPlayListsObservable() {
+    public Observable<Map<String, StoragePlayList>> getPlayListsObservable() {
         return RxContentObserver.getObservable(contentResolver, Playlists.EXTERNAL_CONTENT_URI)
                 .flatMapSingle(o -> Single.create(emitter -> {
-                    LongSparseArray<StoragePlayList> playLists = getPlayLists();
+                    Map<String, StoragePlayList> playLists = getPlayLists();
                     if (playLists != null) {
                         emitter.onSuccess(playLists);
                     }
@@ -54,7 +56,7 @@ public class StoragePlayListsProvider {
     }
 
     @Nullable
-    public LongSparseArray<StoragePlayList> getPlayLists() {
+    public Map<String, StoragePlayList> getPlayLists() {
         try {
             MediaStoreUtils.checkIfMediaStoreAvailable(context);
         } catch (UnavailableMediaStoreException e) {
@@ -68,15 +70,19 @@ public class StoragePlayListsProvider {
                 null,
                 null)) {
             if (cursor == null) {
-                return new LongSparseArray<>();
+                return new HashMap<>();
             }
             CursorWrapper cursorWrapper = new CursorWrapper(cursor);
 
-            LongSparseArray<StoragePlayList> map = new LongSparseArray<>();
+            Map<String, StoragePlayList> map = new HashMap<>();
             while (cursor.moveToNext()) {
                 StoragePlayList playList = getPlayListFromCursor(cursorWrapper);
                 if (playList != null) {
-                    map.put(playList.getStorageId(), playList);
+                    String name = playList.getName()
+                            .replaceAll(Constants.PLAYLIST_NOT_ALLOWED_CHARACTERS, "")
+                            .trim();
+                    name = StringsKt.take(name, Constants.PLAYLIST_NAME_MAX_LENGTH);
+                    map.put(name, playList);
                 }
             }
             return map;

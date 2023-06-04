@@ -6,7 +6,11 @@ public interface SystemServiceController {
 
     void startMusicService();
 
-    void stopMusicService();
+    default void stopMusicService() {
+        stopMusicService(false);
+    }
+
+    void stopMusicService(boolean forceStop);
 
     Observable<Object> getStopForegroundSignal();
 

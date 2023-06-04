@@ -122,16 +122,16 @@ public class FoldersDaoWrapper {
         }
     }
 
-    public void deleteFolder(Long folderId, List<Composition> childCompositions) {
+    public void deleteFolder(Long folderId, Long[] childCompositions) {
         appDatabase.runInTransaction(() -> {
-            compositionsDao.deleteAll(mapList(childCompositions, Composition::getId));
+            compositionsDao.deleteAll(childCompositions);
             foldersDao.deleteFolder(folderId);
         });
     }
 
-    public void deleteFolders(List<Long> folders, List<Composition> childCompositions) {
+    public void deleteFolders(List<Long> folders, Long[] childCompositions) {
         appDatabase.runInTransaction(() -> {
-            compositionsDao.deleteAll(mapList(childCompositions, Composition::getId));
+            compositionsDao.deleteAll(childCompositions);
             foldersDao.deleteFolders(folders);
         });
     }

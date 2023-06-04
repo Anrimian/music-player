@@ -42,7 +42,7 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
 
     private val presenter by moxyPresenter { Components.getAppComponent().equalizerPresenter() }
 
-    private lateinit var viewBinding: DialogEqualizerBinding
+    private lateinit var binding: DialogEqualizerBinding
 
     private lateinit var equalizerController: EqualizerController
 
@@ -56,8 +56,8 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
-        viewBinding = DialogEqualizerBinding.inflate(LayoutInflater.from(context))
-        val view = viewBinding.root
+        binding = DialogEqualizerBinding.inflate(LayoutInflater.from(context))
+        val view = binding.root
         dialog.setContentView(view)
 
         view.measure(
@@ -77,22 +77,22 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
         
         AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground)
         
-        RecyclerViewUtils.attachDynamicShadow(viewBinding.nestedScrollView, viewBinding.titleShadow)
+        RecyclerViewUtils.attachDynamicShadow(binding.nestedScrollView, binding.titleShadow)
         
         equalizerController = Components.getAppComponent().equalizerController()
         
-        viewBinding.rbUseSystemEqualizer.setOnClickListener { enableSystemEqualizer() }
-        viewBinding.btnOpenSystemEqualizer.setOnClickListener { openSystemEqualizer() }
-        viewBinding.rbUseAppEqualizer.setOnClickListener { enableAppEqualizer() }
-        viewBinding.rbDisableEqualizer.setOnClickListener { disableEqualizer() }
-        viewBinding.ivClose.setOnClickListener { dismissAllowingStateLoss() }
-        viewBinding.btnRestartSystemEqualizer.setOnClickListener { presenter.onRestartAppEqClicked() }
+        binding.rbUseSystemEqualizer.setOnClickListener { enableSystemEqualizer() }
+        binding.btnOpenSystemEqualizer.setOnClickListener { openSystemEqualizer() }
+        binding.rbUseAppEqualizer.setOnClickListener { enableAppEqualizer() }
+        binding.rbDisableEqualizer.setOnClickListener { disableEqualizer() }
+        binding.ivClose.setOnClickListener { dismissAllowingStateLoss() }
+        binding.btnRestartSystemEqualizer.setOnClickListener { presenter.onRestartAppEqClicked() }
         
         showActiveEqualizer(equalizerController.selectedEqualizerType)
         
-        CompatUtils.setOutlineButtonStyle(viewBinding.btnOpenSystemEqualizer)
-        CompatUtils.setOutlineButtonStyle(viewBinding.tvPresets)
-        CompatUtils.setOutlineButtonStyle(viewBinding.btnRestartSystemEqualizer)
+        CompatUtils.setOutlineButtonStyle(binding.btnOpenSystemEqualizer)
+        CompatUtils.setOutlineButtonStyle(binding.tvPresets)
+        CompatUtils.setOutlineButtonStyle(binding.btnRestartSystemEqualizer)
     }
 
     override fun onResume() {
@@ -106,11 +106,11 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
             textResId = R.string.external_equalizer_not_found
             enabled = false
         }
-        viewBinding.btnOpenSystemEqualizer.isEnabled = enabled
-        viewBinding.rbUseSystemEqualizer.isEnabled = enabled
-        viewBinding.tvSystemEqualizerText.isEnabled = enabled
-        viewBinding.tvSystemEqualizerDescription.isEnabled = enabled
-        viewBinding.tvSystemEqualizerDescription.text = getString(textResId)
+        binding.btnOpenSystemEqualizer.isEnabled = enabled
+        binding.rbUseSystemEqualizer.isEnabled = enabled
+        binding.tvSystemEqualizerText.isEnabled = enabled
+        binding.tvSystemEqualizerDescription.isEnabled = enabled
+        binding.tvSystemEqualizerDescription.text = getString(textResId)
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {
@@ -126,7 +126,7 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
             lp.weight = 1f
-            viewBinding.llBands.addView(binding.root, lp) //recalculate dialog height?
+            this.binding.llBands.addView(binding.root, lp) //recalculate dialog height?
             
             val lowestRange = config.lowestBandRange
             val highestRange = config.highestBandRange
@@ -147,7 +147,7 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
             val preset = presets[i]
             menuBuilder.add(i, preset.presetName)
         }
-        viewBinding.tvPresets.setOnClickListener { view ->
+        binding.tvPresets.setOnClickListener { view ->
             PopupMenuWindow.showActionBarPopup(
                 view,
                 menuBuilder.items,
@@ -170,7 +170,7 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
     }
 
     override fun showEqualizerRestartButton(show: Boolean) {
-        viewBinding.btnRestartSystemEqualizer.visibility = if (show) View.VISIBLE else View.GONE
+        binding.btnRestartSystemEqualizer.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun enableSystemEqualizer() {
@@ -194,9 +194,9 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
     }
 
     private fun showActiveEqualizer(type: Int) {
-        viewBinding.rbUseSystemEqualizer.isChecked = type == EqualizerType.EXTERNAL
-        viewBinding.rbUseAppEqualizer.isChecked = type == EqualizerType.APP
-        viewBinding.rbDisableEqualizer.isChecked = type == EqualizerType.NONE
+        binding.rbUseSystemEqualizer.isChecked = type == EqualizerType.EXTERNAL
+        binding.rbUseAppEqualizer.isChecked = type == EqualizerType.APP
+        binding.rbDisableEqualizer.isChecked = type == EqualizerType.NONE
         setInAppEqualizerSettingsEnabled(type == EqualizerType.APP)
     }
 
@@ -206,6 +206,6 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
             val binding = pair.first
             binding.sbLevel.isEnabled = enabled
         }
-        viewBinding.tvPresets.isEnabled = enabled
+        binding.tvPresets.isEnabled = enabled
     }
 }

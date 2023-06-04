@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.fragments.navigation;
 
+import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
+
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,8 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class FragmentNavigation {
@@ -50,6 +50,8 @@ public class FragmentNavigation {
 
     @Nullable
     private Runnable bottomFragmentRunnable;
+    private long bottomFragmentRunnableTime;
+    private long bottomFragmentRunnableDelay;
 
     public static FragmentNavigation from(FragmentManager fm) {
         NavigationFragment container = (NavigationFragment) fm.findFragmentByTag(NAVIGATION_FRAGMENT_TAG);
@@ -387,8 +389,8 @@ public class FragmentNavigation {
     }
 
     private void notifyFragmentMovedToTop(Fragment fragment) {
-        if (isVisible && fragment instanceof FragmentLayerListener) {
-            ((FragmentLayerListener) fragment).onFragmentMovedOnTop();
+        if (isVisible && fragment instanceof FragmentNavigationListener) {
+            ((FragmentNavigationListener) fragment).onFragmentResumed();
         }
     }
 
@@ -403,6 +405,21 @@ public class FragmentNavigation {
             actionHandler.removeCallbacks(bottomFragmentRunnable);
         }
         bottomFragmentRunnable = this::silentlyReplaceBottomFragment;
+        actionHandler.postDelayed(bottomFragmentRunnable, delay);
+    }
+
+    private void scheduleBottomFragmentClearing(long delay) {
+        if (bottomFragmentRunnable != null) {
+            actionHandler.removeCallbacks(bottomFragmentRunnable);
+        }
+        bottomFragmentRunnable = () -> {
+            silentlyClearBottomFragment();
+            bottomFragmentRunnable = null;
+            bottomFragmentRunnableTime = 0;
+            bottomFragmentRunnableDelay = 0;
+        };
+        bottomFragmentRunnableTime = System.currentTimeMillis();
+        bottomFragmentRunnableDelay = delay;
         actionHandler.postDelayed(bottomFragmentRunnable, delay);
     }
 
@@ -421,14 +438,6 @@ public class FragmentNavigation {
         }
     }
 
-    private void scheduleBottomFragmentClearing(long delay) {
-        if (bottomFragmentRunnable != null) {
-            actionHandler.removeCallbacks(bottomFragmentRunnable);
-        }
-        bottomFragmentRunnable = this::silentlyClearBottomFragment;
-        actionHandler.postDelayed(bottomFragmentRunnable, delay);
-    }
-
     private void silentlyClearBottomFragment() {
         Fragment fragment = getFragmentOnBottom();
         if (fragment != null) {
@@ -444,13 +453,20 @@ public class FragmentNavigation {
     }
 
     private void runForwardAction(Callback<FragmentManager> runnable) {
-        actionExecutor.execute(() ->
-                actionHandler.post(() -> {
-                    FragmentManager fm = fragmentManagerProvider.getFragmentManager();
-                    if (fm != null) {
-                        runnable.call(fm);
+        actionExecutor.execute(() -> {
+                    Runnable scheduledRunnable = () -> {
+                        FragmentManager fm = fragmentManagerProvider.getFragmentManager();
+                        if (fm != null) {
+                            runnable.call(fm);
+                        }
+                    };
+                    if (bottomFragmentRunnable != null) {
+                        long delay = bottomFragmentRunnableDelay - (System.currentTimeMillis() - bottomFragmentRunnableTime) + 1;
+                        actionHandler.postDelayed(scheduledRunnable, delay);
+                    } else {
+                        actionHandler.post(scheduledRunnable);
                     }
-                })
+                }
         );
     }
 

@@ -139,7 +139,7 @@ public class Composition {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Composition)) return false;//compare child classes too
 
         Composition that = (Composition) o;
 

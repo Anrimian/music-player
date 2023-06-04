@@ -79,26 +79,26 @@ public class PlayQueueDaoWrapper {
         });
     }
 
-    public long insertNewPlayQueue(List<Composition> compositions,
+    public long insertNewPlayQueue(List<Long> compositionIds,
                                    boolean randomPlayingEnabled,
                                    int startPosition) {
         return appDatabase.runInTransaction(() -> {
-            List<Composition> shuffledList = new ArrayList<>(compositions);
+            List<Long> shuffledList = new ArrayList<>(compositionIds);
             long randomSeed = System.nanoTime();
             Collections.shuffle(shuffledList, new Random(randomSeed));
 
-            List<Integer> shuffledPositionList = new ArrayList<>(compositions.size());
-            for (int i = 0; i < compositions.size(); i++) {
+            List<Integer> shuffledPositionList = new ArrayList<>(compositionIds.size());
+            for (int i = 0; i < compositionIds.size(); i++) {
                 shuffledPositionList.add(i);
             }
             Collections.shuffle(shuffledPositionList, new Random(randomSeed));
 
-            List<PlayQueueEntity> entities = new ArrayList<>(compositions.size());
+            List<PlayQueueEntity> entities = new ArrayList<>(compositionIds.size());
             int shuffledStartPosition = 0;
-            for (int i = 0; i < compositions.size(); i++) {
-                Composition composition = compositions.get(i);
+            for (int i = 0; i < compositionIds.size(); i++) {
+                long id = compositionIds.get(i);
                 PlayQueueEntity playQueueEntity = new PlayQueueEntity();
-                playQueueEntity.setAudioId(composition.getId());
+                playQueueEntity.setAudioId(id);
                 playQueueEntity.setPosition(i);
                 int shuffledPosition =  shuffledPositionList.get(i);
                 playQueueEntity.setShuffledPosition(shuffledPosition);
@@ -143,7 +143,7 @@ public class PlayQueueDaoWrapper {
     @Nullable
     public Long restoreDeletedItem() {
         if (deletedItem != null) {
-           return playQueueDao.insertItem(deletedItem);
+            return playQueueDao.insertItem(deletedItem);
         }
         return null;
     }

@@ -1,10 +1,13 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions;
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.Nullable;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RawQuery;
+import androidx.room.util.StringUtil;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
@@ -15,6 +18,7 @@ import com.github.anrimian.musicplayer.data.models.composition.ExternalCompositi
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
 
@@ -164,7 +168,7 @@ public interface CompositionsDao {
     void delete(long id);
 
     @Query("DELETE FROM compositions WHERE id in (:ids)")
-    void delete(List<Long> ids);
+    void delete(Long[] ids);
 
     @Query("UPDATE compositions SET artistId = :artistId WHERE id = :id")
     void updateArtist(long id, Long artistId);
@@ -274,9 +278,14 @@ public interface CompositionsDao {
     @Query("SELECT folderId FROM compositions WHERE id = :id")
     Long getFolderId(long id);
 
-    @Query("SELECT " +
-            "(" +
-            "WITH RECURSIVE path(level, name, parentId) AS (" +
+    @Query("WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
+            "SELECT id as childFolderId, id as rootFolderId FROM folders " +
+            "WHERE parentId = :parentFolderId OR (parentId IS NULL AND :parentFolderId IS NULL)" +
+            "UNION " +
+            "SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
+            ") " +
+            "SELECT " +
+            "(WITH RECURSIVE path(level, name, parentId) AS (" +
             "                SELECT 0, name, parentId " +
             "                FROM folders " +
             "                WHERE id = compositions.folderId " +
@@ -310,16 +319,19 @@ public interface CompositionsDao {
             "dateModified as dateModified, " +
             "coverModifyTime as coverModifyTime, " +
             "storageId IS NOT NULL AS isFileExists " +
-            "FROM compositions ")
-    List<ExternalComposition> getAllAsExternalCompositions();
+            "FROM compositions " +
+            "WHERE folderId IN (SELECT childFolderId FROM allChildFolders)" +
+            "   OR (folderId = :parentFolderId OR (folderId IS NULL AND :parentFolderId IS NULL))")
+    List<ExternalComposition> getAllAsExternalCompositions(Long parentFolderId);
 
     @Query("SELECT id FROM compositions WHERE fileName = :fileName ")
     long[] findCompositionsByFileName(String fileName);
 
+    @Nullable
     @Query("SELECT id " +
             "FROM compositions " +
             "WHERE fileName = :fileName AND (folderId = :folderId OR (folderId IS NULL AND :folderId IS NULL))")
-    long findCompositionByFileName(String fileName, Long folderId);
+    Long findCompositionByFileName(String fileName, Long folderId);
 
     @Query("WITH RECURSIVE path(level, name, parentId) AS (" +
             "    SELECT 0, name, parentId" +
@@ -354,6 +366,11 @@ public interface CompositionsDao {
     void updateCompositionInitialSource(long id,
                                         InitialSource initialSource,
                                         InitialSource updateFrom);
+    @RawQuery
+    List<DeletedComposition> selectDeletedComposition(SupportSQLiteQuery query);
+
+    @Query("SELECT exists(SELECT 1 FROM compositions WHERE id = :compositionId)")
+    boolean isCompositionExists(long compositionId);
 
     static StringBuilder getCompositionQuery(boolean useFileName) {
         return new StringBuilder("SELECT " +
@@ -390,4 +407,41 @@ public interface CompositionsDao {
         sb.append(" LIKE ? OR (artist NOTNULL AND artist LIKE ?))");
         return sb;
     }
+
+    @SuppressLint("RestrictedApi")
+    static StringBuilder getDeletedCompositionQuery(boolean useFileName, int compositionsCount) {
+        StringBuilder sb = new StringBuilder(
+                "SELECT " +
+                        "(" +
+                        "WITH RECURSIVE path(level, name, parentId) AS (" +
+                        "                SELECT 0, name, parentId " +
+                        "                FROM folders " +
+                        "                WHERE id = compositions.folderId " +
+                        "                UNION ALL " +
+                        "                SELECT path.level + 1, " +
+                        "                       folders.name, " +
+                        "                       folders.parentId " +
+                        "                FROM folders " +
+                        "                JOIN path ON folders.id = path.parentId " +
+                        "            ), " +
+                        "            path_from_root AS ( " +
+                        "                SELECT name " +
+                        "                FROM path " +
+                        "                ORDER BY level DESC " +
+                        "            ) " +
+                        "            SELECT group_concat(name, '/') " +
+                        "            FROM path_from_root" +
+                        ") AS parentPath, " +
+                        "fileName as fileName, " +
+                        "compositions.storageId as storageId, "
+        );
+        sb.append("(");
+        sb.append(useFileName ? "fileName" : "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END");
+        sb.append(") as title ");
+        sb.append("FROM compositions WHERE id IN(");
+        StringUtil.appendPlaceholders(sb, compositionsCount);
+        sb.append(")");
+        return sb;
+    }
+
 }

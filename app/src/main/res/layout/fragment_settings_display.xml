@@ -56,6 +56,56 @@
 
             <TextView
                 style="@style/TextStyle.ContentTitle"
+                android:id="@+id/tvInterfaceTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/interface_settings"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLocale"/>
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbPlayerScreensSwipe"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/enable_player_screens_swipe"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvInterfaceTitle"/>
+
+            <TextView
+                style="@style/TextStyle.ContentTitle"
+                android:id="@+id/tvCompositionsTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/compositions"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbPlayerScreensSwipe"/>
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbUseFileName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/display_composition_file_name"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCompositionsTitle"/>
+
+            <TextView
+                style="@style/TextStyle.ContentTitle"
                 android:id="@+id/tvCoversTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -65,7 +115,7 @@
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvLocale"/>
+                app:layout_constraintTop_toBottomOf="@id/cbUseFileName"/>
 
             <CheckBox
                 style="@style/CheckboxStyle"
@@ -126,31 +176,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cbShowCoverStubInNotification" />
-
-            <TextView
-                style="@style/TextStyle.ContentTitle"
-                android:id="@+id/tvCompositionsTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/compositions"
-                android:layout_marginTop="@dimen/content_vertical_margin"
-                android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:layout_marginStart="@dimen/content_horizontal_margin"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cbNotificationOnLockScreen"/>
-
-            <CheckBox
-                style="@style/CheckboxStyle"
-                android:id="@+id/cbUseFileName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/display_composition_file_name"
-                android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:layout_marginStart="@dimen/content_horizontal_margin"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvCompositionsTitle"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -257,7 +257,32 @@
         Bitte Audiodateien dort speichern, dann sollte die Aktion klappen.
     </string>
     <string name="folder_already_excluded_from_scanning">Dieser Ordner wird bei der Musiksuche bereits ignoriert.</string>
-
+    <string name="no_file_modify_permission">Keine Berechtigung, die Datei zu verändern</string>
+    <string name="interface_settings">Benutzeroberfläche</string>
+    <string name="enable_player_screens_swipe">Wischgesten aktivieren, um zwischen Wiedergabeliste und Lyrics zu wechseln</string>
+    <string name="no_enough_data_to_play">Nicht genug Daten, um Titel abzuspielen</string>
+    <string name="permission_required">Berechtigung nötig</string>
+    <string name="open_app_settings">App-Einstellungen öffnen</string>
+    <string name="file_is_corrupted">Datei ist beschädigt</string>
+    <string name="keep_notification_after_pause">Player-Benachrichtigung nach einer Pause nicht automatisch schließen</string>
+    <string name="unknown_play_error">Unbekannter Fehler beim Abspielen</string>
+    <string name="file_read_timeout">Lesen der Datei dauert zu lang</string>
+    <string name="tag_reading_error">Tag-Lesefehler: %s</string>
+    <string name="track_number">Titelnummer</string>
+    <string name="change_track_number">Titelnummer ändern</string>
+    <string name="disc_number">CD-Nummer</string>
+    <string name="change_disc_number">CD-Nummer ändern</string>
+    <string name="comment">Kommentar</string>
+    <string name="change_comment">Kommentar ändern</string>
+    <string name="disc_short">CD %d</string>
+    <string name="track_short">Titelnummer %d</string>
+    <string name="with_delay">Mit %.1fs Verzögerung</string>
+    <string name="insert_to_playlist_beginning">Neue Titel am Anfang der Wiedergabeliste einfügen</string>
+    <string name="export_playlist">Als .m3u-Datei speichern</string>
+    <string name="import_playlist">Playlist importieren</string>
+    <string name="overwrite_playlist">Es gibt bereits eine Playlist mit diesem Namen. \nDiese überschreiben?</string>
+    <string name="playlist_has_no_records">Playlist ist leer</string>
+    <string name="export_playlists_success">Datei „%1$s.m3u“ erfolgreich auf internen Speicher gesichert</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s Titel</item>
@@ -307,6 +332,21 @@
     <plurals name="delete_compositions_template">
         <item quantity="one">%d Titel löschen</item>
         <item quantity="other">%d Titel löschen</item>
+    </plurals>
+
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">Für mindestens %d Minute</item>
+        <item quantity="other">Für mindestens %d Minuten</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d Playlist auf internen Speicher gesichert</item>
+        <item quantity="other">%d Playlists auf internen Speicher gesichert</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">Playlist erfolgreich importiert, aber %d Datei wurde nicht in der Sammlung gefunden</item>
+        <item quantity="other">Playlist erfolgreich importiert, aber %d Dateien wurden nicht in der Sammlung gefunden</item>
     </plurals>
 
 </resources>

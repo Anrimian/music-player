@@ -40,4 +40,21 @@ interface PlayListsView : MvpView {
     @OneExecution
     fun restoreListPosition(listPosition: ListPosition)
 
+    @OneExecution
+    fun launchPickFolderScreen()
+
+    @OneExecution
+    fun showErrorMessage(errorCommand: ErrorCommand)
+
+    @OneExecution
+    fun showPlaylistExportSuccess(playlists: List<PlayList>)
+
+    @OneExecution
+    fun launchPlayListScreen(playlistId: Long)
+
+    @OneExecution
+    fun showOverwritePlaylistDialog()
+
+    @OneExecution
+    fun showNotCompletelyImportedPlaylistDialog(playlistId: Long, notFoundFilesCount: Int)
 }

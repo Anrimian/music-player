@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.player_screen
 
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
@@ -62,7 +63,7 @@ interface PlayerView : MvpView {
     fun showDeleteCompositionError(errorCommand: ErrorCommand)
 
     @OneExecution
-    fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>)
+    fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>)
 
     @OneExecution
     fun showDrawerScreen(selectedDrawerScreenId: Int, selectedPlayListScreenId: Long)
@@ -96,5 +97,8 @@ interface PlayerView : MvpView {
 
     @AddToEndSingle
     fun showCurrentCompositionSyncState(syncState: FileSyncState, item: PlayQueueItem?)
+
+    @AddToEndSingle
+    fun showScreensSwipeEnabled(enabled: Boolean)
 
 }

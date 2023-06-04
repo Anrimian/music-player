@@ -6,8 +6,10 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 
 import android.content.Context;
 
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepositoryImpl;
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.PlaylistFilesStorage;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
@@ -65,14 +67,20 @@ public class PlayListsModule {
     @Provides
     @Nonnull
     @Singleton
-    PlayListsRepository storagePlayListDataSource(SettingsRepository settingsRepository,
+    PlayListsRepository storagePlayListDataSource(Context context,
+                                                  SettingsRepository settingsRepository,
                                                   StoragePlayListsProvider playListsProvider,
+                                                  CompositionsDaoWrapper compositionsDaoWrapper,
                                                   PlayListsDaoWrapper playListsDaoWrapper,
+                                                  PlaylistFilesStorage playlistFilesStorage,
                                                   @Named(DB_SCHEDULER) Scheduler dbScheduler,
                                                   @Named(SLOW_BG_SCHEDULER) Scheduler slowBgScheduler) {
-        return new PlayListsRepositoryImpl(settingsRepository,
+        return new PlayListsRepositoryImpl(context,
+                settingsRepository,
                 playListsProvider,
+                compositionsDaoWrapper,
                 playListsDaoWrapper,
+                playlistFilesStorage,
                 dbScheduler,
                 slowBgScheduler);
     }

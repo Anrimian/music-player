@@ -19,4 +19,12 @@ public class DatabaseUtils {
         }
         return result;
     }
+
+    public static Object[] toArgs(Object arg, int times) {
+        Object[] result = new Object[times];
+        for (int i = 0; i < times; i++) {
+            result[i] = arg;
+        }
+        return result;
+    }
 }

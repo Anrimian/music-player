@@ -45,6 +45,7 @@ import com.github.anrimian.musicplayer.domain.interactors.player.PlayerCoordinat
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.EqualizerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
@@ -98,7 +99,7 @@ public class MusicModule {
     @NonNull
     @Singleton
     CompositionSourceInteractor compositionSourceInteractor(StorageSourceRepository storageSourceRepository,
-                                                            SyncInteractor<?, ?, Long> syncInteractor) {
+                                                            SyncInteractor<FileKey, ?, Long> syncInteractor) {
         return new CompositionSourceInteractor(storageSourceRepository, syncInteractor);
     }
 
@@ -122,7 +123,7 @@ public class MusicModule {
     @NonNull
     @Singleton
     LibraryPlayerInteractor libraryPlayerInteractor(PlayerCoordinatorInteractor playerCoordinatorInteractor,
-                                                    SyncInteractor<?, ?, Long> syncInteractor,
+                                                    SyncInteractor<FileKey, ?, Long> syncInteractor,
                                                     SettingsRepository settingsRepository,
                                                     PlayQueueRepository playQueueRepository,
                                                     LibraryRepository musicProviderRepository,
@@ -314,7 +315,7 @@ public class MusicModule {
                                                     EditorRepository editorRepository,
                                                     LibraryPlayerInteractor musicPlayerInteractor,
                                                     PlayListsInteractor playListsInteractor,
-                                                    SyncInteractor<?, ?, Long> syncInteractor,
+                                                    SyncInteractor<FileKey, ?, Long> syncInteractor,
                                                     SettingsRepository settingsRepository,
                                                     UiStateRepository uiStateRepository,
                                                     MediaScannerRepository mediaScannerRepository) {
@@ -331,11 +332,13 @@ public class MusicModule {
     @Provides
     @Nonnull
     LibraryArtistsInteractor libraryArtistsInteractor(LibraryRepository repository,
-                                                      EditorRepository editorRepository,
+                                                      LibraryPlayerInteractor libraryPlayerInteractor,
+                                                      PlayListsInteractor playListsInteractor,
                                                       SettingsRepository settingsRepository,
                                                       UiStateRepository uiStateRepository) {
         return new LibraryArtistsInteractor(repository,
-                editorRepository,
+                libraryPlayerInteractor,
+                playListsInteractor,
                 settingsRepository,
                 uiStateRepository);
     }
@@ -343,11 +346,13 @@ public class MusicModule {
     @Provides
     @Nonnull
     LibraryAlbumsInteractor libraryAlbumsInteractor(LibraryRepository repository,
-                                                    EditorRepository editorRepository,
+                                                    LibraryPlayerInteractor libraryPlayerInteractor,
+                                                    PlayListsInteractor playListsInteractor,
                                                     SettingsRepository settingsRepository,
                                                     UiStateRepository uiStateRepository) {
         return new LibraryAlbumsInteractor(repository,
-                editorRepository,
+                libraryPlayerInteractor,
+                playListsInteractor,
                 settingsRepository,
                 uiStateRepository);
     }

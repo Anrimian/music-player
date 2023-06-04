@@ -8,10 +8,10 @@ import androidx.annotation.RequiresApi;
 import com.github.anrimian.musicplayer.R;
 
 public class AppTheme {
-    public static final AppTheme WHITE_PURPLE_DEFAULT = new AppTheme(0,
+    public static final AppTheme WHITE_PURPLE_TEAL = new AppTheme(0,
             R.style.PrimaryPurpleTheme,
             0,
-            R.color.colorPrimary,
+            R.color.color_purple_primary,
             R.color.light_background_level_0,
             R.color.colorAccent,
             R.color.color_control_highlight,
@@ -24,10 +24,10 @@ public class AppTheme {
             R.color.colorAccentDark,
             R.color.color_control_highlight_dark,
             true);
-    public static final AppTheme WHITE_INDIGO = new AppTheme(2,
-            R.style.PrimaryBlueTheme,
+    public static final AppTheme WHITE_INDIGO_GREEN = new AppTheme(2,
+            R.style.PrimaryIndigoTheme,
             0,
-            R.color.colorBluePrimary,
+            R.color.color_indigo_primary,
             R.color.light_background_level_0,
             R.color.colorGreenAccent,
             R.color.color_control_highlight,
@@ -37,10 +37,10 @@ public class AppTheme {
             0,
             R.color.darkColorPrimary,
             R.color.dark_background_level_1,
-            R.color.colorOrangeAccent,
+            R.color.color_orange_dark_accent,
             R.color.color_control_highlight_dark,
             true);
-    public static final AppTheme WHITE_TEAL = new AppTheme(3,
+    public static final AppTheme WHITE_TEAL_PINK = new AppTheme(3,
             R.style.PrimaryTealTheme,
             0,
             R.color.colorTealPrimary,
@@ -80,6 +80,30 @@ public class AppTheme {
             R.color.colorRedPrimary,
             R.color.color_control_highlight,
             false);
+    public static final AppTheme WHITE_ORANGE = new AppTheme(9,
+            R.style.PrimaryOrangeTheme,
+            0,
+            R.color.colorOrangePrimary,
+            R.color.light_background_level_0,
+            R.color.colorOrangePrimary,
+            R.color.color_control_highlight,
+            false);
+    public static final AppTheme WHITE_PURPLE_PINK = new AppTheme(10,
+            R.style.PrimaryPurplePinkTheme,
+            0,
+            R.color.color_purple_primary,
+            R.color.light_background_level_0,
+            R.color.colorPinkAccent,
+            R.color.color_control_highlight,
+            false);
+    public static final AppTheme WHITE_BLUE_ORANGE = new AppTheme(11,
+            R.style.PrimaryBlueOrangeTheme,
+            0,
+            R.color.color_blue_primary,
+            R.color.light_background_level_0,
+            R.color.color_orange_accent,
+            R.color.color_control_highlight,
+            false);
 
     @RequiresApi(Build.VERSION_CODES.S)
     public static AppTheme getSystemWhiteTheme() {
@@ -112,20 +136,23 @@ public class AppTheme {
                 return type;
             }
         }
-        return WHITE_PURPLE_DEFAULT;
+        return WHITE_PURPLE_TEAL;
     }
 
     public static AppTheme[] appThemes() {
         return new AppTheme[] {
-                WHITE_PURPLE_DEFAULT,
+                WHITE_PURPLE_TEAL,
                 DARK,
-                WHITE_INDIGO,
+                WHITE_INDIGO_GREEN,
                 DARK_ORANGE,
-                WHITE_TEAL,
+                WHITE_TEAL_PINK,
                 DARK_GREEN,
                 COMPLETELY_WHITE,
                 COMPLETELY_BLACK,
-                WHITE_RED
+                WHITE_RED,
+                WHITE_ORANGE,
+                WHITE_PURPLE_PINK,
+                WHITE_BLUE_ORANGE
         };
     }
 

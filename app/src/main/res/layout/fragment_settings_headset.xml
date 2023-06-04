@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,14 +24,53 @@
                     style="@style/CheckboxStyle"
                     android:id="@+id/cb_play_on_connect"
                     android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="@dimen/content_horizontal_margin"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/iv_play_on_connect_delay"
+                    app:layout_constraintTop_toTopOf="@id/tv_play_on_connect"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_play_on_connect_delay"/>
+
+                <TextView
+                    android:id="@+id/tv_play_on_connect"
+                    style="@style/TextStyle"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/play_on_connect_bluetooth_device"
                     android:layout_marginTop="@dimen/content_spacing_margin"
+                    android:paddingTop="@dimen/checkbox_text_vertical_padding"
+                    android:paddingStart="@dimen/checkbox_description_padding"
+                    android:textSize="15sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/cb_play_on_connect"
+                    app:layout_constraintEnd_toEndOf="@id/cb_play_on_connect"
+                    tools:ignore="RtlSymmetry"/>
+
+                <TextView
+                    android:id="@+id/tv_play_on_connect_delay"
+                    style="@style/TextStyle.Subtitle.Small"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:paddingStart="@dimen/checkbox_description_padding"
+                    android:text="@string/with_delay"
+                    app:layout_constraintTop_toBottomOf="@id/tv_play_on_connect"
+                    app:layout_constraintStart_toStartOf="@id/tv_play_on_connect"
+                    app:layout_constraintEnd_toEndOf="@id/cb_play_on_connect"
+                    tools:ignore="RtlSymmetry"/>
+
+<!--                TODO set content description-->
+                <ImageView
+                    style="@style/ButtonStyle.Menu"
+                    android:id="@+id/iv_play_on_connect_delay"
+                    android:src="@drawable/ic_timer"
                     android:layout_marginEnd="@dimen/content_horizontal_margin"
-                    android:layout_marginStart="@dimen/content_horizontal_margin"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:background="?actionBarItemBackground"
+                    android:contentDescription="@null"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="@id/cb_play_on_connect"
+                    app:layout_constraintBottom_toBottomOf="@id/cb_play_on_connect"/>
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

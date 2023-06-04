@@ -4,6 +4,7 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 
 import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorPresenter;
 
@@ -26,7 +27,7 @@ public class AlbumEditorModule {
     @Provides
     @Nonnull
     AlbumEditorPresenter compositionEditorPresenter(EditorInteractor interactor,
-                                                    SyncInteractor<?, ?, Long> syncInteractor,
+                                                    SyncInteractor<FileKey, ?, Long> syncInteractor,
                                                     @Named(UI_SCHEDULER) Scheduler uiScheduler,
                                                     ErrorParser errorParser) {
         return new AlbumEditorPresenter(albumId, interactor, syncInteractor, uiScheduler, errorParser);

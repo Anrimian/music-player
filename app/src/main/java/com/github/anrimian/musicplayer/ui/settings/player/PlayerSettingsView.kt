@@ -23,6 +23,12 @@ interface PlayerSettingsView : MvpView {
     fun showSelectedEqualizerType(type: Int)
 
     @AddToEndSingle
+    fun showKeepNotificationTime(millis: Long)
+
+    @Skip
+    fun showSelectKeepNotificationTimeDialog(currentValue: Long)
+
+    @AddToEndSingle
     fun showEnabledMediaPlayers(players: IntArray)
 
     @Skip

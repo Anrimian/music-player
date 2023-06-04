@@ -126,7 +126,7 @@ public class MusicService extends Service {
     private void handleNotificationAction(int requestCode, Intent intent) {
         switch (requestCode) {
             case PLAY: {
-                int playDelay = intent.getIntExtra(PLAY_DELAY_MILLIS, 0);
+                long playDelay = intent.getLongExtra(PLAY_DELAY_MILLIS, 0);
                 playerInteractor().play(playDelay);
                 break;
             }

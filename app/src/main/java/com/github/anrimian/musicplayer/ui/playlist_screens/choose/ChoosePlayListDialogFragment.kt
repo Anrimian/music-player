@@ -13,7 +13,6 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogSelectPlayListBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
-import com.github.anrimian.musicplayer.domain.utils.functions.BiCallback
 import com.github.anrimian.musicplayer.ui.common.dialogs.AppBottomSheetDialog
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -23,7 +22,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayList
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
-import com.github.anrimian.musicplayer.ui.utils.OnCompleteListener
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback
@@ -59,8 +57,8 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
     private lateinit var adapter: PlayListsAdapter
     private lateinit var slideDelegate: SlideDelegate
 
-    private var onCompleteListener: OnCompleteListener<PlayList>? = null
-    private var complexCompleteListener: BiCallback<PlayList, Bundle>? = null
+    private var onCompleteListener: ((PlayList) -> Unit)? = null
+    private var complexCompleteListener: ((PlayList, Bundle) -> Unit)? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return AppBottomSheetDialog(requireContext(), theme)
@@ -170,7 +168,7 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
     }
 
     private fun onPlaylistMenuClicked(playList: PlayList, view: View) {
-        PopupMenuWindow.showPopup(view, R.menu.play_list_menu) { menuItem ->
+        PopupMenuWindow.showPopup(view, R.menu.play_list_short_menu) { menuItem ->
             when (menuItem.itemId) {
                 R.id.menu_change_play_list_name -> {
                     presenter.onChangePlayListNameButtonClicked(playList)
@@ -182,28 +180,27 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
         }
     }
 
-    fun setOnCompleteListener(onCompleteListener: OnCompleteListener<PlayList>) {
+    fun setOnCompleteListener(onCompleteListener: (PlayList) -> Unit) {
         this.onCompleteListener = onCompleteListener
     }
 
-    fun setComplexCompleteListener(complexCompleteListener: BiCallback<PlayList, Bundle>) {
+    fun setComplexCompleteListener(complexCompleteListener: (PlayList, Bundle) -> Unit) {
         this.complexCompleteListener = complexCompleteListener
     }
 
     private fun onPlayListSelected(playList: PlayList) {
-        onCompleteListener?.onComplete(playList)
+        onCompleteListener?.invoke(playList)
 
-        complexCompleteListener?.call(
+        complexCompleteListener?.invoke(
             playList,
-            requireArguments().getBundle(Constants.Arguments.EXTRA_DATA_ARG)
+            requireArguments().getBundle(Constants.Arguments.EXTRA_DATA_ARG)!!
         )
 
         dismissAllowingStateLoss()
     }
 
     private fun onCreatePlayListButtonClicked() {
-        val fragment = CreatePlayListDialogFragment()
-        fragment.safeShow(childFragmentManager)
+        CreatePlayListDialogFragment().safeShow(childFragmentManager)
     }
 
     private fun buildSlideDelegate(): SlideDelegate {

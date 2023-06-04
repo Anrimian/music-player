@@ -8,3 +8,7 @@ fun View.runHighlightAnimation() {
     val color = context.getHighlightColor()
     runHighlightAnimation(color)
 }
+
+fun View.setOnHoldListener(action: () -> Unit) {
+    ViewUtils.setOnHoldListener(this, action)
+}

@@ -268,7 +268,7 @@ class MediaSessionHandler(
             currentSource,
             metadataBuilder,
             getMediaSession(),
-            state.settings.isCoversOnLockScreen
+            state.settings
         )
     }
 

@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
@@ -45,7 +46,7 @@ interface PlayListView : MvpView {
     fun showDeleteCompositionError(errorCommand: ErrorCommand)
 
     @OneExecution
-    fun showDeletedCompositionMessage(compositionsToDelete: List<Composition>)
+    fun showDeletedCompositionMessage(compositionsToDelete: List<DeletedComposition>)
 
     @OneExecution
     fun showSelectPlayListDialog()
@@ -100,5 +101,8 @@ interface PlayListView : MvpView {
 
     @AddToEndSingle
     fun showFilesSyncState(states: Map<Long, FileSyncState>)
+
+    @OneExecution
+    fun showPlaylistExportSuccess(playlist: PlayList)
 
 }

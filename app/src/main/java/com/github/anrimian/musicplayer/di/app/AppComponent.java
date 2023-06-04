@@ -16,6 +16,8 @@ import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerComp
 import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
 import com.github.anrimian.musicplayer.di.app.library.LibraryModule;
+import com.github.anrimian.musicplayer.di.app.order.OrderComponent;
+import com.github.anrimian.musicplayer.di.app.order.OrderModule;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListComponent;
 import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
@@ -29,8 +31,10 @@ import com.github.anrimian.musicplayer.domain.interactors.player.MusicServiceInt
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
@@ -80,6 +84,7 @@ public interface AppComponent {
     ArtistEditorComponent artistEditorComponent(ArtistEditorModule module);
     ExternalPlayerComponent externalPlayerComponent(ExternalPlayerModule module);
     ShareComponent shareComponent(ShareModule module);
+    OrderComponent orderComponent(OrderModule orderModule);
 
     LibraryPlayerInteractor libraryPlayerInteractor();
     DisplaySettingsInteractor displaySettingsInteractor();
@@ -87,7 +92,7 @@ public interface AppComponent {
     MusicServiceInteractor musicServiceInteractor();
     LibrarySettingsInteractor librarySettingsInteractor();
     CompositionSourceInteractor sourceInteractor();
-    SyncInteractor<?, ?, Long> syncInteractor();
+    SyncInteractor<FileKey, ?, Long> syncInteractor();
 
     PlayListsPresenter playListsPresenter();
     CreatePlayListPresenter createPlayListsPresenter();
@@ -97,6 +102,7 @@ public interface AppComponent {
     WidgetMenuPresenter widgetMenuPresenter();
 
     UiStateRepository uiStateRepository();
+    SettingsRepository settingsRepository();
     MediaScannerRepository mediaScannerRepository();
     StorageSourceRepository storageSourceRepository();
     LoggerRepository loggerRepository();

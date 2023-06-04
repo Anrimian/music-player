@@ -51,6 +51,8 @@ class PlayerPresenter(
         subscribeOnTrackPositionChanging()
         subscribeOnSleepTimerTime()
         subscribeOnFileScannerState()
+        playerScreenInteractor.playerScreensSwipeObservable
+            .unsafeSubscribeOnUi(viewState::showScreensSwipeEnabled)
     }
 
     fun onSetupScreenStateRequested() {

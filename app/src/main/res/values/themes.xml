@@ -60,9 +60,9 @@
         <item name="colorAccentContrast">@color/colorAccentContrast</item>
     </style>
 
-    <style name="PrimaryBlueTheme" parent="PrimaryLightTheme">
-        <item name="colorPrimary">@color/colorBluePrimary</item>
-        <item name="colorPrimaryDark">@color/colorBluePrimaryDark</item>
+    <style name="PrimaryIndigoTheme" parent="PrimaryLightTheme">
+        <item name="colorPrimary">@color/color_indigo_primary</item>
+        <item name="colorPrimaryDark">@color/color_indigo_primary_dark</item>
         <item name="colorAccent">@color/colorGreenAccent</item>
         <item name="colorAccentContrast">@color/colorGreenAccentContrast</item>
 
@@ -70,7 +70,7 @@
         <item name="dialogButtonColor">@color/colorGreenAccent</item>
 
         <!--navigation view-->
-        <item name="navigationViewPrimaryColor">@color/colorBluePrimary</item>
+        <item name="navigationViewPrimaryColor">@color/color_indigo_primary</item>
     </style>
 
     <style name="PrimaryTealTheme" parent="PrimaryLightTheme">
@@ -100,13 +100,53 @@
         <item name="navigationViewPrimaryColor">@color/colorRedPrimary</item>
     </style>
 
+    <style name="PrimaryOrangeTheme" parent="PrimaryLightTheme">
+        <item name="colorPrimary">@color/colorOrangePrimary</item>
+        <item name="colorPrimaryDark">@color/colorOrangePrimaryDark</item>
+        <item name="colorAccent">@color/colorOrangePrimary</item>
+        <item name="colorAccentContrast">@color/colorOrangeAccentContrast</item>
+        <item name="colorAccentDark">@color/colorOrangePrimaryDark</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@color/colorOrangePrimary</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@color/colorOrangePrimary</item>
+    </style>
+
+    <style name="PrimaryPurplePinkTheme" parent="PrimaryLightTheme">
+        <item name="colorPrimary">@color/color_purple_primary</item>
+        <item name="colorPrimaryDark">@color/color_purple_primary_dark</item>
+        <item name="colorAccent">@color/colorPinkAccent</item>
+        <item name="colorAccentContrast">@color/colorPinkAccentContrast</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@color/colorPinkAccent</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@color/color_purple_primary</item>
+    </style>
+
+    <style name="PrimaryBlueOrangeTheme" parent="PrimaryLightTheme">
+        <item name="colorPrimary">@color/color_blue_primary</item>
+        <item name="colorPrimaryDark">@color/color_blue_primary_dark</item>
+        <item name="colorAccent">@color/color_orange_accent</item>
+        <item name="colorAccentContrast">@color/color_orange_accent_contrast</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@color/color_orange_accent</item>
+
+        <!--navigation view-->
+        <item name="navigationViewPrimaryColor">@color/color_blue_primary</item>
+    </style>
+
     <style name="DarkOrangeTheme" parent="@style/PrimaryDarkTheme">
-        <item name="colorAccent">@color/colorOrangeAccent</item>
+        <item name="colorAccent">@color/color_orange_dark_accent</item>
         <item name="colorPrimaryVariant">@color/colorGreenDarkAccent</item>
         <item name="colorAttention">@color/colorGreenDarkAccent</item>
 
         <!--text-->
-        <item name="dialogButtonColor">@color/colorOrangeAccent</item>
+        <item name="dialogButtonColor">@color/color_orange_dark_accent</item>
     </style>
 
     <style name="DarkGreenTheme" parent="@style/PrimaryDarkTheme">

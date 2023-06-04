@@ -6,6 +6,9 @@ import moxy.viewstate.strategy.alias.AddToEndSingle
 interface DisplaySettingsView : MvpView {
 
     @AddToEndSingle
+    fun showPlayerScreensSwipeEnabled(enabled: Boolean)
+
+    @AddToEndSingle
     fun showFileNameEnabled(enabled: Boolean)
 
     @AddToEndSingle

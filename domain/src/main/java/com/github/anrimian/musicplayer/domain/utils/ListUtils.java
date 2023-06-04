@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 
 @SuppressWarnings("WeakerAccess")
 public class ListUtils {
@@ -72,6 +71,14 @@ public class ListUtils {
 
     public static <T, E> List<E> mapList(List<T> from, MapperFunction<T, E> mapper) {
         return mapList(from, new ArrayList<>(from.size()), mapper);
+    }
+
+    public static <T> Long[] mapToLongArray(List<T> from, MapperFunction<T, Long> mapper) {
+        Long[] arr = new Long[from.size()];
+        for (int i = 0; i < from.size(); i++) {
+            arr[i] = mapper.map(from.get(i));
+        }
+        return arr;
     }
 
     public static <T, E> List<E> mapListNotNull(List<T> from, MapperFunction<T, E> mapper) {

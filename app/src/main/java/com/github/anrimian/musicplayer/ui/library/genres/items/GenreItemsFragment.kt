@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.databinding.FragmentBaseFabListBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
@@ -30,7 +31,6 @@ import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
-import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayListDialogFragment
@@ -39,8 +39,8 @@ import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragmen
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback
@@ -55,7 +55,8 @@ fun newGenreItemsFragment(genreId: Long): GenreItemsFragment {
     return fragment
 }
 
-class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, FragmentLayerListener,
+class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView,
+    FragmentNavigationListener,
     BackButtonListener {
 
     private val presenter by moxyPresenter {
@@ -65,7 +66,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
 
     private lateinit var toolbar: AdvancedToolbar
 
-    private lateinit var adapter: CompositionsAdapter
+    private lateinit var adapter: CompositionsAdapter<Composition>
 
     private lateinit var choosePlayListDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
     private lateinit var editGenreNameDialogRunner: DialogFragmentRunner<InputTextDialogFragment>
@@ -73,9 +74,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
     private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
     private lateinit var deletingErrorHandler: ErrorHandler
 
-    override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<GenreItemsView> {
-        return presenter
-    }
+    override fun getLibraryPresenter(): GenreItemsPresenter = presenter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -141,7 +140,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
         progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG)
     }
 
-    override fun onFragmentMovedOnTop() {
+    override fun onFragmentResumed() {
 //        super.onFragmentMovedOnTop();
         presenter.onFragmentMovedToTop()
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
@@ -255,7 +254,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView, Fr
         }
     }
 
-    override fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>) {
+    override fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
         MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }

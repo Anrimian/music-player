@@ -264,6 +264,34 @@
     </string>
     <string name="folder_already_excluded_from_scanning">Esta pasta já foi excluída da verificação</string>
     <!---->
+    <!--not verified-->
+    <string name="no_file_modify_permission">Sem permissão para modificar o arquivo</string>
+    <string name="interface_settings">Interface</string>
+    <string name="enable_player_screens_swipe">Ative o gesto de deslizar para alternar entre a fila de reprodução e a tela de letras</string>
+    <string name="no_enough_data_to_play">Não há dados suficientes para reproduzir a composição</string>
+    <string name="permission_required">A permissão é necessária</string>
+    <string name="open_app_settings">Abrir configurações do aplicativo</string>
+    <string name="file_is_corrupted">O arquivo está corrompido</string>
+    <string name="keep_notification_after_pause">Evitar que a notificação do jogador feche automaticamente após a pausa</string>
+    <string name="unknown_play_error">Erro de reprodução de arquivo desconhecido</string>
+    <string name="file_read_timeout">Tempo limite de leitura do arquivo</string>
+    <string name="tag_reading_error">Erro de leitura da tag: %s</string>
+    <string name="track_number">Número da faixa</string>
+    <string name="change_track_number">Alterar número da faixa</string>
+    <string name="disc_number">Número do disco</string>
+    <string name="change_disc_number">Alterar número do disco</string>
+    <string name="comment">Comentário</string>
+    <string name="change_comment">Alterar comentário</string>
+    <string name="disc_short">Disco %d</string>
+    <string name="track_short">Faixa %d</string>
+    <string name="with_delay">Com atraso de %.1fs</string>
+    <string name="insert_to_playlist_beginning">Inserir novas composições no início da playlist</string>
+    <string name="export_playlist">Salvar como arquivo .m3u</string>
+    <string name="import_playlist">Importar playlist</string>
+    <string name="overwrite_playlist">Já existe uma playlist com este nome. \nSubstituir?</string>
+    <string name="playlist_has_no_records">A playlist não tem registros</string>
+    <string name="export_playlists_success">O arquivo \"%1$s.m3u\" foi salvo no armazenamento interno</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s música</item>
@@ -316,6 +344,23 @@
     <plurals name="delete_compositions_template">
         <item quantity="one">Excluir %d música</item>
         <item quantity="other">Excluir %d músicas</item>
+    </plurals>
+    <!---->
+
+    <!-- not verified-->
+    <plurals name="for_at_least_minutes">
+        <item quantity="one">Por pelo menos %d minuto</item>
+        <item quantity="other">Por pelo menos %d minutos</item>
+    </plurals>
+
+    <plurals name="export_playlists_success">
+        <item quantity="one">%d lista de reprodução foi salva no armazenamento interno</item>
+        <item quantity="other">%d listas de reprodução foram salvas no armazenamento interno</item>
+    </plurals>
+
+    <plurals name="playlist_import_partial_success">
+        <item quantity="one">A playlist foi importada com sucesso, mas o arquivo %d não foi encontrado na biblioteca</item>
+        <item quantity="other">A playlist foi importada com sucesso, mas %d arquivos não foram encontrados na biblioteca</item>
     </plurals>
     <!---->
 

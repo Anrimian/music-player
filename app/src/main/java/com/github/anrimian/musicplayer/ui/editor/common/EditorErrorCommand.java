@@ -16,8 +16,8 @@ public class EditorErrorCommand extends ErrorCommand {
     @Nonnull
     private final IntentSender intentSender;
 
-    public EditorErrorCommand(Throwable throwable) {
-        super(throwable.getMessage() == null? "" : throwable.getMessage());
+    public EditorErrorCommand(String message, Throwable throwable) {
+        super(message);
 
         if (throwable instanceof RecoverableSecurityException) {
             RecoverableSecurityException recoverableSecurityException = (RecoverableSecurityException) throwable;

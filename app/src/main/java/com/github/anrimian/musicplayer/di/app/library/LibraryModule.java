@@ -10,14 +10,13 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFolders
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.lyrics.LyricsPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.queue.PlayQueuePresenter;
@@ -55,7 +54,7 @@ public class LibraryModule {
     PlayQueuePresenter playQueuePresenter(LibraryPlayerInteractor musicPlayerInteractor,
                                           PlayListsInteractor playListsInteractor,
                                           PlayerScreenInteractor playerScreenInteractor,
-                                          SyncInteractor<?, ?, Long> syncInteractor,
+                                          SyncInteractor<FileKey, ?, Long> syncInteractor,
                                           ErrorParser errorParser,
                                           @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new PlayQueuePresenter(musicPlayerInteractor,
@@ -84,7 +83,7 @@ public class LibraryModule {
     @LibraryScope
     PlayerScreenInteractor playerScreenInteractor(SleepTimerInteractor sleepTimerInteractor,
                                                   LibraryPlayerInteractor libraryPlayerInteractor,
-                                                  SyncInteractor<?, ?, Long> syncInteractor,
+                                                  SyncInteractor<FileKey, ?, Long> syncInteractor,
                                                   PlayQueueRepository playQueueRepository,
                                                   UiStateRepository uiStateRepository,
                                                   SettingsRepository settingsRepository,
@@ -96,12 +95,6 @@ public class LibraryModule {
                 uiStateRepository,
                 settingsRepository,
                 mediaScannerRepository);
-    }
-
-    @Provides
-    @Nonnull
-    SelectOrderPresenter selectOrderPresenter(DisplaySettingsInteractor displaySettingsInteractor) {
-        return new SelectOrderPresenter(displaySettingsInteractor);
     }
 
     @Provides

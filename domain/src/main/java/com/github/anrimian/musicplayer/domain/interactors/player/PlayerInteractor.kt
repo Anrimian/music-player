@@ -81,7 +81,7 @@ class PlayerInteractor(
         preparationDisposable?.dispose()
         currentSource = null
         currentSourceSubject.onNext(Optional(null))
-        systemServiceController.stopMusicService()
+        systemServiceController.stopMusicService(true)
         musicPlayerController.stop()
         playAfterPrepare = false
         isPlayingSubject.onNext(false)
@@ -146,7 +146,7 @@ class PlayerInteractor(
     }
 
     fun stop() {
-        systemServiceController.stopMusicService()
+        systemServiceController.stopMusicService(true)
         playAfterPrepare = false
         musicPlayerController.stop()
         isPlayingSubject.onNext(false)

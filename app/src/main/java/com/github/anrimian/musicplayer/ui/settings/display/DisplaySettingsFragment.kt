@@ -41,10 +41,17 @@ class DisplaySettingsFragment : MvpAppCompatFragment(), DisplaySettingsView {
         
         SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided)
 
-        viewBinding.cbColoredNotification.visibility =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) VISIBLE else GONE
+        viewBinding.cbColoredNotification.visibility = if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+            && Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+        ) VISIBLE else GONE
+
+        viewBinding.cbShowCoverStubInNotification.visibility = if (
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+        ) VISIBLE else GONE
         
         onCheckChanged(viewBinding.cbUseFileName, presenter::onFileNameChecked)
+        onCheckChanged(viewBinding.cbPlayerScreensSwipe, presenter::onSwipePlayerScreensChecked)
         onCheckChanged(viewBinding.cbCovers, presenter::onCoversChecked)
         onCheckChanged(viewBinding.cbCoversInNotification, presenter::onCoversInNotificationChecked)
         onCheckChanged(viewBinding.cbColoredNotification, presenter::onColoredNotificationChecked)
@@ -56,6 +63,10 @@ class DisplaySettingsFragment : MvpAppCompatFragment(), DisplaySettingsView {
         viewBinding.tvLocaleClickableArea.setOnClickListener {
             localeController.openLocaleChooser(requireActivity())
         }
+    }
+
+    override fun showPlayerScreensSwipeEnabled(enabled: Boolean) {
+        setChecked(viewBinding.cbPlayerScreensSwipe, enabled)
     }
 
     override fun showFileNameEnabled(enabled: Boolean) {

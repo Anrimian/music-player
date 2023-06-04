@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.InputType
 import android.text.TextUtils
+import android.text.method.DigitsKeyListener
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
@@ -26,6 +27,8 @@ fun newInputTextDialogFragment(
     editTextValue: String?,
     canBeEmpty: Boolean = true,
     completeOnEnterButton: Boolean = true,
+    inputType: Int = InputType.TYPE_CLASS_TEXT,
+    digits: String? = null,
     hints: Array<String>? = null,
     extra: Bundle? = null
 ) = InputTextDialogFragment().apply {
@@ -37,6 +40,8 @@ fun newInputTextDialogFragment(
         putString(EDIT_TEXT_VALUE, editTextValue)
         putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty)
         putBoolean(COMPLETE_ON_ENTER_ARG, completeOnEnterButton)
+        putInt(INPUT_TYPE_ARG, inputType)
+        putString(DIGITS_ARG, digits)
         putBundle(EXTRA_DATA_ARG, extra)
         putStringArray(HINTS_ARG, hints)
     }
@@ -68,7 +73,11 @@ class InputTextDialogFragment : DialogFragment() {
         val completeOnEnterButton = args.getBoolean(COMPLETE_ON_ENTER_ARG)
         editText.setHint(args.getInt(EDIT_TEXT_HINT))
         editText.imeOptions = if (completeOnEnterButton) EditorInfo.IME_ACTION_DONE else EditorInfo.IME_ACTION_UNSPECIFIED
-        editText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        editText.setRawInputType(args.getInt(INPUT_TYPE_ARG))
+        val digits = args.getString(DIGITS_ARG)
+        if (digits != null) {
+            editText.keyListener = DigitsKeyListener.getInstance(digits)
+        }
         editText.setOnEditorActionListener { _, actionId: Int, _ ->
             if (!canBeEmpty && !isEnterButtonEnabled(editText.text.toString().trim())) {
                 return@setOnEditorActionListener true

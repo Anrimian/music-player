@@ -69,7 +69,7 @@ public class ThemeController {
     }
 
     public AppTheme getCurrentTheme() {
-        return AppTheme.getTheme(preferences.getInt(THEME_ID, AppTheme.WHITE_PURPLE_DEFAULT.getId()));
+        return AppTheme.getTheme(preferences.getInt(THEME_ID, AppTheme.WHITE_PURPLE_TEAL.getId()));
     }
 
     @ColorInt
@@ -123,7 +123,7 @@ public class ThemeController {
     }
 
     private AppTheme getCurrentUsedTheme() {
-        AppTheme theme = AppTheme.getTheme(preferences.getInt(THEME_ID, AppTheme.WHITE_PURPLE_DEFAULT.getId()));
+        AppTheme theme = AppTheme.getTheme(preferences.getInt(THEME_ID, AppTheme.WHITE_PURPLE_TEAL.getId()));
         return applyThemeRules(theme);
     }
 

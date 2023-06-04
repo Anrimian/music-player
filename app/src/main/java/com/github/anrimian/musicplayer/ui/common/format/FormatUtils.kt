@@ -8,9 +8,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.graphics.ColorUtils
 import com.github.anrimian.filesync.models.ProgressInfo
-import com.github.anrimian.filesync.models.state.file.Downloading
 import com.github.anrimian.filesync.models.state.file.FileSyncState
-import com.github.anrimian.filesync.models.state.file.Uploading
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
@@ -33,11 +31,11 @@ fun showFileSyncState(
     progressView: ProgressView,
 ) {
     when(fileSyncState) {
-        is Uploading -> {
+        is FileSyncState.Uploading -> {
             progressView.setProgressInfo(fileSyncState.getProgress())
             progressView.setIconResource(R.drawable.ic_upload)
         }
-        is Downloading -> {
+        is FileSyncState.Downloading -> {
             progressView.setProgressInfo(fileSyncState.getProgress())
             progressView.setIconResource(R.drawable.ic_download)
         }

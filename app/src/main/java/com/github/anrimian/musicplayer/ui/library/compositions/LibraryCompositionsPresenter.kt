@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInt
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
@@ -18,10 +19,10 @@ class LibraryCompositionsPresenter(
     playListsInteractor: PlayListsInteractor,
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
-    syncInteractor: SyncInteractor<*, *, Long>,
+    syncInteractor: SyncInteractor<FileKey, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
-) : BaseLibraryCompositionsPresenter<LibraryCompositionsView>(
+) : BaseLibraryCompositionsPresenter<Composition, LibraryCompositionsView>(
     playerInteractor,
     playListsInteractor,
     displaySettingsInteractor,
@@ -47,6 +48,5 @@ class LibraryCompositionsPresenter(
 
     fun onOrderSelected(order: Order) {
         interactor.order = order
-        subscribeOnCompositions()
     }
 }

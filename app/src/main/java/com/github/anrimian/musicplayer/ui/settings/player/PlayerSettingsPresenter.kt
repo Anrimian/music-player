@@ -6,9 +6,10 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
 
-class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
-                              uiScheduler: Scheduler,
-                              errorParser: ErrorParser
+class PlayerSettingsPresenter(
+    private val interactor: PlayerSettingsInteractor,
+    uiScheduler: Scheduler,
+    errorParser: ErrorParser
 ) : AppPresenter<PlayerSettingsView>(uiScheduler, errorParser) {
 
     override fun onFirstViewAttach() {
@@ -19,6 +20,7 @@ class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
         viewState.showPauseOnAudioFocusLossEnabled(interactor.isPauseOnAudioFocusLossEnabled())
         viewState.showPauseOnZeroVolumeLevelEnabled(interactor.isPauseOnZeroVolumeLevelEnabled())
         viewState.showSoundBalance(interactor.getSoundBalance())
+        viewState.showKeepNotificationTime(interactor.getKeepNotificationTime())
         viewState.showEnabledMediaPlayers(interactor.getEnabledMediaPlayers())
         subscribeOnSelectedEqualizer()
     }
@@ -38,6 +40,12 @@ class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
         interactor.setPauseOnZeroVolumeLevelEnabled(checked)
     }
 
+    fun onSelectKeepNotificationTimeClicked() {
+        viewState.showSelectKeepNotificationTimeDialog(
+            interactor.getKeepNotificationTime()
+        )
+    }
+
     fun onSoundBalanceClicked() {
         viewState.showSoundBalanceDialog(interactor.getSoundBalance())
     }
@@ -55,6 +63,11 @@ class PlayerSettingsPresenter(private val interactor: PlayerSettingsInteractor,
         val soundBalance = SoundBalance(1f, 1f)
         viewState.showSoundBalance(soundBalance)
         interactor.saveSoundBalance(soundBalance)
+    }
+
+    fun onKeepNotificationTimeSelected(millis: Long) {
+        viewState.showKeepNotificationTime(millis)
+        interactor.setKeepNotificationTime(millis)
     }
 
     fun onEnabledMediaPlayersSelected(mediaPlayers: IntArray) {

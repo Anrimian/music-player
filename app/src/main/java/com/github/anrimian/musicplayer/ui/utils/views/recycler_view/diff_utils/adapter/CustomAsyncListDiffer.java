@@ -307,6 +307,8 @@ public class CustomAsyncListDiffer<T> {
             return;
         }
 
+        //fixes freeze for large lists
+        boolean detectMovesGentle = mList.size() < 100 && newList.size() < 100;
         final List<T> oldList = mList;
         mConfig.getBackgroundThreadExecutor().execute(new Runnable() {
             @Override
@@ -364,7 +366,7 @@ public class CustomAsyncListDiffer<T> {
                         // non-null which is the only case handled above.
                         throw new AssertionError();
                     }
-                }, detectMoves);
+                }, detectMoves && detectMovesGentle);
 
                 mMainThreadExecutor.execute(new Runnable() {
                     @Override

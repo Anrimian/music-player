@@ -263,7 +263,7 @@ class PlayerInteractorTest {
 
             playerEventsSubscriber.assertNoValues()
             verify(musicPlayerController, never()).resume()
-            inOrder.verify(systemServiceController).stopMusicService()
+            inOrder.verify(systemServiceController).stopMusicService(eq(true))
             inOrder.verify(musicPlayerController).stop()
 
             isPlayingStateSubscriber.assertValue(false)
@@ -283,7 +283,7 @@ class PlayerInteractorTest {
 
             playerEventsSubscriber.assertNoValues()
             verify(playerErrorParser, never()).parseError(any())
-            inOrder.verify(systemServiceController).stopMusicService()
+            inOrder.verify(systemServiceController).stopMusicService(eq(true))
             inOrder.verify(musicPlayerController).stop()
 
             isPlayingStateSubscriber.assertValue(false)

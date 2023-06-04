@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogSoundBalanceBinding
 import com.github.anrimian.musicplayer.databinding.PartialDeleteDialogBinding
+import com.github.anrimian.musicplayer.databinding.PartialNumberPickerDialogBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
@@ -82,7 +83,7 @@ fun shareCompositions(fragment: Fragment, compositions: Collection<Composition>)
 fun shareComposition(
     ctx: Context,
     fragmentManager: FragmentManager,
-    fullComposition: Composition
+    fullComposition: Composition,
 ) {
     shareCompositions(
         ctx,
@@ -96,7 +97,7 @@ fun shareCompositions(
     ctx: Context,
     fragmentManager: FragmentManager,
     ids: List<Long>,
-    hasNonExistComposition: Boolean
+    hasNonExistComposition: Boolean,
 ) {
     if (hasNonExistComposition) {
         newShareCompositionsDialogFragment(ids.toLongArray()).safeShow(fragmentManager)
@@ -195,7 +196,7 @@ fun showConfirmDeleteFileDialog(
     context: Context,
     message: String,
     deleteCallback: () -> Unit,
-    hasStorageFiles: Boolean
+    hasStorageFiles: Boolean,
 ) {
     var view: View? = null
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && hasStorageFiles) {
@@ -221,13 +222,57 @@ fun showConfirmDeleteDialog(
     context: Context,
     message: String,
     deleteCallback: () -> Unit,
-    view: View? = null
+    view: View? = null,
 ) {
     AlertDialog.Builder(context)
         .setTitle(R.string.deleting)
         .setMessage(message)
         .apply { if (view != null) setView(view) }
         .setPositiveButton(R.string.delete) { _, _ -> deleteCallback() }
+        .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+        .show()
+}
+
+fun showNumberPickerDialog(
+    context: Context,
+    minValue: Long,
+    maxValue: Long,
+    currentValue: Long,
+    stepValue: Long = 1,
+    valueFormatter: ((Long) -> String)? = null,
+    pickCallback: (Long) -> Unit,
+) {
+    val binding = PartialNumberPickerDialogBinding.inflate(LayoutInflater.from(context))
+
+    val pickAction: () -> Unit
+    if (stepValue != 1L && valueFormatter != null) {
+        binding.numberPicker.minValue = 0
+        val values = ArrayList<Long>()
+        var v = minValue
+        var index = 0
+        var currentIndex = 0
+        while (v <= maxValue) {
+            if (v == currentValue) {
+                currentIndex = index
+            }
+            values.add(v)
+            v += stepValue
+            index++
+        }
+        binding.numberPicker.maxValue = index - 1
+        binding.numberPicker.value = currentIndex
+        binding.numberPicker.displayedValues = Array(values.size) { i -> valueFormatter(values[i])}
+        pickAction = { pickCallback(values[binding.numberPicker.value]) }
+    } else {
+        binding.numberPicker.minValue = minValue.toInt()
+        binding.numberPicker.maxValue = maxValue.toInt()
+        binding.numberPicker.value = currentValue.toInt()
+        pickAction = { pickCallback(binding.numberPicker.value.toLong()) }
+    }
+
+    AlertDialog.Builder(context)
+        .setView(binding.root)
+        .setPositiveButton(android.R.string.ok) { _, _ -> pickAction() }
         .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
         .show()
 }

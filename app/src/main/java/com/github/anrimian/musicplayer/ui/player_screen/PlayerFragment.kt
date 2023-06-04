@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.player_screen
 
 import android.os.Bundle
 import android.view.*
+import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -9,10 +10,10 @@ import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.github.anrimian.filesync.models.state.file.FileSyncState
-import com.github.anrimian.filesync.models.state.file.NotActive
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.Constants.Tags
 import com.github.anrimian.musicplayer.R
@@ -25,6 +26,7 @@ import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.NO_TIMER
 import com.github.anrimian.musicplayer.domain.models.Screens
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
@@ -65,6 +67,7 @@ import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.attachPlay
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.newPlayListFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.newPlaylistsFragment
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
@@ -91,12 +94,14 @@ import moxy.ktx.moxyPresenter
 private const val NO_ITEM = -1
 private const val SELECTED_DRAWER_ITEM = "selected_drawer_item"
 
-fun newPlayerFragment(openPlayQueue: Boolean = false): PlayerFragment {
-    val args = Bundle()
-    args.putBoolean(Constants.Arguments.OPEN_PLAYER_PANEL_ARG, openPlayQueue)
-    val fragment = PlayerFragment()
-    fragment.arguments = args
-    return fragment
+fun newPlayerFragment(
+    openPlayQueue: Boolean = false,
+    playlistUriStr: String? = null
+) = PlayerFragment().apply {
+    arguments = Bundle().apply {
+        putBoolean(Constants.Arguments.OPEN_PLAYER_PANEL_ARG, openPlayQueue)
+        putString(Constants.Arguments.PLAYLIST_IMPORT_ARG, playlistUriStr)
+    }
 }
 
 class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
@@ -187,10 +192,15 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
                 drawerLockStateProcessor::onBottomSheetOpened
             )
         }
+
         viewBinding.navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected)
         val headerView = viewBinding.navigationView.inflateHeaderView(R.layout.partial_drawer_header)
         headerView.setBackgroundColor(requireContext().getNavigationViewPrimaryColorLight())
+        headerView.updateLayoutParams<LinearLayout.LayoutParams> {
+            height += AndroidUtils.getStatusBarHeight(requireContext())
+        }
         drawerHeaderBinding = PartialDrawerHeaderBinding.bind(headerView)
+
         val drawerToggle = ActionBarDrawerToggle(
             requireActivity(),
             viewBinding.drawer,
@@ -261,7 +271,15 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         toolbarPlayQueueBinding.flTitleArea.setOnClickListener(this::onPlayerTitleClicked)
 
         if (savedInstanceState == null) {
-            presenter.onSetupScreenStateRequested()
+            val playlistImportUri = requireArguments().getString(Constants.Arguments.PLAYLIST_IMPORT_ARG)
+            if (playlistImportUri == null) {
+                presenter.onSetupScreenStateRequested()
+            } else {
+                requireArguments().remove(Constants.Arguments.PLAYLIST_IMPORT_ARG)
+                selectedDrawerItemId = R.id.menu_play_lists
+                viewBinding.navigationView.setCheckedItem(R.id.menu_play_lists)
+                startFragment(newPlaylistsFragment(playlistImportUri))
+            }
         } else {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM)
         }
@@ -355,7 +373,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             Screens.LIBRARY -> presenter.onLibraryScreenSelected()
             Screens.PLAY_LISTS -> {
                 val fragments: MutableList<Fragment> = ArrayList()
-                fragments.add(PlayListsFragment())
+                fragments.add(newPlaylistsFragment())
                 if (selectedPlayListScreenId != 0L) {
                     fragments.add(newPlayListFragment(selectedPlayListScreenId))
                 }
@@ -522,7 +540,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         }
     }
 
-    override fun showDeleteCompositionMessage(compositionsToDelete: List<Composition>) {
+    override fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
         MessagesUtils.makeSnackbar(viewBinding.clPlayQueueContainer!!, text, Snackbar.LENGTH_SHORT).show()
     }
@@ -588,7 +606,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         val isFileRemote: Boolean
         val formattedState: FileSyncState
         if (item == null) {
-            formattedState = NotActive
+            formattedState = FileSyncState.NotActive
             isFileRemote = false
         } else {
             formattedState = syncState
@@ -608,16 +626,39 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             if (currentFragment is LibraryFoldersRootFragment) {
                 currentFragment.revealComposition(id)
             } else {
-                viewBinding.navigationView.setCheckedItem(R.id.menu_library)
+                if (selectedDrawerItemId != R.id.menu_library) {
+                    selectedDrawerItemId = R.id.menu_library
+                    viewBinding.navigationView.setCheckedItem(R.id.menu_library)
+                }
                 presenter.onLibraryScreenSelected(Screens.LIBRARY_FOLDERS)
                 startFragment(newLibraryFoldersRootFragment(id))
             }
         }
     }
 
+    override fun showScreensSwipeEnabled(enabled: Boolean) {
+        viewBinding.vpPlayContent!!.isUserInputEnabled = enabled
+    }
+
     fun openPlayerPanel() {
         presenter.onOpenPlayerPanelClicked()
         playerPanelWrapper.openPlayerPanel()
+    }
+
+    fun openImportPlaylistScreen(uriStr: String) {
+        playerPanelWrapper.collapseBottomPanelSmoothly {
+            val currentFragment = navigation.fragmentOnTop
+            if (currentFragment is PlayListsFragment) {
+                currentFragment.importPlaylist(uriStr)
+            } else {
+                if (selectedDrawerItemId != R.id.menu_play_lists) {
+                    selectedDrawerItemId = R.id.menu_play_lists
+                    viewBinding.navigationView.setCheckedItem(R.id.menu_play_lists)
+                    presenter.onDrawerScreenSelected(Screens.PLAY_LISTS)
+                }
+                navigation.newRootFragment(newPlaylistsFragment(uriStr), 0, 0)
+            }
+        }
     }
 
     private fun setMusicControlsEnabled(show: Boolean) {

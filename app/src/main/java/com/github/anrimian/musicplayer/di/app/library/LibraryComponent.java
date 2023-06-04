@@ -10,7 +10,6 @@ import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesComponen
 import com.github.anrimian.musicplayer.di.app.library.files.LibraryFilesModule;
 import com.github.anrimian.musicplayer.di.app.library.genres.GenresComponent;
 import com.github.anrimian.musicplayer.di.app.library.genres.GenresModule;
-import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.lyrics.LyricsPresenter;
 import com.github.anrimian.musicplayer.ui.player_screen.queue.PlayQueuePresenter;
@@ -35,6 +34,5 @@ public interface LibraryComponent {
     PlayerPresenter playerPresenter();
     PlayQueuePresenter playQueuePresenter();
     LyricsPresenter lyricsPresenter();
-    SelectOrderPresenter selectOrderPresenter();
     ExcludedFoldersPresenter excludedFoldersPresenter();
 }

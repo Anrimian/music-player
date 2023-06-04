@@ -6,5 +6,6 @@ public enum CorruptionType {
     NOT_FOUND,
     SOURCE_NOT_FOUND,
     TOO_LARGE_SOURCE,
-    FILE_IS_CORRUPTED
+    FILE_IS_CORRUPTED,
+    FILE_READ_TIMEOUT
 }

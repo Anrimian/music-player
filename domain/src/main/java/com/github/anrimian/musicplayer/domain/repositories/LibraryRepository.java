@@ -1,9 +1,11 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
@@ -25,6 +27,7 @@ import io.reactivex.rxjava3.core.Single;
 
 public interface LibraryRepository {
 
+    //compositions
     Observable<List<Composition>> getAllCompositionsObservable(@Nullable String searchText);
 
     Observable<Composition> getCompositionObservable(long id);
@@ -33,38 +36,13 @@ public interface LibraryRepository {
 
     Observable<String> getLyricsObservable(long id);
 
-    Observable<List<Artist>> getArtistsObservable(@Nullable String searchText);
+    Completable writeErrorAboutComposition(CorruptionType errorType, Composition composition);
 
-    Observable<List<Album>> getAlbumsObservable(@Nullable String searchText);
+    Single<DeletedComposition> deleteComposition(Composition composition);
 
-    Observable<List<Genre>> getGenresObservable(@Nullable String searchText);
+    Single<List<DeletedComposition>> deleteCompositions(List<Composition> compositions);
 
-    Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId);
-
-    Observable<List<Composition>> getGenreItemsObservable(long genreId);
-
-    Observable<List<Composition>> getAlbumItemsObservable(long albumId);
-
-    Single<List<Long>> getCompositionIdsInAlbum(long albumId);
-
-    Single<List<Long>> getAllCompositionsByArtist(long artistId);
-
-    Single<List<Long>> getAllCompositionsByGenre(long genreId);
-
-    Observable<Album> getAlbumObservable(long albumId);
-
-    Observable<List<Composition>> getCompositionsByArtist(long artistId);
-
-    Observable<Artist> getArtistObservable(long artistId);
-
-    Observable<List<Album>> getAllAlbumsForArtist(long artistId);
-
-    Single<String[]> getAuthorNames();
-
-    Single<String[]> getAlbumNames();
-
-    Single<String[]> getGenreNames();
-
+    //folders
     Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
                                                     @Nullable String searchQuery);
 
@@ -74,14 +52,64 @@ public interface LibraryRepository {
 
     Single<List<Composition>> getAllCompositionsInFolders(Iterable<FileSource> fileSources);
 
-    Completable writeErrorAboutComposition(CorruptionType errorType, Composition composition);
+    Single<List<DeletedComposition>> deleteFolder(FolderFileSource folder);
 
-    Completable deleteComposition(Composition composition);
+    Single<List<DeletedComposition>> deleteFolders(List<FileSource> folders);
 
-    Completable deleteCompositions(List<Composition> compositions);
+    Single<List<Long>> getAllParentFolders(@Nullable Long folder);
+
+    Single<List<Long>> getAllParentFoldersForComposition(long id);
+
+    //artists
+    Observable<List<Artist>> getArtistsObservable(@Nullable String searchText);
+
+    Single<List<Long>> getAllCompositionIdsByArtists(long artistId);
+
+    Single<List<Long>> getAllCompositionIdsByArtists(Iterable<Artist> artists);
+
+    Single<List<Composition>> getAllCompositionsByArtists(Iterable<Artist> artists);
+
+    Single<List<Composition>> getAllCompositionsByArtistIds(Iterable<Long> artists);
+
+    Observable<List<Composition>> getCompositionsByArtist(long artistId);
+
+    Observable<Artist> getArtistObservable(long artistId);
+
+    Observable<List<Album>> getAllAlbumsForArtist(long artistId);
+
+    Single<String[]> getAuthorNames();
+
+    //albums
+    Observable<List<Album>> getAlbumsObservable(@Nullable String searchText);
+
+    Observable<List<AlbumComposition>> getAlbumItemsObservable(long albumId);
+
+    Single<List<Long>> getCompositionIdsInAlbum(long albumId);
+
+    Single<List<Long>> getCompositionIdsInAlbums(Iterable<Album> albums);
+
+    Single<List<Composition>> getCompositionsInAlbums(Iterable<Album> albums);
+
+    Single<List<Composition>> getCompositionsByAlbumIds(Iterable<Long> artists);
+
+    Observable<Album> getAlbumObservable(long albumId);
+
+    Single<String[]> getAlbumNames();
+
+    //genres
+    Observable<List<Genre>> getGenresObservable(@Nullable String searchText);
+
+    Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId);
+
+    Observable<List<Composition>> getGenreItemsObservable(long genreId);
+
+    Single<List<Long>> getAllCompositionsByGenre(long genreId);
+
+    Single<String[]> getGenreNames();
 
     Observable<Genre> getGenreObservable(long genreId);
 
+    //ignored folders
     Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder);
 
     Completable addFolderToIgnore(IgnoredFolder folder);
@@ -90,11 +118,4 @@ public interface LibraryRepository {
 
     Completable deleteIgnoredFolder(IgnoredFolder folder);
 
-    Single<List<Composition>> deleteFolder(FolderFileSource folder);
-
-    Single<List<Composition>> deleteFolders(List<FileSource> folders);
-
-    Single<List<Long>> getAllParentFolders(@Nullable Long folder);
-
-    Single<List<Long>> getAllParentFoldersForComposition(long id);
 }

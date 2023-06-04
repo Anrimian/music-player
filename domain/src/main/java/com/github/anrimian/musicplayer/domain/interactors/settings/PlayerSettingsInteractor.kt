@@ -7,7 +7,7 @@ import io.reactivex.rxjava3.core.Observable
 
 class PlayerSettingsInteractor(
     private val settingsRepository: SettingsRepository,
-    private val mediaPlayerController: MusicPlayerController
+    private val mediaPlayerController: MusicPlayerController,
 ) {
 
     fun isDecreaseVolumeOnAudioFocusLossEnabled() = settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled
@@ -48,6 +48,12 @@ class PlayerSettingsInteractor(
             return
         }
         settingsRepository.enabledMediaPlayers = players
+    }
+
+    fun getKeepNotificationTime(): Long = settingsRepository.keepNotificationTime
+
+    fun setKeepNotificationTime(millis: Long) {
+        settingsRepository.keepNotificationTime = millis
     }
 
 }

@@ -7,6 +7,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsI
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsPresenter;
 
@@ -32,7 +33,7 @@ public class AlbumItemsModule {
                                             PlayListsInteractor playListsInteractor,
                                             LibraryPlayerInteractor playerInteractor,
                                             DisplaySettingsInteractor displaySettingsInteractor,
-                                            SyncInteractor<?, ?, Long> syncInteractor,
+                                            SyncInteractor<FileKey, ?, Long> syncInteractor,
                                             ErrorParser errorParser,
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new AlbumItemsPresenter(id,

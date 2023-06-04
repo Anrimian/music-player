@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
+import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.composition.content.*
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
@@ -13,7 +14,10 @@ import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.PlayQueueItemHelper
+import com.github.anrimian.musicplayer.domain.models.utils.toFileKey
+import com.github.anrimian.musicplayer.domain.models.utils.toFileKeys
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
@@ -30,7 +34,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 class LibraryPlayerInteractor(
     private val playerCoordinatorInteractor: PlayerCoordinatorInteractor,
-    private val syncInteractor: SyncInteractor<*, *, Long>,
+    private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     private val settingsRepository: SettingsRepository,
     private val playQueueRepository: PlayQueueRepository,
     private val libraryRepository: LibraryRepository,
@@ -64,12 +68,20 @@ class LibraryPlayerInteractor(
     }
 
     @JvmOverloads
-    fun startPlaying(
+    fun startPlayingCompositions(
         compositions: List<Composition>,
         firstPosition: Int = Constants.NO_POSITION,
     ) {
+        startPlaying(compositions.map(Composition::getId), firstPosition)
+    }
+
+    @JvmOverloads
+    fun startPlaying(
+        compositionIds: List<Long>,
+        firstPosition: Int = Constants.NO_POSITION,
+    ) {
         ignoredPreviousCurrentItem = currentItem
-        playQueueRepository.setPlayQueue(compositions, firstPosition)
+        playQueueRepository.setPlayQueue(compositionIds, firstPosition)
             .doOnComplete { playerCoordinatorInteractor.playAfterPrepare(PlayerType.LIBRARY) }
             .doOnError(analytics::processNonFatalError)
             .onErrorComplete()
@@ -219,16 +231,14 @@ class LibraryPlayerInteractor(
         return playQueueRepository.playQueueObservable
     }
 
-    fun deleteComposition(composition: Composition): Single<Composition> {
+    fun deleteComposition(composition: Composition): Single<DeletedComposition> {
         return libraryRepository.deleteComposition(composition)
-            .doOnComplete { syncInteractor.onLocalFileDeleted(composition.id) }
-            .toSingleDefault(composition)
+            .doOnSuccess { c -> syncInteractor.onLocalFileDeleted(c.toFileKey()) }
     }
 
-    fun deleteCompositions(compositions: List<Composition>): Single<List<Composition>> {
+    fun deleteCompositions(compositions: List<Composition>): Single<List<DeletedComposition>> {
         return libraryRepository.deleteCompositions(compositions)
-            .doOnComplete { syncInteractor.onLocalFilesDeleted(compositions.map(Composition::getId)) }
-            .toSingleDefault(compositions)
+            .doOnSuccess { c -> syncInteractor.onLocalFilesDeleted(c.toFileKeys()) }
     }
 
     fun removeQueueItem(item: PlayQueueItem): Completable {
@@ -419,6 +429,7 @@ class LibraryPlayerInteractor(
             is RemoteSourceNotFoundException -> CorruptionType.SOURCE_NOT_FOUND
             is TooLargeSourceException -> CorruptionType.TOO_LARGE_SOURCE
             is CorruptedMediaFileException -> CorruptionType.FILE_IS_CORRUPTED
+            is FileReadTimeoutException -> CorruptionType.FILE_READ_TIMEOUT
             else -> CorruptionType.UNKNOWN
         }
     }

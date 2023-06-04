@@ -32,14 +32,15 @@ import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragmen
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
-import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentLayerListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.google.android.material.snackbar.Snackbar
 import moxy.ktx.moxyPresenter
 
-class GenresListFragment : LibraryFragment(), GenresListView, FragmentLayerListener,
+class GenresListFragment : LibraryFragment(), GenresListView,
+    FragmentNavigationListener,
     BackButtonListener {
 
     private val presenter by moxyPresenter {
@@ -97,8 +98,8 @@ class GenresListFragment : LibraryFragment(), GenresListView, FragmentLayerListe
         progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG)
     }
 
-    override fun onFragmentMovedOnTop() {
-        super.onFragmentMovedOnTop()
+    override fun onFragmentResumed() {
+        super.onFragmentResumed()
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
         toolbar.setSubtitle(R.string.genres)
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText())
