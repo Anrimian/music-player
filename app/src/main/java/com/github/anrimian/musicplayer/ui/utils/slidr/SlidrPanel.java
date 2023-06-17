@@ -8,6 +8,7 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -21,9 +22,10 @@ public class SlidrPanel {
                                                  @NonNull Fragment fragment,
                                                  @Nullable SlideListener slideListener) {
         SlidrConfig slidrConfig = new SlidrConfig.Builder().position(SlidrPosition.LEFT).build();
+        FragmentManager fm = fragment.getParentFragmentManager();
         return SlidrPanel.replace(oldScreen,
                 slidrConfig,
-                () -> FragmentNavigation.from(fragment.getParentFragmentManager()).goBack(0),
+                () -> FragmentNavigation.from(fm).goBack(0),
                 slideListener);
     }
 

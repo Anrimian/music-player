@@ -168,7 +168,7 @@ class PlayQueuePresenter(
         viewState.notifyItemMoved(from, to)
 
         listDragFilter.increaseEventsToSkip()
-        playerInteractor.swapItems(fromItem, toItem)
+        playerInteractor.swapItems(fromItem, toItem).justSubscribe(this::onDefaultError)
     }
 
     private fun deletePreparedCompositions(compositionsToDelete: List<Composition>) {

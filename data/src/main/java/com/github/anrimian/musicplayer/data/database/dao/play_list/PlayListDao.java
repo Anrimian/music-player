@@ -59,7 +59,7 @@ public interface PlayListDao {
     @Query("SELECT " +
             "play_lists.id as id, " +
             "play_lists.storageId as storageId, " +
-            "replace(substr(play_lists.name, 1, 123), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
+            "replace(substr(play_lists.name, 1, 86), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount " +
@@ -69,7 +69,7 @@ public interface PlayListDao {
     @Query("SELECT " +
             "play_lists.id as id, " +
             "play_lists.storageId as storageId, " +
-            "replace(substr(play_lists.name, 1, 123), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
+            "replace(substr(play_lists.name, 1, 86), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount " +
@@ -80,7 +80,7 @@ public interface PlayListDao {
     @Query("SELECT " +
             "play_lists.id as id, " +
             "play_lists.storageId as storageId, " +
-            "replace(substr(play_lists.name, 1, 123), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
+            "replace(substr(play_lists.name, 1, 86), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount " +
@@ -189,7 +189,7 @@ public interface PlayListDao {
     boolean isPlayListExistsByStorageId(long storageId);
 
     @Query("SELECT " +
-            "replace(substr(play_lists.name, 1, 123), '/', '') " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
+            "replace(substr(play_lists.name, 1, 86), '/', '') " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
             "FROM play_lists WHERE id = :playListId")
     String selectPlayListName(long playListId);
 

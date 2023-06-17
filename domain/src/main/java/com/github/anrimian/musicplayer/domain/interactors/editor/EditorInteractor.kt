@@ -78,13 +78,13 @@ class EditorInteractor(
 
     fun editCompositionTrackNumber(compositionId: Long, trackNumber: Long?): Completable {
         return runEditAction(compositionId) { source ->
-            editorRepository.changeCompositionTrackNumber(compositionId, source, trackNumber)
+            editorRepository.changeCompositionTrackNumber(compositionId, source, trackNumber.nullIfZero())
         }
     }
 
     fun editCompositionDiscNumber(compositionId: Long, discNumber: Long?): Completable {
         return runEditAction(compositionId) { source ->
-            editorRepository.changeCompositionDiscNumber(compositionId, source, discNumber)
+            editorRepository.changeCompositionDiscNumber(compositionId, source, discNumber.nullIfZero())
         }
     }
 
@@ -211,4 +211,6 @@ class EditorInteractor(
                 .doOnComplete { syncInteractor.notifyLocalFileChanged() }
         }
     }
+
+    private fun Long?.nullIfZero() = if (this != null && this == 0L) null else this
 }

@@ -222,8 +222,8 @@ public class StorageModule {
 
     @Provides
     @Nonnull
-    PlaylistFilesStorage playlistFilesStorage(Context context) {
-        return new PlaylistFilesStorage(context);
+    PlaylistFilesStorage playlistFilesStorage(Context context, Analytics analytics) {
+        return new PlaylistFilesStorage(context, analytics);
     }
 
     @Provides

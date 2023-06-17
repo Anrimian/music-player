@@ -7,7 +7,13 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
-import com.github.anrimian.musicplayer.domain.models.composition.content.*
+import com.github.anrimian.musicplayer.domain.models.composition.content.AcceptablePlayerException
+import com.github.anrimian.musicplayer.domain.models.composition.content.CorruptedMediaFileException
+import com.github.anrimian.musicplayer.domain.models.composition.content.FileReadTimeoutException
+import com.github.anrimian.musicplayer.domain.models.composition.content.LocalSourceNotFoundException
+import com.github.anrimian.musicplayer.domain.models.composition.content.RemoteSourceNotFoundException
+import com.github.anrimian.musicplayer.domain.models.composition.content.TooLargeSourceException
+import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
@@ -249,8 +255,8 @@ class LibraryPlayerInteractor(
         return playQueueRepository.restoreDeletedItem()
     }
 
-    fun swapItems(firstItem: PlayQueueItem, secondItem: PlayQueueItem) {
-        playQueueRepository.swapItems(firstItem, secondItem).subscribe()
+    fun swapItems(firstItem: PlayQueueItem, secondItem: PlayQueueItem): Completable {
+        return playQueueRepository.swapItems(firstItem, secondItem)
     }
 
     fun addCompositionsToPlayNext(compositions: List<Composition>): Single<List<Composition>> {

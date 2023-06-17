@@ -384,7 +384,7 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
             R.string.track_number,
             composition.trackNumber?.toString(),
             inputType = InputType.TYPE_CLASS_NUMBER,
-            digits = "123456789"
+            digits = "0123456789"
         )
         trackNumberDialogFragmentRunner.show(fragment)
     }
@@ -397,7 +397,7 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
             R.string.disc_number,
             composition.discNumber?.toString(),
             inputType = InputType.TYPE_CLASS_NUMBER,
-            digits = "123456789"
+            digits = "0123456789"
         )
         discNumberDialogFragmentRunner.show(fragment)
     }

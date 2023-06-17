@@ -78,11 +78,7 @@ public class StoragePlayListsProvider {
             while (cursor.moveToNext()) {
                 StoragePlayList playList = getPlayListFromCursor(cursorWrapper);
                 if (playList != null) {
-                    String name = playList.getName()
-                            .replaceAll(Constants.PLAYLIST_NOT_ALLOWED_CHARACTERS, "")
-                            .trim();
-                    name = StringsKt.take(name, Constants.PLAYLIST_NAME_MAX_LENGTH);
-                    map.put(name, playList);
+                    map.put(playList.getName(), playList);
                 }
             }
             return map;
@@ -262,6 +258,9 @@ public class StoragePlayListsProvider {
         if (name == null) {
             return null;
         }
+        name = name.replaceAll(Constants.PLAYLIST_NOT_ALLOWED_CHARACTERS, "").trim();
+        name = StringsKt.take(name, Constants.PLAYLIST_NAME_MAX_LENGTH);
+
         long dateAdded = cursorWrapper.getLong(Playlists.DATE_ADDED);
         long dateModified = cursorWrapper.getLong(Playlists.DATE_MODIFIED);
 

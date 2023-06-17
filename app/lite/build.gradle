@@ -26,7 +26,7 @@ android {
         targetSdkVersion config.androidTargetSdkVersion
 
         applicationId 'com.github.anrimian.musicplayer'
-        versionCode 159
+        versionCode 160
         versionName "0.9.7"
         testInstrumentationRunner config.testInstrumentationRunner
         testApplicationId "${applicationId}.test"
