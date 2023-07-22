@@ -18,7 +18,7 @@ android {
         testInstrumentationRunnerArguments["runnerBuilder"] = config.testJunit5Builder
 
         vectorDrawables.useSupportLibrary = true
-        resConfigs 'en', 'be', 'cs', 'de', 'el', 'es', 'fr', 'pt', 'ru', 'tr', 'uk'
+        resConfigs 'en', 'be', 'cs', 'de', 'el', 'es', 'fr', 'in', 'pt', 'ru', 'tr', 'uk'
 
     }
     buildTypes {

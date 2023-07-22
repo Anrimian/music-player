@@ -36,7 +36,6 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:requestLegacyExternalStorage="true"
-        android:localeConfig="@xml/locales_config"
         tools:ignore="UnusedAttribute"
         tools:replace="android:allowBackup">
 

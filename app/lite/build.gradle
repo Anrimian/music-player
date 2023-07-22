@@ -26,8 +26,8 @@ android {
         targetSdkVersion config.androidTargetSdkVersion
 
         applicationId 'com.github.anrimian.musicplayer'
-        versionCode 160
-        versionName "0.9.7"
+        versionCode 161
+        versionName "0.9.7.1"
         testInstrumentationRunner config.testInstrumentationRunner
         testApplicationId "${applicationId}.test"
         archivesBaseName = "$applicationId-v$versionName($versionCode)"

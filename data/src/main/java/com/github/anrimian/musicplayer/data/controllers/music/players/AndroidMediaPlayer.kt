@@ -28,7 +28,10 @@ class AndroidMediaPlayer(
 
     private val mediaPlayer = MediaPlayer().apply {
         //problem with error case(file not found), multiple error events
-        setOnCompletionListener { playerEventsSubject.onNext(MediaPlayerEvent.Finished) }
+        setOnCompletionListener {
+            isSourcePrepared = false
+            playerEventsSubject.onNext(MediaPlayerEvent.Finished)
+        }
         setOnErrorListener { _, what, extra ->
             val ex = createExceptionFromPlayerError(what, extra)
             playerEventsSubject.onNext(MediaPlayerEvent.Error(ex))
@@ -40,7 +43,9 @@ class AndroidMediaPlayer(
 //        } catch (IllegalStateException ignored) {}
     }
 
-    private var isSourcePrepared = false// is it necessary now?
+    private var currentSource: CompositionContentSource? = null
+
+    private var isSourcePrepared = false
     private var isPlaying = false
 
     private var previousException: Exception? = null
@@ -53,8 +58,9 @@ class AndroidMediaPlayer(
         source: CompositionContentSource,
         previousException: Exception?,
     ): Completable {
+        currentSource = source
         this.previousException = previousException
-        return prepareMediaSource(source)
+        return Completable.fromAction { prepareMediaSource(source) }
             .doOnSubscribe { isSourcePrepared = false }
             .doOnComplete { isSourcePrepared = true }
             .onErrorResumeNext { t -> Completable.error(mapPrepareException(t)) }
@@ -95,6 +101,11 @@ class AndroidMediaPlayer(
         try {
             if (isSourcePrepared) {
                 mediaPlayer.seekTo(position.toInt())
+            } else if (currentSource != null) {
+                prepareMediaSource(currentSource!!)
+                isSourcePrepared = true
+                pause()
+                resume()
             }
         } catch (ignored: IllegalStateException) {}
     }
@@ -146,6 +157,8 @@ class AndroidMediaPlayer(
     }
 
     override fun release() {
+        isSourcePrepared = false
+        currentSource = null
         equalizerController.detachEqualizer()
         mediaPlayer.release()
     }
@@ -192,17 +205,15 @@ class AndroidMediaPlayer(
         return throwable
     }
 
-    private fun prepareMediaSource(source: CompositionContentSource): Completable {
-        return Completable.fromAction {
-            mediaPlayer.reset()
-            mediaPlayer.setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build()
-            )
-            sourceBuilder.setMediaSource(mediaPlayer, source)
-            mediaPlayer.prepare()
-        }
+    private fun prepareMediaSource(source: CompositionContentSource) {
+        mediaPlayer.reset()
+        mediaPlayer.setAudioAttributes(
+            AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build()
+        )
+        sourceBuilder.setMediaSource(mediaPlayer, source)
+        mediaPlayer.prepare()
     }
 
     private fun pausePlayer() {
@@ -223,8 +234,7 @@ class AndroidMediaPlayer(
         try {
             mediaPlayer.start()
             equalizerController.attachEqualizer(mediaPlayer.audioSessionId)
-        } catch (ignored: IllegalStateException) {
-        }
+        } catch (ignored: IllegalStateException) {}
     }
 
 }
