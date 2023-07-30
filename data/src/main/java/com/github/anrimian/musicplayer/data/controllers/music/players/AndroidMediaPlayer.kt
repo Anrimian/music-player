@@ -6,6 +6,7 @@ import android.os.Build
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController
 import com.github.anrimian.musicplayer.data.controllers.music.players.utils.MediaPlayerDataSourceBuilder
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
+import com.github.anrimian.musicplayer.domain.models.composition.content.RelaunchSourceException
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnknownPlayerException
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
@@ -107,7 +108,9 @@ class AndroidMediaPlayer(
                 pause()
                 resume()
             }
-        } catch (ignored: IllegalStateException) {}
+        } catch (ex: Exception) {
+            playerEventsSubject.onNext(MediaPlayerEvent.Error(RelaunchSourceException(ex)))
+        }
     }
 
     override fun setVolume(volume: Float) {
