@@ -7,10 +7,11 @@ import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
 
 
-class ExcludedFoldersPresenter(private val interactor: LibraryFoldersInteractor,
-                               uiScheduler: Scheduler,
-                               errorParser: ErrorParser)
-    : AppPresenter<ExcludedFoldersView>(uiScheduler, errorParser) {
+class ExcludedFoldersPresenter(
+    private val interactor: LibraryFoldersInteractor,
+    uiScheduler: Scheduler,
+    errorParser: ErrorParser
+) : AppPresenter<ExcludedFoldersView>(uiScheduler, errorParser) {
 
     private var recentlyRemovedFolder: IgnoredFolder? = null
 
@@ -21,16 +22,16 @@ class ExcludedFoldersPresenter(private val interactor: LibraryFoldersInteractor,
 
     fun onDeleteFolderClicked(folder: IgnoredFolder) {
         interactor.deleteIgnoredFolder(folder)
-                .toSingleDefault(folder)
-                .subscribeOnUi(this::onFolderRemoved, this::onDefaultError)
+            .toSingleDefault(folder)
+            .subscribeOnUi(this::onFolderRemoved, this::onDefaultError)
     }
 
     fun onRestoreRemovedFolderClicked() {
         if (recentlyRemovedFolder == null) {
             return
         }
-        interactor.addFolderToIgnore(recentlyRemovedFolder)
-                .justSubscribe(this::onFoldersListError)
+        interactor.addFolderToIgnore(recentlyRemovedFolder!!)
+            .justSubscribe(this::onFoldersListError)
     }
 
     private fun onFolderRemoved(folder: IgnoredFolder) {
@@ -39,8 +40,8 @@ class ExcludedFoldersPresenter(private val interactor: LibraryFoldersInteractor,
     }
 
     private fun subscribeOnIgnoredFoldersList() {
-        interactor.ignoredFoldersObservable
-                .subscribeOnUi(this::onFoldersListReceived, this::onFoldersListError)
+        interactor.getIgnoredFoldersObservable()
+            .subscribeOnUi(this::onFoldersListReceived, this::onFoldersListError)
     }
 
     private fun onFoldersListReceived(folders: List<IgnoredFolder>) {

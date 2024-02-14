@@ -153,7 +153,11 @@ class AndroidMediaPlayer(
     override fun setPlaybackSpeed(speed: Float) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
+                val isPlaying = mediaPlayer.isPlaying
                 mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
+                if (!isPlaying) {
+                    mediaPlayer.pause()
+                }
             } catch (ignored: IllegalStateException) {
             } //IllegalArgumentException - handle unsupported case
         }

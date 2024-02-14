@@ -8,9 +8,11 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.databinding.DialogPlaylistDuplicateBinding
 import com.github.anrimian.musicplayer.databinding.DialogSoundBalanceBinding
 import com.github.anrimian.musicplayer.databinding.PartialDeleteDialogBinding
 import com.github.anrimian.musicplayer.databinding.PartialNumberPickerDialogBinding
@@ -22,12 +24,65 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
-import com.github.anrimian.musicplayer.ui.common.dialogs.share.newShareCompositionsDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged
-import com.github.anrimian.musicplayer.ui.utils.ViewUtils.setChecked
+import com.github.anrimian.musicplayer.ui.common.dialogs.share.ShareCompositionsDialogFragment
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+
+private const val MAX_DISPLAY_DUPLICATE_FILES_COUNT = 5
+
+fun showPlaylistDuplicateEntryDialog(
+    context: Context,
+    compositions: Collection<Composition>,
+    hasNonDuplicates: Boolean,
+    playList: PlayList,
+    isDuplicateCheckEnabled: Boolean,
+    onAddEntriesConfirmed: (ignoreDuplicates: Boolean) -> Unit,
+    onDuplicateChecked: (isChecked: Boolean) -> Unit
+) {
+    val binding = DialogPlaylistDuplicateBinding.inflate(LayoutInflater.from(context))
+
+    binding.cbCheck.isChecked = isDuplicateCheckEnabled
+    binding.cbCheck.setOnCheckedChangeListener { _, isChecked -> onDuplicateChecked(isChecked) }
+
+    val dialog = AlertDialog.Builder(context)
+        .setTitle(R.string.duplicates_detected)
+        .setView(binding.root)
+        .create()
+    dialog.show()
+
+    val message = context.getString(R.string.playlist_duplicates_description, playList.name)
+    binding.tvMessage.text = message
+
+    val duplicatesSb = StringBuilder(context.getString(R.string.compositions))
+    duplicatesSb.append(':')
+    for ((i, composition) in compositions.withIndex()) {
+        if (i >= MAX_DISPLAY_DUPLICATE_FILES_COUNT) {
+            duplicatesSb.append("\n")
+            duplicatesSb.append(
+                context.getString(R.string.more_template, compositions.count() - i)
+            )
+            break
+        }
+        duplicatesSb.append("\n  ")
+        duplicatesSb.append(composition.title)
+    }
+    binding.tvDuplicates.text = duplicatesSb.toString()
+
+    binding.btnAdd.setOnClickListener {
+        onAddEntriesConfirmed(false)
+        dialog.dismiss()
+    }
+    binding.btnAddWithoutDuplicates.isVisible = hasNonDuplicates
+    binding.btnAddWithoutDuplicates.setOnClickListener {
+        onAddEntriesConfirmed(true)
+        dialog.dismiss()
+    }
+    binding.btnCancel.setOnClickListener {
+        dialog.dismiss()
+    }
+}
 
 fun showSoundBalanceSelectorDialog(
     context: Context,
@@ -37,14 +92,14 @@ fun showSoundBalanceSelectorDialog(
     onReset: () -> Unit,
 ) {
 
-    val viewBinding = DialogSoundBalanceBinding.inflate(LayoutInflater.from(context))
-    viewBinding.sbSoundBalance.max = 200
-    val seekBarViewWrapper = SeekBarViewWrapper(viewBinding.sbSoundBalance)
+    val binding = DialogSoundBalanceBinding.inflate(LayoutInflater.from(context))
+    binding.sbSoundBalance.max = 200
+    val seekBarViewWrapper = SeekBarViewWrapper(binding.sbSoundBalance)
     seekBarViewWrapper.setProgressChangeListener { progress ->
         val left = if (progress < 100) progress else 100
         val right = if (progress > 100) 100 - (progress - 100) else 100
-        viewBinding.tvLeftValue.text = context.getString(R.string.percent_template, left)
-        viewBinding.tvRightValue.text = context.getString(R.string.percent_template, right)
+        binding.tvLeftValue.text = context.getString(R.string.percent_template, left)
+        binding.tvRightValue.text = context.getString(R.string.percent_template, right)
         onBalancePicked(SoundBalance(left/100f, right/100f))
     }
     seekBarViewWrapper.setOnSeekStopListener { progress ->
@@ -56,12 +111,12 @@ fun showSoundBalanceSelectorDialog(
     val balanceRight = (balance.right * 100).toLong()
     val progress = if (balanceLeft < 100) balanceLeft else balanceLeft + (100 - balanceRight)
     seekBarViewWrapper.setProgress(progress)
-    viewBinding.tvLeftValue.text = context.getString(R.string.percent_template, balanceLeft)
-    viewBinding.tvRightValue.text = context.getString(R.string.percent_template, balanceRight)
+    binding.tvLeftValue.text = context.getString(R.string.percent_template, balanceLeft)
+    binding.tvRightValue.text = context.getString(R.string.percent_template, balanceRight)
 
     AlertDialog.Builder(context)
         .setTitle(R.string.sound_balance)
-        .setView(viewBinding.root)
+        .setView(binding.root)
         .setPositiveButton(android.R.string.ok) { _, _ -> }
         .setNegativeButton(R.string.reset) { _, _ -> onReset()}
         .show()
@@ -72,10 +127,13 @@ fun shareComposition(fragment: Fragment, composition: Composition) {
 }
 
 fun shareCompositions(fragment: Fragment, compositions: Collection<Composition>) {
+    if (compositions.isEmpty()) {
+        return
+    }
     shareCompositions(
         fragment.requireContext(),
         fragment.childFragmentManager,
-        compositions.map(Composition::getId),
+        compositions.map(Composition::id),
         compositions.find { composition -> !composition.isFileExists } != null
     )
 }
@@ -100,7 +158,7 @@ fun shareCompositions(
     hasNonExistComposition: Boolean,
 ) {
     if (hasNonExistComposition) {
-        newShareCompositionsDialogFragment(ids.toLongArray()).safeShow(fragmentManager)
+        ShareCompositionsDialogFragment.newInstance(ids.toLongArray()).safeShow(fragmentManager)
         return
     }
     Components.getAppComponent().sourceInteractor()
@@ -180,7 +238,25 @@ fun showConfirmDeleteDialog(
         )
     }
     val message = context.getString(R.string.undone_action_template, countMessage)
-    showConfirmDeleteFileDialog(context, message, deleteCallback, folder.hasAnyStorageFile())
+    showConfirmDeleteFileDialog(context, message, deleteCallback, folder.hasAnyStorageFile)
+}
+
+fun showConfirmDeleteDialog(
+    context: Context,
+    playLists: Collection<PlayList>,
+    deleteCallback: () -> Unit,
+) {
+    val count = playLists.size
+    if (count == 1) {
+        showConfirmDeleteDialog(context, playLists.first(), deleteCallback)
+    } else {
+        val message = context.resources.getQuantityString(
+            R.plurals.delete_playlists_template,
+            count,
+            count
+        )
+        showConfirmDeleteDialog(context, message, deleteCallback)
+    }
 }
 
 fun showConfirmDeleteDialog(
@@ -209,8 +285,8 @@ fun showConfirmDeleteFileDialog(
             return
         }
         val binding = PartialDeleteDialogBinding.inflate(LayoutInflater.from(context))
-        setChecked(binding.cbDoNotShowDeleteDialog, !isConfirmDialogEnabled)
-        onCheckChanged(binding.cbDoNotShowDeleteDialog) { enabled ->
+        ViewUtils.setChecked(binding.cbDoNotShowDeleteDialog, !isConfirmDialogEnabled)
+        ViewUtils.onCheckChanged(binding.cbDoNotShowDeleteDialog) { enabled ->
             interactor.setAppConfirmDeleteDialogEnabled(!enabled)
         }
         view = binding.root

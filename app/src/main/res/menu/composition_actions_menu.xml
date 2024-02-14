@@ -33,4 +33,8 @@
         android:icon="@drawable/ic_delete_outline"
         android:title="@string/delete"
         app:iconTint="?android:attr/textColorPrimary"/>
+
+<!--    <group android:id="@+id/secondary_items">-->
+<!--    </group>-->
+
 </menu>

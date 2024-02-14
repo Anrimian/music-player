@@ -31,13 +31,18 @@
     <color name="colorPrimaryDarkSecondary">#f5f5f5</color>
     <color name="selectionStatusBarColor">#848282</color>
 
+    <!--too light on pixel 7. check pixel 3a and nexus 5x-->
+    <color name="color_control_highlight">#1f000000</color>
     <color name="color_control_highlight_light">#80BDBDBD</color>
 
     <color name="popup_menu_background_color">#fff</color>
+    <color name="popup_page_foreground_shadow_color">#36888888</color>
+    <color name="popup_page_foreground_shadow_color_dark">#36201F1F</color>
 
     <color name="cover_dark_foreground">#33000000</color>
 
-    <color name="color_control_highlight">#1f000000</color>
+    <color name="chip_background">#D5D2D2</color>
+    <color name="chip_background_dark">#6A6868</color>
 
     <!-- leave for future ideas  -->
 <!--    <color name="player_panel_background">#F6F6F6</color>-->

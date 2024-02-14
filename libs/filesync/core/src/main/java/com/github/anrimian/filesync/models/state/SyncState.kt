@@ -8,14 +8,18 @@ import com.github.anrimian.filesync.models.task.Task
 
 sealed interface SyncState {
     sealed interface IdleSyncState: SyncState
-    object Inactive: IdleSyncState
-    object NoRepos: IdleSyncState
-    //TODO Add disabled state
-    // + do not allow launch tasks in disabled state(seems solved, but check cases)
-    // + what to do on request file sync? Also check remaining methods in SyncTasksInteractor
-    //   A: throw special exception to show it?
-    object Disabled: IdleSyncState
+    class Inactive(val lastSyncedTime: Long): IdleSyncState {
+        override fun equals(other: Any?): Boolean {
+            if (javaClass != other?.javaClass) return false
+            return true
+        }
 
+        override fun hashCode(): Int {
+            return javaClass.hashCode()
+        }
+    }
+    object NoRepos: IdleSyncState
+    object Disabled: IdleSyncState
 
     sealed interface ActiveTask: SyncState
     object NoTask: ActiveTask
@@ -78,6 +82,7 @@ sealed interface SyncState {
 
 
     data class WaitForAllow(val syncEnvConditions: List<SyncEnvCondition>): SyncState
+    object PendingSync: SyncState
 
     data class Error(
         val throwable: Throwable,

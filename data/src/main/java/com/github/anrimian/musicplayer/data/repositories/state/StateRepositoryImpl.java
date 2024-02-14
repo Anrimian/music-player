@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.repositories.state;
 
+import static com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl.Constants.IS_STORAGE_PLAYLISTS_IMPORTED;
 import static com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl.Constants.LAST_COMPLETE_SCAN_TIME;
 import static com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl.Constants.LAST_FILE_SCANNER_VERSION;
 import static com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl.Constants.PREFERENCES_NAME;
@@ -20,6 +21,7 @@ public class StateRepositoryImpl implements StateRepository {
         String ROOT_FOLDER_PATH = "root_folder_path";
         String LAST_FILE_SCANNER_VERSION = "last_file_scanner_version";
         String LAST_COMPLETE_SCAN_TIME = "last_complete_scan_time";
+        String IS_STORAGE_PLAYLISTS_IMPORTED = "is_storage_playlists_imported";
     }
 
     private final SharedPreferencesHelper preferences;
@@ -48,7 +50,7 @@ public class StateRepositoryImpl implements StateRepository {
 
     @Override
     public int getCurrentFileScannerVersion() {
-        return 6;
+        return 7;
     }
 
     @Override
@@ -70,4 +72,15 @@ public class StateRepositoryImpl implements StateRepository {
     public void setLastCompleteScanTime(long scanTime) {
         preferences.putLong(LAST_COMPLETE_SCAN_TIME, scanTime);
     }
+
+    @Override
+    public boolean isStoragePlaylistsImported() {
+        return preferences.getBoolean(Constants.IS_STORAGE_PLAYLISTS_IMPORTED);
+    }
+
+    @Override
+    public void setStoragePlaylistsImported(boolean isImported) {
+        preferences.putBoolean(IS_STORAGE_PLAYLISTS_IMPORTED, isImported);
+    }
+
 }

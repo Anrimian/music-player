@@ -9,7 +9,9 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -17,15 +19,22 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.MenuRes
 import androidx.annotation.RequiresApi
+import androidx.appcompat.view.SupportMenuInflater
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import java.io.Serializable
 
 fun Context.getDimensionPixelSize(@DimenRes resId: Int): Int {
     return resources.getDimensionPixelSize(resId)
 }
 
 fun Context.colorFromAttr(@AttrRes attr: Int) = AndroidUtils.getColorFromAttr(this, attr)
+
+fun Context.attrColor(@AttrRes attr: Int) = AndroidUtils.getColorFromAttr(this, attr)
 
 fun startAppSettings(activity: Activity) {
     val intent = Intent()
@@ -78,6 +87,45 @@ inline fun <reified T> Intent.getParcelable(key: String): T? {
     }
 }
 
+inline fun <reified T : Serializable> Bundle.getSerializableExtra(key: String): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getSerializable(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION") getSerializable(key) as? T
+    }
+}
+
+@SuppressLint("RestrictedApi")
+fun getMenuItems(
+    context: Context,
+    @MenuRes menuRes: Int,
+    menuModifier: (MenuItem) -> Unit
+): List<MenuItem> {
+    val menu = MenuBuilder(context)
+    SupportMenuInflater(context).inflate(menuRes, menu)
+    val items = ArrayList<MenuItem>(menu.size())
+    for (i in 0 until menu.size()) {
+        val item = menu.getItem(i)
+        menuModifier(item)
+        if (item.isVisible) {
+            items.add(item)
+        }
+    }
+    return items
+}
+
+fun TextView.setDrawableStart(@DrawableRes id: Int, @DimenRes sizeRes: Int) {
+    val drawable = ContextCompat.getDrawable(context, id)!!
+    val size = resources.getDimensionPixelSize(sizeRes)
+    drawable.setBounds(0, 0, size, size)
+    if (ViewUtils.isRtl(this)) {
+        setCompoundDrawables(null, null, drawable, null)
+    } else {
+        setCompoundDrawables(drawable, null, null, null)
+    }
+}
+
+@Suppress("unused")
 fun showSystemColors(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         fun ViewGroup.addColorRow(colorResId: Int, description: String) {

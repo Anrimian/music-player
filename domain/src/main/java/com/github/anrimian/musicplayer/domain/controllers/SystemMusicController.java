@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.domain.controllers;
 
 import com.github.anrimian.musicplayer.domain.models.player.AudioFocusEvent;
+import com.github.anrimian.musicplayer.domain.models.volume.VolumeState;
 
 import javax.annotation.Nullable;
 
@@ -19,4 +20,9 @@ public interface SystemMusicController {
 
     Observable<Integer> getVolumeObservable();
 
+    Observable<VolumeState> getVolumeStateObservable();
+
+    void setVolume(int volume);
+
+    void changeVolumeBy(int volume);
 }

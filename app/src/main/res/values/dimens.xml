@@ -65,6 +65,8 @@
     <dimen name="radio_button_description_padding">48dp</dimen>
 
     <!--player bottom sheet-->
+    <dimen name="panel_cover_wrapper_size">50dp</dimen>
+    <dimen name="panel_cover_size">48dp</dimen>
     <dimen name="bottom_sheet_left_shadow_width">3dp</dimen>
     <dimen name="bottom_sheet_top_left_shadow_height">6dp</dimen>
     <dimen name="bottom_sheet_shadow_height">8dp</dimen>
@@ -72,6 +74,9 @@
     <dimen name="bottom_sheet_height">64dp</dimen>
     <dimen name="bottom_sheet_expand_height">190dp</dimen>
     <dimen name="control_button_width">52dp</dimen>
+    <dimen name="panel_secondary_icon_size">12dp</dimen>
+    <dimen name="panel_secondary_icon_padding">2dp</dimen>
+    <dimen name="panel_title_margin_start">@dimen/content_internal_margin</dimen>
 
     <dimen name="bottom_sheet_content_margin">16dp</dimen>
     <dimen name="play_button_expand_margin">8dp</dimen>
@@ -116,8 +121,11 @@
     <dimen name="chip_height">32dp</dimen>
     <dimen name="chip_button_width">34dp</dimen>
     <dimen name="chip_spacing_margin">8dp</dimen>
+    <dimen name="chip_container_min_height">40dp</dimen><!--chip_height+chip_spacing_margin-->
+    <dimen name="chip_drawable_size">20dp</dimen>
 
     <!--covers-->
+    <integer name="icon_widget_image_size">100</integer>
     <integer name="icon_image_size">130</integer>
     <integer name="icon_media_session_image_size">500</integer>
     <integer name="icon_image_full_size">1000</integer>
@@ -137,6 +145,9 @@
     <dimen name="scrollbar_width">4dp</dimen>
 
     <!--popup-->
+    <dimen name="popup_menu_corner_radius">4dp</dimen>
+    <dimen name="popup_list_vertical_padding">8dp</dimen>
+    <dimen name="popup_list_vertical_padding_negative">-8dp</dimen>
     <dimen name="popup_screen_margin">16dp</dimen>
     <dimen name="action_bar_popup_screen_margin">8dp</dimen>
     <dimen name="popup_item_horizontal_margin">16dp</dimen>
@@ -146,18 +157,19 @@
     <!--seekbar-->
     <dimen name="seekbar_height">2dp</dimen>
     <dimen name="seekbar_corner_radius">6dp</dimen>
+    <dimen name="vertical_seekbar_padding_vertical">8dp</dimen><!--8dp for api 21 - fixes width-->
 
     <!--cards-->
     <dimen name="card_corner_radius">8dp</dimen>
-
-    <!--sleep timer-->
-    <dimen name="sleep_timer_icon_size">12dp</dimen>
-    <dimen name="sleep_timer_icon_padding">2dp</dimen>
 
     <!--gradient-->
     <integer name="gradient_angle_start">0</integer>
 
     <!--fast scroller-->
     <dimen name="afs_min_touch_target_size">48dp</dimen>
+
+    <!--volume popup-->
+    <dimen name="volume_button_vertical_padding">8dp</dimen>
+    <integer name="volume_popup_panel_gravity">48</integer><!--Gravity.TOP-->
 
 </resources>

@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.DrawableRes
@@ -16,14 +17,19 @@ import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper
 import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
+import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.speed.SpeedSelectorDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
-import com.github.anrimian.musicplayer.ui.common.view.setOnHoldListener
+import com.github.anrimian.musicplayer.ui.common.format.getVolumeIcon
+import com.github.anrimian.musicplayer.ui.common.menu.showVolumePopup
+import com.github.anrimian.musicplayer.ui.common.view.onRewindHold
+import com.github.anrimian.musicplayer.ui.common.view.setSmallDrawableStart
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ImageUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
@@ -45,6 +51,8 @@ class ExternalPlayerActivity : MvpAppCompatActivity(), ExternalPlayerView {
     private lateinit var seekBarViewWrapper: SeekBarViewWrapper
     private var sourceCreationDisposable: Disposable? = null
 
+    private lateinit var speedDialogFragmentRunner: DialogFragmentRunner<SpeedSelectorDialogFragment>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Components.getAppComponent().themeController().applyCurrentTheme(this)
         theme.applyStyle(R.style.DialogActivityTheme, true)
@@ -53,6 +61,8 @@ class ExternalPlayerActivity : MvpAppCompatActivity(), ExternalPlayerView {
         setContentView(binding.root)
         
         CompatUtils.setOutlineTextButtonStyle(binding.tvPlaybackSpeed)
+
+        binding.tvVolume.setOnClickListener { v -> showVolumePopup(v, Gravity.CENTER_VERTICAL) }
 
         seekBarViewWrapper = SeekBarViewWrapper(binding.sbTrackState)
         seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo)
@@ -65,9 +75,16 @@ class ExternalPlayerActivity : MvpAppCompatActivity(), ExternalPlayerView {
         ViewUtils.onCheckChanged(binding.cbKeepPlayingAfterClose, presenter::onKeepPlayerInBackgroundChecked)
 
         binding.ivFastForward.setOnClickListener { presenter.onFastSeekForwardCalled() }
-        binding.ivFastForward.setOnHoldListener(presenter::onFastSeekForwardCalled)
+        binding.ivFastForward.onRewindHold(presenter::onFastSeekForwardCalled)
         binding.ivRewind.setOnClickListener { presenter.onFastSeekBackwardCalled() }
-        binding.ivRewind.setOnHoldListener(presenter::onFastSeekBackwardCalled)
+        binding.ivRewind.onRewindHold(presenter::onFastSeekBackwardCalled)
+
+        speedDialogFragmentRunner = DialogFragmentRunner(
+            supportFragmentManager,
+            Constants.Tags.SPEED_SELECTOR_TAG
+        ) { fragment ->
+            fragment.setSpeedChangeListener(presenter::onPlaybackSpeedSelected)
+        }
 
         if (savedInstanceState == null
             && intent.getBooleanExtra(Constants.Arguments.LAUNCH_PREPARE_ARG, true)
@@ -149,12 +166,18 @@ class ExternalPlayerActivity : MvpAppCompatActivity(), ExternalPlayerView {
     override fun displayPlaybackSpeed(speed: Float) {
         binding.tvPlaybackSpeed.text = getString(R.string.playback_speed_template, speed)
         binding.tvPlaybackSpeed.setOnClickListener {
-            DialogUtils.showSpeedSelectorDialog(this, speed, presenter::onPlaybackSpeedSelected)
+            speedDialogFragmentRunner.show(SpeedSelectorDialogFragment.newInstance(speed))
         }
     }
 
     override fun showSpeedChangeFeatureVisible(visible: Boolean) {
         binding.tvPlaybackSpeed.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    override fun onVolumeChanged(volume: VolumeState) {
+        val volumePercent = 100 * volume.getVolume() / volume.max
+        binding.tvVolume.text = getString(R.string.percentage_template, volumePercent)
+        binding.tvVolume.setSmallDrawableStart(getVolumeIcon(volumePercent))
     }
 
     private fun createCompositionSource(uri: Uri?) {

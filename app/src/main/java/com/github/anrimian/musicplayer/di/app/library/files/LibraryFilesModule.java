@@ -1,10 +1,10 @@
 package com.github.anrimian.musicplayer.di.app.library.files;
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
 import com.github.anrimian.musicplayer.ui.library.folders.root.FolderRootPresenter;
@@ -15,8 +15,6 @@ import javax.inject.Named;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.rxjava3.core.Scheduler;
-
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
 
 @Module
 public class LibraryFilesModule {
@@ -36,13 +34,9 @@ public class LibraryFilesModule {
     @LibraryFilesScope
     LibraryFoldersScreenInteractor libraryFilesInteractor(LibraryFoldersInteractor foldersInteractor,
                                                           LibraryRepository libraryRepository,
-                                                          EditorRepository editorRepository,
-                                                          MediaScannerRepository mediaScannerRepository,
                                                           UiStateRepository uiStateRepository) {
         return new LibraryFoldersScreenInteractor(foldersInteractor,
                 libraryRepository,
-                editorRepository,
-                mediaScannerRepository,
                 uiStateRepository);
     }
 

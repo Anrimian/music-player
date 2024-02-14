@@ -43,6 +43,11 @@ open class MediumWidgetBinder: SmallExtWidgetBinder() {
             widgetView.setInt(R.id.ivFastForward, "setColorFilter", buttonColor)
         }
 
+        val placeholder = if (widgetData.isRoundCoversEnabled) {
+            R.drawable.ic_music_widget_placeholder_circle
+        } else {
+            R.drawable.ic_music_widget_placeholder
+        }
         if (widgetData.isCoversEnabled) {
             Components.getAppComponent().imageLoader()
                 .displayImage(
@@ -54,10 +59,11 @@ open class MediumWidgetBinder: SmallExtWidgetBinder() {
                     widgetData.coverModifyTime,
                     widgetData.compositionSize,
                     widgetData.isFileExists,
-                    R.drawable.ic_music_widget_placeholder
+                    widgetData.isRoundCoversEnabled,
+                    placeholder
                 )
         } else {
-            widgetView.setImageViewResource(R.id.ivCover, R.drawable.ic_music_placeholder)
+            widgetView.setImageViewResource(R.id.ivCover, placeholder)
         }
 
         val intentRewind = Intent(context, WidgetActionsReceiver::class.java)

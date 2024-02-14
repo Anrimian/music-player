@@ -22,6 +22,7 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrappe
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository;
@@ -36,6 +37,7 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsI
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.CompositionSourceInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.ExternalPlayerInteractor;
@@ -115,8 +117,9 @@ public class MusicModule {
     @NonNull
     @Singleton
     ExternalPlayerInteractor externalPlayerInteractor(PlayerCoordinatorInteractor interactor,
-                                                      SettingsRepository settingsRepository) {
-        return new ExternalPlayerInteractor(interactor, settingsRepository);
+                                                      SettingsRepository settingsRepository,
+                                                      SystemMusicController systemMusicController) {
+        return new ExternalPlayerInteractor(interactor, settingsRepository, systemMusicController);
     }
 
     @Provides
@@ -184,7 +187,9 @@ public class MusicModule {
                                               AlbumsDaoWrapper albumsDao,
                                               GenresDaoWrapper genresDao,
                                               FoldersDaoWrapper foldersDao,
+                                              IgnoredFoldersDao ignoredFoldersDao,
                                               SettingsRepository settingsPreferences,
+                                              MediaScannerRepository mediaScannerRepository,
                                               @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new LibraryRepositoryImpl(
                 storageFilesDataSource,
@@ -193,7 +198,9 @@ public class MusicModule {
                 albumsDao,
                 genresDao,
                 foldersDao,
+                ignoredFoldersDao,
                 settingsPreferences,
+                mediaScannerRepository,
                 scheduler);
     }
 
@@ -207,6 +214,7 @@ public class MusicModule {
                                                   LibraryFoldersInteractor libraryFoldersInteractor,
                                                   LibraryArtistsInteractor libraryArtistsInteractor,
                                                   LibraryAlbumsInteractor libraryAlbumsInteractor,
+                                                  LibraryGenresInteractor libraryGenresInteractor,
                                                   PlayListsInteractor playListsInteractor,
                                                   SettingsRepository settingsRepository) {
         return new MusicServiceInteractor(playerCoordinatorInteractor,
@@ -216,6 +224,7 @@ public class MusicModule {
                 libraryFoldersInteractor,
                 libraryArtistsInteractor,
                 libraryAlbumsInteractor,
+                libraryGenresInteractor,
                 playListsInteractor,
                 settingsRepository);
     }
@@ -314,31 +323,25 @@ public class MusicModule {
     LibraryFoldersInteractor libraryFilesInteractor(LibraryRepository musicProviderRepository,
                                                     EditorRepository editorRepository,
                                                     LibraryPlayerInteractor musicPlayerInteractor,
-                                                    PlayListsInteractor playListsInteractor,
                                                     SyncInteractor<FileKey, ?, Long> syncInteractor,
                                                     SettingsRepository settingsRepository,
-                                                    UiStateRepository uiStateRepository,
-                                                    MediaScannerRepository mediaScannerRepository) {
+                                                    UiStateRepository uiStateRepository) {
         return new LibraryFoldersInteractor(musicProviderRepository,
                 editorRepository,
                 musicPlayerInteractor,
-                playListsInteractor,
                 syncInteractor,
                 settingsRepository,
-                uiStateRepository,
-                mediaScannerRepository);
+                uiStateRepository);
     }
 
     @Provides
     @Nonnull
     LibraryArtistsInteractor libraryArtistsInteractor(LibraryRepository repository,
                                                       LibraryPlayerInteractor libraryPlayerInteractor,
-                                                      PlayListsInteractor playListsInteractor,
                                                       SettingsRepository settingsRepository,
                                                       UiStateRepository uiStateRepository) {
         return new LibraryArtistsInteractor(repository,
                 libraryPlayerInteractor,
-                playListsInteractor,
                 settingsRepository,
                 uiStateRepository);
     }
@@ -347,13 +350,21 @@ public class MusicModule {
     @Nonnull
     LibraryAlbumsInteractor libraryAlbumsInteractor(LibraryRepository repository,
                                                     LibraryPlayerInteractor libraryPlayerInteractor,
-                                                    PlayListsInteractor playListsInteractor,
                                                     SettingsRepository settingsRepository,
                                                     UiStateRepository uiStateRepository) {
         return new LibraryAlbumsInteractor(repository,
                 libraryPlayerInteractor,
-                playListsInteractor,
                 settingsRepository,
                 uiStateRepository);
+    }
+
+    @Provides
+    @Nonnull
+    LibraryGenresInteractor libraryGenresInteractor(
+            LibraryPlayerInteractor playerInteractor,
+            LibraryRepository repository,
+            SettingsRepository settingsRepository,
+            UiStateRepository uiStateRepository) {
+        return new LibraryGenresInteractor(playerInteractor, repository, settingsRepository, uiStateRepository);
     }
 }

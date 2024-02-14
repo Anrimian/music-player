@@ -1,23 +1,33 @@
 package com.github.anrimian.musicplayer.ui.library.artists.list
 
+import com.github.anrimian.musicplayer.data.utils.rx.mapError
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.models.artist.Artist
-import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.share.models.ReceiveCompositionsForSendException
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
-import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
 
 class ArtistsListPresenter(
     private val interactor: LibraryArtistsInteractor,
+    playerInteractor: LibraryPlayerInteractor,
+    playListsInteractor: PlayListsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
-): AppPresenter<ArtistsListView>(uiScheduler, errorParser) {
+): BaseLibraryPresenter<ArtistsListView>(
+    playerInteractor,
+    playListsInteractor,
+    uiScheduler,
+    errorParser
+) {
 
     private var artistsDisposable: Disposable? = null
 
@@ -33,6 +43,10 @@ class ArtistsListPresenter(
 
     fun onStop(listPosition: ListPosition?) {
         interactor.saveListPosition(listPosition)
+    }
+
+    fun onFragmentResumed() {
+        interactor.setSelectedArtistScreen(0)
     }
 
     fun onTryAgainLoadCompositionsClicked() {
@@ -86,11 +100,9 @@ class ArtistsListPresenter(
     }
 
     fun onPlayListToAddingSelected(playList: PlayList, artists: LongArray, closeMultiselect: Boolean) {
-        interactor.addArtistsToPlayList(artists, playList)
-            .subscribeOnUi(
-                { compositions -> onAddingToPlayListCompleted(compositions, playList, closeMultiselect) },
-                this::onAddingToPlayListError
-            )
+        performAddToPlaylist(interactor.getAllCompositionsByArtistIds(artists), playList) {
+            onAddingToPlayListCompleted(closeMultiselect)
+        }
     }
 
     fun onShareSelectedArtistsClicked() {
@@ -102,7 +114,7 @@ class ArtistsListPresenter(
     }
 
     fun onPlayArtistClicked(artist: Artist) {
-        interactor.startPlaying(listOf(artist))
+        startPlaying(listOf(artist))
     }
 
     fun onPlayNextArtistClicked(position: Int) {
@@ -146,43 +158,31 @@ class ArtistsListPresenter(
 
     private fun shareArtistCompositions(artists: List<Artist>) {
         interactor.getAllCompositionsForArtists(artists)
-            .subscribeOnUi(viewState::sendCompositions, this::onReceiveCompositionsError)
+            .mapError(::ReceiveCompositionsForSendException)
+            .launchOnUi(viewState::sendCompositions, viewState::showErrorMessage)
     }
 
-    private fun onReceiveCompositionsError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showReceiveCompositionsForSendError(errorCommand)
-    }
-
-    private fun onAddingToPlayListCompleted(
-        compositions: List<Composition>,
-        playList: PlayList,
-        closeMultiselect: Boolean
-    ) {
-        viewState.showAddingToPlayListComplete(playList, compositions)
+    private fun onAddingToPlayListCompleted(closeMultiselect: Boolean) {
         if (closeMultiselect && selectedArtists.isNotEmpty()) {
             closeSelectionMode()
         }
     }
 
-    private fun onAddingToPlayListError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showAddingToPlayListError(errorCommand)
-    }
-
     private fun playSelectedArtists() {
-        interactor.startPlaying(ArrayList(selectedArtists))
+        startPlaying(ArrayList(selectedArtists))
         closeSelectionMode()
     }
 
+    private fun startPlaying(artists: List<Artist>) {
+        interactor.startPlaying(artists).runOnUi(viewState::showErrorMessage)
+    }
+
     private fun addArtistsToPlayNext(artists: List<Artist>) {
-        interactor.addArtistsToPlayNext(artists)
-            .launchOnUi(viewState::onCompositionsAddedToPlayNext, viewState::showErrorMessage)
+        addCompositionsToPlayNext(interactor.getAllCompositionsForArtists(artists))
     }
 
     private fun addArtistsToPlayQueue(artists: List<Artist>) {
-        interactor.addArtistsToQueue(artists)
-            .launchOnUi(viewState::onCompositionsAddedToQueue, viewState::showErrorMessage)
+        addCompositionsToEndOfQueue(interactor.getAllCompositionsForArtists(artists))
     }
 
     private fun closeSelectionMode() {

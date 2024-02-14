@@ -9,7 +9,7 @@ import android.os.Build;
 import android.os.Environment;
 
 import com.github.anrimian.filesync.SyncInteractor;
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
 import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
@@ -45,6 +46,7 @@ import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
+import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository;
@@ -102,26 +104,30 @@ public class StorageModule {
     @Singleton
     EditorRepository compositionEditorRepository(CompositionSourceEditor sourceEditor,
                                                  StorageFilesDataSource filesDataSource,
+                                                 LibraryDatabase libraryDatabase,
                                                  CompositionsDaoWrapper compositionsDao,
                                                  AlbumsDaoWrapper albumsDao,
                                                  ArtistsDaoWrapper artistsDao,
                                                  GenresDaoWrapper genresDao,
                                                  FoldersDaoWrapper foldersDao,
+                                                 PlayListsDaoWrapper playListsDao,
                                                  StorageMusicProvider storageMusicProvider,
-                                                 StateRepository stateRepository,
-                                                 SettingsRepository settingsRepository,
+                                                 PlayListsRepository playListsRepository,
+                                                 LibraryRepository libraryRepository,
                                                  @Named(DB_SCHEDULER) Scheduler scheduler) {
         return new EditorRepositoryImpl(
                 sourceEditor,
                 filesDataSource,
+                libraryDatabase,
                 compositionsDao,
                 albumsDao,
                 artistsDao,
                 genresDao,
                 foldersDao,
+                playListsDao,
                 storageMusicProvider,
-                stateRepository,
-                settingsRepository,
+                playListsRepository,
+                libraryRepository,
                 scheduler);
     }
 
@@ -172,9 +178,8 @@ public class StorageModule {
     @Singleton
     MediaScannerRepository mediaScannerRepository(StorageMusicProvider musicProvider,
                                                   StoragePlayListsProvider playListsProvider,
-                                                  StorageGenresProvider genresProvider,
                                                   CompositionsDaoWrapper compositionsDao,
-                                                  GenresDaoWrapper genresDao,
+                                                  StateRepository stateRepository,
                                                   SettingsRepository settingsRepository,
                                                   StorageCompositionAnalyzer compositionAnalyzer,
                                                   StoragePlaylistsAnalyzer storagePlaylistAnalyzer,
@@ -184,9 +189,8 @@ public class StorageModule {
                                                   @Named(IO_SCHEDULER) Scheduler scheduler) {
         return new MediaScannerRepositoryImpl(musicProvider,
                 playListsProvider,
-                genresProvider,
                 compositionsDao,
-                genresDao,
+                stateRepository,
                 settingsRepository,
                 compositionAnalyzer,
                 storagePlaylistAnalyzer,
@@ -199,12 +203,12 @@ public class StorageModule {
     @Provides
     @Nonnull
     StorageCompositionAnalyzer compositionAnalyzer(CompositionsDaoWrapper compositionsDao,
-                                                   FoldersDaoWrapper foldersDaoWrapper,
+                                                   IgnoredFoldersDao ignoredFoldersDao,
                                                    StateRepository stateRepository,
                                                    StorageCompositionsInserter compositionsInserter) {
         return new StorageCompositionAnalyzer(
                 compositionsDao,
-                foldersDaoWrapper,
+                ignoredFoldersDao,
                 stateRepository,
                 compositionsInserter,
                 Environment.getExternalStorageDirectory().getAbsolutePath()
@@ -228,7 +232,7 @@ public class StorageModule {
 
     @Provides
     @Nonnull
-    StorageCompositionsInserter compositionsInserter(AppDatabase appDatabase,
+    StorageCompositionsInserter compositionsInserter(LibraryDatabase libraryDatabase,
                                                      CompositionsDao compositionsDao,
                                                      CompositionsDaoWrapper compositionsDaoWrapper,
                                                      FoldersDaoWrapper foldersDao,
@@ -236,7 +240,7 @@ public class StorageModule {
                                                      ArtistsDaoWrapper artistsDaoWrapper,
                                                      AlbumsDao albumsDao,
                                                      AlbumsDaoWrapper albumsDaoWrapper) {
-        return new StorageCompositionsInserter(appDatabase,
+        return new StorageCompositionsInserter(libraryDatabase,
                 compositionsDao,
                 compositionsDaoWrapper,
                 foldersDao,

@@ -13,7 +13,6 @@
     <string name="file_not_found">Файл не найден</string>
     <string name="compositions_on_device_not_found">Композиций на устройстве не найдено</string>
     <string name="compositions_and_folders_for_search_not_found">Композиций и папок, подходящих под результаты поиска, не найдено</string>
-    <string name="compositions_for_search_not_found">Композиций, подходящих под результаты поиска, не найдено</string>
     <string name="foreground_channel_description">Уведомление о проигрывании музыки</string>
     <string name="previous_track">Предыдущий трек</string>
     <string name="next_track">Следующий трек</string>
@@ -97,6 +96,7 @@
     <string name="about_app_text_write">напишите</string>
     <string name="about_app_text_here">напишите</string>
     <string name="about_app_text_here_link">здесь</string>
+    <string name="patchnotes">Описание обновлений</string>
     <string name="theme">Тема оформления</string>
     <string name="dark_theme">Тёмная</string>
     <string name="edit">Редактировать</string>
@@ -280,6 +280,20 @@
     <string name="overwrite_playlist">Плейлист с таким именем уже существует. \nПерезаписать его?</string>
     <string name="playlist_has_no_records">Плейлист не имеет композиций</string>
     <string name="export_playlists_success">Файл \"%1$s.m3u\" был сохранён во внутреннее хранилище</string>
+    <string name="name_is_too_long">имя слишком длинное</string>
+    <string name="play_queue_items_limit_error">Количество элементов в очереди воспроизведения не может превышать %d</string>
+    <string name="play_list_items_limit_error">Количество элементов в плейлисте не может превышат %d</string>
+    <string name="volume_up">Увеличить громкость</string>
+    <string name="volume_down">Уменьшить громкость</string>
+    <string name="no_matching_search_results_found">Подходящих результатов поиска не найдено</string>
+    <string name="covers_shape">Форма обложек</string>
+    <string name="play_once">Играть один раз</string>
+    <string name="back">Назад</string>
+    <string name="duplicates_detected">Обнаружены дубликаты</string>
+    <string name="playlist_duplicates_description">Некоторые композиции уже есть в плейлисте \'%1$s\'. \nВсё равно добавить их?</string>
+    <string name="check_for_duplicates">Проверять плейлист на дубликаты перед добавлением новых композиций</string>
+    <string name="more_template">…ещё %d</string>
+    <string name="add_without_duplicates">Добавить без дубликатов</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиция</item>
@@ -370,6 +384,20 @@
         <item quantity="few">Плейлист был импортирован успешно, но %d файла были не найдены в библиотеке</item>
         <item quantity="many">Плейлист был импортирован успешно, но %d файлов были не найдены в библиотеке</item>
         <item quantity="other">Плейлист был импортирован успешно, но %d файлов были не найдены в библиотеке</item>
+    </plurals>
+
+    <plurals name="delete_playlists_template">
+        <item quantity="one">Удалить %d плейлист</item>
+        <item quantity="few">Удалить %d плейлиста</item>
+        <item quantity="many">Удалить %d плейлистов</item>
+        <item quantity="other">Удалить %d плейлистов</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d плейлист удалён</item>
+        <item quantity="few">%d плейлиста удалено</item>
+        <item quantity="many">%d плейлистов удалено</item>
+        <item quantity="other">%d плейлистов удалено</item>
     </plurals>
 
 </resources>

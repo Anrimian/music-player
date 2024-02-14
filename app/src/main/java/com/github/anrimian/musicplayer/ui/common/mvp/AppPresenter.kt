@@ -19,6 +19,13 @@ import moxy.MvpView
  * - name6 (subscribe on ui scheduler, add to presenter disposable, ()ignore success case, (..)and transform throwable)
  * - launch... (subscribe on ui scheduler, (launch..)do not add to presenter disposable)
  * - launch... (subscribe on ui scheduler, (launch..)do not add to presenter disposable and (...WE??)transform throwable),
+ *
+ *  O:
+ *      _unsafe_(without error case)
+ *      +_just_(without onSuccess case)
+ *      + _run_/_launch_(diff?) (do not register to presenter disposable)/ _subscribe_(register to presenter disposable)
+ *      + _onUi (ui scheduler is used)
+ *      ? transform throwable
  */
 abstract class AppPresenter<T : MvpView>(
     protected val uiScheduler: Scheduler,
@@ -99,6 +106,10 @@ abstract class AppPresenter<T : MvpView>(
         this.observeOn(uiScheduler)
             .subscribe(onNext, onError)
             .ignoreDisposable()
+    }
+
+    protected fun Completable.launchOnUi(onNext: () -> Unit, onError: (ErrorCommand) -> Unit) {
+        this.subscribeOnUi(onNext) { t -> onError(errorParser.parseError(t)) }
     }
 
     protected fun Completable.justSubscribeOnUi(onError: (Throwable) -> Unit) {

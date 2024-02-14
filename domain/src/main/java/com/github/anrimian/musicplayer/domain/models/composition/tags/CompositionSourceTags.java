@@ -10,6 +10,7 @@ public class CompositionSourceTags {
     private final Long discNumber;
     private final String comment;
     private final String lyrics;
+    private final String[] genres;
 
     public CompositionSourceTags(String title,
                                  String artist,
@@ -19,7 +20,8 @@ public class CompositionSourceTags {
                                  Long trackNumber,
                                  Long discNumber,
                                  String comment,
-                                 String lyrics) {
+                                 String lyrics,
+                                 String[] genres) {
         this.title = title;
         this.artist = artist;
         this.album = album;
@@ -29,6 +31,7 @@ public class CompositionSourceTags {
         this.discNumber = discNumber;
         this.comment = comment;
         this.lyrics = lyrics;
+        this.genres = genres;
     }
 
     public String getTitle() {
@@ -65,5 +68,9 @@ public class CompositionSourceTags {
 
     public String getLyrics() {
         return lyrics;
+    }
+
+    public String[] getGenres() {
+        return genres;
     }
 }

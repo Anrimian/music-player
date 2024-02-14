@@ -13,7 +13,6 @@
     <string name="file_not_found">Το αρχείο δεν βρέθηκε</string>
     <string name="compositions_on_device_not_found">Δεν βρέθηκαν τραγούδια στη συσκευή</string>
     <string name="compositions_and_folders_for_search_not_found">Δεν βρέθηκαν αποτελέσματα που να ταιριάζουν σε κομμάτια ή φακέλους</string>
-    <string name="compositions_for_search_not_found">Δεν βρέθηκαν αποτελέσματα</string>
     <string name="foreground_channel_description">Ειδοποίηση τρέχουσας αναπαραγωγής</string>
     <string name="previous_track">Προηγούμενο τραγούδι</string>
     <string name="next_track">Επόμενο τραγούδι</string>
@@ -197,8 +196,7 @@
     <string name="critical_error_report_message">Η εφαρμογή αντιμετώπισε ένα κρίσιμο σφάλμα και δεν μπόρεσε να ξεκινήσει. Αυτό το σφάλμα είναι εξαιρετικά ανεπιθύμητο. Η εφαρμογή δεν στέλνει καμία πληροφορία αυτόματα, αλλά μπορείτε να στείλετε με μήνυμα ηλεκτρονικού ταχυδρομείου, το αρχείο καταγραφής σφαλμάτων. Αυτό θα βοηθήσει να διορθωθεί το σφάλμα.</string>
     <string name="error_report_message">Συνέβη ένα κρίσιμο σφάλμα. Η εφαρμογή δεν στέλνει καμία πληροφορία αυτόματα, αλλά μπορείτε να στείλετε με μήνυμα ηλεκτρονικού ταχυδρομείου, το αρχείο καταγραφής σφαλμάτων. Αυτό θα βοηθήσει να διορθωθεί το σφάλμα.</string>
     <string name="show_error_report_dialog_on_start">Εμφάνιση διαλόγου αναφοράς σφάλματος κατά την εκκίνηση της εφαρμογής εφόσον η εφαρμογή έχει καταρρεύσει</string>
-    <string name="do_not_show_confirm_delete_dialog">Να μην εμφανίζεται ο διάλογος επιβεβαίωσης διαγραφής πολυμέσων</string>
-    <string name="app_equalizer">Ισοσταθμιστής εφαρμογής</string>
+    <string name="do_not_show_confirm_delete_dialog">Να μην εμφανίζεται ο διάλογος επιβεβαίωσης διαγραφής της εφαρμογής</string>    <string name="app_equalizer">Ισοσταθμιστής εφαρμογής</string>
     <string name="presets">Προεπιλεγμένα</string>
     <string name="playback_speed">Ταχύτητα αναπαραγωγής</string>
     <string name="reset">Επαναφορά</string>
@@ -209,15 +207,13 @@
     <string name="sleep_timer_message">Η αναπαραγωγή θα σταματήσει σε:</string>
     <string name="stop">Παύση</string>
     <string name="exclude_compositions_with_duration_less_than">Εξαιρούμενα κομμάτια από την αναζήτηση</string>
-    <string name="with_duration_less_than">Με διάρκεια λιγότερη από %s</string>
+    <string name="with_duration_less_than">Με λειτουργία λιγότερη από %s</string>
     <string name="pause_on_audiofocus_loss">Παύση αναπαραγωγής κατά τις κλήσεις, αναπαραγωγή μουσικής/βίντεο, κλπ.</string>
-    <string name="show_cover_stub_in_notification">Εμφάνιση προκαθορισμένου εξώφυλλου στην ειδοποίηση όταν δεν βρίσκεται εξώφυλλο</string>
-    <string name="write_to_this_is_not_allowed">Δεν υπάρχει άδεια για την τροποποίηση αυτού του αρχείου. Προσπαθήστε από την εφαρμογή εμφάνισης αρχείων.</string>
+    <string name="show_cover_stub_in_notification">Εμφάνιση εξώφυλλου-παράδειγμα στην ειδοποίηση όταν δεν βρίσκεται εξώφυλλο</string>    <string name="write_to_this_is_not_allowed">Δεν υπάρχει άδεια για την τροποποίηση αυτού του αρχείου. Προσπαθήστε από την εφαρμογή εμφάνισης αρχείων.</string>
     <string name="shuffle_all_and_play">Ανακάτεμα και αναπαραγωγή όλων</string>
     <string name="rewind">Επιστροφή στην αρχή</string>
     <string name="fast_forward">Μπροστά</string>
-    <string name="show_covers_on_lock_screen">Εμφάνιση εξώφυλλων στην οθόνη κλειδώματος και στη λειτουργία αυτοκινήτου (Αndroid Αuto)</string>
-    <string name="equalizer_initialization_error">Αδυναμία αρχικοποίησης ισοσταθμιστή εφαρμογής. Προσπαθήστε να τον επανεκκινήσετε.</string>
+    <string name="show_covers_on_lock_screen">Εμφάνιση εξωφύλλων στην οθόνη κλειδώματος και στη λειτουργία αυτοκινήτου (Αndroid Αuto)</string>    <string name="equalizer_initialization_error">Αδυναμία αρχικοποίησης ισοσταθμιστή εφαρμογής. Προσπαθήστε να τον επανεκκινήσετε.</string>
     <string name="restart">Επανεκκίνηση</string>
     <string name="scan_storage_description">Συνήθως όλες οι αλλαγές στα αρχεία της συσκευής εμφανίζονται αυτόματα. Αλλά σε κάποιες συσκευές ή κατασκευές συστήματος αυτό δεν δουλεύει. Αυτό το κουμπί πραγματοποιεί χειροκίνητη αναζήτηση.</string>
     <string name="scanning_completed">Η αναζήτηση ολοκληρώθηκε</string>
@@ -283,6 +279,20 @@
     <string name="overwrite_playlist">Υπάρχει ήδη μια λίστα αναπαραγωγής με το ίδιο όνομα. \nΝα αντικατασταθεί;</string>
     <string name="playlist_has_no_records">Η λίστα αναπαραγωγής δεν έχει καμία καταχώρηση</string>
     <string name="export_playlists_success">Το αρχείο \"%1$s.m3u\" αποθηκεύτηκε στον εσωτερικό χώρο αποθήκευσης</string>
+    <string name="name_is_too_long">όνομα πολύ μεγάλο</string>
+    <string name="play_queue_items_limit_error">Η λίστα αναπαραγωγής δεν μπορεί να υπερβαίνει τα %d αντικείμενα</string>
+    <string name="play_list_items_limit_error">Η λίστα αναπαραγωγής δεν μπορεί να υπερβαίνει τα %d αντικείμενα</string>
+    <string name="volume_up">Αύξηση ήχου</string>
+    <string name="volume_down">Μείωση ήχου</string>
+    <string name="no_matching_search_results_found">Δεν βρέθηκαν αποτελέσματα</string>
+    <string name="covers_shape">Σχήμα εξωφύλλων</string>
+    <string name="play_once">Αναπαραγωγή μία φορά</string>
+    <string name="back">Πίσω</string>
+    <string name="duplicates_detected">Εντοπίστηκαν διπλότυπα</string>
+    <string name="playlist_duplicates_description">Κάποια τραγούδια υπάρχουν ήδη στη λίστα αναπαραγωγής \'%1$s\'. \nΠροσθήκη ούτως ή άλλως;</string>
+    <string name="check_for_duplicates">Ελέγξτε την λίστα αναπαραγωγής για διπλότυπα πριν προσθέσετε καινούρια τραγούδια</string>
+    <string name="more_template">…%d περισσότερα</string>
+    <string name="add_without_duplicates">Προσθήκη χωρίς διπλότυπα</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s τραγούδι</item>
@@ -347,6 +357,16 @@
     <plurals name="playlist_import_partial_success">
         <item quantity="one">Έγινε εισαγωγή της λίστας αναπαραγωγής επιτυχώς, αλλά %d αρχείο δεν βρέθηκε στη συλλογή</item>
         <item quantity="other">Έγινε εισαγωγή της λίστας αναπαραγωγής επιτυχώς, αλλά %d αρχεία δεν βρέθηκαν στη συλλογή</item>
+    </plurals>
+
+    <plurals name="delete_playlists_template">
+        <item quantity="one">Διαγραφή %d λίστας αναπαραγωγής</item>
+        <item quantity="other">Διαγραφή %d λιστών αναπαραγωγής</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d λίστα αναπαραγωγής διαγράφηκε</item>
+        <item quantity="other">%d λίστες αναπαραγωγής διαγράφηκαν</item>
     </plurals>
 
 </resources>

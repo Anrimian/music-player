@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="external"/>
+    <include domain="database" path="configs_database"/>
+    <include domain="file" path="playlists"/>
+    <include domain="sharedpref" path="settings_preferences.xml"/>
+    <include domain="sharedpref" path="theme_preferences.xml"/>
+</full-backup-content>

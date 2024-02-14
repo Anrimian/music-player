@@ -16,17 +16,17 @@ import io.reactivex.rxjava3.core.Scheduler
 
 class LibraryCompositionsPresenter(
     private val interactor: LibraryCompositionsInteractor,
-    playListsInteractor: PlayListsInteractor,
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
     syncInteractor: SyncInteractor<FileKey, *, Long>,
+    playListsInteractor: PlayListsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : BaseLibraryCompositionsPresenter<Composition, LibraryCompositionsView>(
-    playerInteractor,
-    playListsInteractor,
     displaySettingsInteractor,
     syncInteractor,
+    playerInteractor,
+    playListsInteractor,
     errorParser,
     uiScheduler
 ) {
@@ -35,7 +35,7 @@ class LibraryCompositionsPresenter(
     }
 
     override fun getSavedListPosition(): ListPosition? {
-        return interactor.savedListPosition
+        return interactor.getSavedListPosition()
     }
 
     override fun saveListPosition(listPosition: ListPosition) {
@@ -43,10 +43,10 @@ class LibraryCompositionsPresenter(
     }
 
     fun onOrderMenuItemClicked() {
-        viewState.showSelectOrderScreen(interactor.order)
+        viewState.showSelectOrderScreen(interactor.getOrder())
     }
 
     fun onOrderSelected(order: Order) {
-        interactor.order = order
+        interactor.setOrder(order)
     }
 }

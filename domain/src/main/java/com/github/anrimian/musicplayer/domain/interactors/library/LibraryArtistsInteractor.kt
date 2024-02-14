@@ -1,23 +1,21 @@
 package com.github.anrimian.musicplayer.domain.interactors.library
 
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.domain.models.artist.Artist
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.order.Order
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
 class LibraryArtistsInteractor(
     private val libraryRepository: LibraryRepository,
     private val playerInteractor: LibraryPlayerInteractor,
-    private val playListsInteractor: PlayListsInteractor,
     private val settingsRepository: SettingsRepository,
     private val uiStateRepository: UiStateRepository,
 ) {
@@ -44,6 +42,10 @@ class LibraryArtistsInteractor(
         settingsRepository.artistsOrder = order
     }
 
+    fun setSelectedArtistScreen(artistId: Long) {
+        uiStateRepository.selectedArtistScreenId = artistId
+    }
+
     fun getSavedListPosition(): ListPosition? = uiStateRepository.savedArtistsListPosition
 
     fun saveListPosition(listPosition: ListPosition?) {
@@ -58,30 +60,13 @@ class LibraryArtistsInteractor(
         uiStateRepository.saveArtistListPosition(artistId, listPosition)
     }
 
-    fun startPlaying(artists: List<Artist>) {
-        libraryRepository.getAllCompositionIdsByArtists(artists)
-            .subscribe(playerInteractor::startPlaying)
+    fun startPlaying(artists: List<Artist>): Completable {
+        return libraryRepository.getAllCompositionIdsByArtists(artists)
+            .flatMapCompletable(playerInteractor::setQueueAndPlay)
     }
 
-    fun addArtistsToPlayNext(artists: List<Artist>): Single<List<Composition>> {
-        return libraryRepository.getAllCompositionsByArtists(artists)
-            .flatMap(playerInteractor::addCompositionsToPlayNext)
-    }
-
-    fun addArtistsToQueue(artists: List<Artist>): Single<List<Composition>> {
-        return libraryRepository.getAllCompositionsByArtists(artists)
-            .flatMap(playerInteractor::addCompositionsToEnd)
-    }
-
-    fun addArtistsToPlayList(
-        artists: LongArray,
-        playList: PlayList
-    ): Single<List<Composition>> {
+    fun getAllCompositionsByArtistIds(artists: LongArray): Single<List<Composition>> {
         return libraryRepository.getAllCompositionsByArtistIds(artists.asIterable())
-            .flatMap { compositions ->
-                playListsInteractor.addCompositionsToPlayList(compositions, playList)
-                    .toSingleDefault(compositions)
-            }
     }
 
     fun getAllCompositionsForArtists(artists: List<Artist>): Single<List<Composition>> {

@@ -18,7 +18,7 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
 
     private val presenter by moxyPresenter { Components.getSettingsComponent().enabledMediaPlayersPresenter() }
 
-    private lateinit var viewBinding: DialogEnabledMediaPlayersBinding
+    private lateinit var binding: DialogEnabledMediaPlayersBinding
 
     private lateinit var adapter: MediaPlayersAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
@@ -26,24 +26,24 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
     var onCompleteListener: ((IntArray) -> Unit)? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        viewBinding = DialogEnabledMediaPlayersBinding.inflate(LayoutInflater.from(context))
+        binding = DialogEnabledMediaPlayersBinding.inflate(LayoutInflater.from(context))
 
         val dialog = AlertDialog.Builder(activity)
             .setTitle(R.string.enabled_media_players)
-            .setView(viewBinding.root)
+            .setView(binding.root)
             .create()
         dialog.show()
 
-        viewBinding.rvMediaPlayers.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvMediaPlayers.layoutManager = LinearLayoutManager(requireContext())
 
-        val callback = SimpleItemTouchHelperCallback(false)
+        val callback = SimpleItemTouchHelperCallback(isLongPressDragEnabled = false)
         callback.setOnMovedListener(presenter::onItemMoved)
         itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(viewBinding.rvMediaPlayers)
+        itemTouchHelper.attachToRecyclerView(binding.rvMediaPlayers)
 
-        viewBinding.btnApply.setOnClickListener { presenter.onCompleteButtonClicked() }
-        viewBinding.btnClose.setOnClickListener { dismissAllowingStateLoss() }
-        viewBinding.btnReset.setOnClickListener { presenter.onResetButtonClicked() }
+        binding.btnApply.setOnClickListener { presenter.onCompleteButtonClicked() }
+        binding.btnClose.setOnClickListener { dismissAllowingStateLoss() }
+        binding.btnReset.setOnClickListener { presenter.onResetButtonClicked() }
 
         return dialog
     }
@@ -54,7 +54,7 @@ class EnabledMediaPlayersDialogFragment: MvpAppCompatDialogFragment(), EnabledMe
             presenter::onItemEnableStatusChanged,
             itemTouchHelper::startDrag
         )
-        viewBinding.rvMediaPlayers.adapter = adapter
+        binding.rvMediaPlayers.adapter = adapter
     }
 
     override fun showEnabledMediaPlayers(mediaPlayers: Set<Int>) {

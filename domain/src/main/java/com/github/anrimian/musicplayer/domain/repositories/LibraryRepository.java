@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 
 import java.util.List;
 
@@ -99,13 +98,17 @@ public interface LibraryRepository {
     //genres
     Observable<List<Genre>> getGenresObservable(@Nullable String searchText);
 
-    Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId);
-
     Observable<List<Composition>> getGenreItemsObservable(long genreId);
+
+    Single<List<Long>> getCompositionIdsInGenres(Iterable<Genre> genres);
+
+    Single<List<Composition>> getCompositionsInGenres(Iterable<Genre> genres);
+
+    Single<List<Composition>> getCompositionsInGenresIds(Iterable<Long> genresIds);
 
     Single<List<Long>> getAllCompositionsByGenre(long genreId);
 
-    Single<String[]> getGenreNames();
+    Single<String[]> getGenreNames(long forCompositionId);
 
     Observable<Genre> getGenreObservable(long genreId);
 
@@ -117,5 +120,7 @@ public interface LibraryRepository {
     Observable<List<IgnoredFolder>> getIgnoredFoldersObservable();
 
     Completable deleteIgnoredFolder(IgnoredFolder folder);
+
+    void deleteIgnoredFolder(String folderRelativePath);
 
 }

@@ -19,6 +19,8 @@ class LibrarySettingsPresenter(
             .unsafeSubscribeOnUi(viewState::showAllAudioFilesEnabled)
         interactor.geAudioFileMinDurationMillisObservable()
             .unsafeSubscribeOnUi(viewState::showAudioFileMinDurationMillis)
+        interactor.getPlaylistDuplicateCheckObservable()
+            .unsafeSubscribeOnUi(viewState::showPlaylistDuplicateCheckEnabled)
         viewState.showPlaylistInsertStartEnabled(interactor.isPlaylistInsertStartEnabled())
     }
 
@@ -37,6 +39,11 @@ class LibrarySettingsPresenter(
     fun onPlaylistInsertStartChecked(isChecked: Boolean) {
         interactor.setPlaylistInsertStartEnabled(isChecked)
         viewState.showPlaylistInsertStartEnabled(isChecked)
+    }
+
+    fun onPlaylistDuplicateCheckChecked(isChecked: Boolean) {
+        interactor.setPlaylistDuplicateCheckEnabled(isChecked)
+        viewState.showPlaylistDuplicateCheckEnabled(isChecked)
     }
 
     fun onSelectMinDurationClicked() {

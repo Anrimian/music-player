@@ -1,14 +1,17 @@
 package com.github.anrimian.musicplayer.ui.player_screen
 
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
@@ -29,32 +32,40 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
+import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
-import com.github.anrimian.musicplayer.ui.common.dialogs.DialogUtils
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
+import com.github.anrimian.musicplayer.ui.common.dialogs.speed.SpeedSelectorDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.getVolumeIcon
 import com.github.anrimian.musicplayer.ui.common.format.showFileSyncState
 import com.github.anrimian.musicplayer.ui.common.getNavigationViewPrimaryColorLight
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
+import com.github.anrimian.musicplayer.ui.common.menu.showVolumePopup
 import com.github.anrimian.musicplayer.ui.common.navigation.ScreensMap
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
-import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
+import com.github.anrimian.musicplayer.ui.common.view.onRewindHold
+import com.github.anrimian.musicplayer.ui.common.view.setSmallDrawableStart
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
-import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity
+import com.github.anrimian.musicplayer.ui.library.albums.items.AlbumItemsFragment
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListFragment
+import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragment
 import com.github.anrimian.musicplayer.ui.library.artists.list.ArtistsListFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsFragment
 import com.github.anrimian.musicplayer.ui.library.folders.root.LibraryFoldersRootFragment
 import com.github.anrimian.musicplayer.ui.library.folders.root.newLibraryFoldersRootFragment
+import com.github.anrimian.musicplayer.ui.library.genres.items.GenreItemsFragment
 import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListFragment
 import com.github.anrimian.musicplayer.ui.main.setup.SetupFragment
 import com.github.anrimian.musicplayer.ui.player_screen.lyrics.LyricsFragment
@@ -65,9 +76,8 @@ import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPane
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.TabletPlayerPanelWrapper
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.attachPlayerPagerWrapper
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.newPlayListFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.newPlaylistsFragment
 import com.github.anrimian.musicplayer.ui.settings.SettingsFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
@@ -83,32 +93,31 @@ import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrappe
 import com.github.anrimian.musicplayer.ui.utils.views.view_pager.FragmentPagerAdapter
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
-
 
 /**
  * Created on 19.10.2017.
  */
+class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
 
-private const val NO_ITEM = -1
-private const val SELECTED_DRAWER_ITEM = "selected_drawer_item"
+    companion object {
+        private const val NO_ITEM = -1
+        private const val SELECTED_DRAWER_ITEM = "selected_drawer_item"
 
-fun newPlayerFragment(
-    openPlayQueue: Boolean = false,
-    playlistUriStr: String? = null
-) = PlayerFragment().apply {
-    arguments = Bundle().apply {
-        putBoolean(Constants.Arguments.OPEN_PLAYER_PANEL_ARG, openPlayQueue)
-        putString(Constants.Arguments.PLAYLIST_IMPORT_ARG, playlistUriStr)
+        fun newInstance(
+            openPlayQueue: Boolean = false,
+            playlistUriStr: String? = null
+        ) = PlayerFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(Constants.Arguments.OPEN_PLAYER_PANEL_ARG, openPlayQueue)
+                putString(Constants.Arguments.PLAYLIST_IMPORT_ARG, playlistUriStr)
+            }
+        }
     }
-}
-
-class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
     private val presenter by moxyPresenter { Components.getLibraryComponent().playerPresenter() }
 
-    private lateinit var viewBinding: FragmentDrawerBinding
+    private lateinit var binding: FragmentDrawerBinding
     private lateinit var panelBinding: PartialDetailedMusicBinding
     private lateinit var drawerHeaderBinding: PartialDrawerHeaderBinding
     private lateinit var toolbarPlayQueueBinding: PartialQueueToolbarBinding
@@ -129,8 +138,11 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     private lateinit var deletingErrorHandler: ErrorHandler
 
     private lateinit var choosePlayListFragmentRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
+    private lateinit var speedDialogFragmentRunner: DialogFragmentRunner<SpeedSelectorDialogFragment>
 
     private var previousCoverComposition: Composition? = null
+
+    override fun getLibraryPresenter(): BaseLibraryPresenter<*> = presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,11 +154,11 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        viewBinding = FragmentDrawerBinding.inflate(inflater, container, false)
-        toolbar = viewBinding.toolbar.root
-        toolbarPlayQueueBinding = viewBinding.toolbarPlayQueue
-        panelBinding = viewBinding.clMusicPanel!!
-        return viewBinding.root
+        binding = FragmentDrawerBinding.inflate(inflater, container, false)
+        toolbar = binding.toolbar.root
+        toolbarPlayQueueBinding = binding.toolbarPlayQueue
+        panelBinding = binding.clMusicPanel!!
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -157,22 +169,22 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         toolbar.setupWithActivity(requireActivity() as AppCompatActivity)
 
         navigation = FragmentNavigation.from(childFragmentManager)
-        navigation.initialize(viewBinding.drawerFragmentContainer!!, savedInstanceState)
+        navigation.initialize(binding.drawerFragmentContainer!!, savedInstanceState)
         navigation.checkForEqualityOnReplace(true)
         navigation.setExitAnimation(R.anim.anim_slide_out_right)
         navigation.setEnterAnimation(R.anim.anim_slide_in_right)
         navigation.setRootExitAnimation(R.anim.anim_alpha_disappear)
 
-        drawerLockStateProcessor = DrawerLockStateProcessor(viewBinding.drawer)
+        drawerLockStateProcessor = DrawerLockStateProcessor(binding.drawer)
         drawerLockStateProcessor.setupWithNavigation(navigation)
         viewDisposable.add(
-            toolbar.searchModeObservable.subscribe(drawerLockStateProcessor::onSearchModeChanged)
+            toolbar.getSearchModeObservable().subscribe(drawerLockStateProcessor::onSearchModeChanged)
         )
         viewDisposable.add(
-            toolbar.selectionModeObservable.subscribe(drawerLockStateProcessor::onSelectionModeChanged)
+            toolbar.getSelectionModeObservable().subscribe(drawerLockStateProcessor::onSelectionModeChanged)
         )
 
-        val mlBottomSheet = viewBinding.root.findViewById<MotionLayout>(R.id.ml_bottom_sheet)
+        val mlBottomSheet = binding.root.findViewById<MotionLayout>(R.id.ml_bottom_sheet)
         playerPanelWrapper = if (mlBottomSheet == null) {
             TabletPlayerPanelWrapper(
                 view,
@@ -182,7 +194,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         } else {
             PlayerPanelWrapperImpl(
                 view,
-                viewBinding,
+                binding,
                 panelBinding,
                 mlBottomSheet,
                 requireActivity(),
@@ -193,8 +205,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             )
         }
 
-        viewBinding.navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected)
-        val headerView = viewBinding.navigationView.inflateHeaderView(R.layout.partial_drawer_header)
+        binding.navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected)
+        val headerView = binding.navigationView.inflateHeaderView(R.layout.partial_drawer_header)
         headerView.setBackgroundColor(requireContext().getNavigationViewPrimaryColorLight())
         headerView.updateLayoutParams<LinearLayout.LayoutParams> {
             height += AndroidUtils.getStatusBarHeight(requireContext())
@@ -203,25 +215,30 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
         val drawerToggle = ActionBarDrawerToggle(
             requireActivity(),
-            viewBinding.drawer,
+            binding.drawer,
             R.string.open_drawer,
             R.string.close_drawer
         )
         val drawerArrowDrawable = createDrawerArrowDrawable()
         drawerToggle.drawerArrowDrawable = drawerArrowDrawable
-        viewBinding.drawer.addDrawerListener(SimpleDrawerListener(this::onDrawerClosed))
+        binding.drawer.addDrawerListener(SimpleDrawerListener(this::onDrawerClosed))
 
         toolbar.setupWithNavigation(navigation, drawerArrowDrawable) {
             playerPanelWrapper.isBottomPanelExpanded
         }
 
         panelBinding.ivSkipToPrevious.setOnClickListener { presenter.onSkipToPreviousButtonClicked() }
-        ViewUtils.setOnHoldListener(panelBinding.ivSkipToPrevious, presenter::onFastSeekBackwardCalled)
+        panelBinding.ivSkipToPrevious.onRewindHold(presenter::onFastSeekBackwardCalled)
         panelBinding.ivSkipToNext.setOnClickListener { presenter.onSkipToNextButtonClicked() }
-        ViewUtils.setOnHoldListener(panelBinding.ivSkipToNext, presenter::onFastSeekForwardCalled)
+        panelBinding.ivSkipToNext.onRewindHold(presenter::onFastSeekForwardCalled)
 
         panelBinding.btnActionsMenu.setOnClickListener(this::onCompositionMenuClicked)
         panelBinding.topPanel.setOnClickListener { openPlayerPanel() }
+
+        panelBinding.tvVolume.setOnClickListener { v ->
+            val gravity = resources.getInteger(R.integer.volume_popup_panel_gravity)
+            showVolumePopup(v, gravity)
+        }
 
         seekBarViewWrapper = SeekBarViewWrapper(panelBinding.sbTrackState)
         seekBarViewWrapper.setProgressChangeListener(presenter::onTrackRewoundTo)
@@ -230,6 +247,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
         CompatUtils.setOutlineTextButtonStyle(panelBinding.tvPlaybackSpeed)
         CompatUtils.setOutlineTextButtonStyle(panelBinding.tvSleepTime)
+        CompatUtils.setOutlineTextButtonStyle(panelBinding.tvVolume)
 
         deletingErrorHandler = DeleteErrorHandler(
             this,
@@ -237,10 +255,14 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             this::showEditorRequestDeniedMessage
         )
 
-        choosePlayListFragmentRunner = DialogFragmentRunner(
-            childFragmentManager,
+        val fm = childFragmentManager
+        choosePlayListFragmentRunner = DialogFragmentRunner(fm,
             Tags.SELECT_PLAYLIST_TAG
         ) { fragment -> fragment.setOnCompleteListener(presenter::onPlayListForAddingSelected) }
+
+        speedDialogFragmentRunner = DialogFragmentRunner(fm, Tags.SPEED_SELECTOR_TAG) { fragment ->
+            fragment.setSpeedChangeListener(presenter::onPlaybackSpeedSelected)
+        }
 
         if (requireArguments().getBoolean(Constants.Arguments.OPEN_PLAYER_PANEL_ARG)) {
             requireArguments().remove(Constants.Arguments.OPEN_PLAYER_PANEL_ARG)
@@ -255,16 +277,16 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
                 .commit()
         }
 
-        viewBinding.vpPlayContent!!.adapter = FragmentPagerAdapter(
+        binding.vpPlayContent!!.adapter = FragmentPagerAdapter(
             this,
             listOf(::LyricsFragment, ::PlayQueueFragment)
         )
         //necessary, otherwise motion layout will be buggy:
         // tvSubtitle shouldn't be updated when motion layout is in progress state
-        viewBinding.vpPlayContent!!.offscreenPageLimit = 1
-        viewBinding.vpPlayContent!!.reduceDragSensitivityBy(4)
+        binding.vpPlayContent!!.offscreenPageLimit = 1
+        binding.vpPlayContent!!.reduceDragSensitivityBy(4)
         attachPlayerPagerWrapper(
-            viewBinding.vpPlayContent!!,
+            binding.vpPlayContent!!,
             toolbarPlayQueueBinding,
             presenter::onPlayerContentPageChanged
         )
@@ -277,8 +299,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             } else {
                 requireArguments().remove(Constants.Arguments.PLAYLIST_IMPORT_ARG)
                 selectedDrawerItemId = R.id.menu_play_lists
-                viewBinding.navigationView.setCheckedItem(R.id.menu_play_lists)
-                startFragment(newPlaylistsFragment(playlistImportUri))
+                binding.navigationView.setCheckedItem(R.id.menu_play_lists)
+                startFragment(PlayListsFragment.newInstance(playlistImportUri))
             }
         } else {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM)
@@ -291,7 +313,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
         //drawer header is RecyclerView item, unable to add fragment in a normal way.
         //so we add header fragment into stable container view and then move it into header
-        val headerContainer = viewBinding.flDrawerHeaderStableContainer
+        val headerContainer = binding.flDrawerHeaderStableContainer
         if (savedInstanceState == null) {
             val headerFragment = Components.getAppComponent().specificNavigation().getDrawerHeaderFragment()
             if (headerFragment != null) {
@@ -309,8 +331,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            if (viewBinding.drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
-                viewBinding.drawer.openDrawer(GravityCompat.START)
+            if (binding.drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+                binding.drawer.openDrawer(GravityCompat.START)
             } else {
                 onBackPressed()
             }
@@ -336,8 +358,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             playerPanelWrapper.collapseBottomPanelSmoothly()
             return true
         }
-        if (viewBinding.drawer.isDrawerOpen(GravityCompat.START)) {
-            viewBinding.drawer.closeDrawer(GravityCompat.START)
+        if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
+            binding.drawer.closeDrawer(GravityCompat.START)
             return true
         }
         val fragment = navigation.fragmentOnTop
@@ -353,6 +375,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         AndroidUtils.clearVectorAnimationInfo(panelBinding.ivPlayPause)
     }
 
+    override fun getCoordinatorLayout() = binding.clPlayQueueContainer!!
+
     override fun setButtonPanelState(expanded: Boolean) {
         if (expanded) {
             playerPanelWrapper.expandBottomPanel()
@@ -362,36 +386,61 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     }
 
     override fun showPlayerContentPage(position: Int) {
-        viewBinding.vpPlayContent!!.setCurrentItem(position, false)
+        binding.vpPlayContent!!.setCurrentItem(position, false)
     }
 
     override fun showDrawerScreen(selectedDrawerScreenId: Int, selectedPlayListScreenId: Long) {
         val itemId = ScreensMap.getMenuId(selectedDrawerScreenId)
         selectedDrawerItemId = itemId
-        viewBinding.navigationView.setCheckedItem(itemId)
+        binding.navigationView.setCheckedItem(itemId)
         when (selectedDrawerScreenId) {
             Screens.LIBRARY -> presenter.onLibraryScreenSelected()
             Screens.PLAY_LISTS -> {
                 val fragments: MutableList<Fragment> = ArrayList()
-                fragments.add(newPlaylistsFragment())
+                fragments.add(PlayListsFragment.newInstance())
                 if (selectedPlayListScreenId != 0L) {
-                    fragments.add(newPlayListFragment(selectedPlayListScreenId))
+                    fragments.add(PlayListFragment.newInstance(selectedPlayListScreenId))
                 }
                 navigation.newRootFragmentStack(fragments, 0, R.anim.anim_alpha_appear)
             }
         }
     }
 
-    override fun showLibraryScreen(selectedLibraryScreen: Int) {
-        val fragment = when (selectedLibraryScreen) {
-            Screens.LIBRARY_COMPOSITIONS -> LibraryCompositionsFragment()
-            Screens.LIBRARY_FOLDERS -> newLibraryFoldersRootFragment()
-            Screens.LIBRARY_ARTISTS -> ArtistsListFragment()
-            Screens.LIBRARY_ALBUMS -> AlbumsListFragment()
-            Screens.LIBRARY_GENRES -> GenresListFragment()
-            else -> LibraryCompositionsFragment()
+    override fun showLibraryScreen(
+        selectedLibraryScreen: Int,
+        selectedArtistScreenId: Long,
+        selectedAlbumScreenId: Long,
+        selectedGenreScreenId: Long
+    ) {
+        val fragments: MutableList<Fragment> = ArrayList()
+        when (selectedLibraryScreen) {
+            Screens.LIBRARY_COMPOSITIONS -> fragments.add(LibraryCompositionsFragment())
+            Screens.LIBRARY_FOLDERS -> fragments.add(newLibraryFoldersRootFragment())
+            Screens.LIBRARY_ARTISTS -> {
+                fragments.add(ArtistsListFragment())
+                if (selectedArtistScreenId != 0L) {
+                    fragments.add(ArtistItemsFragment.newInstance(selectedArtistScreenId))
+                    //need to fix fragment navigation lifecycle issue before implementing this
+                    // (after restore title is from artist instead of album)
+//                    if (selectedAlbumScreenId != 0L) {
+//                        fragments.add(AlbumItemsFragment.newInstance(selectedAlbumScreenId))
+//                    }
+                }
+            }
+            Screens.LIBRARY_ALBUMS -> {
+                fragments.add(AlbumsListFragment())
+                if (selectedAlbumScreenId != 0L) {
+                    fragments.add(AlbumItemsFragment.newInstance(selectedAlbumScreenId))
+                }
+            }
+            Screens.LIBRARY_GENRES -> {
+                fragments.add(GenresListFragment())
+                if (selectedGenreScreenId != 0L) {
+                    fragments.add(GenreItemsFragment.newInstance(selectedGenreScreenId))
+                }
+            }
         }
-        startFragment(fragment)
+        navigation.newRootFragmentStack(fragments, 0, R.anim.anim_alpha_appear)
     }
 
     override fun showPlayerState(isPlaying: Boolean) {
@@ -411,7 +460,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     }
 
     override fun showCurrentQueueItem(item: PlayQueueItem?) {
-        animateVisibility(viewBinding.bottomSheetTopShadow, View.VISIBLE)
+        animateVisibility(binding.bottomSheetTopShadow, View.VISIBLE)
         setMusicControlsEnabled(item != null)
         if (item == null) {
             panelBinding.tvPlayedTime.text = FormatUtils.formatMilliseconds(0)
@@ -491,33 +540,16 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     }
 
     override fun startEditCompositionScreen(id: Long) {
-        startActivity(newCompositionEditorIntent(requireContext(), id))
-    }
-
-    override fun showErrorMessage(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(viewBinding.clPlayQueueContainer!!, errorCommand.message).show()
+        startActivity(CompositionEditorActivity.newIntent(requireContext(), id))
     }
 
     override fun showDeletedItemMessage() {
         MessagesUtils.makeSnackbar(
-            viewBinding.clPlayQueueContainer!!,
+            binding.clPlayQueueContainer!!,
             R.string.queue_item_removed,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.cancel, presenter::onRestoreDeletedItemClicked)
             .show()
-    }
-
-    override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            viewBinding.clPlayQueueContainer!!,
-            getString(R.string.add_to_playlist_error_template, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
-    override fun showAddingToPlayListComplete(playList: PlayList?, compositions: List<Composition>) {
-        val text = MessagesUtils.getAddToPlayListCompleteMessage(requireActivity(), playList, compositions)
-        MessagesUtils.makeSnackbar(viewBinding.clPlayQueueContainer!!, text, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun showSelectPlayListDialog() {
@@ -533,7 +565,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     override fun showDeleteCompositionError(errorCommand: ErrorCommand) {
         deletingErrorHandler.handleError(errorCommand) {
             MessagesUtils.makeSnackbar(
-                viewBinding.clPlayQueueContainer!!,
+                binding.clPlayQueueContainer!!,
                 getString(R.string.delete_composition_error_template, errorCommand.message),
                 Snackbar.LENGTH_SHORT
             ).show()
@@ -542,22 +574,21 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
     override fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
-        MessagesUtils.makeSnackbar(viewBinding.clPlayQueueContainer!!, text, Snackbar.LENGTH_SHORT).show()
+        MessagesUtils.makeSnackbar(binding.clPlayQueueContainer!!, text, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun displayPlaybackSpeed(speed: Float) {
         panelBinding.tvPlaybackSpeed.text = getString(R.string.playback_speed_template, speed)
         panelBinding.tvPlaybackSpeed.setOnClickListener {
-            DialogUtils.showSpeedSelectorDialog(
-                requireContext(),
-                speed,
-                presenter::onPlaybackSpeedSelected
-            )
+            speedDialogFragmentRunner.show(SpeedSelectorDialogFragment.newInstance(speed))
         }
     }
 
     override fun showSpeedChangeFeatureVisible(visible: Boolean) {
         panelBinding.tvPlaybackSpeed.visibility = if (visible) View.VISIBLE else View.GONE
+        if (!visible) {
+            speedDialogFragmentRunner.close()
+        }
     }
 
     override fun showSleepTimerRemainingTime(remainingMillis: Long) {
@@ -571,19 +602,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
         }
         if (!panelBinding.tvSleepTime.hasOnClickListeners()) {
             //initialize, set visible
-            val icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_timer)!!
-            val resources = requireContext().resources
-            val iconSize = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_size)
-            icon.setBounds(0, 0, iconSize, iconSize)
-            icon.setTint(
-                AndroidUtils.getColorFromAttr(
-                    requireContext(),
-                    android.R.attr.textColorSecondary
-                )
-            )
-            panelBinding.tvSleepTime.setCompoundDrawables(icon, null, null, null)
-            val iconPadding = resources.getDimensionPixelSize(R.dimen.sleep_timer_icon_padding)
-            panelBinding.tvSleepTime.compoundDrawablePadding = iconPadding
+
+            panelBinding.tvSleepTime.setSmallDrawableStart(R.drawable.ic_timer)
             panelBinding.tvSleepTime.setBackgroundResource(R.drawable.bg_outline_text_button)
             panelBinding.tvSleepTime.setOnClickListener {
                 SleepTimerDialogFragment().safeShow(childFragmentManager)
@@ -628,7 +648,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             } else {
                 if (selectedDrawerItemId != R.id.menu_library) {
                     selectedDrawerItemId = R.id.menu_library
-                    viewBinding.navigationView.setCheckedItem(R.id.menu_library)
+                    binding.navigationView.setCheckedItem(R.id.menu_library)
                 }
                 presenter.onLibraryScreenSelected(Screens.LIBRARY_FOLDERS)
                 startFragment(newLibraryFoldersRootFragment(id))
@@ -637,7 +657,13 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
     }
 
     override fun showScreensSwipeEnabled(enabled: Boolean) {
-        viewBinding.vpPlayContent!!.isUserInputEnabled = enabled
+        binding.vpPlayContent!!.isUserInputEnabled = enabled
+    }
+
+    override fun onVolumeChanged(volume: VolumeState) {
+        val volumePercent = 100 * volume.getVolume() / volume.max
+        panelBinding.tvVolume.text = getString(R.string.percentage_template, volumePercent)
+        panelBinding.tvVolume.setSmallDrawableStart(getVolumeIcon(volumePercent))
     }
 
     fun openPlayerPanel() {
@@ -653,10 +679,10 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
             } else {
                 if (selectedDrawerItemId != R.id.menu_play_lists) {
                     selectedDrawerItemId = R.id.menu_play_lists
-                    viewBinding.navigationView.setCheckedItem(R.id.menu_play_lists)
+                    binding.navigationView.setCheckedItem(R.id.menu_play_lists)
                     presenter.onDrawerScreenSelected(Screens.PLAY_LISTS)
                 }
-                navigation.newRootFragment(newPlaylistsFragment(uriStr), 0, 0)
+                navigation.newRootFragment(PlayListsFragment.newInstance(uriStr), 0, 0)
             }
         }
     }
@@ -674,8 +700,8 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
     @Suppress("unused")
     private fun onNavigationIconClicked() {
-        if (viewBinding.drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
-            viewBinding.drawer.openDrawer(GravityCompat.START)
+        if (binding.drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+            binding.drawer.openDrawer(GravityCompat.START)
         } else {
             onBackPressed()
         }
@@ -718,7 +744,7 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
                 selected = true
             }
         }
-        viewBinding.drawer.closeDrawer(GravityCompat.START)
+        binding.drawer.closeDrawer(GravityCompat.START)
         return selected
     }
 
@@ -732,8 +758,9 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
     private fun onRepeatModeButtonClicked(view: View, currentRepeatMode: Int) {
         val selectedItemId = when(currentRepeatMode) {
-            RepeatMode.REPEAT_PLAY_QUEUE -> R.id.menu_repeat_playlist
+            RepeatMode.REPEAT_PLAY_QUEUE -> R.id.menu_repeat_queue
             RepeatMode.REPEAT_COMPOSITION -> R.id.menu_repeat_composition
+            RepeatMode.PLAY_COMPOSITION_ONCE -> R.id.menu_play_once
             else -> R.id.menu_do_not_repeat
         }
         val menu = AndroidUtils.createMenu(requireContext(), R.menu.repeat_mode_menu)
@@ -741,8 +768,9 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
 
         PopupMenuWindow.showPopup(view, menu) { item ->
             val repeatMode = when (item.itemId) {
-                R.id.menu_repeat_playlist -> RepeatMode.REPEAT_PLAY_QUEUE
+                R.id.menu_repeat_queue -> RepeatMode.REPEAT_PLAY_QUEUE
                 R.id.menu_repeat_composition -> RepeatMode.REPEAT_COMPOSITION
+                R.id.menu_play_once -> RepeatMode.PLAY_COMPOSITION_ONCE
                 else -> RepeatMode.NONE
             }
             presenter.onRepeatModeChanged(repeatMode)
@@ -755,13 +783,13 @@ class PlayerFragment : MvpAppCompatFragment(), BackButtonListener, PlayerView {
                 R.id.menu_lyrics -> 0
                 else -> 1
             }
-            viewBinding.vpPlayContent!!.currentItem = position
+            binding.vpPlayContent!!.currentItem = position
         }
     }
 
     private fun showEditorRequestDeniedMessage() {
         MessagesUtils.makeSnackbar(
-            viewBinding.clPlayQueueContainer!!,
+            binding.clPlayQueueContainer!!,
             R.string.android_r_edit_file_permission_denied,
             Snackbar.LENGTH_LONG
         ).show()

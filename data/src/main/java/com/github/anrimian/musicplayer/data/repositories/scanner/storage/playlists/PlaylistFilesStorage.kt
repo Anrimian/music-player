@@ -3,11 +3,9 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.storage.playli
 import android.content.Context
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.M3UEditor
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListFile
-import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
+import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlayListFileNameValidator
 import java.io.File
-
-private const val PlAY_LISTS_DIRECTORY_NAME = "playlists"
 
 class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
 
@@ -20,7 +18,7 @@ class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
         return files.mapNotNull { file ->
             try {
                 return@mapNotNull file.inputStream().use { stream ->
-                    m3uEditor.read(getPlaylistName(file.name), stream)
+                    m3uEditor.read(PlayListFileNameValidator.getPlaylistName(file.name), stream)
                 }
             } catch (e: Exception) {
                 analytics.processNonFatalError(e, "playlist file '${file.name}' (length: ${file.length()}) read error")
@@ -32,7 +30,8 @@ class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
     }
 
     fun getPlaylistFile(name: String): File {
-        return File(getPlaylistFilesDir(), getPlaylistFileName(name))
+        val formattedName = name.trim().ifEmpty { "0" }//fix for broken migration(15). Move fix to next migration and remove it
+        return File(getPlaylistFilesDir(), PlayListFileNameValidator.getPlaylistFileName(formattedName))
     }
 
     fun insertPlaylist(playList: PlayListFile) {
@@ -40,8 +39,7 @@ class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
         try {
             file.outputStream().use { stream -> m3uEditor.write(playList, stream) }
         } catch (e: Exception) {
-            analytics.logMessage("playlist file (${file.name}) insert error")
-            throw e
+            analytics.logMessage("playlist file (${file.absolutePath}) insert error")
         }
     }
 
@@ -65,12 +63,8 @@ class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
         return playlistsFilesDir
     }
 
-    private fun getPlaylistName(fileName: String): String {
-        return fileName.substring(0, fileName.lastIndexOf(".m3u"))
-            .take(Constants.PLAYLIST_NAME_MAX_LENGTH)//fix for too long names that were already inserted before limitations
+    private companion object {
+        const val PlAY_LISTS_DIRECTORY_NAME = "playlists"
     }
 
-    private fun getPlaylistFileName(playlistName: String): String {
-        return playlistName + Constants.PLAYLIST_EXTENSION
-    }
 }

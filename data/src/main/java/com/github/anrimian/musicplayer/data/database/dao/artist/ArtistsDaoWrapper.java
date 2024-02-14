@@ -5,7 +5,7 @@ import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.
 
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -22,12 +22,12 @@ import io.reactivex.rxjava3.core.Single;
 
 public class ArtistsDaoWrapper {
 
-    private final AppDatabase appDatabase;
+    private final LibraryDatabase libraryDatabase;
     private final ArtistsDao artistsDao;
     private final AlbumsDao albumsDao;
 
-    public ArtistsDaoWrapper(AppDatabase appDatabase, ArtistsDao artistsDao, AlbumsDao albumsDao) {
-        this.appDatabase = appDatabase;
+    public ArtistsDaoWrapper(LibraryDatabase libraryDatabase, ArtistsDao artistsDao, AlbumsDao albumsDao) {
+        this.libraryDatabase = libraryDatabase;
         this.artistsDao = artistsDao;
         this.albumsDao = albumsDao;
     }
@@ -81,7 +81,7 @@ public class ArtistsDaoWrapper {
     }
 
     public void updateArtistName(String name, long id) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             artistsDao.updateArtistCompositionsModifyTime(id, new Date());
 
             Long existArtistId = artistsDao.findArtistIdByName(name);

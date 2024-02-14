@@ -5,4 +5,8 @@
         <item name="android:progressDrawable">@drawable/bg_seekbar_progress</item>
         <item name="android:thumb">@drawable/bg_seekbar_thumb</item>
     </style>
+
+    <style name="VerticalSeekbarStyle" parent="SeekBarStyle">
+        <item name="android:layout_height">match_parent</item>
+    </style>
 </resources>

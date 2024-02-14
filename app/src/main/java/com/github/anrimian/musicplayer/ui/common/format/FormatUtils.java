@@ -23,6 +23,7 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -197,6 +198,16 @@ public class FormatUtils {
         return sb.toString();
     }
 
+    public static String formatAlbumAdditionalInfoForMediaBrowser(Context context, Genre genre) {
+        SpannableStringBuilder sb = new DescriptionStringBuilder();
+        sb.append(formatCompositionsCount(context, genre.getCompositionsCount()));
+        long totalDuration = genre.getTotalDuration();
+        if (totalDuration != 0L) {
+            sb.append(FormatUtils.formatMilliseconds(totalDuration));
+        }
+        return sb.toString();
+    }
+
     public static String formatCompositionAdditionalInfoForMediaBrowser(Context context, Composition composition) {
         SpannableStringBuilder sb = new DescriptionStringBuilder();
         sb.append(formatCompositionAuthor(composition, context));
@@ -248,6 +259,9 @@ public class FormatUtils {
             case RepeatMode.REPEAT_PLAY_QUEUE: {
                 return R.drawable.ic_repeat;
             }
+            case RepeatMode.PLAY_COMPOSITION_ONCE: {
+                return R.drawable.ic_play_once;
+            }
             default: return R.drawable.ic_repeat_off;
         }
     }
@@ -263,6 +277,9 @@ public class FormatUtils {
             }
             case RepeatMode.REPEAT_PLAY_QUEUE: {
                 return R.string.repeat_playlist;
+            }
+            case RepeatMode.PLAY_COMPOSITION_ONCE: {
+                return R.string.play_once;
             }
             default: return R.string.do_not_repeat;
         }

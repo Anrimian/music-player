@@ -21,14 +21,14 @@ class LibrarySettingsInteractor(
 
     fun setAudioFileMinDurationMillis(millis: Long) {
         settingsRepository.audioFileMinDurationMillis = millis
-        mediaScannerRepository.rescanStorage()
+        mediaScannerRepository.rescanStorageAsync()
     }
 
     fun getAudioFileMinDurationMillis() = settingsRepository.audioFileMinDurationMillis
 
     fun setShowAllAudioFilesEnabled(enabled: Boolean) {
         settingsRepository.isShowAllAudioFilesEnabled = enabled
-        mediaScannerRepository.rescanStorage()
+        mediaScannerRepository.rescanStorageAsync()
     }
 
     fun getShowAllAudioFilesEnabledObservable(): Observable<Boolean> =
@@ -39,5 +39,12 @@ class LibrarySettingsInteractor(
     }
 
     fun isPlaylistInsertStartEnabled(): Boolean = settingsRepository.isPlaylistInsertStartEnabled
+
+    fun setPlaylistDuplicateCheckEnabled(enabled: Boolean) {
+        settingsRepository.isPlaylistDuplicateCheckEnabled = enabled
+    }
+
+    fun getPlaylistDuplicateCheckObservable(): Observable<Boolean> =
+        settingsRepository.playlistDuplicateCheckObservable
 
 }

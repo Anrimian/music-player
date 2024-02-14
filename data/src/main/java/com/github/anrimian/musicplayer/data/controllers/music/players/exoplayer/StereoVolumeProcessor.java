@@ -1,14 +1,16 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players.exoplayer;
 
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.audio.AudioProcessor;
+import androidx.annotation.NonNull;
+import androidx.media3.common.C;
+import androidx.media3.common.Format;
+import androidx.media3.common.audio.AudioProcessor;
+import androidx.media3.common.util.UnstableApi;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-public class StereoVolumeProcessor implements AudioProcessor {
+@UnstableApi public class StereoVolumeProcessor implements AudioProcessor {
 
     private int channelCount;
     private int sampleRateHz;
@@ -36,6 +38,7 @@ public class StereoVolumeProcessor implements AudioProcessor {
         pendingOutputChannels = outputChannels;
     }
 
+    @NonNull
     @Override
     public AudioFormat configure(AudioFormat inputAudioFormat) throws UnhandledAudioFormatException {
         int sampleRateHz = inputAudioFormat.sampleRate;
@@ -117,6 +120,7 @@ public class StereoVolumeProcessor implements AudioProcessor {
         return volume[RIGHT_SPEAKER];
     }
 
+    @NonNull
     @Override
     public ByteBuffer getOutput() {
         ByteBuffer outputBuffer = this.outputBuffer;

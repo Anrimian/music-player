@@ -1,16 +1,22 @@
 package com.github.anrimian.musicplayer.data.controllers.music.error
 
+import androidx.media3.common.ParserException
+import androidx.media3.common.PlaybackException
+import androidx.media3.datasource.ContentDataSource
+import androidx.media3.datasource.FileDataSource
+import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
+import androidx.media3.exoplayer.upstream.Loader
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotFoundException
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerErrorParser
-import com.github.anrimian.musicplayer.domain.models.composition.content.*
-import com.google.android.exoplayer2.ParserException
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.source.UnrecognizedInputFormatException
-import com.google.android.exoplayer2.upstream.ContentDataSource.ContentDataSourceException
-import com.google.android.exoplayer2.upstream.FileDataSource.FileDataSourceException
-import com.google.android.exoplayer2.upstream.Loader
+import com.github.anrimian.musicplayer.domain.models.composition.content.AcceptablePlayerException
+import com.github.anrimian.musicplayer.domain.models.composition.content.CorruptedMediaFileException
+import com.github.anrimian.musicplayer.domain.models.composition.content.LocalSourceNotFoundException
+import com.github.anrimian.musicplayer.domain.models.composition.content.RelaunchSourceException
+import com.github.anrimian.musicplayer.domain.models.composition.content.TooLargeSourceException
+import com.github.anrimian.musicplayer.domain.models.composition.content.UnknownPlayerException
+import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
 import java.io.FileNotFoundException
 
 open class PlayerErrorParserImpl(
@@ -31,7 +37,7 @@ open class PlayerErrorParserImpl(
                     }
                     return RelaunchSourceException(relaunchCause)
                 }
-                if (cause is ContentDataSourceException || cause is FileDataSourceException) {
+                if (cause is ContentDataSource.ContentDataSourceException || cause is FileDataSource.FileDataSourceException) {
                     val causeOfCause = cause.cause
                     if (causeOfCause is FileNotFoundException) {
                         return LocalSourceNotFoundException()

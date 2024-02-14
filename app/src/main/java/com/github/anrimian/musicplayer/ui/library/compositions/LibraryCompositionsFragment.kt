@@ -17,7 +17,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposit
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
@@ -32,6 +31,7 @@ import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
+import com.github.anrimian.musicplayer.ui.library.common.setupLibraryTitle
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayListDialogFragment
@@ -53,7 +53,7 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         Components.getLibraryCompositionsComponent().libraryCompositionsPresenter()
     }
 
-    private lateinit var viewBinding: FragmentLibraryCompositionsBinding
+    private lateinit var binding: FragmentLibraryCompositionsBinding
     private lateinit var layoutManager: LinearLayoutManager
 
     private lateinit var toolbar: AdvancedToolbar
@@ -70,39 +70,39 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentLibraryCompositionsBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentLibraryCompositionsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar = requireActivity().findViewById(R.id.toolbar)
 
-        viewBinding.progressStateView.onTryAgainClick { presenter.onTryAgainLoadCompositionsClicked() }
+        binding.progressStateView.onTryAgainClick { presenter.onTryAgainLoadCompositionsClicked() }
 
         layoutManager = LinearLayoutManager(context)
-        viewBinding.rvCompositions.layoutManager = layoutManager
-        RecyclerViewUtils.attachFastScroller(viewBinding.rvCompositions, true)
+        binding.rvCompositions.layoutManager = layoutManager
+        RecyclerViewUtils.attachFastScroller(binding.rvCompositions, true)
         adapter = CompositionsAdapter(
             this,
-            viewBinding.rvCompositions,
+            binding.rvCompositions,
             presenter.getSelectedCompositions(),
             presenter::onCompositionClicked,
             presenter::onCompositionLongClick,
             presenter::onCompositionIconClicked,
             this::onCompositionMenuClicked
         )
-        viewBinding.rvCompositions.adapter = adapter
+        binding.rvCompositions.adapter = adapter
         val callback = ShortSwipeCallback(requireContext(),
             R.drawable.ic_play_next,
             R.string.play_next,
             swipeCallback = presenter::onPlayNextCompositionClicked
         )
         val itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(viewBinding.rvCompositions)
+        itemTouchHelper.attachToRecyclerView(binding.rvCompositions)
 
-        viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
-        onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
+        binding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        onLongVibrationClick(binding.fab, presenter::onChangeRandomModePressed)
 
         val fm = childFragmentManager
         deletingErrorHandler = DeleteErrorHandler(
@@ -120,8 +120,8 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
     }
 
     override fun onFragmentResumed() {
-        super.onFragmentResumed()
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
+        toolbar.setupLibraryTitle(this)
         toolbar.setSubtitle(R.string.compositions)
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText())
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu, this::onActionModeItemClicked)
@@ -134,38 +134,40 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
     }
 
     override fun onBackPressed(): Boolean {
-        if (toolbar.isInActionMode) {
+        if (toolbar.isInActionMode()) {
             presenter.onSelectionModeBackPressed()
             return true
         }
-        if (toolbar.isInSearchMode) {
+        if (toolbar.isInSearchMode()) {
             toolbar.setSearchModeEnabled(false)
             return true
         }
         return false
     }
 
+    override fun getCoordinatorLayout() = binding.root
+
     override fun showEmptyList() {
-        viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.showMessage(R.string.compositions_on_device_not_found)
+        binding.fab.visibility = View.GONE
+        binding.progressStateView.showMessage(R.string.compositions_on_device_not_found)
     }
 
     override fun showEmptySearchResult() {
-        viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.showMessage(R.string.compositions_for_search_not_found)
+        binding.fab.visibility = View.GONE
+        binding.progressStateView.showMessage(R.string.no_matching_search_results_found)
     }
 
     override fun showList() {
-        viewBinding.fab.visibility = View.VISIBLE
-        viewBinding.progressStateView.hideAll()
+        binding.fab.visibility = View.VISIBLE
+        binding.progressStateView.hideAll()
     }
 
     override fun showLoading() {
-        viewBinding.progressStateView.showProgress()
+        binding.progressStateView.showProgress()
     }
 
     override fun showLoadingError(errorCommand: ErrorCommand) {
-        viewBinding.progressStateView.showMessage(errorCommand.message, true)
+        binding.progressStateView.showMessage(errorCommand.message, true)
     }
 
     override fun updateList(genres: List<Composition>) {
@@ -192,21 +194,8 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
         toolbar.showSelectionMode(count)
     }
 
-    override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
-            getString(R.string.add_to_playlist_error_template, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
-    override fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>) {
-        val text = MessagesUtils.getAddToPlayListCompleteMessage(requireActivity(), playList, compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
-    }
-
     override fun showSelectPlayListDialog() {
-        val dialog = if (toolbar.isInActionMode) {
+        val dialog = if (toolbar.isInActionMode()) {
             newChoosePlayListDialogFragment(R.attr.actionModeStatusBarColor)
         } else {
             ChoosePlayListDialogFragment()
@@ -236,7 +225,7 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
     override fun showDeleteCompositionError(errorCommand: ErrorCommand) {
         deletingErrorHandler.handleError(errorCommand) {
             MessagesUtils.makeSnackbar(
-                viewBinding.listContainer,
+                binding.listContainer,
                 getString(R.string.delete_composition_error_template, errorCommand.message),
                 Snackbar.LENGTH_SHORT
             ).show()
@@ -245,7 +234,7 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
 
     override fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun shareCompositions(selectedCompositions: Collection<Composition>) {
@@ -261,22 +250,7 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
     }
 
     override fun showRandomMode(isRandomModeEnabled: Boolean) {
-        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
-    }
-
-    override fun showErrorMessage(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, errorCommand.message, Snackbar.LENGTH_SHORT)
-            .show()
-    }
-
-    override fun onCompositionsAddedToPlayNext(compositions: List<Composition>) {
-        val message = MessagesUtils.getPlayNextMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
-    }
-
-    override fun onCompositionsAddedToQueue(compositions: List<Composition>) {
-        val message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
+        FormatUtils.formatPlayAllButton(binding.fab, isRandomModeEnabled)
     }
 
     override fun showFilesSyncState(states: Map<Long, FileSyncState>) {
@@ -294,7 +268,7 @@ class LibraryCompositionsFragment : BaseLibraryCompositionsFragment(), LibraryCo
 
     private fun showEditorRequestDeniedMessage() {
         MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
+            binding.listContainer,
             R.string.android_r_edit_file_permission_denied,
             Snackbar.LENGTH_LONG
         ).show()

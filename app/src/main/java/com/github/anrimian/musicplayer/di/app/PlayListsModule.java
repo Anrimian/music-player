@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepo
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.PlaylistFilesStorage;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -35,9 +36,10 @@ public class PlayListsModule {
     @Provides
     @Nonnull
     PlayListsPresenter playListsPresenter(PlayListsInteractor playListsInteractor,
+                                          LibraryPlayerInteractor playerInteractor,
                                           @Named(UI_SCHEDULER) Scheduler uiSchedule,
                                           ErrorParser errorParser) {
-        return new PlayListsPresenter(playListsInteractor, uiSchedule, errorParser);
+        return new PlayListsPresenter(playListsInteractor, playerInteractor, uiSchedule, errorParser);
     }
 
     @Provides
@@ -58,10 +60,16 @@ public class PlayListsModule {
 
     @Provides
     @Nonnull
-    PlayListsInteractor playListsInteractor(PlayListsRepository playListsRepository,
+    PlayListsInteractor playListsInteractor(LibraryPlayerInteractor playerInteractor,
+                                            PlayListsRepository playListsRepository,
+                                            SettingsRepository settingsRepository,
                                             UiStateRepository uiStateRepository,
                                             Analytics analytics) {
-        return new PlayListsInteractor(playListsRepository, uiStateRepository, analytics);
+        return new PlayListsInteractor(playerInteractor,
+                playListsRepository,
+                settingsRepository,
+                uiStateRepository,
+                analytics);
     }
 
     @Provides

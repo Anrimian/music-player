@@ -1,23 +1,21 @@
 package com.github.anrimian.musicplayer.domain.interactors.library
 
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.order.Order
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
 class LibraryAlbumsInteractor(
     private val libraryRepository: LibraryRepository,
     private val playerInteractor: LibraryPlayerInteractor,
-    private val playListsInteractor: PlayListsInteractor,
     private val settingsRepository: SettingsRepository,
     private val uiStateRepository: UiStateRepository
 ) {
@@ -40,6 +38,10 @@ class LibraryAlbumsInteractor(
         settingsRepository.albumsOrder = order
     }
 
+    fun setSelectedAlbumScreen(albumId: Long) {
+        uiStateRepository.selectedAlbumScreenId = albumId
+    }
+
     fun getSavedListPosition(): ListPosition? = uiStateRepository.savedAlbumsListPosition
 
     fun saveListPosition(listPosition: ListPosition?) {
@@ -54,30 +56,13 @@ class LibraryAlbumsInteractor(
         uiStateRepository.saveAlbumListPosition(albumId, listPosition)
     }
 
-    fun startPlaying(albums: List<Album>) {
-        libraryRepository.getCompositionIdsInAlbums(albums)
-            .subscribe(playerInteractor::startPlaying)
+    fun startPlaying(albums: List<Album>): Completable {
+        return libraryRepository.getCompositionIdsInAlbums(albums)
+            .flatMapCompletable(playerInteractor::setQueueAndPlay)
     }
 
-    fun addAlbumsToPlayNext(albums: List<Album>): Single<List<Composition>> {
-        return libraryRepository.getCompositionsInAlbums(albums)
-            .flatMap(playerInteractor::addCompositionsToPlayNext)
-    }
-
-    fun addAlbumsToQueue(albums: List<Album>): Single<List<Composition>> {
-        return libraryRepository.getCompositionsInAlbums(albums)
-            .flatMap(playerInteractor::addCompositionsToEnd)
-    }
-
-    fun addAlbumsToPlayList(
-        albumIds: LongArray,
-        playList: PlayList
-    ): Single<List<Composition>> {
+    fun getCompositionsByAlbumIds(albumIds: LongArray): Single<List<Composition>> {
         return libraryRepository.getCompositionsByAlbumIds(albumIds.asIterable())
-            .flatMap { compositions ->
-                playListsInteractor.addCompositionsToPlayList(compositions, playList)
-                    .toSingleDefault(compositions)
-            }
     }
 
     fun getCompositionsInAlbums(albums: List<Album>): Single<List<Composition>> {

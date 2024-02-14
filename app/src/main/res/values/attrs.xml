@@ -20,6 +20,8 @@
     <attr name="popupMenuBackgroundColor" format="color"/>
     <attr name="subToolbarBackground" format="color"/>
     <attr name="dialogBackground" format="color"/>
+    <attr name="popupPageForegroundShadowColor" format="color"/>
+    <attr name="chipBackground" format="color"/>
 
     <attr name="navigationViewPrimaryColor" format="color"/>
 
@@ -52,4 +54,7 @@
     <attr name="widgetButtonColor" format="color"/>
     <attr name="widgetDisabledColor" format="color"/>
     <attr name="widgetSelectableColor" format="color"/>
+
+    <!--corners-->
+    <attr name="coverImageCornerSize" format="dimension|fraction"/>
 </resources>

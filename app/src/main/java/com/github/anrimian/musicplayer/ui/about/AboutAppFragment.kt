@@ -56,7 +56,7 @@ class AboutAppFragment : Fragment(),
         binding.btnView.setOnClickListener { appLogger.startViewLogScreen(requireActivity()) }
         binding.btnSend.setOnClickListener { appLogger.startSendLogScreen(requireActivity()) }
 
-        binding.cbShowReportDialogOnStart.isChecked = loggerRepository.isReportDialogOnStartEnabled
+        binding.cbShowReportDialogOnStart.isChecked = loggerRepository.isReportDialogOnStartEnabled()
         ViewUtils.onCheckChanged(binding.cbShowReportDialogOnStart, loggerRepository::showReportDialogOnStart)
 
         SlidrPanel.simpleSwipeBack(binding.containerView, this, toolbar::onStackFragmentSlided)

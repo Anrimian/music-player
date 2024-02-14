@@ -2,7 +2,11 @@ package com.github.anrimian.musicplayer.ui.equalizer
 
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.EqInitializationException
 import com.github.anrimian.musicplayer.domain.interactors.player.EqualizerInteractor
-import com.github.anrimian.musicplayer.domain.models.equalizer.*
+import com.github.anrimian.musicplayer.domain.models.equalizer.Band
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqInitializationState
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerConfig
+import com.github.anrimian.musicplayer.domain.models.equalizer.EqualizerState
+import com.github.anrimian.musicplayer.domain.models.equalizer.Preset
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
@@ -28,7 +32,7 @@ class EqualizerPresenter(
     }
 
     private fun subscribeOnEqInitializationState() {
-        interactor.eqInitializationState
+        interactor.getEqInitializationState()
             .unsafeSubscribeOnUi(this::onEqInitializationStateReceived)
     }
 
@@ -38,7 +42,7 @@ class EqualizerPresenter(
     }
 
     private fun loadEqualizerConfig() {
-        interactor.equalizerConfig
+        interactor.getEqualizerConfig()
             .subscribeOnUi(this::onEqualizerConfigReceived, this::onEqConfigError)
     }
 
@@ -87,7 +91,7 @@ class EqualizerPresenter(
     }
 
     private fun subscribeOnEqualizerState(config: EqualizerConfig) {
-        interactor.equalizerStateObservable
+        interactor.getEqualizerStateObservable()
             .subscribeOnUi(
                 { equalizerState -> onEqualizerStateReceived(equalizerState, config) },
                 this::onEqStateError

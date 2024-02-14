@@ -5,6 +5,7 @@ import static java.io.File.separator;
 import android.content.Context;
 import android.os.Build;
 
+import com.github.anrimian.musicplayer.ui.utils.AppInfo;
 import com.github.anrimian.musicplayer.ui.utils.AppInfoKt;
 
 import java.io.BufferedReader;
@@ -96,8 +97,12 @@ public class FileLog {
     }
 
     private void appendSystemInfo(StringBuilder sb) {
-        sb.append("App version code: ");
-        sb.append(AppInfoKt.getAppInfo(context).getVersionCode());
+        sb.append("App version: ");
+        AppInfo appInfo = AppInfoKt.getAppInfo(context);
+        sb.append(appInfo.getVersionName());
+        sb.append(" (");
+        sb.append(appInfo.getVersionCode());
+        sb.append(")");
         sb.append("\n");
 
         sb.append("Android system version: ");
@@ -113,7 +118,7 @@ public class FileLog {
 
     private void appendCurrentTime(StringBuilder sb) {
         sb.append("Log time: ");
-        sb.append(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.getDefault()).format(new Date()));
+        sb.append(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date()));
         sb.append("\n");
     }
 

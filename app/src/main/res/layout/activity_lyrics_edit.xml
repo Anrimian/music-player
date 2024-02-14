@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:minHeight="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="8dp"
+            android:theme="@style/ToolbarStyle"
+            app:titleTextColor="?attr/toolbarTextColorPrimary"
+            app:subtitleTextColor="?attr/toolbarTextColorSecondary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:title="Title"/>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toTopOf="@id/btnChange">
+
+            <EditText
+                style="@style/EditTextStyle"
+                android:id="@+id/evLyrics"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingVertical="@dimen/content_margin"
+                android:paddingHorizontal="@dimen/content_margin"
+                android:gravity="top|center_horizontal"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:inputType="textMultiLine"
+                android:background="@android:color/transparent"
+                android:importantForAutofill="no"
+                android:hint="@string/lyrics"
+                tools:text="dffdfdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgfgdfgdfgdfg" />
+
+        </androidx.core.widget.NestedScrollView>
+
+        <Button
+            style="@style/ButtonBorderlessStyle"
+            android:id="@+id/btnChange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/change"
+            android:layout_gravity="end|bottom"
+            android:layout_marginBottom="@dimen/content_vertical_margin"
+            android:layout_marginEnd="@dimen/content_horizontal_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.github.anrimian.musicplayer.ui.utils.views.progress_state.ProgressStateView
+            android:id="@+id/progressStateView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

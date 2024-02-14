@@ -5,7 +5,7 @@ import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULE
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.filesync.SyncInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
+import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor;
@@ -38,13 +38,13 @@ public class LibraryModule {
     @Provides
     @Nonnull
     PlayerPresenter playerPresenter(LibraryPlayerInteractor musicPlayerInteractor,
-                                    PlayListsInteractor playListsInteractor,
                                     PlayerScreenInteractor playerScreenInteractor,
+                                    PlayListsInteractor playListsInteractor,
                                     ErrorParser errorParser,
                                     @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new PlayerPresenter(musicPlayerInteractor,
-                playListsInteractor,
                 playerScreenInteractor,
+                playListsInteractor,
                 errorParser,
                 uiScheduler);
     }
@@ -52,15 +52,15 @@ public class LibraryModule {
     @Provides
     @Nonnull
     PlayQueuePresenter playQueuePresenter(LibraryPlayerInteractor musicPlayerInteractor,
-                                          PlayListsInteractor playListsInteractor,
                                           PlayerScreenInteractor playerScreenInteractor,
                                           SyncInteractor<FileKey, ?, Long> syncInteractor,
+                                          PlayListsInteractor playListsInteractor,
                                           ErrorParser errorParser,
                                           @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new PlayQueuePresenter(musicPlayerInteractor,
-                playListsInteractor,
                 playerScreenInteractor,
                 syncInteractor,
+                playListsInteractor,
                 errorParser,
                 uiScheduler);
     }
@@ -68,12 +68,10 @@ public class LibraryModule {
     @Provides
     @Nonnull
     LyricsPresenter lyricsPresenter(LibraryPlayerInteractor libraryPlayerInteractor,
-                                    EditorInteractor editorInteractor,
                                     ErrorParser errorParser,
                                     @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new LyricsPresenter(
                 libraryPlayerInteractor,
-                editorInteractor,
                 errorParser,
                 uiScheduler);
     }
@@ -87,14 +85,16 @@ public class LibraryModule {
                                                   PlayQueueRepository playQueueRepository,
                                                   UiStateRepository uiStateRepository,
                                                   SettingsRepository settingsRepository,
-                                                  MediaScannerRepository mediaScannerRepository) {
+                                                  MediaScannerRepository mediaScannerRepository,
+                                                  SystemMusicController systemMusicController) {
         return new PlayerScreenInteractor(sleepTimerInteractor,
                 libraryPlayerInteractor,
                 syncInteractor,
                 playQueueRepository,
                 uiStateRepository,
                 settingsRepository,
-                mediaScannerRepository);
+                mediaScannerRepository,
+                systemMusicController);
     }
 
     @Provides

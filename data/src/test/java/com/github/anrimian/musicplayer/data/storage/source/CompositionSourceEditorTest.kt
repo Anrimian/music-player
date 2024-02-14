@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.data.storage.source
 
+import com.github.anrimian.musicplayer.data.storage.exceptions.GenreAlreadyPresentException
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider
 import com.github.anrimian.musicplayer.data.utils.files.TestFileUtils
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
@@ -14,7 +15,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
-import java.util.*
+import java.util.Arrays
 
 class CompositionSourceEditorTest {
     
@@ -48,7 +49,7 @@ class CompositionSourceEditorTest {
         println("album: " + tags.album)
         println("album artist: " + tags.albumArtist)
         println("durationSeconds: " + tags.durationSeconds)
-        println("genre: " + sourceEditor.getCompositionGenre(source))
+        println("genre: " + sourceEditor.getCompositionRawGenre(source))
     }
 
     @Test
@@ -72,141 +73,174 @@ class CompositionSourceEditorTest {
     }
 
     @Test
-    fun addGenreTest() {
-        val genres = sourceEditor.getCompositionGenre(source)
+    fun addGenreInFirstPositionTest() {
+        val genres = sourceEditor.getCompositionRawGenre(source)
         println("genres: $genres")
 
-        val testGenre1 = "Test genre1"
-        val testGenre2 = "Test genre2"
-        sourceEditor.addCompositionGenre(source, testGenre1).subscribe()
-        sourceEditor.addCompositionGenre(source, testGenre2).subscribe()
-
-        val newGenres = sourceEditor.getCompositionGenres(source)
-        println("new genres: " + Arrays.toString(newGenres))
-        assertEquals(testGenre1, newGenres[0])
-        assertEquals(testGenre2, newGenres[1])
-    }
-
-    @Test
-    fun addGenreWithSpacesTest() {
-        val genres = sourceEditor.getCompositionGenre(source)
-        println("genres: $genres")
-
-        val testGenre1 = "Test genre1"
-        val testGenre2 = "Test genre2"
-        sourceEditor.addCompositionGenre(source, "$testGenre1 ").subscribe()
-        sourceEditor.addCompositionGenre(source, " $testGenre2").subscribe()
-
-        val newGenres = sourceEditor.getCompositionGenres(source)
-        println("new genres: " + Arrays.toString(newGenres))
-        assertEquals(testGenre1, newGenres[0])
-        assertEquals(testGenre2, newGenres[1])
-    }
-
-    @Test
-    fun removeGenreAtFirstPositionTest() {
-        val genres = sourceEditor.getCompositionGenre(source)
-        println("genres: $genres")
-
-        val testGenre1 = "Test genre1"
-        val testGenre2 = "Test genre2"
-        sourceEditor.addCompositionGenre(source, testGenre1).subscribe()
-        sourceEditor.addCompositionGenre(source, testGenre2).subscribe()
-        sourceEditor.removeCompositionGenre(source, testGenre1).subscribe()
-
-        val newGenres = sourceEditor.getCompositionGenres(source)
-        println("new genres: " + Arrays.toString(newGenres))
-        assertEquals(1, newGenres.size)
-        assertEquals(testGenre2, newGenres[0])
-    }
-
-    @Test
-    fun removeGenreInMiddlePositionTest() {
-        val genres = sourceEditor.getCompositionGenre(source)
-        println("genres: $genres")
-
-        val testGenre1 = "Test genre1"
         val testGenre2 = "Test genre2"
         val testGenre3 = "Test genre3"
-        sourceEditor.addCompositionGenre(source, testGenre1).subscribe()
         sourceEditor.addCompositionGenre(source, testGenre2).subscribe()
         sourceEditor.addCompositionGenre(source, testGenre3).subscribe()
-        sourceEditor.removeCompositionGenre(source, testGenre2).subscribe()
+        val testGenre1 = "Test genre1"
+        sourceEditor.addCompositionGenre(source, testGenre1, 0).subscribe()
 
         val newGenres = sourceEditor.getCompositionGenres(source)
         println("new genres: " + Arrays.toString(newGenres))
-        assertEquals(2, newGenres.size)
+        assertEquals(3, newGenres.size)
         assertEquals(testGenre1, newGenres[0])
-        assertEquals(testGenre3, newGenres[1])
+        assertEquals(testGenre2, newGenres[1])
+        assertEquals(testGenre3, newGenres[2])
     }
 
     @Test
-    fun removeGenreOnLastPositionTest() {
-        val genres = sourceEditor.getCompositionGenre(source)
+    fun addGenreInMiddlePositionTest() {
+        val genres = sourceEditor.getCompositionRawGenre(source)
         println("genres: $genres")
 
         val testGenre1 = "Test genre1"
+        val testGenre3 = "Test genre3"
+        sourceEditor.addCompositionGenre(source, testGenre1).subscribe()
+        sourceEditor.addCompositionGenre(source, testGenre3).subscribe()
         val testGenre2 = "Test genre2"
-        sourceEditor.addCompositionGenre(source, testGenre1).subscribe()
-        sourceEditor.addCompositionGenre(source, testGenre2).subscribe()
-        sourceEditor.removeCompositionGenre(source, testGenre2).subscribe()
+        sourceEditor.addCompositionGenre(source, testGenre2, 1).subscribe()
 
         val newGenres = sourceEditor.getCompositionGenres(source)
         println("new genres: " + Arrays.toString(newGenres))
-        assertEquals(1, newGenres.size)
+        assertEquals(3, newGenres.size)
         assertEquals(testGenre1, newGenres[0])
-    }
-
-    @Test
-    fun removeLastGenreTest() {
-        val genres = sourceEditor.getCompositionGenre(source)
-        println("genres: $genres")
-
-        val testGenre1 = "Test genre1"
-        sourceEditor.addCompositionGenre(source, testGenre1).subscribe()
-        sourceEditor.removeCompositionGenre(source, testGenre1).subscribe()
-
-        val newGenres = sourceEditor.getCompositionGenres(source)
-        println("new genres: " + Arrays.toString(newGenres))
-        assertEquals(0, newGenres.size)
+        assertEquals(testGenre2, newGenres[1])
+        assertEquals(testGenre3, newGenres[2])
     }
 
     @ParameterizedTest
     @CsvSource(
-        "Test genre1k, Test genre1, k",
-        "Test genre1kk, Test genre1, kk",
-        "kTest genre1, Test genre1, k",
-        "kkTest genre1, Test genre1, kk",
+        "Test genre1, Test genre2, 'Test genre1, Test genre2'",
+        "'Test genre1, Test genre2', Test genre3, 'Test genre1, Test genre2, Test genre3'",
+        "'Test genre1', Test, 'Test genre1, Test'",
+        //spaces case
+        "'', 'Test genre1 ', Test genre1",
+        "'Test genre1', ' Test genre2', 'Test genre1, Test genre2'",
     )
-    fun removeInvalidGenreTest(genre: String, genreToRemote: String, expectedSymbolsLeft: String) {
-        val genres = sourceEditor.getCompositionGenre(source)
-        println("genres: $genres")
+    fun addGenreTest(
+        rawGenre: String,
+        genreToAdd: String,
+        expectedGenres: String
+    ) {
+        sourceEditor.setCompositionRawGenre(source, rawGenre).subscribe()
+        sourceEditor.addCompositionGenre(source, genreToAdd).subscribe()
 
-        sourceEditor.addCompositionGenre(source, genre).subscribe()
-        sourceEditor.removeCompositionGenre(source, genreToRemote).subscribe()
-
-        val newGenres = sourceEditor.getCompositionGenres(source)
-        println("new genres: " + Arrays.toString(newGenres))
-        assertEquals(1, newGenres.size)
-        assertEquals(expectedSymbolsLeft, newGenres[0])
+        assertEquals(expectedGenres, sourceEditor.getCompositionRawGenre(source))
     }
 
-    @Test
-    fun changeGenreTest() {
-        val genres = sourceEditor.getCompositionGenre(source)
-        println("genres: $genres")
+    @ParameterizedTest
+    @CsvSource(
+        "Test genre1, Test genre1, Test genre1",
+    )
+    fun addDuplicateGenreTest(
+        rawGenre: String,
+        genreToAdd: String,
+        expectedGenres: String
+    ) {
+        sourceEditor.setCompositionRawGenre(source, rawGenre).subscribe()
+        sourceEditor.addCompositionGenre(source, genreToAdd)
+            .test()
+            .assertError { t -> t is GenreAlreadyPresentException }
 
-        val testGenre1 = "Test genre1"
-        val testGenre2 = "Test genre2"
-        val testGenre3 = "Test genre3"
-        sourceEditor.addCompositionGenre(source, testGenre1).subscribe()
-        sourceEditor.addCompositionGenre(source, testGenre2).subscribe()
-        sourceEditor.changeCompositionGenre(source, testGenre1, testGenre3).subscribe()
+        assertEquals(expectedGenres, sourceEditor.getCompositionRawGenre(source))
+    }
 
-        val newGenres = sourceEditor.getCompositionGenres(source)
-        println("new genres: " + Arrays.toString(newGenres))
-        assertEquals(testGenre3, newGenres[0])
-        assertEquals(testGenre2, newGenres[1])
+    @ParameterizedTest
+    @CsvSource(
+        "'Test genre1, Test genre2', 0, 1, 'Test genre2, Test genre1'",
+        "'Test genre1, Test genre2', 1, 0, 'Test genre2, Test genre1'",
+        "'Test genre1, Test genre2, Test genre3', 1, 0, 'Test genre2, Test genre1, Test genre3'",
+        "'Test genre1, Test genre2, Test genre3', 1, 2, 'Test genre1, Test genre3, Test genre2'",
+        "'Test genre1, Test genre2, Test genre3', 0, 2, 'Test genre2, Test genre3, Test genre1'",
+        "'Test genre1, Test genre2, Test genre3, Test genre4', 1, 2, 'Test genre1, Test genre3, Test genre2, Test genre4'",
+        "'Test genre1, Test genre2, Test genre3, Test genre4', 3, 0, 'Test genre4, Test genre1, Test genre2, Test genre3'",
+        "'Test genre1, Test genre2, Test genre3, Test genre4', 0, 3, 'Test genre2, Test genre3, Test genre4, Test genre1'",
+    )
+    fun moveGenreTest(
+        rawGenre: String,
+        from: Int,
+        to: Int,
+        expectedGenres: String
+    ) {
+        sourceEditor.setCompositionRawGenre(source, rawGenre).subscribe()
+        sourceEditor.moveGenre(source, from, to).subscribe()
+
+        assertEquals(expectedGenres, sourceEditor.getCompositionRawGenre(source))
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "'Test genre1, Test genre2', Test genre1, Test genre2",
+        "'Test genre1, Test genre2, Test genre3', Test genre2, 'Test genre1, Test genre3'",
+        "'Test genre1, Test genre2', Test genre2, Test genre1",
+        "Test genre1, Test genre1, ''",
+        "'Test genre1, Test', Test, Test genre1",
+        //invalid values cases
+        "Test genre1k, Test genre1, Test genre1k",
+        "Test genre1kk, Test genre1, Test genre1kk",
+        "kTest genre1, Test genre1, kTest genre1",
+        "kkTest genre1, Test genre1, kkTest genre1",
+        //duplicate cases
+        "'Test genre1, Test genre1', Test genre1, ''",
+        "'Test genre0, Test genre1, Test genre1', Test genre1, Test genre0",
+        "'Test genre1, Test genre0, Test genre1', Test genre1, Test genre0",
+        "'Test genre1, Test genre1, Test genre0', Test genre1, Test genre0",
+    )
+    fun removeGenreTest(
+        rawGenre: String,
+        genreToRemove: String,
+        expectedGenresLeft: String
+    ) {
+        sourceEditor.setCompositionRawGenre(source, rawGenre).subscribe()
+        sourceEditor.removeCompositionGenre(source, genreToRemove).subscribe()
+
+        assertEquals(expectedGenresLeft, sourceEditor.getCompositionRawGenre(source))
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "'Test genre1, Test genre2, Test genre3', Test genre1, Test genre1_a, 'Test genre1_a, Test genre2, Test genre3'",
+        "'Test genre1, Test genre2', Test genre1, Test, 'Test, Test genre2'",
+        )
+    fun changeGenreTest(
+        rawGenre: String,
+        genreToChange: String,
+        newGenre: String,
+        expectedGenresLeft: String
+    ) {
+        println("before: $rawGenre")
+        println("replace: $genreToChange -> $newGenre")
+        sourceEditor.setCompositionRawGenre(source, rawGenre).subscribe()
+        sourceEditor.changeCompositionGenre(source, genreToChange, newGenre).subscribe()
+
+        val result = sourceEditor.getCompositionRawGenre(source)
+        println("after: $result")
+        assertEquals(expectedGenresLeft, result)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "'Test genre1, Test genre2', Test genre1, Test genre2",
+        "'Test genre1, Test genre2, Test genre3', Test genre1, Test genre2",
+        "'Test genre2, Test genre1, Test genre3', Test genre1, Test genre2",
+        "'Test genre2, Test genre3, Test genre1', Test genre1, Test genre2",
+        "'Test genre2, Test genre1, Test genre2', Test genre1, Test genre2",
+    )
+    fun changeGenreToDuplicateTest(
+        rawGenre: String,
+        genreToChange: String,
+        newGenre: String,
+    ) {
+        println("before: $rawGenre")
+        println("replace: $genreToChange -> $newGenre")
+        sourceEditor.setCompositionRawGenre(source, rawGenre).subscribe()
+        sourceEditor.changeCompositionGenre(source, genreToChange, newGenre)
+            .test()
+            .assertError { t -> t is GenreAlreadyPresentException }
     }
 
     @Test

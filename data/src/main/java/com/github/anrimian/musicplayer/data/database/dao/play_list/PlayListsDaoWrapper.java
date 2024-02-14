@@ -1,14 +1,16 @@
 package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
+import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArg;
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
+import com.github.anrimian.musicplayer.data.models.exceptions.DuplicatePlaylistEntriesException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListEntry;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlayList;
@@ -21,7 +23,9 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Function;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -31,18 +35,18 @@ public class PlayListsDaoWrapper {
 
     private final PlayListDao playListDao;
     private final CompositionsDao compositionsDao;
-    private final AppDatabase appDatabase;
+    private final LibraryDatabase libraryDatabase;
 
     public PlayListsDaoWrapper(PlayListDao playListDao,
                                CompositionsDao compositionsDao,
-                               AppDatabase appDatabase) {
+                               LibraryDatabase libraryDatabase) {
         this.playListDao = playListDao;
         this.compositionsDao = compositionsDao;
-        this.appDatabase = appDatabase;
+        this.libraryDatabase = libraryDatabase;
     }
 
     public void insertStoragePlaylist(StoragePlayList playList, List<StoragePlayListItem> entries) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             long storageId = playList.getStorageId();
             if (playListDao.isPlayListExistsByStorageId(storageId)) {
                 return;
@@ -62,7 +66,7 @@ public class PlayListsDaoWrapper {
                                Date dateAdded,
                                Date dateModified,
                                List<Long> compositionsIds) {
-        return appDatabase.runInTransaction(() -> {
+        return libraryDatabase.runInTransaction(() -> {
             long playlistId = playListDao.insertPlayList(null, name, dateAdded, dateModified);
             insertPlayListEntries(playlistId, compositionsIds);
             return playlistId;
@@ -70,7 +74,7 @@ public class PlayListsDaoWrapper {
     }
 
     public void setPlayListEntries(long playlistId, List<Long> compositionsIds) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             if (!playListDao.isPlaylistExists(playlistId)) {
                 return;
             }
@@ -117,8 +121,8 @@ public class PlayListsDaoWrapper {
         playListDao.updatePlayListName(id, name);
     }
 
-    public Observable<List<PlayList>> getPlayListsObservable() {
-        return playListDao.getPlayListsObservable();
+    public Observable<List<PlayList>> getPlayListsObservable(String searchQuery) {
+        return playListDao.getPlayListsObservable(getSearchArg(searchQuery));
     }
 
     public Observable<PlayList> getPlayListsObservable(long id) {
@@ -140,12 +144,30 @@ public class PlayListsDaoWrapper {
                 .map(entities -> mapList(entities, this::toItem));
     }
 
+    public Set<Long> getPlayListsForCompositions(List<Long> compositionIds) {
+        Set<Long> playlistsIds = new HashSet<>();
+        for (long compositionId: compositionIds) {
+            playlistsIds.addAll(playListDao.getPlaylistsForComposition(compositionId));
+        }
+        return playlistsIds;
+    }
+
+    public List<Long> getCompositionIdsInPlaylist(long playlistId) {
+        return playListDao.getCompositionIdsInPlaylist(playlistId);
+    }
+
+    public List<Composition> getCompositionsInPlaylist(long playlistId, boolean useFileName) {
+        String query = PlayListDao.getCompositionsQuery(useFileName);
+        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] { playlistId });
+        return playListDao.getCompositionsInPlaylist(sqlQuery);
+    }
+
     public List<PlayListEntry> getPlayListItemsAsFileEntries(long playListId) {
         return playListDao.getPlayListItemsAsFileEntries(playListId);
     }
 
     public int deletePlayListEntry(long id, long playListId) {
-        return appDatabase.runInTransaction(() -> {
+        return libraryDatabase.runInTransaction(() -> {
             int position = playListDao.selectPositionById(id);
             playListDao.deletePlayListEntry(id);
             playListDao.decreasePositionsAfter(position, playListId);
@@ -157,32 +179,38 @@ public class PlayListsDaoWrapper {
         insertPlayListItems(items, playListId, playListDao.selectMaxOrder(playListId));
     }
 
-    public void addCompositions(List<Composition> compositions,
-                                long playListId,
-                                int position) {
-        appDatabase.runInTransaction(() -> {
-            playListDao.increasePositionsByCountAfter(compositions.size(), position, playListId);
-
-            List<PlayListEntryEntity> entities = new ArrayList<>(compositions.size());
-            int orderPosition = position;
-            for (Composition item : compositions) {
-                PlayListEntryEntity entryEntity = new PlayListEntryEntity(
-                        null,
-                        item.getId(),
-                        playListId,
-                        orderPosition++
-                );
-                entities.add(entryEntity);
+    //? change checkForDuplicates, ignoreDuplicates to enum
+    // DuplicateCheckType: INSERT_ALL, INSERT_EXCLUDE_DUPLICATES, ABORT_ON_DUPLICATE
+    public List<Composition> addCompositions(List<Composition> compositions,
+                                             long playListId,
+                                             int position,
+                                             boolean checkForDuplicates,
+                                             boolean ignoreDuplicates) {
+        List<Composition> compositionsToInsert = compositions;
+        if (checkForDuplicates || ignoreDuplicates) {
+            List<Composition> duplicates = getCompositionsInPlaylist(playListId, compositions);
+            if (!duplicates.isEmpty()) {
+                if (!ignoreDuplicates) {
+                    boolean hasNonDuplicates = duplicates.size() < compositions.size();
+                    throw new DuplicatePlaylistEntriesException(duplicates, hasNonDuplicates);
+                }
+                compositionsToInsert = new ArrayList<>(compositions.size());
+                Set<Composition> duplicatesSet = new HashSet<>(duplicates);
+                for (Composition composition : compositions) {
+                    if (!duplicatesSet.contains(composition)) {
+                        compositionsToInsert.add(composition);
+                    }
+                }
             }
-            playListDao.insertPlayListEntries(entities);
-            playListDao.updatePlayListModifyTime(playListId, new Date());
-        });
+        }
+        addCompositions(compositionsToInsert, playListId, position);
+        return compositionsToInsert;
     }
 
     public void insertPlayListItems(List<StoragePlayListItem> items,
                                     long playListId,
                                     int position) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             playListDao.increasePositionsByCountAfter(items.size(), position, playListId);
 
             List<PlayListEntryEntity> entities = new ArrayList<>(items.size());
@@ -225,8 +253,8 @@ public class PlayListsDaoWrapper {
         return playListDao.findPlaylist(name);
     }
 
-    private PlayListItem toItem(PlayListEntryDto entryDto) {
-        return new PlayListItem(entryDto.getItemId(), entryDto.getComposition());
+    public int getPlaylistSize(long playListId) {
+        return playListDao.getPlaylistSize(playListId);
     }
 
     private void insertPlayListEntries(long playlistId, List<Long> compositionsIds) {
@@ -236,6 +264,44 @@ public class PlayListsDaoWrapper {
                 playListDao.insertPlayListEntry(null, compositionId, playlistId, i);
             }
         }
+    }
+
+    private void addCompositions(List<Composition> compositions,
+                                 long playListId,
+                                 int position) {
+        libraryDatabase.runInTransaction(() -> {
+            playListDao.increasePositionsByCountAfter(compositions.size(), position, playListId);
+
+            List<PlayListEntryEntity> entities = new ArrayList<>(compositions.size());
+            int orderPosition = position;
+            for (Composition item : compositions) {
+                PlayListEntryEntity entryEntity = new PlayListEntryEntity(
+                        null,
+                        item.getId(),
+                        playListId,
+                        orderPosition++
+                );
+                entities.add(entryEntity);
+            }
+            playListDao.insertPlayListEntries(entities);
+            playListDao.updatePlayListModifyTime(playListId, new Date());
+        });
+    }
+
+    private List<Composition> getCompositionsInPlaylist(long playListId, List<Composition> compositions) {
+        List<Long> playlistCompositions = playListDao.getCompositionIdsInPlaylist(playListId);
+        Set<Long> playlistCompositionsSet = new HashSet<>(playlistCompositions);
+        List<Composition> foundCompositions = new ArrayList<>();
+        for (Composition composition: compositions) {
+            if (playlistCompositionsSet.contains(composition.getId())) {
+                foundCompositions.add(composition);
+            }
+        }
+        return foundCompositions;
+    }
+
+    private PlayListItem toItem(PlayListEntryDto entryDto) {
+        return new PlayListItem(entryDto.getItemId(), entryDto.getComposition());
     }
 
     private String getUniquePlayListName(String name) {
@@ -251,4 +317,5 @@ public class PlayListsDaoWrapper {
         }
         return uniqueName;
     }
+
 }

@@ -8,8 +8,8 @@ android {
 
     def config = rootProject.ext
 
-    compileSdkVersion config.androidCompileSdkVersion
-    buildToolsVersion config.androidBuildToolsVersion
+    compileSdkVersion = config.androidCompileSdkVersion
+    buildToolsVersion = config.androidBuildToolsVersion
     defaultConfig {
         minSdkVersion config.androidMinSdkVersion
         targetSdkVersion config.androidTargetSdkVersion
@@ -64,52 +64,48 @@ dependencies {
 
     implementation project(':libs:filesync:core')
 
-    def deps = rootProject.ext
-
     implementation kotlinStdLib
 
-    implementation deps.appCompat
-    implementation deps.appCompatResources
-    implementation deps.material
-    implementation deps.recyclerView
-    implementation deps.constraintLayout
-    implementation deps.supportMedia
+    implementation appCompat
+    implementation appCompatResources
+    implementation material
+    implementation recyclerView
+    implementation constraintLayout
+    implementation supportMedia
 
-    implementation deps.rxAndroid
+    implementation rxAndroid
 
-    implementation deps.moxy
-    implementation deps.moxyAppcompat
-    implementation deps.moxyMaterial
-    implementation deps.moxyKtx
-    kapt deps.moxyCompiler
+    implementation moxy
+    implementation moxyAppcompat
+    implementation moxyMaterial
+    implementation moxyKtx
+    kapt moxyCompiler
 
-    implementation deps.dagger
-    kapt deps.daggerCompiler
+    implementation dagger
+    kapt daggerCompiler
 
-    implementation deps.room
-    kapt deps.roomCompiler
+    implementation room
+    kapt roomCompiler
 
-    implementation deps.glide
-    kapt deps.glideCompiler
+    implementation glide
+    kapt glideCompiler
 
-    implementation deps.slidr
+    implementation slidr
 
-    implementation deps.chipsLayoutManager
+    implementation chipsLayoutManager
 
-    compileOnly deps.javaxAnnotation
-    compileOnly deps.javaxGeneratedAnnotation
+    implementation rotateLayout
 
-    testImplementation deps.junit5
-    testImplementation deps.junit5Params
-    testRuntimeOnly deps.junit5Engine
-    testImplementation deps.mockito
+    compileOnly javaxAnnotation
+    compileOnly javaxGeneratedAnnotation
 
-    androidTestImplementation deps.androidXTestRunner
-    androidTestImplementation deps.junit5
-    androidTestImplementation deps.junit5PluginCore
-    androidTestRuntimeOnly deps.junit5PluginRunner
-//    androidTestImplementation deps.dexmaker
-//    androidTestImplementation deps.dexmakerMockito
-    androidTestImplementation deps.mockito
-    androidTestImplementation deps.espresso
+    testImplementation junit5
+    testImplementation junit5Params
+    testRuntimeOnly junit5Engine
+    testImplementation mockito
+
+    androidTestImplementation androidXTestRunner
+    androidTestImplementation junit5PluginCore
+    androidTestRuntimeOnly junit5PluginRunner
+    androidTestImplementation espresso
 }

@@ -9,7 +9,7 @@ import android.util.Log;
 import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList;
@@ -26,14 +26,14 @@ public class PlayListsDaoWrapperTest {
 
     private PlayListDao playListDao;
     private CompositionsDao compositionsDao;
-    private AppDatabase db;
+    private LibraryDatabase db;
 
     private PlayListsDaoWrapper daoWrapper;
 
     @BeforeEach
     public void setUp() {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
+        db = Room.inMemoryDatabaseBuilder(context, LibraryDatabase.class).build();
         compositionsDao = db.compositionsDao();
         playListDao = db.playListDao();
 
@@ -85,7 +85,7 @@ public class PlayListsDaoWrapperTest {
 //                new Change<>(playList3, duplicatePlayList3)
 //        ));
 
-        System.out.println("KEKAS" + daoWrapper.getPlayListsObservable().blockingFirst());
+        System.out.println("KEKAS" + daoWrapper.getPlayListsObservable(null).blockingFirst());
     }
 
     private void displayItems(String message, List<PlayListItem> items) {

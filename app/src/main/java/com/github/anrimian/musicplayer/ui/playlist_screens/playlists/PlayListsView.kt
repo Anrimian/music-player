@@ -1,20 +1,23 @@
 package com.github.anrimian.musicplayer.ui.playlist_screens.playlists
 
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import moxy.MvpView
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryView
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
+import moxy.viewstate.strategy.alias.Skip
 
-private const val LIST_STATE = "list_state"
-
-interface PlayListsView : MvpView {
+interface PlayListsView : BaseLibraryView {
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showEmptyList()
+
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
+    fun showEmptySearchResult()
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showList()
@@ -26,10 +29,10 @@ interface PlayListsView : MvpView {
     fun updateList(lists: List<PlayList>)
 
     @OneExecution
-    fun showConfirmDeletePlayListDialog(playList: PlayList)
+    fun showConfirmDeletePlayListsDialog(playLists: Collection<PlayList>)
 
     @OneExecution
-    fun showPlayListDeleteSuccess(playList: PlayList)
+    fun showPlayListsDeleteSuccess(playLists: Collection<PlayList>)
 
     @OneExecution
     fun showDeletePlayListError(errorCommand: ErrorCommand)
@@ -44,17 +47,36 @@ interface PlayListsView : MvpView {
     fun launchPickFolderScreen()
 
     @OneExecution
-    fun showErrorMessage(errorCommand: ErrorCommand)
-
-    @OneExecution
     fun showPlaylistExportSuccess(playlists: List<PlayList>)
 
     @OneExecution
     fun launchPlayListScreen(playlistId: Long)
+
+    @Skip
+    fun onPlaylistSelected(playlist: PlayList, position: Int)
+
+    @Skip
+    fun onPlaylistUnselected(playlist: PlayList, position: Int)
+
+    @Skip
+    fun setItemsSelected(selected: Boolean)
+
+    @AddToEndSingle
+    fun showSelectionMode(playlists: Set<PlayList>)
+
+    @OneExecution
+    fun showSelectPlayListDialog(playlists: Collection<PlayList>, closeMultiselect: Boolean)
+
+    @OneExecution
+    fun sendCompositions(compositions: List<Composition>)
 
     @OneExecution
     fun showOverwritePlaylistDialog()
 
     @OneExecution
     fun showNotCompletelyImportedPlaylistDialog(playlistId: Long, notFoundFilesCount: Int)
+
+    companion object {
+        private const val LIST_STATE = "list_state"
+    }
 }

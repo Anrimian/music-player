@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer;
 public interface Constants {
 
     String PLAYLIST_MIME_TYPE = "audio/x-mpegurl";
+    long EDIT_DIALOG_DELAY_MILLIS = 600;
 
     interface Actions {
         int PLAY = 1;
@@ -32,10 +33,7 @@ public interface Constants {
         String CAN_BE_EMPTY_ARG = "can_be_empty_arg";
         String COMPLETE_ON_ENTER_ARG = "complete_on_enter_arg";
         String EXTRA_DATA_ARG = "extra_data_arg";
-        String COMPOSITION_ARG = "composition_arg";
-        String MENU_ARG = "menu_arg";
         String HINTS_ARG = "hints_arg";
-        String PLAYLIST_ARG = "playlist_arg";
         String FILE_NAME_SETTING_ARG = "file_name_setting_arg";
         String HIGHLIGHT_COMPOSITION_ID = "highlight_composition_id";
         String IDS_ARG = "ids_arg";
@@ -58,25 +56,22 @@ public interface Constants {
         String FILE_NAME_TAG = "file_name_tag";
         String ALBUM_TAG = "album_tag";
         String ALBUM_ARTIST_TAG = "album_artist_tag";
-        String LYRICS = "lyrics_tag";
         String TRACK_NUMBER_TAG = "track_number_tag";
         String DISC_NUMBER_TAG = "disc_number_tag";
         String COMMENT_TAG = "comment_tag";
         String ADD_GENRE_TAG = "add_genre_tag";
         String EDIT_GENRE_TAG = "edit_genre_tag";
         String NEW_FOLDER_NAME_TAG = "new_folder_name_tag";
-        String GENRE_MENU_TAG = "genre_menu_tag";
-        String ARTIST_NAME_TAG = "artist_name_tag";
-        String GENRE_NAME_TAG = "genre_name_tag";
         String MESSAGE_ARG = "message_arg";
         String MESSAGE_RES_ARG = "message_res_arg";
         String PROGRESS_DIALOG_TAG = "progress_dialog_arg";
         String EDIT_COVER_TAG = "edit_cover_tag";
         String ENABLED_MEDIA_PLAYERS = "enabled_media_players";
+        String SPEED_SELECTOR_TAG = "speed_selector_tag";
     }
 
     interface Animation {
-        int TOOLBAR_ARROW_ANIMATION_TIME = 200;
+        long TOOLBAR_ARROW_ANIMATION_TIME = 200;
     }
 
     interface RemoteViewPlayerState {

@@ -4,24 +4,18 @@ import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.mvp.ListMvpView
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryView
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 import moxy.viewstate.strategy.alias.Skip
 
-interface BaseLibraryCompositionsView<C : Composition> : ListMvpView<C> {
+interface BaseLibraryCompositionsView<C : Composition> : ListMvpView<C>, BaseLibraryView {
 
     @OneExecution
     fun showSelectPlayListDialog()
-
-    @OneExecution
-    fun showAddingToPlayListError(errorCommand: ErrorCommand)
-
-    @OneExecution
-    fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>)
 
     @OneExecution
     fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>)
@@ -47,20 +41,11 @@ interface BaseLibraryCompositionsView<C : Composition> : ListMvpView<C> {
     @Skip
     fun shareCompositions(selectedCompositions: Collection<Composition>)
 
-    @OneExecution
-    fun showErrorMessage(errorCommand: ErrorCommand)
-
     @AddToEndSingle
     fun setDisplayCoversEnabled(isCoversEnabled: Boolean)
 
     @AddToEndSingle
     fun showRandomMode(isRandomModeEnabled: Boolean)
-
-    @OneExecution
-    fun onCompositionsAddedToPlayNext(compositions: List<Composition>)
-
-    @OneExecution
-    fun onCompositionsAddedToQueue(compositions: List<Composition>)
 
     @AddToEndSingle
     fun showCurrentComposition(currentComposition: CurrentComposition)

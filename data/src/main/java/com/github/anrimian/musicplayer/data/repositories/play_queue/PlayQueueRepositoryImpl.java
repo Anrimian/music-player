@@ -3,6 +3,10 @@ package com.github.anrimian.musicplayer.data.repositories.play_queue;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
 
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
+import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayQueueItemsException;
+import com.github.anrimian.musicplayer.domain.Constants;
+import com.github.anrimian.musicplayer.data.models.exceptions.NoCompositionsToInsertException;
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
@@ -67,9 +71,6 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
 
     @Override
     public Completable setPlayQueue(List<Long> compositionIds, int startPosition) {
-        if (compositionIds.isEmpty()) {
-            return Completable.complete();
-        }
         return Completable.fromAction(() -> insertNewQueue(compositionIds, startPosition))
                 .subscribeOn(scheduler);
     }
@@ -162,6 +163,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable addCompositionsToPlayNext(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
+            checkPlayQueueItemsCount(compositions.size());
             long id = uiStatePreferences.getCurrentQueueItemId();
             long firstId = playQueueDao.addCompositionsToQueue(compositions, id);
             if (id == NO_ITEM) {
@@ -173,6 +175,7 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     @Override
     public Completable addCompositionsToEnd(List<Composition> compositions) {
         return Completable.fromRunnable(() -> {
+            checkPlayQueueItemsCount(compositions.size());
             long id = uiStatePreferences.getCurrentQueueItemId();
             long firstId = playQueueDao.addCompositionsToEndQueue(compositions);
             if (id == NO_ITEM) {
@@ -213,6 +216,15 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
         );
     }
 
+    private void checkPlayQueueItemsCount(int itemsCountToInsert) {
+        if (itemsCountToInsert == 0) {
+            throw new NoCompositionsToInsertException();
+        }
+        if (playQueueDao.getPlayQueueSize() + itemsCountToInsert > Constants.PLAY_QUEUE_MAX_ITEMS_COUNT) {
+            throw new TooManyPlayQueueItemsException();
+        }
+    }
+
     private void setCurrentItem(@Nullable Long itemId) {
         if (itemId == null) {
             itemId = NO_ITEM;
@@ -221,6 +233,12 @@ public class PlayQueueRepositoryImpl implements PlayQueueRepository {
     }
 
     private void insertNewQueue(List<Long> compositionIds, int startPosition) {
+        if (compositionIds.isEmpty()) {
+            return;
+        }
+        if (compositionIds.size() > Constants.PLAY_QUEUE_MAX_ITEMS_COUNT) {
+            throw new TooManyPlayQueueItemsException();
+        }
         consumeDeletedItemEvent = true;
         long itemId = playQueueDao.insertNewPlayQueue(compositionIds,
                 settingsPreferences.isRandomPlayingEnabled(),

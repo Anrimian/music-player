@@ -26,6 +26,7 @@ class ExternalPlayerPresenter(
         subscribeOnErrorEvents()
         subscribeOnSpeedAvailableState()
         subscribeOnSpeedState()
+        interactor.getVolumeObservable().unsafeSubscribeOnUi(viewState::onVolumeChanged)
     }
 
     override fun onDestroy() {

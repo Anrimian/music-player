@@ -7,15 +7,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
+//support levels?
 public class RepeatListener implements OnTouchListener {
 
     private final static int TOUCH_OFFSET = 20;
-    private final static int CALL_COUNT_TO_INCREASE_SPEED = 5;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private final int initialInterval;
     private final int normalInterval;
+    private final int callCountToIncreaseSpeed;
     private final Runnable startListener;
     private final Runnable actionListener;
 
@@ -48,6 +49,7 @@ public class RepeatListener implements OnTouchListener {
 
     public RepeatListener(int initialInterval,
                           int normalInterval,
+                          int callCountToIncreaseSpeed,
                           Runnable startListener,
                           Runnable actionListener) {
         if (actionListener == null) {
@@ -59,6 +61,7 @@ public class RepeatListener implements OnTouchListener {
 
         this.initialInterval = initialInterval;
         this.normalInterval = normalInterval;
+        this.callCountToIncreaseSpeed = callCountToIncreaseSpeed;
         this.startListener = startListener;
         this.actionListener = actionListener;
     }
@@ -107,7 +110,7 @@ public class RepeatListener implements OnTouchListener {
     }
 
     private long getCallInterval() {
-        if (callCount <= CALL_COUNT_TO_INCREASE_SPEED) {
+        if (callCount <= callCountToIncreaseSpeed) {
             return normalInterval;
         } else {
             return normalInterval / 2;

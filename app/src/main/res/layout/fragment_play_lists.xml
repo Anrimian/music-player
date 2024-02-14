@@ -25,6 +25,7 @@
         android:layout_marginEnd="@dimen/margin_normal"
         android:tint="@android:color/white"
         android:contentDescription="@string/play_all"
+        app:shapeAppearanceOverlay="@style/FabShapeAppearance"
         app:fabSize="normal"
         app:layout_anchor="@id/rvPlayLists"
         app:layout_anchorGravity="bottom|right|end"

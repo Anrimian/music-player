@@ -4,10 +4,10 @@ import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
+import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import moxy.MvpView
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryView
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 import moxy.viewstate.strategy.alias.Skip
@@ -15,7 +15,7 @@ import moxy.viewstate.strategy.alias.Skip
 /**
  * Created on 02.11.2017.
  */
-interface PlayerView : MvpView {
+interface PlayerView : BaseLibraryView {
     
     @AddToEndSingle
     fun showPlayerState(isPlaying: Boolean)
@@ -51,12 +51,6 @@ interface PlayerView : MvpView {
     fun showShareCompositionDialog(composition: Composition)
 
     @OneExecution
-    fun showAddingToPlayListError(errorCommand: ErrorCommand)
-
-    @OneExecution
-    fun showAddingToPlayListComplete(playList: PlayList?, compositions: List<Composition>)
-
-    @OneExecution
     fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>)
 
     @OneExecution
@@ -69,13 +63,15 @@ interface PlayerView : MvpView {
     fun showDrawerScreen(selectedDrawerScreenId: Int, selectedPlayListScreenId: Long)
 
     @OneExecution
-    fun showLibraryScreen(selectedLibraryScreen: Int)
+    fun showLibraryScreen(
+        selectedLibraryScreen: Int,
+        selectedArtistScreenId: Long,
+        selectedAlbumScreenId: Long,
+        selectedGenreScreenId: Long
+    )
 
     @Skip
     fun startEditCompositionScreen(id: Long)
-
-    @OneExecution
-    fun showErrorMessage(errorCommand: ErrorCommand)
 
     @OneExecution
     fun showDeletedItemMessage()
@@ -100,5 +96,8 @@ interface PlayerView : MvpView {
 
     @AddToEndSingle
     fun showScreensSwipeEnabled(enabled: Boolean)
+
+    @AddToEndSingle
+    fun onVolumeChanged(volume: VolumeState)
 
 }

@@ -2,4 +2,5 @@
 <resources>
     <!--toolbar-->
     <dimen name="toolbar_player_content_start_padding">24dp</dimen>
+
 </resources>

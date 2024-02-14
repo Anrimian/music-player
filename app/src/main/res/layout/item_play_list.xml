@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/tv_play_list_name"
-        style="@style/TextStyle"
+        style="@style/TextStyleItemPrimary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
@@ -18,12 +18,11 @@
         app:layout_constraintEnd_toStartOf="@+id/btnActionsMenu"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:targetApi="lollipop"
         tools:text="cocompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositioncompositionmposition"/>
 
     <TextView
         android:id="@+id/tv_additional_info"
-        style="@style/Content.SecondaryText"
+        style="@style/TextStyleContentSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/content_spacing_margin"

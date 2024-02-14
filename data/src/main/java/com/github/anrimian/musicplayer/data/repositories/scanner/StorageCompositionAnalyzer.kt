@@ -5,7 +5,7 @@ import android.os.Environment
 import androidx.collection.LongSparseArray
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
 import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter
-import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao
 import com.github.anrimian.musicplayer.data.models.changes.Change
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderNode
 import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderTreeBuilder
@@ -17,11 +17,11 @@ import com.github.anrimian.musicplayer.domain.repositories.StateRepository
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils
 import java.io.File
-import java.util.*
+import java.util.LinkedList
 
 class StorageCompositionAnalyzer(
     private val compositionsDao: CompositionsDaoWrapper,
-    private val foldersDao: FoldersDaoWrapper,
+    private val ignoredFoldersDao: IgnoredFoldersDao,
     private val stateRepository: StateRepository,
     private val compositionsInserter: StorageCompositionsInserter,
     private val maxCutDirPath: String = Environment.getExternalStorageDirectory().absolutePath,
@@ -37,7 +37,7 @@ class StorageCompositionAnalyzer(
 
         actualTreeBuilder.createFileTree(actualCompositions)
             .cutCommonRoots(actualCompositions)
-            .excludeCompositions(actualCompositions, currentCompositions, foldersDao.ignoredFolders)
+            .excludeCompositions(actualCompositions, currentCompositions, ignoredFoldersDao.getIgnoredFolders())
 
         val addedCompositions = ArrayList<StorageFullComposition>()
         val deletedCompositions = ArrayList<StorageComposition>()

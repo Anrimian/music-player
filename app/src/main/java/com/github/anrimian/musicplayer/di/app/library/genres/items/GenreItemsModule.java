@@ -30,18 +30,18 @@ public class GenreItemsModule {
     @Provides
     @Nonnull
     GenreItemsPresenter genreItemsPresenter(LibraryGenresInteractor interactor,
-                                            PlayListsInteractor playListsInteractor,
                                             LibraryPlayerInteractor playerInteractor,
                                             DisplaySettingsInteractor displaySettingsInteractor,
                                             SyncInteractor<FileKey, ?, Long> syncInteractor,
+                                            PlayListsInteractor playListsInteractor,
                                             ErrorParser errorParser,
                                             @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new GenreItemsPresenter(id,
                 interactor,
-                playListsInteractor,
                 playerInteractor,
                 displaySettingsInteractor,
                 syncInteractor,
+                playListsInteractor,
                 errorParser,
                 uiScheduler);
     }

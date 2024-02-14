@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.common.compositions
 
 import com.github.anrimian.filesync.SyncInteractor
+import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
@@ -14,7 +15,7 @@ import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
-import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
@@ -22,13 +23,13 @@ import io.reactivex.rxjava3.disposables.Disposable
 import java.util.LinkedList
 
 abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibraryCompositionsView<C>>(
-    private val playerInteractor: LibraryPlayerInteractor,
-    private val playListsInteractor: PlayListsInteractor,
     private val displaySettingsInteractor: DisplaySettingsInteractor,
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
+    private val playerInteractor: LibraryPlayerInteractor,
+    playListsInteractor: PlayListsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler,
-) : AppPresenter<V>(uiScheduler, errorParser) {
+) : BaseLibraryPresenter<V>(playerInteractor, playListsInteractor, uiScheduler, errorParser) {
 
     private var currentCompositionDisposable: Disposable? = null
     private var compositionsDisposable: Disposable? = null
@@ -68,7 +69,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
             if (composition == currentComposition) {
                 playerInteractor.playOrPause()
             } else {
-                playerInteractor.startPlayingCompositions(compositions, position)
+                startPlaying(compositions, position)
                 viewState.showCurrentComposition(CurrentComposition(composition, true))
             }
             return
@@ -87,7 +88,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
         if (composition == currentComposition) {
             playerInteractor.playOrPause()
         } else {
-            playerInteractor.startPlayingCompositions(compositions, position)
+            startPlaying(compositions, position)
             viewState.showCurrentComposition(CurrentComposition(composition, true))
         }
     }
@@ -100,7 +101,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
 
     fun onPlayAllButtonClicked() {
         if (selectedCompositions.isEmpty()) {
-            playerInteractor.startPlayingCompositions(compositions)
+            startPlaying(compositions)
         } else {
             playSelectedCompositions()
         }
@@ -134,7 +135,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
     }
 
     fun onAddToQueueCompositionClicked(composition: Composition) {
-        addCompositionsToEnd(ListUtils.asList(composition))
+        addCompositionsToEndOfQueue(ListUtils.asList(composition))
     }
 
     fun onAddToPlayListButtonClicked(composition: Composition) {
@@ -150,11 +151,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
     }
 
     fun onPlayListToAddingSelected(playList: PlayList) {
-        playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
-            .subscribeOnUi(
-                { onAddingToPlayListCompleted(playList) },
-                this::onAddingToPlayListError
-            )
+        performAddToPlaylist(compositionsForPlayList, playList, ::onAddingToPlayListCompleted)
     }
 
     fun onSelectionModeBackPressed() {
@@ -182,12 +179,12 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
     }
 
     fun onAddToQueueSelectedCompositionsClicked() {
-        addCompositionsToEnd(ArrayList(selectedCompositions))
+        addCompositionsToEndOfQueue(ArrayList(selectedCompositions))
         closeSelectionMode()
     }
 
     fun onPlayActionSelected(position: Int) {
-        playerInteractor.startPlayingCompositions(compositions, position)
+        startPlaying(compositions, position)
     }
 
     fun onSearchTextChanged(text: String?) {
@@ -224,7 +221,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
         presenterDisposable.add(compositionsDisposable!!)
     }
 
-    protected fun onDefaultError(throwable: Throwable?) {
+    protected fun onDefaultError(throwable: Throwable) {
         val errorCommand = errorParser.parseError(throwable)
         viewState.showErrorMessage(errorCommand)
     }
@@ -234,32 +231,21 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
         viewState.showDeleteCompositionError(errorCommand)
     }
 
-    private fun onAddingToPlayListError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showAddingToPlayListError(errorCommand)
-    }
-
-    private fun onAddingToPlayListCompleted(playList: PlayList) {
-        viewState.showAddingToPlayListComplete(playList, compositionsForPlayList)
+    private fun onAddingToPlayListCompleted() {
         compositionsForPlayList.clear()
         if (selectedCompositions.isNotEmpty()) {
             closeSelectionMode()
         }
     }
 
-    private fun addCompositionsToPlayNext(compositions: List<Composition>) {
-        playerInteractor.addCompositionsToPlayNext(compositions)
-            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
-    }
-
-    private fun addCompositionsToEnd(compositions: List<Composition>) {
-        playerInteractor.addCompositionsToEnd(compositions)
-            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
-    }
-
     private fun playSelectedCompositions() {
-        playerInteractor.startPlayingCompositions(ArrayList(selectedCompositions))
+        startPlaying(ArrayList(selectedCompositions))
         closeSelectionMode()
+    }
+
+    private fun startPlaying(compositions: List<Composition>, firstPosition: Int = Constants.NO_POSITION) {
+        playerInteractor.setCompositionsQueueAndPlay(compositions, firstPosition)
+            .runOnUi(viewState::showErrorMessage)
     }
 
     private fun closeSelectionMode() {

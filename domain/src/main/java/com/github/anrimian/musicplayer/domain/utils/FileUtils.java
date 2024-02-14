@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.domain.utils;
 
-import java.io.File;
-
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
+
+import java.io.File;
 
 public class FileUtils {
 
@@ -41,13 +41,16 @@ public class FileUtils {
         return fileName;
     }
 
-    public static String getNewPath(String fullPath, String newFileName) {
+    public static String replaceFileName(String fullPath, String newFileName) {
         String fileName = FileUtils.formatFileName(fullPath);
+        if (fileName.equals(newFileName)) {
+            return fullPath;
+        }
         return TextUtils.replaceLast(fullPath, fileName, newFileName);
     }
 
     public static String getChangedFilePath(String fullPath, String newFileName) {
-        String newPath = getNewPath(fullPath, newFileName);
+        String newPath = replaceFileName(fullPath, newFileName);
         return getUniqueFilePath(newPath, newFileName);
     }
 
@@ -73,6 +76,24 @@ public class FileUtils {
 
                 newFileName = fileName + "(" + filesCount + ")";//hmm, check on new name like name(1)?
                 String newPath = filePath.replace(fileName, newFileName);
+
+                file = new File(newPath);
+            }
+        }
+        return file.getPath();
+    }
+
+    public static String getUniqueFilePath(String filePath) {
+        File file = new File(filePath);
+        int filesCount = 0;
+        String fileName = FileUtils.formatFileName(filePath);
+        if (file.exists()) {
+            while (file.exists()) {
+                filesCount++;
+
+                String newFileName = fileName + " (" + filesCount + ")";
+                String newPath = filePath.replace(fileName, newFileName);
+                fileName = newFileName;
 
                 file = new File(newPath);
             }

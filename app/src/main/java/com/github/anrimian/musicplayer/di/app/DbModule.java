@@ -2,8 +2,9 @@ package com.github.anrimian.musicplayer.di.app;
 
 import android.content.Context;
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.ConfigsDatabase;
 import com.github.anrimian.musicplayer.data.database.DatabaseManager;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
@@ -14,6 +15,7 @@ import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListDao;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
@@ -42,90 +44,90 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
-    AppDatabase provideAppDatabase(DatabaseManager databaseManager) {
-        return databaseManager.getAppDatabase();
+    LibraryDatabase provideAppDatabase(DatabaseManager databaseManager) {
+        return databaseManager.getLibraryDatabase();
     }
 
     @Provides
     @Nonnull
     @Singleton
-    PlayQueueDao playQueueDao(AppDatabase appDatabase) {
-        return appDatabase.playQueueDao();
+    PlayQueueDao playQueueDao(LibraryDatabase libraryDatabase) {
+        return libraryDatabase.playQueueDao();
     }
 
     @Provides
     @Nonnull
     @Singleton
-    CompositionsDao compositionsDao(AppDatabase appDatabase) {
-        return appDatabase.compositionsDao();
+    CompositionsDao compositionsDao(LibraryDatabase libraryDatabase) {
+        return libraryDatabase.compositionsDao();
     }
 
     @Provides
     @Nonnull
     @Singleton
-    PlayQueueDaoWrapper playQueueDaoWrapper(AppDatabase appDatabase, PlayQueueDao playQueueDao) {
-        return new PlayQueueDaoWrapper(appDatabase, playQueueDao);
+    PlayQueueDaoWrapper playQueueDaoWrapper(LibraryDatabase libraryDatabase, PlayQueueDao playQueueDao) {
+        return new PlayQueueDaoWrapper(libraryDatabase, playQueueDao);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    ArtistsDao artistsDao(AppDatabase appDatabase) {
-        return appDatabase.artistsDao();
+    ArtistsDao artistsDao(LibraryDatabase libraryDatabase) {
+        return libraryDatabase.artistsDao();
     }
 
     @Provides
     @Nonnull
     @Singleton
-    AlbumsDao albumssDao(AppDatabase appDatabase) {
-        return appDatabase.albumsDao();
+    AlbumsDao albumsDao(LibraryDatabase libraryDatabase) {
+        return libraryDatabase.albumsDao();
     }
 
     @Provides
     @Nonnull
     @Singleton
-    GenreDao genreDao(AppDatabase appDatabase) {
-        return appDatabase.genreDao();
+    GenreDao genreDao(LibraryDatabase libraryDatabase) {
+        return libraryDatabase.genreDao();
     }
 
     @Provides
     @Nonnull
     @Singleton
-    AlbumsDaoWrapper albumsDaoWrapper(AppDatabase appDatabase,
+    AlbumsDaoWrapper albumsDaoWrapper(LibraryDatabase libraryDatabase,
                                       AlbumsDao albumsDao,
                                       ArtistsDao artistsDao,
                                       ArtistsDaoWrapper artistsDaoWrapper) {
-        return new AlbumsDaoWrapper(appDatabase, albumsDao, artistsDao, artistsDaoWrapper);
+        return new AlbumsDaoWrapper(libraryDatabase, albumsDao, artistsDao, artistsDaoWrapper);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    ArtistsDaoWrapper artistsDaoWrapper(AppDatabase appDatabase,
+    ArtistsDaoWrapper artistsDaoWrapper(LibraryDatabase libraryDatabase,
                                         ArtistsDao artistsDao,
                                         AlbumsDao albumsDao) {
-        return new ArtistsDaoWrapper(appDatabase, artistsDao, albumsDao);
+        return new ArtistsDaoWrapper(libraryDatabase, artistsDao, albumsDao);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    GenresDaoWrapper genresDaoWrapper(AppDatabase appDatabase,
+    GenresDaoWrapper genresDaoWrapper(LibraryDatabase libraryDatabase,
                                       GenreDao genreDao,
                                       CompositionsDao compositionsDao) {
-        return new GenresDaoWrapper(appDatabase, genreDao, compositionsDao);
+        return new GenresDaoWrapper(libraryDatabase, genreDao, compositionsDao);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    CompositionsDaoWrapper compositionsDaoWrapper(AppDatabase appDatabase,
+    CompositionsDaoWrapper compositionsDaoWrapper(LibraryDatabase libraryDatabase,
                                                   ArtistsDao artistsDao,
                                                   CompositionsDao compositionsDao,
                                                   AlbumsDao albumsDao,
                                                   GenreDao genreDao,
                                                   FoldersDao foldersDao) {
-        return new CompositionsDaoWrapper(appDatabase,
+        return new CompositionsDaoWrapper(libraryDatabase,
                 artistsDao,
                 compositionsDao,
                 albumsDao,
@@ -136,24 +138,24 @@ public class DbModule {
     @Provides
     @Nonnull
     @Singleton
-    FoldersDao foldersDao(AppDatabase appDatabase) {
-        return appDatabase.foldersDao();
+    FoldersDao foldersDao(LibraryDatabase libraryDatabase) {
+        return libraryDatabase.foldersDao();
     }
 
     @Provides
     @Nonnull
     @Singleton
-    FoldersDaoWrapper foldersDaoWrapper(AppDatabase appDatabase,
+    FoldersDaoWrapper foldersDaoWrapper(LibraryDatabase libraryDatabase,
                                         FoldersDao foldersDao,
                                         CompositionsDaoWrapper compositionsDao) {
-        return new FoldersDaoWrapper(appDatabase, foldersDao, compositionsDao);
+        return new FoldersDaoWrapper(libraryDatabase, foldersDao, compositionsDao);
     }
 
     @Provides
     @Nonnull
     @Singleton
-    PlayListDao playListDao(AppDatabase appDatabase) {
-        return appDatabase.playListDao();
+    PlayListDao playListDao(LibraryDatabase libraryDatabase) {
+        return libraryDatabase.playListDao();
     }
 
     @Provides
@@ -161,7 +163,22 @@ public class DbModule {
     @Singleton
     PlayListsDaoWrapper playListsDaoWrapper(PlayListDao playListDao,
                                             CompositionsDao compositionsDao,
-                                            AppDatabase appDatabase) {
-        return new PlayListsDaoWrapper(playListDao, compositionsDao, appDatabase);
+                                            LibraryDatabase libraryDatabase) {
+        return new PlayListsDaoWrapper(playListDao, compositionsDao, libraryDatabase);
     }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    ConfigsDatabase configsDatabase(DatabaseManager databaseManager) {
+        return databaseManager.getConfigsDatabase();
+    }
+
+    @Provides
+    @Nonnull
+    @Singleton
+    IgnoredFoldersDao ignoredFoldersDao(ConfigsDatabase configsDatabase) {
+        return configsDatabase.ignoredFoldersDao();
+    }
+
 }

@@ -10,11 +10,14 @@
     <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
     <string name="source_code_link" translatable="false">https://github.com/Anrimian/music-player</string>
     <string name="privacy_policy_link" translatable="false">https://github.com/Anrimian/music-player/blob/master/privacy-policy.md</string>
+    <string name="patch_notes_link" translatable="false">https://github.com/Anrimian/music-player/releases</string>
 
     <string name="app_name" translatable="false">Music Player</string>
     <string name="useless_image" translatable="false">Useless image</string>
 
+    <!--strings for rare cases-->
     <string name="system_media_store_system_error" translatable="false">Android system can\'t find the system media storage. This is very strange and rare issue on android 10. Try to restart app or reboot the device, perhaps it will solve this problem.</string>
+    <string name="playlists_scanning_completed" translatable="false">Playlists scanning completed</string>
     <string name="empty_string" translatable="false"/>
 
     <string name="widget_small_name" translatable="false">3x1: Small</string>
@@ -30,6 +33,9 @@
     <string name="about_app_text_here" translatable="false">email me</string>
     <string name="privacy_policy" translatable="false">Privacy policy</string>
     <string name="about_app_text_here_link" translatable="false">here</string>
+    <string name="patchnotes" translatable="false">Patch notes</string>
+
+    <string name="percentage_template" translatable="false">%d%%</string>
 
     <!--experimental one-->
     <string name="app_has_no_system_permission_to_start" translatable="false">App has no system permission to start</string>

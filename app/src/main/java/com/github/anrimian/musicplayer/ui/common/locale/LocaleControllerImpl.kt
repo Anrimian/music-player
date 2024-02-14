@@ -5,13 +5,7 @@ import android.content.Context
 import android.content.res.Configuration
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper
-import java.util.*
-
-
-private const val PREFERENCES_NAME = "locale_preferences"
-
-private const val CURRENT_LANGUAGE_CODE = "current_language_code"
-private const val SYSTEM_LANGUAGE = "system_language"
+import java.util.Locale
 
 class LocaleControllerImpl(private val context: Context): LocaleController {
 
@@ -59,6 +53,13 @@ class LocaleControllerImpl(private val context: Context): LocaleController {
 
     private fun getCurrentLocaleCode(): String {
         return preferences.getString(CURRENT_LANGUAGE_CODE, SYSTEM_LANGUAGE)
+    }
+
+    private companion object {
+        const val PREFERENCES_NAME = "locale_preferences"
+
+        const val CURRENT_LANGUAGE_CODE = "current_language_code"
+        const val SYSTEM_LANGUAGE = "system_language"
     }
 
 }

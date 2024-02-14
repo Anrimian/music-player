@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.editor.composition
 
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
-import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
@@ -23,7 +22,7 @@ interface CompositionEditorView : MvpView {
     fun showCompositionLoadingError(errorCommand: ErrorCommand)
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = DISPLAY_COMPOSITION_STATE)
-    fun showComposition(composition: FullComposition)
+    fun showComposition(composition: FullComposition, genres: List<String>)
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = CHANGE_FILE_STATE)
     fun showChangeFileProgress()
@@ -68,13 +67,10 @@ interface CompositionEditorView : MvpView {
     fun showAddGenreDialog(genres: Array<String>?)
 
     @Skip
-    fun showEditGenreDialog(shortGenre: ShortGenre, genres: Array<String>?)
-
-    @AddToEndSingle
-    fun showGenres(shortGenres: List<ShortGenre>)
+    fun showEditGenreDialog(genre: String, genres: Array<String>?)
 
     @OneExecution
-    fun showRemovedGenreMessage(genre: ShortGenre)
+    fun showRemovedGenreMessage(genre: String)
 
     @Skip
     fun showCoverActionsDialog()
@@ -90,5 +86,8 @@ interface CompositionEditorView : MvpView {
 
     @Skip
     fun showEnterCommentDialog(composition: FullComposition)
+
+    @Skip
+    fun notifyGenreItemMoved(from: Int, to: Int)
 
 }

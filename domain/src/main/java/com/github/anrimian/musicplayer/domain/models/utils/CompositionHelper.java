@@ -13,6 +13,7 @@ import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
 import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
@@ -95,4 +96,12 @@ public class CompositionHelper {
     public static boolean isCompositionFileRemote(Composition composition) {
         return !composition.isFileExists() && composition.getInitialSource() == InitialSource.REMOTE;
     }
+
+    public static String[] splitGenres(String genres) {
+        if (genres == null || genres.isEmpty()) {
+            return new String[0];
+        }
+        return genres.split(Constants.GENRE_DIVIDER);
+    }
+
 }

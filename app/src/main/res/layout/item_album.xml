@@ -8,15 +8,13 @@
     android:background="?attr/listItemBackground">
 
     <com.google.android.material.imageview.ShapeableImageView
-        style="@style/BaseShapeableImageStyle"
+        style="@style/ImageStyle.ItemImage"
         android:id="@+id/ivMusicIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
         android:scaleType="centerCrop"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         android:contentDescription="@string/folder"
-        app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
+        app:shapeAppearance="@style/ShapeAppearance.CoverImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_album_name"
         tools:srcCompat="@drawable/ic_music_placeholder_simple" />

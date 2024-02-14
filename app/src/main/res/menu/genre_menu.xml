@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_play"
+        android:title="@string/play"
+        android:icon="@drawable/ic_play"/>
+    <item android:id="@+id/menu_play_next"
+        android:title="@string/play_next"
+        android:icon="@drawable/ic_play_next"/>
+    <item android:id="@+id/menu_add_to_queue"
+        android:title="@string/add_to_play_queue"
+        android:icon="@drawable/ic_add_to_queue"/>
+    <item android:id="@+id/menu_add_to_playlist"
+        android:title="@string/add_to_playlist"
+        android:icon="@drawable/ic_playlist_plus"/>
     <item android:id="@+id/menu_rename"
         android:title="@string/edit_name"
         android:icon="@drawable/ic_rename_box"
         app:showAsAction="always"/>
+    <item android:id="@+id/menu_share"
+        android:title="@string/share"
+        android:icon="@drawable/ic_share_variant"/>
 </menu>

@@ -12,7 +12,7 @@
     <item android:id="@+id/menu_albums"
         android:title="@string/albums"
         android:icon="@drawable/ic_album"/>
-<!-- <return genres after deep scan implementation> -->
-<!--    <item android:id="@+id/menu_genres"-->
-<!--        android:title="@string/genres"/>-->
+    <item android:id="@+id/menu_genres"
+        android:title="@string/genres"
+        android:icon="@drawable/ic_genres"/>
 </menu>

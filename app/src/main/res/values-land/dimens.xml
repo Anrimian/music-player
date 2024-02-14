@@ -9,4 +9,8 @@
     <!--snackbar-->
     <dimen name="snackbar_padding_vertical">8dp</dimen>
 
+    <!--volume popup-->
+    <dimen name="volume_button_vertical_padding">8dp</dimen>
+    <integer name="volume_popup_panel_gravity">16</integer><!--Gravity.CENTER_VERTICAL-->
+
 </resources>

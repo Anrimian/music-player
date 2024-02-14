@@ -15,7 +15,9 @@ import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.models.composition.ExternalComposition;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.models.CompositionMoveData;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition;
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
@@ -36,6 +38,13 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "(SELECT group_concat(name, '" + Constants.GENRE_DIVIDER + "') FROM ( " +
+            "   SELECT name" +
+            "   FROM genres " +
+            "   JOIN genre_entries AS entries ON entries.compositionId = compositions.id" +
+            "   WHERE id = entries.genreId " +
+            "   ORDER BY entries.position" +
+            ")) AS genres, " +
             "trackNumber as trackNumber, " +
             "discNumber as discNumber, " +
             "comment as comment, " +
@@ -63,6 +72,13 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "(SELECT group_concat(name, '" + Constants.GENRE_DIVIDER + "') FROM ( " +
+            "   SELECT name" +
+            "   FROM genres " +
+            "   JOIN genre_entries AS entries ON entries.compositionId = compositions.id" +
+            "   WHERE id = entries.genreId " +
+            "   ORDER BY entries.position" +
+            ")) AS genres, " +
             "trackNumber as trackNumber, " +
             "discNumber as discNumber, " +
             "comment as comment, " +
@@ -82,6 +98,33 @@ public interface CompositionsDao {
             "LIMIT 1")
     FullComposition getFullComposition(long id);
 
+    @Query("SELECT " +
+            "(WITH RECURSIVE path(level, name, parentId) AS (" +
+            "                SELECT 0, name, parentId " +
+            "                FROM folders " +
+            "                WHERE id = compositions.folderId " +
+            "                UNION ALL " +
+            "                SELECT path.level + 1, " +
+            "                       folders.name, " +
+            "                       folders.parentId " +
+            "                FROM folders " +
+            "                JOIN path ON folders.id = path.parentId " +
+            "            ), " +
+            "            path_from_root AS ( " +
+            "                SELECT name " +
+            "                FROM path " +
+            "                ORDER BY level DESC " +
+            "            ) " +
+            "            SELECT IFNULL(group_concat(name, '/'), '') " +
+            "            FROM path_from_root" +
+            ") AS parentPath, " +
+            "compositions.id AS id, " +
+            "compositions.storageId AS storageId, " +
+            "compositions.fileName AS fileName " +
+            "FROM compositions " +
+            "WHERE id = :id")
+    CompositionMoveData getCompositionMoveData(long id);
+
     @RawQuery(observedEntities = { CompositionEntity.class, ArtistEntity.class, AlbumEntity.class })
     Observable<List<Composition>> getCompositionsObservable(SupportSQLiteQuery query);
 
@@ -90,6 +133,9 @@ public interface CompositionsDao {
 
     @RawQuery
     List<Composition> executeQuery(SimpleSQLiteQuery sqlQuery);
+
+    @RawQuery
+    List<CompositionMoveData> executeQueryForMove(SimpleSQLiteQuery sqlQuery);
 
     @Query("SELECT " +
             "(" +
@@ -109,7 +155,7 @@ public interface CompositionsDao {
             "                FROM path " +
             "                ORDER BY level DESC " +
             "            ) " +
-            "            SELECT group_concat(name, '/') " +
+            "            SELECT IFNULL(group_concat(name, '/'), '') " +
             "            FROM path_from_root" +
             ") AS parentPath, " +
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
@@ -203,6 +249,9 @@ public interface CompositionsDao {
     @Query("UPDATE compositions SET folderId = :folderId WHERE id = :id")
     void updateFolderId(long id, Long folderId);
 
+    @Query("UPDATE compositions SET folderId = :folderId WHERE folderId = :fromFolderId")
+    void replaceFolderId(long fromFolderId, Long folderId);
+
     @Query("UPDATE compositions SET storageId = :storageId WHERE id = :id")
     void updateStorageId(long id, Long storageId);
 
@@ -247,6 +296,13 @@ public interface CompositionsDao {
             "title as title, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "(SELECT group_concat(name, '" + Constants.GENRE_DIVIDER + "') FROM ( " +
+            "   SELECT name" +
+            "   FROM genres " +
+            "   JOIN genre_entries AS entries ON entries.compositionId = compositions.id" +
+            "   WHERE id = entries.genreId " +
+            "   ORDER BY entries.position" +
+            ")) AS genres, " +
             "trackNumber as trackNumber, " +
             "discNumber as discNumber, " +
             "comment as comment, " +
@@ -283,7 +339,8 @@ public interface CompositionsDao {
             "WHERE parentId = :parentFolderId OR (parentId IS NULL AND :parentFolderId IS NULL)" +
             "UNION " +
             "SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
-            ") " +
+            "), " +
+            "entries(genreId, position) AS (SELECT genreId, position FROM genre_entries) " +
             "SELECT " +
             "(WITH RECURSIVE path(level, name, parentId) AS (" +
             "                SELECT 0, name, parentId " +
@@ -301,7 +358,7 @@ public interface CompositionsDao {
             "                FROM path " +
             "                ORDER BY level DESC " +
             "            ) " +
-            "            SELECT group_concat(name, '/') " +
+            "            SELECT IFNULL(group_concat(name, '/'), '') " +
             "            FROM path_from_root" +
             ") AS parentPath, " +
             "fileName as fileName, " +
@@ -309,6 +366,13 @@ public interface CompositionsDao {
             "(SELECT name FROM artists WHERE id = artistId) as artist, " +
             "(SELECT name FROM albums WHERE id = albumId) as album, " +
             "(SELECT name FROM artists WHERE id = (SELECT artistId FROM albums WHERE id = albumId)) as albumArtist, " +
+            "(SELECT group_concat(name, '" + Constants.GENRE_DIVIDER + "') FROM ( " +
+            "   SELECT name" +
+            "   FROM genres " +
+            "   JOIN genre_entries AS entries ON entries.compositionId = compositions.id" +
+            "   WHERE id = entries.genreId " +
+            "   ORDER BY entries.position" +
+            ")) AS genres, " +
             "trackNumber as trackNumber, " +
             "discNumber as discNumber, " +
             "comment as comment, " +
@@ -378,6 +442,34 @@ public interface CompositionsDao {
                 "FROM compositions");
     }
 
+    static StringBuilder getMoveCompositionQuery() {
+        return new StringBuilder(
+                "SELECT " +
+                        "(WITH RECURSIVE path(level, name, parentId) AS (" +
+                        "                SELECT 0, name, parentId " +
+                        "                FROM folders " +
+                        "                WHERE id = compositions.folderId " +
+                        "                UNION ALL " +
+                        "                SELECT path.level + 1, " +
+                        "                       folders.name, " +
+                        "                       folders.parentId " +
+                        "                FROM folders " +
+                        "                JOIN path ON folders.id = path.parentId " +
+                        "            ), " +
+                        "            path_from_root AS ( " +
+                        "                SELECT name " +
+                        "                FROM path " +
+                        "                ORDER BY level DESC " +
+                        "            ) " +
+                        "            SELECT IFNULL(group_concat(name, '/'), '') " +
+                        "            FROM path_from_root" +
+                        ") AS parentPath, " +
+                "compositions.id AS id, " +
+                "compositions.storageId AS storageId, " +
+                "compositions.fileName AS fileName " +
+                "FROM compositions");
+    }
+
     static String getCompositionSelectionQuery(boolean useFileName) {
         return "compositions.id AS id, " +
                 "compositions.storageId AS storageId, " +
@@ -429,7 +521,7 @@ public interface CompositionsDao {
                         "                FROM path " +
                         "                ORDER BY level DESC " +
                         "            ) " +
-                        "            SELECT group_concat(name, '/') " +
+                        "            SELECT IFNULL(group_concat(name, '/'), '') " +
                         "            FROM path_from_root" +
                         ") AS parentPath, " +
                         "fileName as fileName, " +

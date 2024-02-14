@@ -11,7 +11,7 @@ import android.content.Context;
 import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 public class CompositionsDaoWrapperTest {
 
-    private AppDatabase db;
+    private LibraryDatabase db;
     private CompositionsDao compositionsDao;
     private ArtistsDao artistsDao;
     private AlbumsDao albumsDao;
@@ -32,7 +32,7 @@ public class CompositionsDaoWrapperTest {
     @BeforeEach
     public void setUp() {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
+        db = Room.inMemoryDatabaseBuilder(context, LibraryDatabase.class).build();
         compositionsDao = db.compositionsDao();
         artistsDao = db.artistsDao();
         albumsDao = db.albumsDao();

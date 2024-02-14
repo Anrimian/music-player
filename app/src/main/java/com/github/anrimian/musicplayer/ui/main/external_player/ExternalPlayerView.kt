@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.main.external_player
 
 import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
+import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import moxy.MvpView
 import moxy.viewstate.strategy.alias.AddToEndSingle
@@ -30,5 +31,8 @@ interface ExternalPlayerView : MvpView {
 
     @AddToEndSingle
     fun showSpeedChangeFeatureVisible(visible: Boolean)
+
+    @AddToEndSingle
+    fun onVolumeChanged(volume: VolumeState)
 
 }

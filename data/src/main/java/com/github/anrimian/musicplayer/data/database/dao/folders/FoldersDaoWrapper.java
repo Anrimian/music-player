@@ -4,24 +4,24 @@ package com.github.anrimian.musicplayer.data.database.dao.folders;
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
 import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
+import com.github.anrimian.musicplayer.data.repositories.library.edit.models.CompositionMoveData;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.exceptions.FolderAlreadyIgnoredException;
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,14 +31,14 @@ import io.reactivex.rxjava3.core.Single;
 
 public class FoldersDaoWrapper {
 
-    private final AppDatabase appDatabase;
+    private final LibraryDatabase libraryDatabase;
     private final FoldersDao foldersDao;
     private final CompositionsDaoWrapper compositionsDao;
 
-    public FoldersDaoWrapper(AppDatabase appDatabase,
+    public FoldersDaoWrapper(LibraryDatabase libraryDatabase,
                              FoldersDao foldersDao,
                              CompositionsDaoWrapper compositionsDao) {
-        this.appDatabase = appDatabase;
+        this.libraryDatabase = libraryDatabase;
         this.foldersDao = foldersDao;
         this.compositionsDao = compositionsDao;
     }
@@ -76,13 +76,11 @@ public class FoldersDaoWrapper {
                 .map(list -> list.get(0));
     }
 
-    public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources,
-                                                                     boolean useFileName) {
+    public Single<List<Long>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources) {
         return Observable.fromIterable(fileSources)
-                .flatMap(source -> fileSourceToComposition(source, useFileName))
+                .flatMap(this::fileSourceToCompositionId)
                 .collect(ArrayList::new, List::add);
     }
-
     public Single<List<Composition>> extractAllCompositionsFromFiles(Iterable<FileSource> fileSources,
                                                                      Order order,
                                                                      boolean useFileName) {
@@ -109,43 +107,39 @@ public class FoldersDaoWrapper {
         return result;
     }
 
-    public IgnoredFolder insertIgnoredFolder(String path) {
-        Date addDate = new Date();
-        insertIgnoredFolder(path, addDate);
-        return new IgnoredFolder(path, addDate);
-    }
-
-    public void insertIgnoredFolder(String relativePath, Date addDate) {
-        long id = foldersDao.insert(relativePath, addDate);
-        if (id == -1) {
-            throw new FolderAlreadyIgnoredException();
-        }
-    }
-
     public void deleteFolder(Long folderId, Long[] childCompositions) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             compositionsDao.deleteAll(childCompositions);
             foldersDao.deleteFolder(folderId);
         });
     }
 
     public void deleteFolders(List<Long> folders, Long[] childCompositions) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             compositionsDao.deleteAll(childCompositions);
             foldersDao.deleteFolders(folders);
         });
     }
 
     public void changeFolderName(long folderId, String newName) {
+        Long parentId = foldersDao.getFolderParentId(folderId);
+        Long existingFolderId = foldersDao.getFolderByName(parentId, newName);
         foldersDao.changeFolderName(folderId, newName);
+        if (existingFolderId != null) {
+            //move all references out from existing folder and delete it
+            foldersDao.replaceParentId(existingFolderId, folderId);
+            compositionsDao.replaceFolderId(existingFolderId, folderId);
+            foldersDao.deleteFolder(existingFolderId);
+        }
     }
 
     public String getFullFolderPath(long folderId) {
         return foldersDao.getFullFolderPath(folderId);
     }
 
-    public List<Long> getAllChildFoldersId(Long parentId) {
-        return foldersDao.getAllChildFoldersId(parentId);
+    @NonNull
+    public String getFolderRelativePath(@Nullable Long folderId) {
+        return folderId == null? "" : foldersDao.getFullFolderPath(folderId);
     }
 
     public List<Long> getAllParentFoldersId(@Nullable Long currentFolder) {
@@ -157,16 +151,8 @@ public class FoldersDaoWrapper {
         return result;
     }
 
-    public String getFolderName(long folderId) {
-        return foldersDao.getFolderName(folderId);
-    }
-
-    public List<String> getChildFoldersNames(Long toFolderId) {
-        return foldersDao.getChildFoldersNames(toFolderId);
-    }
-
-    public void updateFolderId(Collection<FileSource> files, Long toFolderId) {
-        appDatabase.runInTransaction(() -> {
+    public void updateFolderId(Collection<FileSource> files, @Nullable Long toFolderId) {
+        libraryDatabase.runInTransaction(() -> {
             for (FileSource fileSource: files) {
                 if (fileSource instanceof CompositionFileSource) {
                     long id = ((CompositionFileSource) fileSource).getComposition().getId();
@@ -181,20 +167,21 @@ public class FoldersDaoWrapper {
         });
     }
 
+    public long moveCompositionsIntoFolder(@Nullable Long parentFolderId,
+                                           String directoryName,
+                                           Collection<FileSource> files) {
+        return libraryDatabase.runInTransaction(() -> {
+            Long folderId = foldersDao.getFolderByName(parentFolderId, directoryName);
+            if (folderId == null) {
+                folderId = createFolder(parentFolderId, directoryName);
+            }
+            updateFolderId(files, folderId);
+            return folderId;
+        });
+    }
+
     public long createFolder(Long parentId, String name) {
         return foldersDao.insertFolder(new FolderEntity(parentId, name));
-    }
-
-    public String[] getIgnoredFolders() {
-        return foldersDao.getIgnoredFolders();
-    }
-
-    public Observable<List<IgnoredFolder>> getIgnoredFoldersObservable() {
-        return foldersDao.getIgnoredFoldersObservable();
-    }
-
-    public void deleteIgnoredFolder(IgnoredFolder folder) {
-        foldersDao.deleteIgnoredFolder(folder.getRelativePath());
     }
 
     public boolean isFolderWithNameExists(Long parentId, String name) {
@@ -312,16 +299,17 @@ public class FoldersDaoWrapper {
         throw new IllegalStateException("unexpected file source: " + fileSource);
     }
 
-    private Observable<Composition> fileSourceToComposition(FileSource fileSource, boolean useFilename) {
+    private Observable<Long> fileSourceToCompositionId(FileSource fileSource) {
         if (fileSource instanceof CompositionFileSource) {
-            return Observable.just(((CompositionFileSource) fileSource).getComposition());
+            return Observable.just(((CompositionFileSource) fileSource).getComposition().getId());
         }
         if (fileSource instanceof FolderFileSource) {
-            return Observable.fromIterable(compositionsDao.getAllCompositionsInFolder(
-                    ((FolderFileSource) fileSource).getId(),
-                    useFilename
-            ));
+            return Observable.fromIterable(ListUtils.mapList(
+                    compositionsDao.getAllCompositionsInFolder(((FolderFileSource) fileSource).getId()),
+                    CompositionMoveData::getId)
+            );
         }
         throw new IllegalStateException("unexpected file source: " + fileSource);
     }
+
 }

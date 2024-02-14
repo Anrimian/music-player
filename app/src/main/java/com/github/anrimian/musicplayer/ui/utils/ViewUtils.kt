@@ -3,12 +3,14 @@ package com.github.anrimian.musicplayer.ui.utils
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
+import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
@@ -17,6 +19,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.animation.addListener
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 
@@ -57,7 +60,7 @@ fun View.moveToParent(newParent: ViewGroup) {
     newParent.addView(this)
 }
 
-fun AppCompatActivity.setToolbar(toolbar: Toolbar, @StringRes titleRes: Int) {
+fun AppCompatActivity.setToolbar(toolbar: Toolbar, @StringRes titleRes: Int = 0) {
     setSupportActionBar(toolbar)
     toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     val actionBar = supportActionBar
@@ -79,6 +82,27 @@ fun ViewPager2.reduceDragSensitivityBy(f: Int) {
         touchSlopField.set(recyclerView, touchSlop * f)
     } catch (ignored: NoSuchFieldException) {}
     catch (ignored: IllegalAccessException) {}
+}
+
+fun ViewPager2.setCurrentItem(
+    item: Int,
+    duration: Long,
+    interpolator: TimeInterpolator = AccelerateDecelerateInterpolator(),
+    pagePxWidth: Int = width // Default value taken from getWidth() from ViewPager2 view
+) {
+    val pxToDrag: Int = pagePxWidth * (item - currentItem)
+    val animator = ValueAnimator.ofInt(0, pxToDrag)
+    var previousValue = 0
+    animator.addUpdateListener { valueAnimator ->
+        val currentValue = valueAnimator.animatedValue as Int
+        val currentPxToDrag = (currentValue - previousValue).toFloat()
+        fakeDragBy(-currentPxToDrag)
+        previousValue = currentValue
+    }
+    animator.addListener(onStart = { beginFakeDrag() }, onEnd = { endFakeDrag() })
+    animator.interpolator = interpolator
+    animator.duration = duration
+    animator.start()
 }
 
 fun Context.createStyledButton(@StyleRes styleRes: Int): Button {

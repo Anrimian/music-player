@@ -1,27 +1,24 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
 import android.content.res.Resources;
-import androidx.annotation.DimenRes;
 import android.util.TypedValue;
 import android.widget.TextView;
 
-import static androidx.core.view.ViewCompat.isLaidOut;
+import androidx.annotation.DimenRes;
 
 /**
  * Created on 21.01.2018.
  */
 
-public class TextSizeDelegate implements SlideDelegate {
+public class TextSizeDelegate extends ViewSlideDelegate<TextView> {
 
     private final float startTextSize;
     private final float targetTextSize;
 
-    private final TextView textView;
-
     public TextSizeDelegate(TextView textView,
                             @DimenRes int startTextSize,
                             @DimenRes int targetTextSize) {
-        this.textView = textView;
+        super(textView);
 
         Resources resources = textView.getResources();
         this.startTextSize = resources.getDimensionPixelSize(startTextSize);
@@ -29,17 +26,10 @@ public class TextSizeDelegate implements SlideDelegate {
     }
 
     @Override
-    public void onSlide(float slideOffset) {
-        if (isLaidOut(textView)) {
-            moveView(slideOffset);
-        } else {
-            textView.post(() -> moveView(slideOffset));
-        }
+    protected void applySlide(TextView view, float slideOffset) {
+        float resultTextSize = (startTextSize + ((targetTextSize - startTextSize) * slideOffset));
+        view.setTextSize(TypedValue.COMPLEX_UNIT_PX, resultTextSize);
+        view.invalidate();
     }
 
-    private void moveView(float slideOffset) {
-        float resultTextSize = (startTextSize + ((targetTextSize - startTextSize) * slideOffset));
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resultTextSize);
-        textView.invalidate();
-    }
 }

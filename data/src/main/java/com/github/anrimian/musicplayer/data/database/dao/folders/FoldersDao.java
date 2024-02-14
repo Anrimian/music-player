@@ -3,40 +3,20 @@ package com.github.anrimian.musicplayer.data.database.dao.folders;
 import androidx.annotation.Nullable;
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.RawQuery;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
-import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFolderEntity;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
-import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 
-import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 
 @Dao
 public interface FoldersDao {
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(IgnoredFolderEntity entity);
-
-    @Query("INSERT OR IGNORE INTO ignored_folders (relativePath, addDate) " +
-            "VALUES (:relativePath, :addDate)")
-    long insert(String relativePath, Date addDate);
-
-    @Query("SELECT relativePath FROM ignored_folders")
-    String[] getIgnoredFolders();
-
-    @Query("SELECT relativePath, addDate FROM ignored_folders ORDER BY addDate")
-    Observable<List<IgnoredFolder>> getIgnoredFoldersObservable();
-
-    @Query("DELETE FROM ignored_folders WHERE relativePath = :path")
-    void deleteIgnoredFolder(String path);
 
     @RawQuery(observedEntities = { CompositionEntity.class, FolderEntity.class })
     Observable<List<FolderFileSource>> getFoldersObservable(SupportSQLiteQuery query);
@@ -67,6 +47,9 @@ public interface FoldersDao {
     @Query("UPDATE folders SET parentId = :toFolderId WHERE id = :id")
     void updateParentId(long id, Long toFolderId);
 
+    @Query("UPDATE folders SET parentId = :toFolderId WHERE parentId = :fromParentId")
+    void replaceParentId(long fromParentId, Long toFolderId);
+
     @Query("WITH RECURSIVE path(level, name, parentId) AS (" +
             "    SELECT 0, name, parentId" +
             "    FROM folders" +
@@ -83,17 +66,9 @@ public interface FoldersDao {
             "    FROM path" +
             "    ORDER BY level DESC" +
             ")" +
-            "SELECT group_concat(name, '/')" +
+            "SELECT IFNULL(group_concat(name, '/'), '')" +
             "FROM path_from_root")
     String getFullFolderPath(long folderId);
-
-    @Query("WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
-            "                SELECT id as childFolderId, id as rootFolderId FROM folders WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)" +
-            "                UNION" +
-            "                SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
-            "                )" +
-            "SELECT childFolderId FROM allChildFolders")
-    List<Long> getAllChildFoldersId(Long parentId);
 
     @Query("WITH RECURSIVE path(level, id, parentId) AS (" +
             "    SELECT 0, id, parentId" +
@@ -109,13 +84,9 @@ public interface FoldersDao {
             "SELECT id FROM path ORDER BY level DESC")
     List<Long> getAllParentFoldersId(Long folderId);
 
-    @Query("SELECT name FROM folders WHERE id = :folderId")
-    String getFolderName(long folderId);
-
-    @Query("SELECT name " +
-            "FROM folders " +
-            "WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)")
-    List<String> getChildFoldersNames(Long parentId);
+    @Nullable
+    @Query("SELECT parentId FROM folders WHERE id = :folderId")
+    Long getFolderParentId(long folderId);
 
     @Query("SELECT exists(" +
             "SELECT 1 " +
@@ -132,9 +103,6 @@ public interface FoldersDao {
             "AND name = :name " +
             "LIMIT 1")
     Long getFolderByName(Long parentId, String name);
-
-    @Query("SELECT exists(SELECT 1 FROM folders WHERE id = :id LIMIT 1)")
-    boolean isFolderExists(long id);
 
     @Query("WITH parentIds AS (SELECT parentId FROM folders)" +
             "DELETE FROM folders " +

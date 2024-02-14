@@ -17,33 +17,31 @@ import com.github.anrimian.musicplayer.ui.common.format.setProgressInfo
 import moxy.MvpAppCompatDialogFragment
 import moxy.ktx.moxyPresenter
 
-fun newShareCompositionsDialogFragment(
-    compositionIds: LongArray,
-) : ShareCompositionsDialogFragment {
-    return ShareCompositionsDialogFragment().apply {
-        arguments = Bundle().apply {
-            putLongArray(IDS_ARG, compositionIds)
+class ShareCompositionsDialogFragment: MvpAppCompatDialogFragment(), ShareCompositionsView {
+
+    companion object {
+        fun newInstance(compositionIds: LongArray) = ShareCompositionsDialogFragment().apply {
+            arguments = Bundle().apply {
+                putLongArray(IDS_ARG, compositionIds)
+            }
         }
     }
-}
-
-class ShareCompositionsDialogFragment: MvpAppCompatDialogFragment(), ShareCompositionsView {
 
     private val presenter by moxyPresenter {
         val ids = requireArguments().getLongArray(IDS_ARG)!!
         Components.getShareComponent(ids).shareCompositionsPresenter()
     }
 
-    private lateinit var viewBinding: DialogProgressHorizontalBinding
+    private lateinit var binding: DialogProgressHorizontalBinding
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        viewBinding = DialogProgressHorizontalBinding.inflate(LayoutInflater.from(context))
+        binding = DialogProgressHorizontalBinding.inflate(LayoutInflater.from(context))
 
-        viewBinding.btnTryAgain.setOnClickListener { presenter.onTryAgainClicked() }
+        binding.btnTryAgain.setOnClickListener { presenter.onTryAgainClicked() }
 
         val dialog = AlertDialog.Builder(context)
             .setTitle(R.string.preparing_files)
-            .setView(viewBinding.root)
+            .setView(binding.root)
             .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
             .create()
         dialog.show()
@@ -58,24 +56,24 @@ class ShareCompositionsDialogFragment: MvpAppCompatDialogFragment(), ShareCompos
 
     override fun showShareError(errorCommand: ErrorCommand?) {
         if (errorCommand == null) {
-            viewBinding.progressBar.visibility = View.VISIBLE
-            viewBinding.tvProgress.visibility = View.VISIBLE
-            viewBinding.tvError.visibility = View.GONE
-            viewBinding.btnTryAgain.visibility = View.GONE
+            binding.progressBar.visibility = View.VISIBLE
+            binding.tvProgress.visibility = View.VISIBLE
+            binding.tvError.visibility = View.GONE
+            binding.btnTryAgain.visibility = View.GONE
             return
         }
-        viewBinding.progressBar.visibility = View.GONE
-        viewBinding.tvProgress.visibility = View.GONE
-        viewBinding.tvError.visibility = View.VISIBLE
-        viewBinding.tvError.text = errorCommand.message
-        viewBinding.btnTryAgain.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        binding.tvProgress.visibility = View.GONE
+        binding.tvError.visibility = View.VISIBLE
+        binding.tvError.text = errorCommand.message
+        binding.btnTryAgain.visibility = View.VISIBLE
     }
 
     override fun showProcessedFileCount(processed: Int, total: Int) {
-        viewBinding.tvProgress.text = getString(R.string.downloading, processed, total)
+        binding.tvProgress.text = getString(R.string.downloading, processed, total)
     }
 
     override fun showDownloadingFileInfo(progressInfo: ProgressInfo) {
-        viewBinding.progressBar.setProgressInfo(progressInfo)
+        binding.progressBar.setProgressInfo(progressInfo)
     }
 }

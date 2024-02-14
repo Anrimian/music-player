@@ -10,9 +10,11 @@ import androidx.documentfile.provider.DocumentFile;
 
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
+import com.github.anrimian.musicplayer.data.models.exceptions.NoCompositionsToInsertException;
 import com.github.anrimian.musicplayer.data.models.exceptions.NoPlaylistItemsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlaylistNotCompletelyImportedException;
+import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayListItemsException;
 import com.github.anrimian.musicplayer.data.models.folders.UriFileReference;
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.PlaylistFilesStorage;
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.M3UEditor;
@@ -21,6 +23,7 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlis
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlayList;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
 import com.github.anrimian.musicplayer.data.utils.file.ContentProviderUtils;
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileReference;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
@@ -33,6 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,8 +86,8 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Observable<List<PlayList>> getPlayListsObservable() {
-        return playListsDao.getPlayListsObservable();
+    public Observable<List<PlayList>> getPlayListsObservable(String searchQuery) {
+        return playListsDao.getPlayListsObservable(searchQuery);
     }
 
     @Override
@@ -97,6 +101,36 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         return settingsRepository.getDisplayFileNameObservable()
                 .switchMap(useFileName ->
                         playListsDao.getPlayListItemsObservable(playlistId, useFileName, searchText));
+    }
+
+    @Override
+    public Single<List<Long>> getCompositionIdsInPlaylists(Iterable<PlayList> playlists) {
+        return Observable.fromIterable(playlists)
+                .map(playlist -> playListsDao.getCompositionIdsInPlaylist(playlist.getId()))
+                .<List<Long>>collect(ArrayList::new, List::addAll)
+                .subscribeOn(dbScheduler);
+    }
+
+    @Override
+    public Single<List<Composition>> getCompositionsInPlaylists(Iterable<PlayList> playlists) {
+        return Observable.fromIterable(playlists)
+                .map(playList -> playListsDao.getCompositionsInPlaylist(
+                        playList.getId(),
+                        settingsRepository.isDisplayFileNameEnabled())
+                )
+                .<List<Composition>>collect(ArrayList::new, List::addAll)
+                .subscribeOn(dbScheduler);
+    }
+
+    @Override
+    public Single<List<Composition>> getCompositionsByPlaylistsIds(Iterable<Long> playlistsIds) {
+        return Observable.fromIterable(playlistsIds)
+                .map(playlistId -> playListsDao.getCompositionsInPlaylist(
+                        playlistId,
+                        settingsRepository.isDisplayFileNameEnabled())
+                )
+                .<List<Composition>>collect(ArrayList::new, List::addAll)
+                .subscribeOn(dbScheduler);
     }
 
     @Override
@@ -117,19 +151,18 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Completable addCompositionsToPlayList(List<Composition> compositions,
-                                                 PlayList playList,
-                                                 int position) {
-        return addCompositionsToPlayList(compositions, playList.getId(), position);
-    }
-
-    @Override
-    public Completable addCompositionsToPlayList(List<Composition> compositions,
-                                                 PlayList playList,
-                                                 boolean checkForDuplicates) {
+    public Single<List<Composition>> addCompositionsToPlayList(List<Composition> compositions,
+                                                               PlayList playList,
+                                                               boolean checkForDuplicates,
+                                                               boolean ignoreDuplicates) {
         int position = settingsRepository.isPlaylistInsertStartEnabled()? 0 : playList.getCompositionsCount();
-        return addCompositionsToPlayList(compositions, playList, position)
-                .subscribeOn(dbScheduler);
+        return addCompositionsToPlayList(
+                compositions,
+                playList.getId(),
+                position,
+                checkForDuplicates,
+                ignoreDuplicates
+        ).subscribeOn(dbScheduler);
     }
 
     @Override
@@ -152,7 +185,10 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         return addCompositionsToPlayList(
                 asList(deletedItem.getComposition()),
                 deletedItemPlayListId,
-                deletedItemPosition);
+                deletedItemPosition,
+                false,
+                false)
+                .ignoreElement();
     }
 
     @Override
@@ -169,11 +205,11 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
     }
 
     @Override
-    public Completable moveItemInPlayList(PlayList playList, int from, int to) {
+    public Completable moveItemInPlayList(long playlistId, int from, int to) {
         return Completable.fromAction(() -> {
-            playListsDao.moveItems(playList.getId(), from, to);
-            updatePlaylistCache(playList.getId());
-            moveItemInStoragePlayList(playList, from, to);
+            playListsDao.moveItems(playlistId, from, to);
+            updatePlaylistCache(playlistId);
+            moveItemInStoragePlayList(playlistId, from, to);
         }).subscribeOn(dbScheduler);
     }
 
@@ -250,17 +286,41 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
         }).subscribeOn(dbScheduler);
     }
 
-    //media store playlist methods are quite slow, run on separate thread
-    private Completable addCompositionsToPlayList(List<Composition> compositions,
-                                                  long playListId,
-                                                  int position) {
-        return Completable.fromAction(() -> {
-                    playListsDao.addCompositions(compositions, playListId, position);
-                    updatePlaylistCache(playListId);
-                }).subscribeOn(dbScheduler)
-                .doOnComplete(() -> addCompositionsToStoragePlaylist(compositions, playListId, position));
+    @Override
+    public void updatePlaylistCache(long playlistId) {
+        AppPlayList playList = playListsDao.getPlayList(playlistId);
+        List<PlayListEntry> entries = playListsDao.getPlayListItemsAsFileEntries(playlistId);
+        PlayListFile playlistFile = new PlayListFile(playList.getName(),
+                playList.getDateAdded(),
+                playList.getDateModified(),
+                entries);
+        playlistFilesStorage.insertPlaylist(playlistFile);
     }
 
+    private Single<List<Composition>> addCompositionsToPlayList(List<Composition> compositions,
+                                                                long playListId,
+                                                                int position,
+                                                                boolean checkForDuplicates,
+                                                                boolean ignoreDuplicates) {
+        return Single.fromCallable(() ->{
+                    if (compositions.isEmpty()) {
+                        throw new NoCompositionsToInsertException();
+                    }
+                    if (playListsDao.getPlaylistSize(playListId) + compositions.size() > Constants.PLAY_LIST_MAX_ITEMS_COUNT) {
+                        throw new TooManyPlayListItemsException();
+                    }
+                    List<Composition> addedCompositions = playListsDao.addCompositions(compositions,
+                            playListId,
+                            position,
+                            checkForDuplicates,
+                            ignoreDuplicates);
+                    updatePlaylistCache(playListId);
+                    return addedCompositions;
+                }).subscribeOn(dbScheduler)
+                .doOnSuccess(c -> addCompositionsToStoragePlaylist(c, playListId, position));
+    }
+
+    //media store playlist methods are quite slow, run on separate thread
     private void addCompositionsToStoragePlaylist(List<Composition> compositions,
                                                   long playListId,
                                                   int position) {
@@ -276,9 +336,9 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                 .subscribe();
     }
 
-    private void moveItemInStoragePlayList(PlayList playList, int from, int to) {
+    private void moveItemInStoragePlayList(long playlistId, int from, int to) {
         Completable.fromAction(() -> {
-                    Long storageId = playListsDao.selectStorageId(playList.getId());
+                    Long storageId = playListsDao.selectStorageId(playlistId);
                     storagePlayListsProvider.moveItemInPlayList(storageId, from, to);
                 }).onErrorComplete()
                 .subscribeOn(slowBgScheduler)
@@ -295,16 +355,6 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
                 }).onErrorComplete()
                 .subscribeOn(slowBgScheduler)
                 .subscribe();
-    }
-
-    private void updatePlaylistCache(long playlistId) {
-        AppPlayList playList = playListsDao.getPlayList(playlistId);
-        List<PlayListEntry> entries = playListsDao.getPlayListItemsAsFileEntries(playlistId);
-        PlayListFile playlistFile = new PlayListFile(playList.getName(),
-                playList.getDateAdded(),
-                playList.getDateModified(),
-                entries);
-        playlistFilesStorage.insertPlaylist(playlistFile);
     }
 
 }

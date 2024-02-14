@@ -10,7 +10,8 @@ import androidx.room.Room;
 
 public class DatabaseManager {
 
-    private static final String DATABASE_NAME = "music_player_database";
+    private static final String LIBRARY_DATABASE_NAME = "music_player_database";
+    private static final String CONFIGS_DATABASE_NAME = "configs_database";
 
     private final Context context;
 
@@ -18,8 +19,8 @@ public class DatabaseManager {
         this.context = context;
     }
 
-    public AppDatabase getAppDatabase() {
-        return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME)
+    public LibraryDatabase getLibraryDatabase() {
+        return Room.databaseBuilder(context, LibraryDatabase.class, LIBRARY_DATABASE_NAME)
                 .addMigrations(Migrations.getMigration1_2(context),
                         Migrations.MIGRATION_2_3,
                         Migrations.getMigration3_4(context),
@@ -31,7 +32,14 @@ public class DatabaseManager {
                         Migrations.MIGRATION_9_10,
                         Migrations.MIGRATION_10_11,
                         Migrations.MIGRATION_11_12,
-                        Migrations.MIGRATION_12_13)
+                        Migrations.MIGRATION_12_13,
+                        Migrations.getMigration13_14(context),
+                        Migrations.MIGRATION_14_15)
                 .build();
     }
+
+    public ConfigsDatabase getConfigsDatabase() {
+        return Room.databaseBuilder(context, ConfigsDatabase.class, CONFIGS_DATABASE_NAME).build();
+    }
+
 }

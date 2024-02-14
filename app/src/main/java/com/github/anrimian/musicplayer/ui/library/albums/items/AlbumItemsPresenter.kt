@@ -17,17 +17,17 @@ import io.reactivex.rxjava3.core.Scheduler
 class AlbumItemsPresenter(
     private val albumId: Long,
     private val interactor: LibraryAlbumsInteractor,
-    playListsInteractor: PlayListsInteractor,
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
     syncInteractor: SyncInteractor<FileKey, *, Long>,
+    playListsInteractor: PlayListsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : BaseLibraryCompositionsPresenter<AlbumComposition, AlbumItemsView>(
-    playerInteractor,
-    playListsInteractor,
     displaySettingsInteractor,
     syncInteractor,
+    playerInteractor,
+    playListsInteractor,
     errorParser,
     uiScheduler
 ) {
@@ -51,8 +51,8 @@ class AlbumItemsPresenter(
         interactor.saveItemsListPosition(albumId, listPosition)
     }
 
-    fun onFragmentMovedToTop() {
-        //save selected screen. Wait a little for all screens
+    fun onFragmentResumed() {
+        interactor.setSelectedAlbumScreen(albumId)
     }
 
     fun onEditAlbumClicked() {

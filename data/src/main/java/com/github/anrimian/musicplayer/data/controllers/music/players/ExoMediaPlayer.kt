@@ -2,6 +2,20 @@ package com.github.anrimian.musicplayer.data.controllers.music.players
 
 import android.content.Context
 import android.net.Uri
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.audio.AudioProcessor
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.RenderersFactory
+import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioSink
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.source.UnrecognizedInputFormatException
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerController
 import com.github.anrimian.musicplayer.data.controllers.music.players.exoplayer.StereoVolumeProcessor
 import com.github.anrimian.musicplayer.data.controllers.music.players.utils.ExoPlayerMediaItemBuilder
@@ -10,15 +24,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.content.Composi
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
 import com.github.anrimian.musicplayer.domain.models.player.events.MediaPlayerEvent
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.audio.AudioCapabilities
-import com.google.android.exoplayer2.audio.AudioProcessor
-import com.google.android.exoplayer2.audio.AudioSink
-import com.google.android.exoplayer2.audio.DefaultAudioSink
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.UnrecognizedInputFormatException
-import com.google.android.exoplayer2.upstream.DefaultDataSource
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
@@ -26,11 +31,12 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
+@UnstableApi
 class ExoMediaPlayer(
     private val context: Context,
     private val uiScheduler: Scheduler,
     private val equalizerController: EqualizerController,
-    private val exoPlayerMediaItemBuilder: ExoPlayerMediaItemBuilder
+    private val exoPlayerMediaItemBuilder: ExoPlayerMediaItemBuilder,
 ) : AppMediaPlayer {
 
     private val playerEventsSubject = PublishSubject.create<MediaPlayerEvent>()
@@ -61,7 +67,7 @@ class ExoMediaPlayer(
 
     override fun prepareToPlay(
         source: CompositionContentSource,
-        previousException: Exception?
+        previousException: Exception?,
     ): Completable {
         return Single.just(exoPlayerMediaItemBuilder.createUri(source))
             .flatMap(this::createMediaSource)
@@ -180,25 +186,19 @@ class ExoMediaPlayer(
 
     private fun createSimpleRenderersFactory(
         context: Context,
-        vararg audioProcessors: AudioProcessor
+        vararg audioProcessors: AudioProcessor,
     ): RenderersFactory {
         return object : DefaultRenderersFactory(context) {
             override fun buildAudioSink(
-                context1: Context,
+                context: Context,
                 enableFloatOutput: Boolean,
                 enableAudioTrackPlaybackParams: Boolean,
-                enableOffload: Boolean
             ): AudioSink {
-                return DefaultAudioSink.Builder()
-                    .setAudioCapabilities(AudioCapabilities.getCapabilities(context1))
+                return DefaultAudioSink.Builder(context)
                     .setAudioProcessors(audioProcessors)
                     .setEnableFloatOutput(enableFloatOutput)
                     .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
-                    .setOffloadMode(if (enableOffload) {
-                        DefaultAudioSink.OFFLOAD_MODE_ENABLED_GAPLESS_REQUIRED
-                    } else {
-                        DefaultAudioSink.OFFLOAD_MODE_DISABLED
-                    }).build()
+                    .build()
             }
         }
     }

@@ -15,6 +15,8 @@ public class ExternalComposition {
     @Nullable
     private final String albumArtist;
     @Nullable
+    private final String genres;
+    @Nullable
     private final Long trackNumber;
     @Nullable
     private final Long discNumber;
@@ -37,6 +39,7 @@ public class ExternalComposition {
                                @Nullable String artist,
                                @Nullable String album,
                                @Nullable String albumArtist,
+                               @Nullable String genres,
                                @Nullable Long trackNumber,
                                @Nullable Long discNumber,
                                @Nullable String comment,
@@ -53,6 +56,7 @@ public class ExternalComposition {
         this.artist = artist;
         this.album = album;
         this.albumArtist = albumArtist;
+        this.genres = genres;
         this.trackNumber = trackNumber;
         this.discNumber = discNumber;
         this.comment = comment;
@@ -123,6 +127,11 @@ public class ExternalComposition {
     @Nullable
     public String getLyrics() {
         return lyrics;
+    }
+
+    @Nullable
+    public String getGenres() {
+        return genres;
     }
 
     public long getDuration() {

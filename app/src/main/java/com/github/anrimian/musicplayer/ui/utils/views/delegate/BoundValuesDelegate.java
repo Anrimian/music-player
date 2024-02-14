@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
+import com.github.anrimian.musicplayer.domain.utils.NumberUtilsKt;
+
 /**
  * Created on 21.01.2018.
  */
@@ -22,14 +24,6 @@ public class BoundValuesDelegate implements SlideDelegate {
 
     @Override
     public void onSlide(float slideOffset) {
-        float resultSlide;
-        if (slideOffset <= start) {
-            resultSlide = 0.0f;
-        } else if (slideOffset >= end) {
-            resultSlide = 1.0f;
-        } else {
-            resultSlide = (slideOffset - start) / (end - start);
-        }
-        delegate.onSlide(resultSlide);
+        delegate.onSlide(NumberUtilsKt.boundValue(slideOffset, start, end));
     }
 }

@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.ui.utils.views.delegate;
 
-import static androidx.core.view.ViewCompat.isLaidOut;
-
 import android.view.View;
 
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
@@ -10,15 +8,14 @@ import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
  * Created on 14.01.2018.
  */
 
-public class MoveXDelegate implements SlideDelegate {
+public class MoveXDelegate extends ViewSlideDelegate<View> {
 
     private int baseWidth = -1;
 
     private final float expandPercent;
-    private final View view;
 
     public MoveXDelegate(float expandPercent, View view) {
-        this.view = view;
+        super(view);
         if (ViewUtils.isRtl(view)) {
             this.expandPercent = expandPercent*-1;
         } else {
@@ -27,19 +24,12 @@ public class MoveXDelegate implements SlideDelegate {
     }
 
     @Override
-    public void onSlide(float slideOffset) {
-        if (isLaidOut(view)) {
-            moveView(slideOffset);
-        } else {
-            view.post(() -> moveView(slideOffset));
-        }
-    }
-
-    private void moveView(float slideOffset) {
+    protected void applySlide(View view, float slideOffset) {
         if (baseWidth == -1) {
             baseWidth = view.getWidth();
         }
         int width = (int) (baseWidth * (1 - slideOffset * expandPercent));
         view.setTranslationX(baseWidth - width);
     }
+
 }

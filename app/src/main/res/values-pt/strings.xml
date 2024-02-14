@@ -12,7 +12,6 @@
     <string name="file_not_found">Arquivo não encontrado</string>
     <string name="compositions_on_device_not_found">Nenhuma música encontrada no dispositivo</string>
     <string name="compositions_and_folders_for_search_not_found">Composições e pastas correspondentes aos resultados da pesquisa não encontrados</string>
-    <string name="compositions_for_search_not_found">Não foram encontrados resultados de pesquisa correspondentes</string>
     <string name="foreground_channel_description">Notificação de reprodução em primeiro plano</string>
     <string name="previous_track">Música anterior</string>
     <string name="next_track">Próxima música</string>
@@ -292,6 +291,22 @@
     <string name="playlist_has_no_records">A playlist não tem registros</string>
     <string name="export_playlists_success">O arquivo \"%1$s.m3u\" foi salvo no armazenamento interno</string>
     <!---->
+    <!--not verified-->
+    <string name="name_is_too_long">nome é muito longo</string>
+    <string name="play_queue_items_limit_error">A contagem de itens da fila de reprodução não pode ser superior a %d</string>
+    <string name="play_list_items_limit_error">A contagem de itens da lista de reprodução não pode ser superior a %d</string>
+    <string name="volume_up">Aumentar o volume</string>
+    <string name="volume_down">Diminuir volume</string>
+    <string name="no_matching_search_results_found">Nenhum resultado de pesquisa correspondente encontrado</string>
+    <string name="covers_shape">Forma da capa</string>
+    <string name="play_once">Jogar uma vez</string>
+    <string name="back">Voltar</string>
+    <string name="duplicates_detected">Duplicatas detectadas</string>
+    <string name="playlist_duplicates_description">Algumas composições já estão na playlist \'%1$s\'. \nAdicioná-los mesmo assim?</string>
+    <string name="check_for_duplicates">Verifique se há duplicatas na playlist antes de adicionar novas composições</string>
+    <string name="more_template">…%d mais</string>
+    <string name="add_without_duplicates">Adicionar sem duplicatas</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s música</item>
@@ -361,6 +376,17 @@
     <plurals name="playlist_import_partial_success">
         <item quantity="one">A playlist foi importada com sucesso, mas o arquivo %d não foi encontrado na biblioteca</item>
         <item quantity="other">A playlist foi importada com sucesso, mas %d arquivos não foram encontrados na biblioteca</item>
+    </plurals>
+    <!---->
+    <!--not verified-->
+    <plurals name="delete_playlists_template">
+        <item quantity="one">Excluir %d lista de reprodução</item>
+        <item quantity="other">Excluir %d listas de reprodução</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d lista de reprodução excluída</item>
+        <item quantity="other">%d playlists excluídas</item>
     </plurals>
     <!---->
 

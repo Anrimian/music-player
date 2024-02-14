@@ -16,6 +16,9 @@ import androidx.appcompat.widget.PublicActionMenuPresenter;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow;
 
+/**
+ * Do not refactor this to kotlin, it has access to restricted access classes
+ */
 public class ActionMenuUtil {
 
     public static Menu setupMenu(ActionMenuView actionMenuView,

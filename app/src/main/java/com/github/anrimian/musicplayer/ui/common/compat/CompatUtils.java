@@ -5,6 +5,7 @@ import static com.github.anrimian.musicplayer.ui.utils.AndroidUtils.getColorFrom
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Build;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.core.graphics.ColorUtils;
@@ -33,7 +34,7 @@ public class CompatUtils {
         }
     }
 
-    public static void setOutlineTextButtonStyle(TextView button) {
+    public static void setOutlineTextButtonStyle(View button) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             Context context = button.getContext();
             int[][] states = new int[][]{

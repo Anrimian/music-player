@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_chip"
+    android:paddingEnd="@dimen/chip_spacing_margin"
+    android:paddingBottom="@dimen/chip_spacing_margin"
+    tools:ignore="RtlSymmetry">
+
+    <TextView
+        android:id="@+id/tvAdd"
+        style="@style/TextStyle.Chip"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/chip_height"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/chip_horizontal_margin"
+        android:text="@string/add_composition_genre"
+        android:drawablePadding="4dp"
+        tools:drawableStart="@drawable/ic_shape_circle_plus"/>
+
+</FrameLayout>

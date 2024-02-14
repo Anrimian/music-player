@@ -7,13 +7,13 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
-import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
-import com.github.anrimian.musicplayer.ui.library.LibraryFragment
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFragment
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 
-abstract class BaseLibraryCompositionsFragment : LibraryFragment() {
+abstract class BaseLibraryCompositionsFragment : BaseLibraryFragment() {
     
-    protected abstract fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<*, *>
+    abstract override fun getLibraryPresenter(): BaseLibraryCompositionsPresenter<*, *>
 
     protected fun onActionModeItemClicked(menuItem: MenuItem) {
         when (menuItem.itemId) {
@@ -43,7 +43,7 @@ abstract class BaseLibraryCompositionsFragment : LibraryFragment() {
             R.id.menu_play_next -> getLibraryPresenter().onPlayNextCompositionClicked(composition)
             R.id.menu_add_to_queue -> getLibraryPresenter().onAddToQueueCompositionClicked(composition)
             R.id.menu_add_to_playlist -> getLibraryPresenter().onAddToPlayListButtonClicked(composition)
-            R.id.menu_edit -> startActivity(newCompositionEditorIntent(requireContext(), composition.id))
+            R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.id))
             R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), composition)
             R.id.menu_share -> shareComposition(this, composition)
             R.id.menu_delete -> getLibraryPresenter().onDeleteCompositionButtonClicked(composition)

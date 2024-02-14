@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
@@ -33,8 +34,9 @@
     <application
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:allowBackup="false"
-        android:fullBackupContent="false"
+        android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:requestLegacyExternalStorage="true"
         tools:ignore="UnusedAttribute"
         tools:replace="android:allowBackup">
@@ -93,6 +95,10 @@
 
         <activity android:name=".ui.editor.album.AlbumEditorActivity"
             android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/SlidrActivityTheme"/>
+
+        <activity android:name=".ui.editor.lyrics.LyricsEditorActivity"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/SlidrActivityTheme"/>
 
         <service android:name=".infrastructure.service.music.MusicService"

@@ -1,8 +1,6 @@
 package com.github.anrimian.musicplayer.ui.library.folders.adapter
 
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.RippleDrawable
 import android.view.View
 import android.view.ViewGroup
 import com.github.anrimian.musicplayer.R
@@ -11,10 +9,8 @@ import com.github.anrimian.musicplayer.domain.Payloads
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
+import com.github.anrimian.musicplayer.ui.common.format.wrappers.ItemBackgroundWrapper
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
-import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener
 
 /**
@@ -27,40 +23,28 @@ internal class FolderViewHolder(
     onLongClickListener: (Int, FileSource) -> Unit,
 ) : FileViewHolder(parent, R.layout.item_storage_folder), SwipeListener {
 
-    private val viewBinding = ItemStorageFolderBinding.bind(itemView)
+    private val binding = ItemStorageFolderBinding.bind(itemView)
 
     private lateinit var folder: FolderFileSource
 
-    private val backgroundDrawable = ItemDrawable()
-    private val stateDrawable = ItemDrawable()
-    private val rippleMaskDrawable = ItemDrawable()
+    private val itemBackgroundWrapper = ItemBackgroundWrapper(itemView, binding.clickableItem)
 
     private var isSelected = false
     private var isSelectedForMove = false
     private var isSwiping = false
 
     init {
-        viewBinding.clickableItem.setOnClickListener {
+        binding.clickableItem.setOnClickListener {
             onFolderClickListener(bindingAdapterPosition, folder)
         }
-        ViewUtils.onLongClick(viewBinding.clickableItem) {
+        ViewUtils.onLongClick(binding.clickableItem) {
             if (isSelected) {
                 return@onLongClick
             }
             selectImmediate()
             onLongClickListener(bindingAdapterPosition, folder)
         }
-        viewBinding.btnActionsMenu.setOnClickListener { v -> onMenuClickListener(v, folder) }
-
-        backgroundDrawable.setColor(context.colorFromAttr(R.attr.listItemBackground))
-        itemView.background = backgroundDrawable
-        stateDrawable.setColor(Color.TRANSPARENT)
-        viewBinding.clickableItem.background = stateDrawable
-        viewBinding.clickableItem.foreground = RippleDrawable(
-            ColorStateList.valueOf(context.colorFromAttr(android.R.attr.colorControlHighlight)),
-            null,
-            rippleMaskDrawable
-        )
+        binding.btnActionsMenu.setOnClickListener { v -> onMenuClickListener(v, folder) }
     }
 
     override fun setSelected(selected: Boolean) {
@@ -85,18 +69,11 @@ internal class FolderViewHolder(
         val swiping = swipeOffset > 0.0f
         if (isSwiping != swiping) {
             isSwiping = swiping
-            val swipedCorners = context.resources.getDimension(R.dimen.swiped_item_corners)
+            val swipedCorners = getResources().getDimension(R.dimen.swiped_item_corners)
             val from: Float = if (swiping) 0f else swipedCorners
             val to: Float = if (swiping) swipedCorners else 0f
-            val duration = context.resources.getInteger(R.integer.swiped_item_animation_time)
-            AndroidUtils.animateItemDrawableCorners(
-                from,
-                to,
-                duration,
-                backgroundDrawable,
-                stateDrawable,
-                rippleMaskDrawable
-            )
+            val duration = getResources().getInteger(R.integer.swiped_item_animation_time)
+            itemBackgroundWrapper.animateItemDrawableCorners(from, to, duration)
         }
     }
 
@@ -131,12 +108,12 @@ internal class FolderViewHolder(
     }
 
     private fun showFilesCount() {
-        val text = FormatUtils.formatCompositionsCount(context, folder.filesCount)
-        viewBinding.tvCompositionsCount.text = text
+        val text = FormatUtils.formatCompositionsCount(getContext(), folder.filesCount)
+        binding.tvCompositionsCount.text = text
     }
 
     private fun showFolderName() {
-        viewBinding.tvFolderName.text = folder.name
+        binding.tvFolderName.text = folder.name
     }
 
     private fun updateSelectionState() {
@@ -147,11 +124,11 @@ internal class FolderViewHolder(
         } else {
             Color.TRANSPARENT
         }
-        ViewUtils.animateItemDrawableColor(stateDrawable, stateColor)
+        itemBackgroundWrapper.showStateColor(stateColor, true)
     }
 
     private fun selectImmediate() {
-        stateDrawable.setColor(selectionColor)
+        itemBackgroundWrapper.showStateColor(selectionColor, false)
         isSelected = true
     }
 }

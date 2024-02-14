@@ -130,6 +130,6 @@ open class CompositionViewHolder<T: Composition>(
     }
 
     @ColorInt
-    private fun getPlaySelectionColor() = ColorFormatUtils.getPlayingCompositionColor(context, 25)
+    private fun getPlaySelectionColor() = ColorFormatUtils.getPlayingCompositionColor(getContext(), 25)
 
 }

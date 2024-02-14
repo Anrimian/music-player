@@ -13,7 +13,6 @@
     <string name="file_not_found">Файл не знайдено</string>
     <string name="compositions_on_device_not_found">Композицій на пристрої не знайдено</string>
     <string name="compositions_and_folders_for_search_not_found">Композицій і папок, відповідних до результатів пошуку, не знайдено</string>
-    <string name="compositions_for_search_not_found">Композицій, відповідних до результатів пошуку, не знайдено</string>
     <string name="foreground_channel_description">Сповіщення про проигравання музики</string>
     <string name="previous_track">Минулий трек</string>
     <string name="next_track">Наступний трек</string>
@@ -276,6 +275,20 @@
     <string name="overwrite_playlist">Плейлист з таки іменем вже існує. \nПерезаписати його?</string>
     <string name="playlist_has_no_records">Плейлист не має композицій</string>
     <string name="export_playlists_success">Файл \"%1$s.m3u\" було збережено у внутрішнє сховище</string>
+    <string name="name_is_too_long">ім\'я занадто довге</string>
+    <string name="play_queue_items_limit_error">Кількість елементів у черзі відтворення не може перевищувати %d</string>
+    <string name="play_list_items_limit_error">Кількість елементів у плейлисті не може перевищувати %d</string>
+    <string name="volume_up">Збільшити гучність</string>
+    <string name="volume_down">Зменшити гучність</string>
+    <string name="no_matching_search_results_found">Відповідних результатів пошуку не знайдено</string>
+    <string name="covers_shape">Форма обкладинок</string>
+    <string name="play_once">Грати один раз</string>
+    <string name="back">Назад</string>
+    <string name="duplicates_detected">Виявлено дублікати</string>
+    <string name="playlist_duplicates_description">Деякі композиції вже є в плейлисті \'%1$s\'. \nВсе одно додати їх?</string>
+    <string name="check_for_duplicates">Перевіряти плейлист на дублікати перед додаванням нових композицій</string>
+    <string name="more_template">…ще %d</string>
+    <string name="add_without_duplicates">Додати без дублікатів</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиція</item>
@@ -366,6 +379,20 @@
         <item quantity="few">Плейлист було імпортовано успішно, але %d файли були не знайдені в бібліотеці</item>
         <item quantity="many">Плейлист було імпортовано успішно, але %d файлів були не знайдені в бібліотеці</item>
         <item quantity="other">Плейлист було імпортовано успішно, але %d файлів були не знайдені в бібліотеці</item>
+    </plurals>
+
+    <plurals name="delete_playlists_template">
+        <item quantity="one">Видалити %d плейлист</item>
+        <item quantity="few">Видалити %d плейлисти</item>
+        <item quantity="many">Видалити %d плейлистів</item>
+        <item quantity="other">Видалити %d плейлистів</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d плейлист видалено</item>
+        <item quantity="few">%d плейлисти видалено</item>
+        <item quantity="many">%d плейлистів видалено</item>
+        <item quantity="other">%d плейлистів видалено</item>
     </plurals>
 
 </resources>

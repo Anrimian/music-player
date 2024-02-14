@@ -4,19 +4,16 @@ import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryView
 import com.github.anrimian.musicplayer.ui.utils.moxy.SingleOneExecution
-import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 import moxy.viewstate.strategy.alias.Skip
 
-private const val LIST_STATE = "list_state"
-
-interface PlayQueueView : MvpView {
+interface PlayQueueView : BaseLibraryView {
 
     @AddToEndSingle
     fun showPlayerState(isPlaying: Boolean)
@@ -42,15 +39,6 @@ interface PlayQueueView : MvpView {
     @OneExecution
     fun showDeletedItemMessage()
 
-    @OneExecution
-    fun showErrorMessage(errorCommand: ErrorCommand)
-
-    @OneExecution
-    fun showAddingToPlayListComplete(playList: PlayList?, compositions: List<Composition>)
-
-    @OneExecution
-    fun showAddingToPlayListError(errorCommand: ErrorCommand)
-
     @AddToEndSingle
     fun setPlayQueueCoversEnabled(isCoversEnabled: Boolean)
 
@@ -68,5 +56,9 @@ interface PlayQueueView : MvpView {
 
     @AddToEndSingle
     fun showFilesSyncState(states: Map<Long, FileSyncState>)
+
+    private companion object {
+        const val LIST_STATE = "list_state"
+    }
 
 }

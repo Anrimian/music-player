@@ -6,13 +6,13 @@
     android:layout_height="wrap_content"
     android:background="?attr/listItemBackground">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_folder_icon"
         style="@style/ImageStyle.ItemImage"
-        android:padding="@dimen/padding_small"
-        android:background="@drawable/bg_folder_round"
+        android:background="?attr/colorAccent"
         android:layout_marginStart="@dimen/content_horizontal_margin"
         android:contentDescription="@string/folder"
+        android:scaleType="centerInside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_folder_name"
         app:srcCompat="@drawable/ic_folder" />
@@ -28,8 +28,7 @@
         app:layout_constraintEnd_toStartOf="@+id/btnActionsMenu"
         app:layout_constraintStart_toEndOf="@+id/iv_folder_icon"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="pathpathpathpathpathpathpathpathpathpathpapathpathpath"
-        tools:targetApi="lollipop" />
+        tools:text="pathpathpathpathpathpathpathpathpathpathpapathpathpath" />
 
     <TextView
         android:id="@+id/tv_compositions_count"

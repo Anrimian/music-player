@@ -15,7 +15,7 @@ import javax.inject.Named
 class ArtistEditorModule(private val artistId: Long, private val name: String) {
 
     @Provides
-    fun compositionEditorPresenter(
+    fun renameArtistPresenter(
         editorInteractor: EditorInteractor,
         syncInteractor: SyncInteractor<FileKey, *, Long>,
         @Named(SchedulerModule.UI_SCHEDULER) uiScheduler: Scheduler,

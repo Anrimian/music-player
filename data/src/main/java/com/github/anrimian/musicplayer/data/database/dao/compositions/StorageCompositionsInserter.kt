@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao
@@ -14,7 +14,7 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullC
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 
 class StorageCompositionsInserter(
-    private val appDatabase: AppDatabase,
+    private val libraryDatabase: LibraryDatabase,
     private val compositionsDao: CompositionsDao,
     private val compositionsDaoWrapper: CompositionsDaoWrapper,
     private val foldersDaoWrapper: FoldersDaoWrapper,
@@ -31,7 +31,7 @@ class StorageCompositionsInserter(
     ) {
         val previousCount = compositionsDao.compositionsCount
 
-        appDatabase.runInTransaction {
+        libraryDatabase.runInTransaction {
             applyCompositionChanges(addedCompositions, deletedCompositions, changedCompositions)
         }
 
@@ -94,7 +94,7 @@ class StorageCompositionsInserter(
 
         val folderId = foldersDaoWrapper.getOrCreateFolder(composition.relativePath, foldersCache)
 
-        //if we had not found composition - just remove not_found mark
+        //if we have not found composition - just remove not_found mark
         val id = compositionsDao.findCompositionByFileName(composition.fileName, folderId)
         if (id != null) {
             val storageId = compositionsDao.selectStorageId(id)

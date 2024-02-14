@@ -45,6 +45,18 @@ public interface UiStateRepository {
 
     long getSelectedPlayListScreenId();
 
+    void setSelectedArtistScreenId(long artistId);
+
+    long getSelectedArtistScreenId();
+
+    void setSelectedAlbumScreenId(long albumId);
+
+    long getSelectedAlbumScreenId();
+
+    void setSelectedGenreScreenId(long genreId);
+
+    long getSelectedGenreScreenId();
+
     void setCurrentQueueItemId(long id);
 
     Observable<Long> getCurrentItemIdObservable();
@@ -62,6 +74,10 @@ public interface UiStateRepository {
     ListPosition getSavedAlbumsListPosition();
 
     void saveAlbumsListPosition(ListPosition listPosition);
+
+    ListPosition getSavedGenresListPosition();
+
+    void saveGenresListPosition(ListPosition listPosition);
 
     ListPosition getSavedPlaylistsPosition();
 

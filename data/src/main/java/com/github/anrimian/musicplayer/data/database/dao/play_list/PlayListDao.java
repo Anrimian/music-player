@@ -14,6 +14,7 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListEntry;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlayList;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 
 import java.util.Date;
@@ -53,13 +54,14 @@ public interface PlayListDao {
             "(SELECT count() FROM entries WHERE playListId = play_lists.id) as compositionsCount, " +
             "(SELECT sum(duration) FROM entries WHERE playlistId = play_lists.id) as totalDuration " +
             "FROM play_lists " +
+            "WHERE (:searchQuery IS NULL OR name LIKE :searchQuery)" +
             "ORDER BY dateModified DESC")
-    Observable<List<PlayList>> getPlayListsObservable();
+    Observable<List<PlayList>> getPlayListsObservable(String searchQuery);
 
     @Query("SELECT " +
             "play_lists.id as id, " +
             "play_lists.storageId as storageId, " +
-            "replace(substr(play_lists.name, 1, 86), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
+            "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount " +
@@ -69,7 +71,7 @@ public interface PlayListDao {
     @Query("SELECT " +
             "play_lists.id as id, " +
             "play_lists.storageId as storageId, " +
-            "replace(substr(play_lists.name, 1, 86), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
+            "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount " +
@@ -80,7 +82,7 @@ public interface PlayListDao {
     @Query("SELECT " +
             "play_lists.id as id, " +
             "play_lists.storageId as storageId, " +
-            "replace(substr(play_lists.name, 1, 86), '/', '') as name, " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
+            "play_lists.name as name, " +
             "play_lists.dateAdded as dateAdded, " +
             "play_lists.dateModified as dateModified, " +
             "(SELECT count() FROM play_lists_entries WHERE playListId = play_lists.id) as compositionsCount " +
@@ -107,6 +109,15 @@ public interface PlayListDao {
 
     @RawQuery(observedEntities = { PlayListEntryEntity.class, ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
     Observable<List<PlayListEntryDto>> getPlayListItemsObservable(SimpleSQLiteQuery query);
+
+    @Query("SELECT playlistId FROM play_lists_entries WHERE audioId = :compositionId")
+    List<Long> getPlaylistsForComposition(long compositionId);
+
+    @Query("SELECT audioId FROM play_lists_entries WHERE playListId = :playlistId ORDER BY orderPosition")
+    List<Long> getCompositionIdsInPlaylist(long playlistId);
+
+    @RawQuery
+    List<Composition> getCompositionsInPlaylist(SimpleSQLiteQuery query);
 
     @Query("SELECT " +
             "(" +
@@ -155,12 +166,12 @@ public interface PlayListDao {
     int selectPositionById(long id);
 
     @Query("UPDATE play_lists_entries SET orderPosition = " +
-            "  case " +
-            "    when orderPosition < :fromPos then orderPosition + 1" +
-            "    when orderPosition > :fromPos then orderPosition - 1" +
-            "    else :toPos" +
-            "  end " +
-            "WHERE (orderPosition between min(:fromPos, :toPos) and max(:fromPos,:toPos)) " +
+            "  CASE " +
+            "    WHEN orderPosition < :fromPos THEN orderPosition + 1" +
+            "    WHEN orderPosition > :fromPos THEN orderPosition - 1" +
+            "    ELSE :toPos" +
+            "  END " +
+            "WHERE (orderPosition BETWEEN min(:fromPos, :toPos) AND max(:fromPos,:toPos)) " +
             "AND playListId = :playListId")
     void moveItems(long playListId, int fromPos, int toPos);
 
@@ -188,9 +199,7 @@ public interface PlayListDao {
     @Query("SELECT exists(SELECT 1 FROM play_lists WHERE storageId = :storageId LIMIT 1)")
     boolean isPlayListExistsByStorageId(long storageId);
 
-    @Query("SELECT " +
-            "replace(substr(play_lists.name, 1, 86), '/', '') " + //fix for invalid names. Remove after 12.05.2025. Or add it to the next db migration
-            "FROM play_lists WHERE id = :playListId")
+    @Query("SELECT name FROM play_lists WHERE id = :playListId")
     String selectPlayListName(long playListId);
 
     @Query("SELECT id FROM play_lists WHERE name = :name")
@@ -198,6 +207,9 @@ public interface PlayListDao {
 
     @Query("SELECT exists(SELECT 1 FROM play_lists WHERE id = :playlistId)")
     boolean isPlaylistExists(long playlistId);
+
+    @Query("SELECT count() FROM play_lists_entries WHERE playListId = :playListId")
+    int getPlaylistSize(long playListId);
 
     static String getPlaylistItemsQuery(boolean useFileName) {
         return "SELECT " +
@@ -209,4 +221,14 @@ public interface PlayListDao {
                 CompositionsDao.getSearchQuery(useFileName) +
                 "ORDER BY orderPosition";
     }
+
+    static String getCompositionsQuery(boolean useFileName) {
+        return "SELECT " +
+                CompositionsDao.getCompositionSelectionQuery(useFileName) +
+                "FROM play_lists_entries " +
+                "INNER JOIN compositions ON play_lists_entries.audioId = compositions.id " +
+                "WHERE play_lists_entries.playListId = ? " +
+                "ORDER BY orderPosition";
+    }
+
 }

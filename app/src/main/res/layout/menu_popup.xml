@@ -8,8 +8,8 @@
         android:id="@+id/rvMenuItems"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingTop="@dimen/popup_list_vertical_padding"
+        android:paddingBottom="@dimen/popup_list_vertical_padding"
         android:clipToPadding="false"
         android:overScrollMode="never"/>
 

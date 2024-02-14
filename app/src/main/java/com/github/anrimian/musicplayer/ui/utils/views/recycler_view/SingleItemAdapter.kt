@@ -18,7 +18,7 @@ class SingleItemAdapter<T : ViewBinding>(
     }
 
     override fun onBindViewHolder(holder: StubViewHolder, position: Int) {
-        viewWrapper.setObject(holder.viewBinding)
+        viewWrapper.setObject(holder.binding)
     }
 
     override fun getItemCount() = 1
@@ -27,5 +27,5 @@ class SingleItemAdapter<T : ViewBinding>(
         viewWrapper.call(action)
     }
 
-    inner class StubViewHolder(val viewBinding: T): RecyclerView.ViewHolder(viewBinding.root)
+    inner class StubViewHolder(val binding: T): RecyclerView.ViewHolder(binding.root)
 }

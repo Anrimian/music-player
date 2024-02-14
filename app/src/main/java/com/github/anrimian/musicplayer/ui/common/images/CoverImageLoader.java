@@ -19,8 +19,10 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
@@ -236,12 +238,15 @@ public class CoverImageLoader {
                              long lastCoverModifyTime,
                              long compositionSize,
                              boolean isFileExists,
+                             boolean isRoundCoverEnabled,
                              @DrawableRes int placeholder) {
         CustomAppWidgetTarget widgetTarget = new CustomAppWidgetTarget(context,
                 viewId,
                 widgetView,
                 placeholder,
                 componentName);
+
+        BitmapTransformation transformation = isRoundCoverEnabled? new CircleCrop() : new RoundedCorners(500);
 
         GlideApp.with(context)
                 .asBitmap()
@@ -251,9 +256,9 @@ public class CoverImageLoader {
                         new Date(lastCoverModifyTime),
                         compositionSize,
                         isFileExists)
-                ).override(getCoverSize())
-                .downsample(DownsampleStrategy.AT_MOST)
-                .transform(new CircleCrop())
+                ).override(getCoverWidgetSize())
+                .downsample(DownsampleStrategy.AT_LEAST)
+                .transform(transformation)
                 .timeout(TIMEOUT_MILLIS)
                 .into(widgetTarget);
     }
@@ -348,6 +353,10 @@ public class CoverImageLoader {
 
     private int getCoverSize() {
         return context.getResources().getInteger(R.integer.icon_image_size);
+    }
+
+    private int getCoverWidgetSize() {
+        return context.getResources().getInteger(R.integer.icon_widget_image_size);
     }
 
     private int getCoverMediaSessionSize() {

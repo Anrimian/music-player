@@ -17,4 +17,9 @@ public interface StateRepository {
     long getLastCompleteScanTime();
 
     void setLastCompleteScanTime(long scanTime);
+
+    boolean isStoragePlaylistsImported();
+
+    void setStoragePlaylistsImported(boolean isImported);
+
 }

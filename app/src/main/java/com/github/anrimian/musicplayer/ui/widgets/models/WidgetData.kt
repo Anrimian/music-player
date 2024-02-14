@@ -13,4 +13,5 @@ class WidgetData(
     var randomPlayModeEnabled: Boolean,
     var repeatMode: Int,
     var isCoversEnabled: Boolean,
+    var isRoundCoversEnabled: Boolean,
 )

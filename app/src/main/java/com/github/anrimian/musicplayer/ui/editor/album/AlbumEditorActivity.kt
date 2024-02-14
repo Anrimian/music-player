@@ -11,8 +11,8 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ActivityAlbumEditBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
-import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
@@ -30,13 +30,16 @@ import com.google.android.material.snackbar.Snackbar
 import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 
-fun newAlbumEditorIntent(context: Context, albumId: Long): Intent {
-    val intent = Intent(context, AlbumEditorActivity::class.java)
-    intent.putExtra(Constants.Arguments.ALBUM_ID_ARG, albumId)
-    return intent
-}
-
 class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
+
+    companion object {
+        fun newIntent(
+            context: Context,
+            albumId: Long
+        ) = Intent(context, AlbumEditorActivity::class.java).apply {
+            putExtra(Constants.Arguments.ALBUM_ID_ARG, albumId)
+        }
+    }
 
     private val presenter by moxyPresenter {
         val albumId = intent.getLongExtra(Constants.Arguments.ALBUM_ID_ARG, 0)
@@ -129,7 +132,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
     }
 
     override fun showEnterAuthorDialog(album: Album, hints: Array<String>?) {
-        val fragment = newInputTextDialogFragment(
+        val fragment = InputTextDialogFragment.newInstance(
             R.string.change_album_artist,
             R.string.change,
             R.string.cancel,
@@ -141,7 +144,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
     }
 
     override fun showEnterNameDialog(album: Album) {
-        val fragment = newInputTextDialogFragment(
+        val fragment = InputTextDialogFragment.newInstance(
             R.string.change_name,
             R.string.change,
             R.string.cancel,
@@ -176,16 +179,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
     }
 
     private fun copyText(textView: TextView, tvLabel: TextView) {
-        AndroidUtils.copyText(this, textView.text.toString(), tvLabel.text.toString())
-        onTextCopied()
-    }
-
-    private fun onTextCopied() {
-        MessagesUtils.makeSnackbar(
-            binding.root,
-            R.string.copied_message,
-            Snackbar.LENGTH_SHORT
-        ).show()
+        AppAndroidUtils.copyText(binding.root, textView.text.toString(), tvLabel.text.toString())
     }
 
     private fun showEditorRequestDeniedMessage() {

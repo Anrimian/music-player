@@ -22,7 +22,7 @@ fun <K, V1, V2> mergeMaps(
     hasChanges: (V1, V2) -> Boolean,
     isFirstEntryMoreActual: (V1, V2) -> Boolean,
     onFirstEntryModified: (old: V1, new: V2) -> Unit,
-    onSecondEntryModified: (old: V2, new: V1) -> Unit
+    onSecondEntryModified: (old: V2, new: V1) -> Unit,
 ) {
     for(firstEntry in firstMap) {
         val firstValue = firstEntry.value

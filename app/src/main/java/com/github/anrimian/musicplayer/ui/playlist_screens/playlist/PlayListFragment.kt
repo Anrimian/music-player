@@ -33,11 +33,15 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
-import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity
+import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.adapter.PlayListItemAdapter
-import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.rename.newRenamePlaylistDialog
+import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -48,25 +52,25 @@ import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_swipe.DragAndSwipeTouchHelperCallback
 import com.google.android.material.snackbar.Snackbar
-import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
 
-fun newPlayListFragment(playListId: Long) = PlayListFragment().apply {
-    val args = Bundle()
-    args.putLong(Constants.Arguments.PLAY_LIST_ID_ARG, playListId)
-    arguments = args
-}
-
-
-class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListener,
+class PlayListFragment : BaseLibraryFragment(), PlayListView, BackButtonListener,
     FragmentNavigationListener {
+
+    companion object {
+        fun newInstance(playListId: Long) = PlayListFragment().apply {
+            arguments = Bundle().apply {
+                putLong(Constants.Arguments.PLAY_LIST_ID_ARG, playListId)
+            }
+        }
+    }
 
     private val presenter by moxyPresenter {
         Components.getPlayListComponent(getPlayListId()).playListPresenter()
     }
 
-    private lateinit var viewBinding: FragmentBaseFabListBinding
+    private lateinit var binding: FragmentBaseFabListBinding
 
     private lateinit var toolbar: AdvancedToolbar
     private lateinit var adapter: PlayListItemAdapter
@@ -86,13 +90,15 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
         }
     }
 
+    override fun getLibraryPresenter(): BaseLibraryPresenter<*> = presenter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentBaseFabListBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentBaseFabListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,7 +106,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
         toolbar = requireActivity().findViewById(R.id.toolbar)
 
         touchHelperCallback = FormatUtils.withSwipeToDelete(
-            viewBinding.recyclerView,
+            binding.recyclerView,
             AndroidUtils.getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
             presenter::onItemSwipedToDelete,
             ItemTouchHelper.START,
@@ -111,25 +117,25 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
         touchHelperCallback.setOnStartDragListener(presenter::onDragStarted)
         touchHelperCallback.setOnEndDragListener(presenter::onDragEnded)
         val itemTouchHelper = ItemTouchHelper(touchHelperCallback)
-        itemTouchHelper.attachToRecyclerView(viewBinding.recyclerView)
+        itemTouchHelper.attachToRecyclerView(binding.recyclerView)
 
         layoutManager = LinearLayoutManager(context)
-        viewBinding.recyclerView.layoutManager = layoutManager
-        RecyclerViewUtils.attachFastScroller(viewBinding.recyclerView, true)
+        binding.recyclerView.layoutManager = layoutManager
+        RecyclerViewUtils.attachFastScroller(binding.recyclerView, true)
         adapter = PlayListItemAdapter(
             this,
-            viewBinding.recyclerView,
+            binding.recyclerView,
             presenter.isCoversEnabled(),
             this::onItemMenuClicked,
             presenter::onItemIconClicked
         )
-        viewBinding.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
-        viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
-        ViewUtils.onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
+        binding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        ViewUtils.onLongVibrationClick(binding.fab, presenter::onChangeRandomModePressed)
 
         SlidrPanel.simpleSwipeBack(
-            viewBinding.listContainer,
+            binding.listContainer,
             this,
             toolbar::onStackFragmentSlided
         )
@@ -152,7 +158,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
             config.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText())
             config.setupOptionsMenu(R.menu.play_list_toolbar_menu, this::onOptionsItemClicked)
         }
-        presenter.onFragmentMovedToTop()
+        presenter.onFragmentResumed()
     }
 
     override fun onStop() {
@@ -161,30 +167,32 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
     }
 
     override fun onBackPressed(): Boolean {
-        if (toolbar.isInSearchMode) {
+        if (toolbar.isInSearchMode()) {
             toolbar.setSearchModeEnabled(false)
             return true
         }
         return false
     }
 
+    override fun getCoordinatorLayout() = binding.listContainer
+
     override fun showEmptyList() {
-        viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.showMessage(R.string.play_list_is_empty, false)
+        binding.fab.visibility = View.GONE
+        binding.progressStateView.showMessage(R.string.play_list_is_empty, false)
     }
 
     override fun showEmptySearchResult() {
-        viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.showMessage(R.string.compositions_for_search_not_found, false)
+        binding.fab.visibility = View.GONE
+        binding.progressStateView.showMessage(R.string.no_matching_search_results_found, false)
     }
 
     override fun showList() {
-        viewBinding.fab.visibility = View.VISIBLE
-        viewBinding.progressStateView.hideAll()
+        binding.fab.visibility = View.VISIBLE
+        binding.progressStateView.hideAll()
     }
 
     override fun showLoading() {
-        viewBinding.progressStateView.showProgress()
+        binding.progressStateView.showProgress()
     }
 
     override fun updateItemsList(list: List<PlayListItem>) {
@@ -200,12 +208,12 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
     }
 
     override fun showPlayListInfo(playList: PlayList) {
-        toolbar.title = playList.name
-        toolbar.subtitle = FormatUtils.formatPlaylistAdditionalInfo(
+        toolbar.setTitle(playList.name)
+        toolbar.setSubtitle(FormatUtils.formatPlaylistAdditionalInfo(
             requireContext(),
             playList,
             R.drawable.ic_description_text_circle_inverse
-        )
+        ))
     }
 
     override fun showConfirmDeleteDialog(compositionsToDelete: List<Composition>) {
@@ -223,7 +231,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
     override fun showDeleteCompositionError(errorCommand: ErrorCommand) {
         deletingErrorHandler.handleError(errorCommand) {
             MessagesUtils.makeSnackbar(
-                viewBinding.listContainer,
+                binding.listContainer,
                 getString(R.string.delete_composition_error_template, errorCommand.message),
                 Snackbar.LENGTH_SHORT
             ).show()
@@ -232,26 +240,12 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
 
     override fun showDeletedCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
-    }
-
-    override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
-            getString(R.string.add_to_playlist_error_template, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
-    override fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>) {
-        val text =
-            MessagesUtils.getAddToPlayListCompleteMessage(requireActivity(), playList, compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun showDeleteItemError(errorCommand: ErrorCommand) {
         MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
+            binding.listContainer,
             getString(R.string.add_item_to_playlist_error_template, errorCommand.message),
             Snackbar.LENGTH_SHORT
         ).show()
@@ -260,7 +254,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
     override fun showDeleteItemCompleted(playList: PlayList, items: List<PlayListItem>) {
         val text =
             MessagesUtils.getDeletePlayListItemCompleteMessage(requireActivity(), playList, items)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_LONG)
+        MessagesUtils.makeSnackbar(binding.listContainer, text, Snackbar.LENGTH_LONG)
             .setAction(R.string.cancel, presenter::onRestoreRemovedItemClicked)
             .show()
     }
@@ -273,7 +267,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
 
     override fun showPlayListDeleteSuccess(playList: PlayList) {
         MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
+            binding.listContainer,
             getString(R.string.play_list_deleted, playList.name),
             Snackbar.LENGTH_SHORT
         ).show()
@@ -281,7 +275,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
 
     override fun showDeletePlayListError(errorCommand: ErrorCommand) {
         MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
+            binding.listContainer,
             getString(R.string.play_list_delete_error, errorCommand.message),
             Snackbar.LENGTH_SHORT
         ).show()
@@ -296,26 +290,11 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
     }
 
     override fun showEditPlayListNameDialog(playList: PlayList) {
-        RenamePlayListDialogFragment.newInstance(playList.id).safeShow(childFragmentManager)
-    }
-
-    override fun showErrorMessage(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, errorCommand.message, Snackbar.LENGTH_SHORT)
-            .show()
-    }
-
-    override fun onCompositionsAddedToPlayNext(compositions: List<Composition>) {
-        val message = MessagesUtils.getPlayNextMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
-    }
-
-    override fun onCompositionsAddedToQueue(compositions: List<Composition>) {
-        val message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
+        newRenamePlaylistDialog(playList.id).safeShow(childFragmentManager)
     }
 
     override fun showRandomMode(isRandomModeEnabled: Boolean) {
-        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
+        FormatUtils.formatPlayAllButton(binding.fab, isRandomModeEnabled)
     }
 
     override fun setDragEnabled(enabled: Boolean) {
@@ -327,7 +306,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
     }
 
     override fun showPlaylistExportSuccess(playlist: PlayList) {
-        viewBinding.listContainer.showSnackbar(
+        binding.listContainer.showSnackbar(
             getExportedPlaylistsMessage(requireContext(), listOf(playlist))
         )
     }
@@ -351,7 +330,7 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
             R.id.menu_add_to_queue -> presenter.onAddToQueueCompositionClicked(composition)
             R.id.menu_add_to_playlist -> presenter.onAddToPlayListButtonClicked(composition)
             R.id.menu_edit ->
-                startActivity(newCompositionEditorIntent(requireContext(), composition.id))
+                startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.id))
             R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), composition)
             R.id.menu_share -> shareComposition(this, composition)
             R.id.menu_delete_from_play_list -> presenter.onDeleteFromPlayListButtonClicked(item)
@@ -366,13 +345,15 @@ class PlayListFragment : MvpAppCompatFragment(), PlayListView, BackButtonListene
             R.id.menu_search -> toolbar.setSearchModeEnabled(true)
             R.id.menu_change_play_list_name -> presenter.onChangePlayListNameButtonClicked()
             R.id.menu_export_playlist -> pickFolderLauncher.launch(null)
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(childFragmentManager)
+            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(childFragmentManager)
             R.id.menu_delete_play_list -> presenter.onDeletePlayListButtonClicked()
         }
     }
 
     private fun showEditorRequestDeniedMessage() {
         MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
+            binding.listContainer,
             R.string.android_r_edit_file_permission_denied,
             Snackbar.LENGTH_LONG
         ).show()

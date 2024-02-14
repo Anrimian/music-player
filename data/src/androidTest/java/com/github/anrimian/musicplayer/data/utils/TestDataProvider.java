@@ -10,8 +10,6 @@ import com.github.anrimian.musicplayer.data.storage.providers.playlists.StorageP
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 
@@ -81,10 +79,6 @@ public class TestDataProvider {
             items.put(i, item);
         }
         return items;
-    }
-
-    public static CompositionSource fakeCompositionSource(long id) {
-        return new LibraryCompositionSource(fakeComposition(id), 0);
     }
 
     public static Composition fakeComposition(long id) {

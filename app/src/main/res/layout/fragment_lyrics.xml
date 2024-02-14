@@ -19,6 +19,7 @@
             android:layout_marginVertical="@dimen/content_vertical_margin"
             android:layout_marginHorizontal="@dimen/content_horizontal_margin"
             android:textAlignment="center"
+            android:textIsSelectable="true"
             tools:text="dffdfdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgdffdffgdfgdfgdfgfgdfgdfgdfg" />
 
     </androidx.core.widget.NestedScrollView>

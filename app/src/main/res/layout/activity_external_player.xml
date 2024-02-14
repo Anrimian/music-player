@@ -16,7 +16,7 @@
         android:scaleType="centerCrop"
         android:layout_marginTop="@dimen/content_vertical_margin"
         android:layout_marginStart="@dimen/content_horizontal_margin"
-        app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
+        app:shapeAppearance="@style/ShapeAppearance.CoverImageView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:srcCompat="@drawable/ic_music_placeholder" />
@@ -113,6 +113,16 @@
         app:layout_constraintTop_toTopOf="@id/tvTotalTime"
         app:layout_constraintBottom_toBottomOf="@id/tvTotalTime"
         app:layout_constraintEnd_toStartOf="@id/tvTotalTime"/>
+
+    <TextView
+        android:id="@+id/tvVolume"
+        style="@style/TextStyleVolumeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/content_horizontal_margin"
+        app:layout_constraintBottom_toBottomOf="@id/tvPlayedTime"
+        app:layout_constraintStart_toEndOf="@id/tvPlayedTime"
+        app:layout_constraintTop_toTopOf="@id/tvPlayedTime" />
 
     <ImageView
         android:id="@+id/ivRewind"

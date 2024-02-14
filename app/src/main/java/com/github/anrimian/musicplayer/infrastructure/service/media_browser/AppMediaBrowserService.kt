@@ -15,12 +15,17 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
+import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.*
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAlbumAdditionalInfoForMediaBrowser
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatPlayListDescriptionForMediaBrowser
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -52,6 +57,7 @@ const val COMPOSITIONS_ACTION_ID = "compositions_action_id"
 const val FOLDERS_ACTION_ID = "folders_action_id"
 const val ARTIST_ITEMS_ACTION_ID = "artist_items_action_id"
 const val ALBUM_ITEMS_ACTION_ID = "album_items_action_id"
+const val GENRE_ITEMS_ACTION_ID = "genre_items_action_id"
 const val PLAYLIST_ITEMS_ACTION_ID = "playlist_items_action_id"
 const val SEARCH_ITEMS_ACTION_ID = "search_items_action_id"
 
@@ -60,6 +66,7 @@ const val COMPOSITION_ID_ARG = "composition_id_arg"
 const val FOLDER_ID_ARG = "folder_id_arg"
 const val ARTIST_ID_ARG = "artist_id_arg"
 const val ALBUM_ID_ARG = "artist_id_arg"
+const val GENRE_ID_ARG = "genre_id_arg"
 const val PLAYLIST_ID_ARG = "artist_id_arg"
 const val SEARCH_QUERY_ARG = "search_query_arg"
 
@@ -70,9 +77,11 @@ private const val COMPOSITIONS_NODE_ID = "compositions_node_id"
 private const val FOLDERS_NODE_ID = "folders_node_id"
 private const val ARTISTS_NODE_ID = "artists_node_id"
 private const val ALBUMS_NODE_ID = "albums_node_id"
+private const val GENRES_NODE_ID = "genres_node_id"
 private const val PLAYLISTS_NODE_ID = "playlists_node_id"
 private const val ARTIST_ITEMS_NODE_ID = "artist_items_node_id"
 private const val ALBUM_ITEMS_NODE_ID = "album_items_node_id"
+private const val GENRE_ITEMS_NODE_ID = "genre_items_node_id"
 private const val PLAYLIST_ITEMS_NODE_ID = "playlist_items_node_id"
 
 const val DELIMITER = '-'
@@ -122,6 +131,8 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             parentId.startsWith(ARTIST_ITEMS_NODE_ID) -> loadArtistItems(resultCallback, parentId)
             parentId == ALBUMS_NODE_ID -> loadAlbums(resultCallback)
             parentId.startsWith(ALBUM_ITEMS_NODE_ID) -> loadAlbumItems(resultCallback, parentId)
+            parentId == GENRES_NODE_ID -> loadGenres(resultCallback)
+            parentId.startsWith(GENRE_ITEMS_NODE_ID) -> loadGenreItems(resultCallback, parentId)
             parentId == PLAYLISTS_NODE_ID -> loadPlaylists(resultCallback)
             parentId.startsWith(PLAYLIST_ITEMS_NODE_ID) -> loadPlaylistItems(resultCallback, parentId)
             else -> resultCallback.sendResult(emptyList())
@@ -222,6 +233,14 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         ) { sources -> sources.map(this::toBrowsableItem) }
     }
 
+    private fun loadGenres(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
+        loadItems(
+            GENRES_NODE_ID,
+            resultCallback,
+            Components.getAppComponent().musicServiceInteractor().genresObservable
+        ) { sources -> sources.map(this::toBrowsableItem) }
+    }
+
     private fun loadAlbumItems(
         resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
         nodeId: String
@@ -233,6 +252,21 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             Components.getAppComponent().musicServiceInteractor().getAlbumItemsObservable(albumId)
         ) { sources -> sources.mapIndexed { position, composition ->
             toActionAlbumItem(position, composition, albumId)
+        }
+        }
+    }
+
+    private fun loadGenreItems(
+        resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
+        nodeId: String
+    ) {
+        val genreId = nodeId.split(DELIMITER).last().toLong()
+        loadItems(
+            nodeId,
+            resultCallback,
+            Components.getAppComponent().musicServiceInteractor().getGenreItemsObservable(genreId)
+        ) { sources -> sources.mapIndexed { position, composition ->
+            toActionGenreItem(position, composition, genreId)
         }
         }
     }
@@ -288,14 +322,15 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
                 add(browsableItem(PLAYLISTS_NODE_ID, R.string.play_lists))
                 add(browsableItem(ARTISTS_NODE_ID, R.string.artists))
                 add(browsableItem(ALBUMS_NODE_ID, R.string.albums))
+                add(browsableItem(GENRES_NODE_ID, R.string.genres))
             }
         }
     }
 
     private fun <T: Any> loadItems(rootItemId: String,
-                              resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
-                              valuesObservable: Observable<T>,
-                              resultMapper: (T) -> List<MediaBrowserCompat.MediaItem>
+                                   resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
+                                   valuesObservable: Observable<T>,
+                                   resultMapper: (T) -> List<MediaBrowserCompat.MediaItem>
     ) {
         if (!Permissions.hasFilePermission(this)) {
             resultCallback.sendErrorResult(PERMISSION_ERROR_ACTION_ID, R.string.no_file_permission)
@@ -457,6 +492,16 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         }
     )
 
+    private fun toActionGenreItem(position: Int, composition: Composition, genreId: Long) = actionItem(
+        GENRE_ITEMS_ACTION_ID,
+        formatCompositionName(composition),
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
+        Bundle().apply {
+            putInt(POSITION_ARG, position)
+            putLong(GENRE_ID_ARG, genreId)
+        }
+    )
+
     private fun toActionPlaylistItem(
         position: Int,
         playlistItem: PlayListItem,
@@ -486,6 +531,12 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         formatAlbumAdditionalInfoForMediaBrowser(this, album)
     )
 
+    private fun toBrowsableItem(genre: Genre) = browsableItem(
+        GENRE_ITEMS_NODE_ID + DELIMITER + genre.id,
+        genre.name,
+        formatAlbumAdditionalInfoForMediaBrowser(this, genre)
+    )
+
     private fun toBrowsableItem(playlist: PlayList) = browsableItem(
         PLAYLIST_ITEMS_NODE_ID + DELIMITER + playlist.id,
         playlist.name,
@@ -495,10 +546,11 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun actionItem(mediaId: String, titleResId: Int, subtitle: CharSequence? = null) =
         actionItem(mediaId, getString(titleResId), subtitle)
 
-    private fun actionItem(mediaId: String,
-                           title: CharSequence?,
-                           subtitle: CharSequence? = null,
-                           extras: Bundle? = null
+    private fun actionItem(
+        mediaId: String,
+        title: CharSequence?,
+        subtitle: CharSequence? = null,
+        extras: Bundle? = null
     ) = MediaBrowserCompat.MediaItem(
         MediaDescriptionCompat.Builder()
             .setTitle(title)

@@ -51,18 +51,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/fakeFab"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
-                android:src="@drawable/ic_round"
+                android:src="?attr/colorAccent"
                 android:importantForAccessibility="no"
+                app:shapeAppearance="@style/ShapeAppearance.CoverImageView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 tools:color="?android:attr/colorBackground"/>
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

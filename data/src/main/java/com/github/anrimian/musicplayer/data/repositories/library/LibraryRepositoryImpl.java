@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrappe
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
+import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
 import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
@@ -17,8 +18,8 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
+import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
@@ -45,7 +46,9 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     private final AlbumsDaoWrapper albumsDao;
     private final GenresDaoWrapper genresDao;
     private final FoldersDaoWrapper foldersDao;
+    private final IgnoredFoldersDao ignoredFoldersDao;
     private final SettingsRepository settingsPreferences;
+    private final MediaScannerRepository mediaScannerRepository;
     private final Scheduler scheduler;
 
     public LibraryRepositoryImpl(StorageFilesDataSource storageFilesDataSource,
@@ -54,7 +57,9 @@ public class LibraryRepositoryImpl implements LibraryRepository {
                                  AlbumsDaoWrapper albumsDao,
                                  GenresDaoWrapper genresDao,
                                  FoldersDaoWrapper foldersDao,
+                                 IgnoredFoldersDao ignoredFoldersDao,
                                  SettingsRepository settingsPreferences,
+                                 MediaScannerRepository mediaScannerRepository,
                                  Scheduler scheduler) {
         this.storageFilesDataSource = storageFilesDataSource;
         this.compositionsDao = compositionsDao;
@@ -62,7 +67,9 @@ public class LibraryRepositoryImpl implements LibraryRepository {
         this.albumsDao = albumsDao;
         this.genresDao = genresDao;
         this.foldersDao = foldersDao;
+        this.ignoredFoldersDao = ignoredFoldersDao;
         this.settingsPreferences = settingsPreferences;
+        this.mediaScannerRepository = mediaScannerRepository;
         this.scheduler = scheduler;
     }
 
@@ -177,9 +184,9 @@ public class LibraryRepositoryImpl implements LibraryRepository {
 
     @Override
     public Single<List<DeletedComposition>> deleteFolders(List<FileSource> folders) {
-        return foldersDao.extractAllCompositionsFromFiles(folders, settingsPreferences.isDisplayFileNameEnabled())
-                .map(compositions -> {
-                    Long[] ids = ListUtils.mapToLongArray(compositions, Composition::getId);
+        return foldersDao.extractAllCompositionsFromFiles(folders)
+                .map(idList -> {
+                    Long[] ids = ListUtils.mapToLongArray(idList, id -> id);
                     List<DeletedComposition> deletedCompositions = compositionsDao.selectDeletedComposition(
                             ids,
                             settingsPreferences.isDisplayFileNameEnabled()
@@ -335,25 +342,50 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Observable<List<ShortGenre>> getShortGenresInComposition(long compositionId) {
-        return genresDao.getShortGenresInComposition(compositionId);
-    }
-
-    @Override
     public Observable<List<Composition>> getGenreItemsObservable(long genreId) {
         return settingsPreferences.getDisplayFileNameObservable()
                 .switchMap(useFileName -> genresDao.getCompositionsInGenreObservable(genreId, useFileName));
     }
 
     @Override
-    public Single<List<Long>> getAllCompositionsByGenre(long genreId) {
-        return genresDao.getAllCompositionsByGenre(genreId)
+    public Single<List<Long>> getCompositionIdsInGenres(Iterable<Genre> genres) {
+        return Observable.fromIterable(genres)
+                .flatMapSingle(playList -> genresDao.getAllCompositionIdsByGenre(playList.getId()))
+                .<List<Long>>collect(ArrayList::new, List::addAll)
                 .subscribeOn(scheduler);
     }
 
     @Override
-    public Single<String[]> getGenreNames() {
-        return Single.fromCallable(genresDao::getGenreNames)
+    public Single<List<Composition>> getCompositionsInGenres(Iterable<Genre> genres) {
+        return Observable.fromIterable(genres)
+                .map(genre -> genresDao.getCompositionsInGenre(
+                        genre.getId(),
+                        settingsPreferences.isDisplayFileNameEnabled())
+                )
+                .<List<Composition>>collect(ArrayList::new, List::addAll)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Composition>> getCompositionsInGenresIds(Iterable<Long> genresIds) {
+        return Observable.fromIterable(genresIds)
+                .map(genreId -> genresDao.getCompositionsInGenre(
+                        genreId,
+                        settingsPreferences.isDisplayFileNameEnabled())
+                )
+                .<List<Composition>>collect(ArrayList::new, List::addAll)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<Long>> getAllCompositionsByGenre(long genreId) {
+        return genresDao.getAllCompositionIdsByGenre(genreId)
+                .subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<String[]> getGenreNames(long forCompositionId) {
+        return Single.fromCallable(() -> genresDao.getGenreNames(forCompositionId))
                 .subscribeOn(scheduler);
     }
 
@@ -365,26 +397,38 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     @Override
     public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
         return Single.fromCallable(() -> foldersDao.getFullFolderPath(folder.getId()))
-                .map(foldersDao::insertIgnoredFolder)
+                .map(ignoredFoldersDao::insertIgnoredFolder)
+                .flatMap(ignoredFolder ->
+                        mediaScannerRepository.runStorageScanner().toSingleDefault(ignoredFolder)
+                )
                 .subscribeOn(scheduler);
     }
 
     @Override
     public Completable addFolderToIgnore(IgnoredFolder folder) {
         return Completable.fromAction(() ->
-                foldersDao.insertIgnoredFolder(folder.getRelativePath(), folder.getAddDate())
-        ).subscribeOn(scheduler);
+                ignoredFoldersDao.insert(folder.getRelativePath(), folder.getAddDate())
+        ).andThen(mediaScannerRepository.runStorageScanner())
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Observable<List<IgnoredFolder>> getIgnoredFoldersObservable() {
-        return foldersDao.getIgnoredFoldersObservable();
+        return ignoredFoldersDao.getIgnoredFoldersObservable();
     }
 
     @Override
     public Completable deleteIgnoredFolder(IgnoredFolder folder) {
-        return Completable.fromAction(() -> foldersDao.deleteIgnoredFolder(folder))
+        return Completable.fromAction(() -> deleteIgnoredFolder(folder.getRelativePath()))
                 .subscribeOn(scheduler);
+    }
+
+    @Override
+    public void deleteIgnoredFolder(String folderRelativePath) {
+        int deletedRows = ignoredFoldersDao.deleteIgnoredFolder(folderRelativePath);
+        if (deletedRows > 0) {
+            mediaScannerRepository.rescanStorage();
+        }
     }
 
     private List<Long> extractFolderIds(List<FileSource> sources) {

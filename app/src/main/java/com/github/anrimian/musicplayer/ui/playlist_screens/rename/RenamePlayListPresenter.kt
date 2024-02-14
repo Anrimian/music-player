@@ -6,14 +6,15 @@ import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
 
-class RenamePlayListPresenter(private val playListId: Long,
-                              private val playListsInteractor: PlayListsInteractor,
-                              uiScheduler: Scheduler,
-                              errorParser: ErrorParser) 
-    : AppPresenter<RenamePlayListView>(uiScheduler, errorParser) {
-    
+class RenamePlayListPresenter(
+    private val playListId: Long,
+    private val playListsInteractor: PlayListsInteractor,
+    uiScheduler: Scheduler,
+    errorParser: ErrorParser
+) : AppPresenter<RenamePlayListView>(uiScheduler, errorParser) {
+
     private var initialName: String? = null
-    
+
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.showInputState()
@@ -24,7 +25,7 @@ class RenamePlayListPresenter(private val playListId: Long,
     fun onCompleteInputButtonClicked(playListName: String) {
         viewState.showProgress()
         playListsInteractor.updatePlayListName(playListId, playListName)
-                .subscribeOnUi(viewState::closeScreen, this::onDefaultError)
+            .subscribeOnUi(viewState::closeScreen, this::onDefaultError)
     }
 
     private fun onDefaultError(throwable: Throwable) {
@@ -34,7 +35,7 @@ class RenamePlayListPresenter(private val playListId: Long,
 
     private fun loadPlayListInfo() {
         playListsInteractor.getPlayListObservable(playListId)
-                .subscribeOnUi(this::onPlayListInfoReceived, this::onDefaultError, viewState::closeScreen)
+            .subscribeOnUi(this::onPlayListInfoReceived, this::onDefaultError, viewState::closeScreen)
     }
 
     private fun onPlayListInfoReceived(playList: PlayList) {

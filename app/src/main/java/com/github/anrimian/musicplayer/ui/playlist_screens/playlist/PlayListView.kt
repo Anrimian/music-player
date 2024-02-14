@@ -7,16 +7,14 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import moxy.MvpView
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryView
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 import moxy.viewstate.strategy.alias.Skip
 
-private const val LIST_STATE = "list_state"
-
-interface PlayListView : MvpView {
+interface PlayListView : BaseLibraryView {
     
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showEmptyList()
@@ -52,12 +50,6 @@ interface PlayListView : MvpView {
     fun showSelectPlayListDialog()
 
     @OneExecution
-    fun showAddingToPlayListError(errorCommand: ErrorCommand)
-
-    @OneExecution
-    fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>)
-
-    @OneExecution
     fun showDeleteItemError(errorCommand: ErrorCommand)
 
     @OneExecution
@@ -76,19 +68,10 @@ interface PlayListView : MvpView {
     fun notifyItemMoved(from: Int, to: Int)
 
     @OneExecution
-    fun showErrorMessage(errorCommand: ErrorCommand)
-
-    @OneExecution
     fun notifyItemRemoved(position: Int)
 
     @OneExecution
     fun showEditPlayListNameDialog(playList: PlayList)
-
-    @OneExecution
-    fun onCompositionsAddedToPlayNext(compositions: List<Composition>)
-
-    @OneExecution
-    fun onCompositionsAddedToQueue(compositions: List<Composition>)
 
     @OneExecution
     fun restoreListPosition(listPosition: ListPosition)
@@ -105,4 +88,7 @@ interface PlayListView : MvpView {
     @OneExecution
     fun showPlaylistExportSuccess(playlist: PlayList)
 
+    companion object {
+        private const val LIST_STATE = "list_state"
+    }
 }

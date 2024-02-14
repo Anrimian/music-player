@@ -5,8 +5,11 @@ import com.github.anrimian.filesync.models.repo.RemoteRepoInfo
 class FileTaskInfo<K>(
     val task: Task<K>,
     val taskCreateTime: Long,
+    val taskCompleteTime: Long?,
     val excludeReason: ExcludeReason?,
-    val repoInfo: RemoteRepoInfo?,
+    val repoInfo: RemoteRepoInfo,
+    val taskReason: Int,
+    val reasonDescription: String?
 ) {
 
     override fun equals(other: Any?): Boolean {

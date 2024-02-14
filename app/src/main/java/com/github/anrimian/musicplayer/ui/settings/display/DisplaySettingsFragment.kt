@@ -21,15 +21,15 @@ class DisplaySettingsFragment : MvpAppCompatFragment(), DisplaySettingsView {
 
     private val presenter by moxyPresenter { Components.getSettingsComponent().displaySettingsPresenter() }
     
-    private lateinit var viewBinding: FragmentSettingsDisplayBinding
+    private lateinit var binding: FragmentSettingsDisplayBinding
   
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentSettingsDisplayBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentSettingsDisplayBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,73 +39,73 @@ class DisplaySettingsFragment : MvpAppCompatFragment(), DisplaySettingsView {
         toolbar.setSubtitle(R.string.display)
         toolbar.setTitleClickListener(null)
         
-        SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided)
+        SlidrPanel.simpleSwipeBack(binding.nsvContainer, this, toolbar::onStackFragmentSlided)
 
-        viewBinding.cbColoredNotification.visibility = if (
+        binding.cbColoredNotification.visibility = if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
             && Build.VERSION.SDK_INT < Build.VERSION_CODES.S
         ) VISIBLE else GONE
 
-        viewBinding.cbShowCoverStubInNotification.visibility = if (
+        binding.cbShowCoverStubInNotification.visibility = if (
             Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
         ) VISIBLE else GONE
         
-        onCheckChanged(viewBinding.cbUseFileName, presenter::onFileNameChecked)
-        onCheckChanged(viewBinding.cbPlayerScreensSwipe, presenter::onSwipePlayerScreensChecked)
-        onCheckChanged(viewBinding.cbCovers, presenter::onCoversChecked)
-        onCheckChanged(viewBinding.cbCoversInNotification, presenter::onCoversInNotificationChecked)
-        onCheckChanged(viewBinding.cbColoredNotification, presenter::onColoredNotificationChecked)
-        onCheckChanged(viewBinding.cbShowCoverStubInNotification, presenter::onNotificationCoverStubChecked)
-        onCheckChanged(viewBinding.cbNotificationOnLockScreen, presenter::onCoversOnLockScreenChecked)
+        onCheckChanged(binding.cbUseFileName, presenter::onFileNameChecked)
+        onCheckChanged(binding.cbPlayerScreensSwipe, presenter::onSwipePlayerScreensChecked)
+        onCheckChanged(binding.cbCovers, presenter::onCoversChecked)
+        onCheckChanged(binding.cbCoversInNotification, presenter::onCoversInNotificationChecked)
+        onCheckChanged(binding.cbColoredNotification, presenter::onColoredNotificationChecked)
+        onCheckChanged(binding.cbShowCoverStubInNotification, presenter::onNotificationCoverStubChecked)
+        onCheckChanged(binding.cbNotificationOnLockScreen, presenter::onCoversOnLockScreenChecked)
 
         val localeController = Components.getAppComponent().localeController()
-        viewBinding.tvLocale.text = localeController.getCurrentLocaleName()
-        viewBinding.tvLocaleClickableArea.setOnClickListener {
+        binding.tvLocale.text = localeController.getCurrentLocaleName()
+        binding.tvLocaleClickableArea.setOnClickListener {
             localeController.openLocaleChooser(requireActivity())
         }
     }
 
     override fun showPlayerScreensSwipeEnabled(enabled: Boolean) {
-        setChecked(viewBinding.cbPlayerScreensSwipe, enabled)
+        setChecked(binding.cbPlayerScreensSwipe, enabled)
     }
 
     override fun showFileNameEnabled(enabled: Boolean) {
-        setChecked(viewBinding.cbUseFileName, enabled)
+        setChecked(binding.cbUseFileName, enabled)
     }
 
     override fun showCoversChecked(checked: Boolean) {
-        setChecked(viewBinding.cbCovers, checked)
+        setChecked(binding.cbCovers, checked)
     }
 
     override fun showCoversInNotificationChecked(checked: Boolean) {
-        setChecked(viewBinding.cbCoversInNotification, checked)
+        setChecked(binding.cbCoversInNotification, checked)
     }
 
     override fun showColoredNotificationChecked(checked: Boolean) {
-        setChecked(viewBinding.cbColoredNotification, checked)
+        setChecked(binding.cbColoredNotification, checked)
     }
 
     override fun showCoversOnLockScreenChecked(checked: Boolean) {
-        setChecked(viewBinding.cbNotificationOnLockScreen, checked)
+        setChecked(binding.cbNotificationOnLockScreen, checked)
     }
 
     override fun showCoversInNotificationEnabled(enabled: Boolean) {
-        viewBinding.cbCoversInNotification.isEnabled = enabled
+        binding.cbCoversInNotification.isEnabled = enabled
     }
 
     override fun showColoredNotificationEnabled(enabled: Boolean) {
-        viewBinding.cbColoredNotification.isEnabled = enabled
+        binding.cbColoredNotification.isEnabled = enabled
     }
 
     override fun showCoversOnLockScreenEnabled(enabled: Boolean) {
-        viewBinding.cbNotificationOnLockScreen.isEnabled = enabled
+        binding.cbNotificationOnLockScreen.isEnabled = enabled
     }
 
     override fun showNotificationCoverStubChecked(checked: Boolean) {
-        setChecked(viewBinding.cbShowCoverStubInNotification, checked)
+        setChecked(binding.cbShowCoverStubInNotification, checked)
     }
 
     override fun showNotificationCoverStubEnabled(enabled: Boolean) {
-        viewBinding.cbShowCoverStubInNotification.isEnabled = enabled
+        binding.cbShowCoverStubInNotification.isEnabled = enabled
     }
 }

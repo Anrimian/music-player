@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_popup">
+
+    <ImageView
+        style="@style/ButtonStyle"
+        android:id="@+id/btnVolumeUp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="@dimen/volume_button_vertical_padding"
+        android:src="@drawable/ic_volume_up"
+        android:background="@drawable/bg_volume_up"
+        android:elevation="2dp"
+        android:contentDescription="@string/volume_up"/>
+
+    <com.github.rongi.rotate_layout.layout.RotateLayout
+        android:layout_width="48dp"
+        android:layout_height="140dp"
+        app:angle="90">
+
+        <SeekBar
+            style="@style/VerticalSeekbarStyle"
+            android:id="@+id/sbVolume"
+            android:layout_width="match_parent"
+            android:paddingVertical="@dimen/vertical_seekbar_padding_vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+    <ImageView
+        style="@style/ButtonStyle"
+        android:id="@+id/btnVolumeDown"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="@dimen/volume_button_vertical_padding"
+        android:src="@drawable/ic_volume"
+        android:background="@drawable/bg_volume_down"
+        android:elevation="2dp"
+        android:contentDescription="@string/volume_down"/>
+
+</LinearLayout>

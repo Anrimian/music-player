@@ -7,24 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.ActionMenuView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLyricsBinding
 import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
-import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
-import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
+import com.github.anrimian.musicplayer.ui.editor.lyrics.LyricsEditorActivity
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
-import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil
-import com.google.android.material.snackbar.Snackbar
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
@@ -36,11 +26,6 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
 
     private lateinit var clPlayQueueContainer: CoordinatorLayout
     private lateinit var acvToolbar: ActionMenuView
-
-    private lateinit var errorHandler: ErrorHandler
-
-    private lateinit var lyricsDialogFragmentRunner: DialogFragmentRunner<InputTextDialogFragment>
-    private lateinit var progressDialogRunner: DialogFragmentDelayRunner<ProgressDialogFragment>
 
     private var isActionMenuEnabled = false
 
@@ -60,18 +45,6 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
         acvToolbar = requireActivity().findViewById(R.id.acvPlayQueue)
 
         binding.progressStateView.onTryAgainClick(presenter::onEditLyricsClicked)
-
-        errorHandler = ErrorHandler(
-            this,
-            presenter::onRetryFailedEditActionClicked,
-            this::showEditorRequestDeniedMessage
-        )
-
-        val fm = childFragmentManager
-        lyricsDialogFragmentRunner = DialogFragmentRunner(fm, Constants.Tags.LYRICS) { fragment ->
-            fragment.setOnCompleteListener(presenter::onNewLyricsEntered)
-        }
-        progressDialogRunner = DialogFragmentDelayRunner(fm, Constants.Tags.PROGRESS_DIALOG_TAG)
     }
 
     override fun setMenuVisibility(menuVisible: Boolean) {
@@ -107,33 +80,8 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
         }
     }
 
-    override fun showEnterLyricsDialog(lyrics: String) {
-        val fragment = newInputTextDialogFragment(
-            R.string.edit_lyrics,
-            R.string.change,
-            R.string.cancel,
-            R.string.lyrics,
-            lyrics,
-            completeOnEnterButton = false
-        )
-        lyricsDialogFragmentRunner.show(fragment)
-    }
-
-    override fun showChangeFileProgress() {
-        val fragment = newProgressDialogFragment(R.string.changing_file_progress)
-        progressDialogRunner.show(fragment)
-    }
-
-    override fun hideChangeFileProgress() {
-        progressDialogRunner.cancel()
-    }
-
-    override fun showErrorMessage(errorCommand: ErrorCommand) {
-        errorHandler.handleError(errorCommand) {
-            MessagesUtils.makeSnackbar(
-                clPlayQueueContainer, errorCommand.message, Snackbar.LENGTH_LONG
-            ).show()
-        }
+    override fun showEditLyricsScreen(compositionId: Long) {
+        startActivity(LyricsEditorActivity.newIntent(requireContext(), compositionId))
     }
 
     override fun resetTextPosition() {
@@ -152,11 +100,4 @@ class LyricsFragment: MvpAppCompatFragment(), LyricsView {
         acvToolbar.menu.findItem(R.id.menu_edit_lyrics)?.isEnabled = isActionMenuEnabled
     }
 
-    private fun showEditorRequestDeniedMessage() {
-        MessagesUtils.makeSnackbar(
-            clPlayQueueContainer,
-            R.string.android_r_edit_file_permission_denied,
-            Snackbar.LENGTH_LONG
-        ).show()
-    }
 }

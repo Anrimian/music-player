@@ -12,13 +12,17 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_COMPOSITIONS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_FOLDERS_POSITIONS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_GENRES_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYER_CONTENT_PAGE;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYLISTS_COMPOSITIONS_POSITIONS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYLISTS_COMPOSITIONS_POSITIONS_MAX_CACHE_SIZE;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYLISTS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PREFERENCES_NAME;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_ALBUM_SCREEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_ARTIST_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_DRAWER_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_FOLDER_SCREEN;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_GENRE_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_LIBRARY_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_PLAYLIST_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.TRACK_POSITION;
@@ -59,9 +63,13 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String IS_PLAYER_PANEL_OPEN = "is_player_panel_open";
         String SELECTED_FOLDER_SCREEN = "selected_folder_screen_id";
         String SELECTED_PLAYLIST_SCREEN = "selected_playlist_screen";
+        String SELECTED_ARTIST_SCREEN = "selected_artist_screen";
+        String SELECTED_ALBUM_SCREEN = "selected_album_screen";
+        String SELECTED_GENRE_SCREEN = "selected_genre_screen";
         String LIBRARY_COMPOSITIONS_POSITION = "library_compositions_position";
         String LIBRARY_ARTISTS_POSITION = "library_artists_position";
         String LIBRARY_ALBUMS_POSITION = "library_albums_position";
+        String LIBRARY_GENRES_POSITION = "library_agenres_position";
         String LIBRARY_FOLDERS_POSITIONS = "library_folders_positions";
         String LIBRARY_ALBUMS_COMPOSITIONS_POSITIONS = "library_albums_compositions_positions";
         String LIBRARY_ARTISTS_COMPOSITIONS_POSITIONS = "library_artists_compositions_positions";
@@ -193,6 +201,36 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     }
 
     @Override
+    public void setSelectedArtistScreenId(long artistId) {
+        preferences.putLong(Constants.SELECTED_ARTIST_SCREEN, artistId);
+    }
+
+    @Override
+    public long getSelectedArtistScreenId() {
+        return preferences.getLong(SELECTED_ARTIST_SCREEN);
+    }
+
+    @Override
+    public void setSelectedAlbumScreenId(long albumId) {
+        preferences.putLong(SELECTED_ALBUM_SCREEN, albumId);
+    }
+
+    @Override
+    public long getSelectedAlbumScreenId() {
+        return preferences.getLong(SELECTED_ALBUM_SCREEN);
+    }
+
+    @Override
+    public void setSelectedGenreScreenId(long genreId) {
+        preferences.putLong(SELECTED_GENRE_SCREEN, genreId);
+    }
+
+    @Override
+    public long getSelectedGenreScreenId() {
+        return preferences.getLong(SELECTED_GENRE_SCREEN);
+    }
+
+    @Override
     public void setCurrentQueueItemId(long id) {
         preferences.putLong(CURRENT_QUEUE_ITEM_ID, id);
         currentItemSubject.onNext(id);
@@ -241,6 +279,16 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     @Override
     public void saveAlbumsListPosition(ListPosition listPosition) {
         preferences.putListPosition(LIBRARY_ALBUMS_POSITION, listPosition);
+    }
+
+    @Override
+    public ListPosition getSavedGenresListPosition() {
+        return preferences.getListPosition(LIBRARY_GENRES_POSITION);
+    }
+
+    @Override
+    public void saveGenresListPosition(ListPosition listPosition) {
+        preferences.putListPosition(LIBRARY_GENRES_POSITION, listPosition);
     }
 
     @Override

@@ -203,7 +203,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
                 .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
                 .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(viewBinding.drawerFragmentContainer))))
-                .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.icon_size, panelBinding.ivMusicIcon)))
+                .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.panel_cover_size, panelBinding.ivMusicIcon)))
                 .addDelegate(new BoundValuesDelegate(0.98f, 1.0f, new VisibilityDelegate(panelBinding.pvFileState)))
                 .addDelegate(new BoundValuesDelegate(0.95f, 1.0f, new VisibilityDelegate(panelBinding.tvCurrentCompositionAuthor)))
                 .addDelegate(new BoundValuesDelegate(0.4f, 1.0f, new VisibilityDelegate(panelBinding.btnActionsMenu)))
@@ -215,6 +215,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
                 .addDelegate(new ToolbarDelegate(toolbar, activity.getWindow()))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvTotalTime)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvPlaybackSpeed)))
+                .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvVolume)))
                 .addDelegate(new BoundValuesDelegate(0.97f, 1.0f, new VisibilityDelegate(panelBinding.tvSleepTime)))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.8f, 1f, new VisibilityDelegate(panelBinding.ivBottomPanelIndicator))));
 

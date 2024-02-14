@@ -105,8 +105,18 @@ public class ListUtils {
         Collections.swap(list, i, j);
     }
 
+    public static void swap(Object[] arr, int i, int j) {
+        Object tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+    }
+
     public static boolean isIndexInRange(List<?> list, int index) {
         return index >= 0 && index < list.size();
+    }
+
+    public static boolean isIndexInRange(Object[] list, int index) {
+        return index >= 0 && index < list.length;
     }
 
     public static <T> int findPosition(List<T> list, MapperFunction<T, Boolean> predicate) {

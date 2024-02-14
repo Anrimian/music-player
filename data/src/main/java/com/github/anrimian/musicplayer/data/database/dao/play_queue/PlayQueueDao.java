@@ -176,6 +176,9 @@ public interface PlayQueueDao {
     Long getPreviousShuffledQueueItemId(long currentItemId);
 
     @Query("SELECT count() FROM play_queue")
+    int getPlayQueueSize();
+
+    @Query("SELECT count() FROM play_queue")
     Observable<Integer> getPlayQueueSizeObservable();
 
     static String getCompositionQuery(boolean useFileName) {

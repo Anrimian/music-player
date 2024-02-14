@@ -31,7 +31,24 @@ import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotific
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.*
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.ALBUM_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.ALBUM_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.ARTIST_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.ARTIST_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.COMPOSITIONS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.COMPOSITION_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.FOLDERS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.FOLDER_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.GENRE_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.GENRE_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.PAUSE_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.PLAYLIST_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.PLAYLIST_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.POSITION_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.RESUME_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SEARCH_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SEARCH_QUERY_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SHUFFLE_ALL_AND_PLAY_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.music.CompositionSourceModelHelper
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
@@ -426,11 +443,11 @@ class MediaSessionHandler(
         }
 
         override fun onFastForward() {
-            playerInteractor.fastSeekForward()
+            playerInteractor.fastSeekForward().subscribe()
         }
 
         override fun onRewind() {
-            playerInteractor.fastSeekBackward()
+            playerInteractor.fastSeekBackward().subscribe()
         }
 
         override fun onSetPlaybackSpeed(speed: Float) {
@@ -462,7 +479,8 @@ class MediaSessionHandler(
                         folderId = null
                     }
                     val compositionId = extras.getLong(COMPOSITION_ID_ARG)
-                    musicServiceInteractor.play(folderId, compositionId)
+                    actionDisposable = musicServiceInteractor.play(folderId, compositionId)
+                        .subscribe({}, this::processError)
                 }
                 ARTIST_ITEMS_ACTION_ID -> {
                     val artistId = extras.getLong(ARTIST_ID_ARG)
@@ -474,6 +492,12 @@ class MediaSessionHandler(
                     val albumId = extras.getLong(ALBUM_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromAlbumCompositions(albumId, position)
+                        .subscribe({}, this::processError)
+                }
+                GENRE_ITEMS_ACTION_ID -> {
+                    val genreId = extras.getLong(GENRE_ID_ARG)
+                    val position = extras.getInt(POSITION_ARG)
+                    actionDisposable = musicServiceInteractor.startPlayingFromGenreCompositions(genreId, position)
                         .subscribe({}, this::processError)
                 }
                 PLAYLIST_ITEMS_ACTION_ID -> {

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: "de.mannodermaus.android-junit5"
 
 android {
@@ -7,8 +8,8 @@ android {
 
     def config = rootProject.ext
 
-    compileSdkVersion config.androidCompileSdkVersion
-    buildToolsVersion config.androidBuildToolsVersion
+    compileSdkVersion = config.androidCompileSdkVersion
+    buildToolsVersion = config.androidBuildToolsVersion
 
     defaultConfig {
         minSdkVersion config.androidMinSdkVersion
@@ -41,44 +42,47 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+    packagingOptions {
+        resources {
+            excludes += [
+                    'META-INF/*',
+            ]
+        }
+    }
 }
 
 dependencies {
     implementation project(':domain')
 
-    def deps = rootProject.ext
-
     implementation kotlinStdLib
 
-    implementation deps.appCompat
-    implementation deps.documentFile
-    implementation deps.rxJava
-    implementation deps.exoPlayerCore
+    implementation appCompat
+    implementation documentFile
+    implementation rxJava
+    implementation exoPlayerCore
 
-    compileOnly deps.javaxAnnotation
-    compileOnly deps.javaxGeneratedAnnotation
+    compileOnly javaxAnnotation
+    compileOnly javaxGeneratedAnnotation
 
-    implementation deps.room
-    implementation deps.roomRx
-    annotationProcessor deps.roomCompiler
+    implementation room
+    implementation roomRx
+    kapt roomCompiler
 
-    implementation deps.jAudioTagger
+    implementation jAudioTagger
 
-    testImplementation deps.junit5
-    testImplementation deps.junit5Params
-    testRuntimeOnly deps.junit5Engine
-    testImplementation deps.mockito
-    testImplementation deps.mockitoKt
+    testImplementation junit5
+    testImplementation junit5Params
+    testRuntimeOnly junit5Engine
+    testImplementation mockito
+    testImplementation mockitoKt
 
-    androidTestImplementation deps.androidXTestRunner
-    androidTestImplementation deps.junit5
-    androidTestImplementation deps.junit5PluginCore
-    androidTestRuntimeOnly deps.junit5PluginRunner
-    androidTestImplementation deps.espresso
-    androidTestImplementation deps.rules
-    androidTestImplementation deps.rxJavaExt
-    androidTestImplementation deps.roomTest
-    androidTestImplementation deps.mockito
-    androidTestImplementation deps.mockitoKt
+    androidTestImplementation androidXTestRunner
+    androidTestImplementation junit5
+    androidTestImplementation junit5PluginCore
+    androidTestRuntimeOnly junit5PluginRunner
+    androidTestImplementation espresso
+    androidTestImplementation androidXTestRules
+    androidTestImplementation rxJavaExt
+    androidTestImplementation roomTest
 
 }

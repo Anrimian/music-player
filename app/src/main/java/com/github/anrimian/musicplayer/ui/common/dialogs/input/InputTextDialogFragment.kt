@@ -12,42 +12,54 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
-import com.github.anrimian.musicplayer.Constants.Arguments.*
+import com.github.anrimian.musicplayer.Constants.Arguments.CAN_BE_EMPTY_ARG
+import com.github.anrimian.musicplayer.Constants.Arguments.COMPLETE_ON_ENTER_ARG
+import com.github.anrimian.musicplayer.Constants.Arguments.DIGITS_ARG
+import com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_HINT
+import com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_VALUE
+import com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG
+import com.github.anrimian.musicplayer.Constants.Arguments.HINTS_ARG
+import com.github.anrimian.musicplayer.Constants.Arguments.INPUT_TYPE_ARG
+import com.github.anrimian.musicplayer.Constants.Arguments.NEGATIVE_BUTTON_ARG
+import com.github.anrimian.musicplayer.Constants.Arguments.POSITIVE_BUTTON_ARG
+import com.github.anrimian.musicplayer.Constants.Arguments.TITLE_ARG
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogCommonInputSimpleBinding
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher
 
-fun newInputTextDialogFragment(
-    @StringRes title: Int,
-    @StringRes positiveButtonText: Int,
-    @StringRes negativeButtonText: Int,
-    @StringRes editTextHint: Int,
-    editTextValue: String?,
-    canBeEmpty: Boolean = true,
-    completeOnEnterButton: Boolean = true,
-    inputType: Int = InputType.TYPE_CLASS_TEXT,
-    digits: String? = null,
-    hints: Array<String>? = null,
-    extra: Bundle? = null
-) = InputTextDialogFragment().apply {
-    arguments = Bundle().apply {
-        putInt(TITLE_ARG, title)
-        putInt(POSITIVE_BUTTON_ARG, positiveButtonText)
-        putInt(NEGATIVE_BUTTON_ARG, negativeButtonText)
-        putInt(EDIT_TEXT_HINT, editTextHint)
-        putString(EDIT_TEXT_VALUE, editTextValue)
-        putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty)
-        putBoolean(COMPLETE_ON_ENTER_ARG, completeOnEnterButton)
-        putInt(INPUT_TYPE_ARG, inputType)
-        putString(DIGITS_ARG, digits)
-        putBundle(EXTRA_DATA_ARG, extra)
-        putStringArray(HINTS_ARG, hints)
-    }
-}
-
 class InputTextDialogFragment : DialogFragment() {
+
+    companion object {
+        fun newInstance(
+            @StringRes title: Int,
+            @StringRes positiveButtonText: Int,
+            @StringRes negativeButtonText: Int,
+            @StringRes editTextHint: Int,
+            editTextValue: String?,
+            canBeEmpty: Boolean = true,
+            completeOnEnterButton: Boolean = true,
+            inputType: Int = InputType.TYPE_CLASS_TEXT,
+            digits: String? = null,
+            hints: Array<String>? = null,
+            extra: Bundle? = null
+        ) = InputTextDialogFragment().apply {
+            arguments = Bundle().apply {
+                putInt(TITLE_ARG, title)
+                putInt(POSITIVE_BUTTON_ARG, positiveButtonText)
+                putInt(NEGATIVE_BUTTON_ARG, negativeButtonText)
+                putInt(EDIT_TEXT_HINT, editTextHint)
+                putString(EDIT_TEXT_VALUE, editTextValue)
+                putBoolean(CAN_BE_EMPTY_ARG, canBeEmpty)
+                putBoolean(COMPLETE_ON_ENTER_ARG, completeOnEnterButton)
+                putInt(INPUT_TYPE_ARG, inputType)
+                putString(DIGITS_ARG, digits)
+                putBundle(EXTRA_DATA_ARG, extra)
+                putStringArray(HINTS_ARG, hints)
+            }
+        }
+    }
 
     private lateinit var editText: AutoCompleteTextView
     

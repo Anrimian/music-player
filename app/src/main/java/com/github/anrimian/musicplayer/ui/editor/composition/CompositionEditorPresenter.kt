@@ -4,16 +4,18 @@ import com.github.anrimian.filesync.SyncInteractor
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
-import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.models.utils.isFileExists
+import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
+import java.util.Collections
 
 class CompositionEditorPresenter(
     private val compositionId: Long,
@@ -26,15 +28,16 @@ class CompositionEditorPresenter(
     private var changeDisposable: Disposable? = null
 
     private lateinit var composition: FullComposition
+    private lateinit var genres: MutableList<String>
     private lateinit var fileSyncState: FileSyncState
 
-    private var removedGenre: ShortGenre? = null
     private var lastEditAction: Completable? = null
+
+    private var startGenreDragPosition = 0
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         subscribeOnComposition()
-        subscribeOnGenres()
         subscribeOnSyncState()
     }
 
@@ -108,7 +111,7 @@ class CompositionEditorPresenter(
     }
 
     fun onAddGenreItemClicked() {
-        editorInteractor.getGenreNames()
+        editorInteractor.getGenreNames(compositionId)
             .observeOn(uiScheduler)
             .doOnSuccess(viewState::showAddGenreDialog)
             .doOnError { throwable ->
@@ -120,8 +123,8 @@ class CompositionEditorPresenter(
             .subscribe()
     }
 
-    fun onGenreItemClicked(genre: ShortGenre) {
-        editorInteractor.getGenreNames()
+    fun onGenreItemClicked(genre: String) {
+        editorInteractor.getGenreNames(compositionId)
             .observeOn(uiScheduler)
             .doOnSuccess { genres -> viewState.showEditGenreDialog(genre, genres) }
             .doOnError { throwable ->
@@ -137,21 +140,48 @@ class CompositionEditorPresenter(
         performChangeAction(editorInteractor.addCompositionGenre(compositionId, genre))
     }
 
-    fun onNewGenreNameEntered(newName: String?, oldGenre: ShortGenre?) {
+    fun onNewGenreNameEntered(newName: String, oldGenre: String) {
         performChangeAction(editorInteractor.changeCompositionGenre(compositionId, oldGenre, newName))
     }
 
-    fun onRemoveGenreClicked(genre: ShortGenre) {
+    fun onGenreItemMoved(from: Int, to: Int) {
+        if (from < to) {
+            for (i in from until to) {
+                swapGenreItems(i, i + 1)
+            }
+        } else {
+            for (i in from downTo to + 1) {
+                swapGenreItems(i, i - 1)
+            }
+        }
+    }
+
+    fun onGenreItemDragStarted(position: Int) {
+        startGenreDragPosition = position
+    }
+
+    fun onGenreItemDragEnded(position: Int) {
+        if (startGenreDragPosition == position
+            || !ListUtils.isIndexInRange(genres, startGenreDragPosition)
+            || !ListUtils.isIndexInRange(genres, position)
+        ) {
+            return
+        }
+        performChangeAction(editorInteractor.moveGenre(compositionId, startGenreDragPosition, position))
+    }
+
+    fun onEditRequestDenied() {
+        showComposition()
+    }
+
+    fun onRemoveGenreClicked(genre: String) {
         performChangeAction(editorInteractor.removeCompositionGenre(compositionId, genre)) {
-            onGenreRemoved(genre)
+            viewState.showRemovedGenreMessage(genre)
         }
     }
 
     fun onRestoreRemovedGenreClicked() {
-        if (removedGenre == null) {
-            return
-        }
-        onNewGenreEntered(removedGenre!!.name)
+        performChangeAction(editorInteractor.restoreRemovedCompositionGenre())
     }
 
     fun onNewAuthorEntered(author: String?) {
@@ -171,15 +201,7 @@ class CompositionEditorPresenter(
     }
 
     fun onNewFileNameEntered(fileName: String) {
-        if (!::composition.isInitialized) {
-            return
-        }
-        RxUtils.dispose(changeDisposable, presenterDisposable)
-        lastEditAction = editorInteractor.editCompositionFileName(composition, fileName)
-            .observeOn(uiScheduler)
-            .doOnSubscribe { viewState.showChangeFileProgress() }
-            .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
+        performChangeAction(editorInteractor.editCompositionFileName(compositionId, fileName))
     }
 
     fun onNewTrackNumberEntered(number: Long?) {
@@ -192,10 +214,6 @@ class CompositionEditorPresenter(
 
     fun onNewCommentEntered(text: String?) {
         performChangeAction(editorInteractor.editCompositionComment(compositionId, text))
-    }
-
-    fun onNewLyricsEntered(text: String?) {
-        performChangeAction(editorInteractor.editCompositionLyrics(compositionId, text))
     }
 
     fun onCopyFileNameClicked() {
@@ -258,17 +276,23 @@ class CompositionEditorPresenter(
         changeDisposable?.dispose()
     }
 
+    private fun swapGenreItems(from: Int, to: Int) {
+        if (!ListUtils.isIndexInRange(genres, from) || !ListUtils.isIndexInRange(genres, to)) {
+            return
+        }
+
+        Collections.swap(genres, from, to)
+        viewState.notifyGenreItemMoved(from, to)
+    }
+
     private fun performChangeAction(action: Completable, onComplete: (() -> Unit)? = null) {
         RxUtils.dispose(changeDisposable, presenterDisposable)
         lastEditAction = action
             .observeOn(uiScheduler)
             .doOnSubscribe { viewState.showChangeFileProgress() }
             .doFinally { viewState.hideChangeFileProgress() }
-        changeDisposable = lastEditAction!!.subscribe(
-            { onComplete?.invoke() },
-            this::onDefaultError,
-            presenterDisposable
-        )
+            .doOnComplete { onComplete?.invoke() }
+        changeDisposable = lastEditAction!!.subscribe({}, this::onDefaultError, presenterDisposable)
     }
 
     private fun onDefaultError(throwable: Throwable) {
@@ -283,20 +307,11 @@ class CompositionEditorPresenter(
 
     private fun subscribeOnComposition() {
         editorInteractor.getCompositionObservable(compositionId)
-            .subscribeOnUi(
+            .runOnUi(
                 this::onCompositionReceived,
-                this::onCompositionLoadingError,
+                viewState::showCompositionLoadingError,
                 viewState::closeScreen
             )
-    }
-
-    private fun subscribeOnGenres() {
-        editorInteractor.getShortGenresInComposition(compositionId)
-            .subscribeOnUi(this::onGenresReceived, this::onDefaultError)
-    }
-
-    private fun onGenresReceived(shortGenres: List<ShortGenre>) {
-        viewState.showGenres(shortGenres)
     }
 
     private fun onSyncStateReceived(syncState: FileSyncState) {
@@ -310,15 +325,18 @@ class CompositionEditorPresenter(
             checkCompositionTagsInSource(composition)
         }
         if (firstReceive
-            || this.composition.dateModified != composition.dateModified
             || this.composition.coverModifyTime != composition.coverModifyTime
-            || this.composition.size != composition.size
             || this.composition.isFileExists() != composition.isFileExists()) {
             viewState.showCompositionCover(composition)
         }
         this.composition = composition
-        viewState.showComposition(composition)
+        showComposition()
         showSyncState()
+    }
+
+    private fun showComposition() {
+        this.genres = CompositionHelper.splitGenres(composition.genres).toMutableList()
+        viewState.showComposition(composition, genres)
     }
 
     private fun showSyncState() {
@@ -328,21 +346,8 @@ class CompositionEditorPresenter(
     }
 
     private fun checkCompositionTagsInSource(composition: FullComposition) {
-        editorInteractor.updateTagsFromSource(composition).justSubscribeOnUi(this::onTagCheckError)
+        editorInteractor.updateTagsFromSource(composition)
+            .runOnUi(viewState::showCheckTagsErrorMessage)
     }
 
-    private fun onTagCheckError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showCheckTagsErrorMessage(errorCommand)
-    }
-
-    private fun onCompositionLoadingError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showCompositionLoadingError(errorCommand)
-    }
-
-    private fun onGenreRemoved(genre: ShortGenre) {
-        removedGenre = genre
-        viewState.showRemovedGenreMessage(genre)
-    }
 }

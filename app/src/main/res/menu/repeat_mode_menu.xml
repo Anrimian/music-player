@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/menu_repeat_playlist"
+    <item android:id="@+id/menu_repeat_queue"
         android:title="@string/repeat_playlist"
         android:icon="@drawable/ic_repeat"
         app:iconTint="?android:attr/textColorPrimary"/>
@@ -12,5 +12,9 @@
     <item android:id="@+id/menu_do_not_repeat"
         android:title="@string/do_not_repeat"
         android:icon="@drawable/ic_repeat_off"
+        app:iconTint="?android:attr/textColorPrimary"/>
+    <item android:id="@+id/menu_play_once"
+        android:title="@string/play_once"
+        android:icon="@drawable/ic_play_once"
         app:iconTint="?android:attr/textColorPrimary"/>
 </menu>

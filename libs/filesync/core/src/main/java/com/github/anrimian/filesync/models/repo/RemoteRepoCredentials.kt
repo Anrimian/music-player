@@ -1,3 +1,5 @@
 package com.github.anrimian.filesync.models.repo
 
-interface RemoteRepoCredentials
+interface RemoteRepoCredentials {
+    fun getRepoType(): Int
+}

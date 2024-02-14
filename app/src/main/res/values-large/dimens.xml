@@ -7,9 +7,12 @@
     <item name="popup_dialog_min_width_minor" type="dimen">60%</item>
 
     <!--player bottom sheet-->
+    <dimen name="panel_cover_wrapper_size">58dp</dimen>
+    <dimen name="panel_cover_size">56dp</dimen>
     <dimen name="bottom_sheet_expand_height">210dp</dimen>
     <dimen name="bottom_sheet_height">76dp</dimen>
     <dimen name="control_button_width">64dp</dimen>
+    <dimen name="panel_title_margin_start">16dp</dimen>
 
     <!--content margins-->
     <dimen name="content_internal_margin">16dp</dimen>
@@ -32,4 +35,7 @@
     <dimen name="toolbar_player_content_start_padding">16dp</dimen>
     <!--    -->
     <dimen name="toolbar_control_offset">8dp</dimen>
+
+    <!--volume popup-->
+    <integer name="volume_popup_panel_gravity">16</integer><!--Gravity.CENTER_VERTICAL-->
 </resources>

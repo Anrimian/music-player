@@ -57,6 +57,7 @@ class LibrarySettingsFragment : MvpAppCompatFragment(),
         onCheckChanged(binding.cbDoNotShowDeleteDialog, presenter::doNotAppConfirmDialogChecked)
         onCheckChanged(binding.cbShowAllAudioFiles, presenter::onShowAllAudioFilesChecked)
         onCheckChanged(binding.cbPlaylistInsertStart, presenter::onPlaylistInsertStartChecked)
+        onCheckChanged(binding.cbPlaylistDuplicateCheck, presenter::onPlaylistDuplicateCheckChecked)
 
         binding.flAudioMinDurationClickableArea.setOnClickListener {
             presenter.onSelectMinDurationClicked()
@@ -90,6 +91,10 @@ class LibrarySettingsFragment : MvpAppCompatFragment(),
 
     override fun showPlaylistInsertStartEnabled(enabled: Boolean) {
         ViewUtils.setChecked(binding.cbPlaylistInsertStart, enabled)
+    }
+
+    override fun showPlaylistDuplicateCheckEnabled(enabled: Boolean) {
+        ViewUtils.setChecked(binding.cbPlaylistDuplicateCheck, enabled)
     }
 
     override fun showSelectMinAudioDurationDialog(currentValue: Long) {

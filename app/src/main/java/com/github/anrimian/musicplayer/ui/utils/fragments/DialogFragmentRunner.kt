@@ -21,5 +21,9 @@ class DialogFragmentRunner<T : DialogFragment>(
         fragment.safeShow(fragmentManager, tag)
     }
 
+    fun close() {
+        val fragment = fragmentManager.findFragmentByTag(tag) as DialogFragment?
+        fragment?.dismissAllowingStateLoss()
+    }
 
 }

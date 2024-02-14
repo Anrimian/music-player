@@ -4,7 +4,6 @@ import com.github.anrimian.filesync.models.RemoteFileSource
 import com.github.anrimian.filesync.models.SyncEnvCondition
 import com.github.anrimian.filesync.models.repo.RemoteRepoFullInfo
 import com.github.anrimian.filesync.models.repo.RemoteRepoInfo
-import com.github.anrimian.filesync.models.repo.RemoteRepoType
 import com.github.anrimian.filesync.models.repo.RepoSetupTemplate
 import com.github.anrimian.filesync.models.state.SyncState
 import com.github.anrimian.filesync.models.state.file.FileSyncState
@@ -24,13 +23,15 @@ interface SyncInteractor<K, T, I> {
     fun onLocalFileAdded()
     fun onLocalFileDeleted(key: K)
     fun onLocalFilesDeleted(keys: List<K>)
+    fun onLocalFileKeyChanged(key: Pair<K, K>)
+    fun onLocalFilesKeyChanged(keys: List<Pair<K, K>>)
     fun notifyLocalFileChanged()
     fun isSyncEnabled(): Boolean
     fun setSyncEnabled(enabled: Boolean)
     fun onScheduledSyncCalled(): Completable
     fun getSyncConditions(): List<SyncEnvCondition>
     fun setSyncConditionEnabled(condition: SyncEnvCondition, enabled: Boolean)
-    fun getAvailableRemoteRepositories(): List<RemoteRepoType>
+    fun getAvailableRemoteRepositories(): List<Int>
     fun getSyncStateObservable(): Observable<SyncState>
     fun getRepositoriesObservable(): Observable<List<RemoteRepoFullInfo>>
     fun getTasksListObservable(): Observable<List<FileTaskInfo<K>>>

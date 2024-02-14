@@ -8,10 +8,9 @@ import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.domain.models.order.Order
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import moxy.MvpView
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryView
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
@@ -21,11 +20,7 @@ import moxy.viewstate.strategy.alias.Skip
 /**
  * Created on 23.10.2017.
  */
-
-private const val LIST_STATE = "list_state"
-private const val PROGRESS_DIALOG_STATE = "progress_dialog_state"
-
-interface LibraryFoldersView : MvpView {
+interface LibraryFoldersView : BaseLibraryView {
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showEmptyList()
@@ -70,12 +65,6 @@ interface LibraryFoldersView : MvpView {
     fun showSelectPlayListDialog()
 
     @OneExecution
-    fun showAddingToPlayListError(errorCommand: ErrorCommand)
-
-    @OneExecution
-    fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>)
-
-    @OneExecution
     fun showSelectPlayListForFolderDialog(folder: FolderFileSource)
 
     @OneExecution
@@ -93,14 +82,8 @@ interface LibraryFoldersView : MvpView {
     @OneExecution
     fun sendCompositions(compositions: List<Composition>)
 
-    @OneExecution
-    fun showReceiveCompositionsForSendError(errorCommand: ErrorCommand)
-
     @Skip
     fun goToMusicStorageScreen(folderId: Long)
-
-    @OneExecution
-    fun showErrorMessage(errorCommand: ErrorCommand)
 
     @AddToEndSingle
     fun setDisplayCoversEnabled(isCoversEnabled: Boolean)
@@ -135,12 +118,6 @@ interface LibraryFoldersView : MvpView {
     @OneExecution
     fun showAddedIgnoredFolderMessage(folder: IgnoredFolder)
 
-    @OneExecution
-    fun onCompositionsAddedToPlayNext(compositions: List<Composition>)
-
-    @OneExecution
-    fun onCompositionsAddedToQueue(compositions: List<Composition>)
-
     @AddToEndSingle
     fun showCurrentComposition(currentComposition: CurrentComposition)
 
@@ -149,5 +126,10 @@ interface LibraryFoldersView : MvpView {
 
     @AddToEndSingle
     fun showFilesSyncState(states: Map<Long, FileSyncState>)
+
+    private companion object {
+        const val LIST_STATE = "list_state"
+        const val PROGRESS_DIALOG_STATE = "progress_dialog_state"
+    }
 
 }

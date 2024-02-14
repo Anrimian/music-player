@@ -84,6 +84,7 @@
 
             <androidx.appcompat.widget.ActionMenuView
                 android:id="@+id/acvMain"
+                android:theme="@style/ActionMenuViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginEnd="@dimen/toolbar_control_offset_2"
@@ -137,7 +138,7 @@
 
             <androidx.appcompat.widget.ActionMenuView
                 android:id="@+id/acvSelection"
-                android:theme="@style/SelectionOverflowButtonStyle"
+                android:theme="@style/SelectionActionMenuViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginEnd="@dimen/toolbar_control_offset"

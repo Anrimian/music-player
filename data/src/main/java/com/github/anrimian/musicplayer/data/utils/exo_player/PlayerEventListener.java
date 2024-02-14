@@ -1,10 +1,10 @@
 package com.github.anrimian.musicplayer.data.utils.exo_player;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
 
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.google.android.exoplayer2.PlaybackException;
-import com.google.android.exoplayer2.Player;
 
 public class PlayerEventListener implements Player.Listener {
 

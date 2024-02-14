@@ -5,7 +5,6 @@ import com.github.anrimian.filesync.models.RemoteFileSource
 import com.github.anrimian.filesync.models.SyncEnvCondition
 import com.github.anrimian.filesync.models.repo.RemoteRepoFullInfo
 import com.github.anrimian.filesync.models.repo.RemoteRepoInfo
-import com.github.anrimian.filesync.models.repo.RemoteRepoType
 import com.github.anrimian.filesync.models.repo.RepoSetupTemplate
 import com.github.anrimian.filesync.models.state.SyncState
 import com.github.anrimian.filesync.models.state.file.FileSyncState
@@ -33,6 +32,8 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
     override fun onLocalFileAdded() {}
     override fun onLocalFileDeleted(key: K) {}
     override fun onLocalFilesDeleted(keys: List<K>) {}
+    override fun onLocalFileKeyChanged(key: Pair<K, K>) {}
+    override fun onLocalFilesKeyChanged(keys: List<Pair<K, K>>) {}
     override fun notifyLocalFileChanged() {}
     override fun isSyncEnabled() = false
     override fun setSyncEnabled(enabled: Boolean) {}
@@ -43,7 +44,7 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
 
     override fun setSyncConditionEnabled(condition: SyncEnvCondition, enabled: Boolean) {}
 
-    override fun getAvailableRemoteRepositories(): List<RemoteRepoType> {
+    override fun getAvailableRemoteRepositories(): List<Int> {
         return emptyList()
     }
 

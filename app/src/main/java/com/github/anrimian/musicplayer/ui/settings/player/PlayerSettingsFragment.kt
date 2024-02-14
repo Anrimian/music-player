@@ -30,7 +30,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
     private val presenter by moxyPresenter { Components.getSettingsComponent().playerSettingsPresenter() }
     
-    private lateinit var viewBinding: FragmentSettingsPlayerBinding
+    private lateinit var binding: FragmentSettingsPlayerBinding
 
     private lateinit var enabledMediaPlayersDialogFragmentRunner: DialogFragmentRunner<EnabledMediaPlayersDialogFragment>
 
@@ -39,8 +39,8 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentSettingsPlayerBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentSettingsPlayerBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,16 +50,16 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         toolbar.setSubtitle(R.string.playing)
         toolbar.setTitleClickListener(null)
 
-        ViewUtils.onCheckChanged(viewBinding.cbDecreaseVolume, presenter::onDecreaseVolumeOnAudioFocusLossChecked)
-        ViewUtils.onCheckChanged(viewBinding.cbPauseOnAudioFocusLoss, presenter::onPauseOnAudioFocusLossChecked)
-        ViewUtils.onCheckChanged(viewBinding.cbPauseOnZeroVolumeLevel, presenter::onPauseOnZeroVolumeLevelChecked)
+        ViewUtils.onCheckChanged(binding.cbDecreaseVolume, presenter::onDecreaseVolumeOnAudioFocusLossChecked)
+        ViewUtils.onCheckChanged(binding.cbPauseOnAudioFocusLoss, presenter::onPauseOnAudioFocusLossChecked)
+        ViewUtils.onCheckChanged(binding.cbPauseOnZeroVolumeLevel, presenter::onPauseOnZeroVolumeLevelChecked)
 
-        viewBinding.flEqualizerClickableArea.setOnClickListener { showEqualizerDialog() }
-        viewBinding.flMediaPlayersClickableArea.setOnClickListener { showMediaPlayersSettingScreen() }
-        viewBinding.flKeepNotificationClickableArea.setOnClickListener { presenter.onSelectKeepNotificationTimeClicked() }
-        viewBinding.flSoundBalanceClickableArea.setOnClickListener { presenter.onSoundBalanceClicked() }
+        binding.flEqualizerClickableArea.setOnClickListener { showEqualizerDialog() }
+        binding.flMediaPlayersClickableArea.setOnClickListener { showMediaPlayersSettingScreen() }
+        binding.flKeepNotificationClickableArea.setOnClickListener { presenter.onSelectKeepNotificationTimeClicked() }
+        binding.flSoundBalanceClickableArea.setOnClickListener { presenter.onSoundBalanceClicked() }
 
-        SlidrPanel.simpleSwipeBack(viewBinding.nsvContainer, this, toolbar::onStackFragmentSlided)
+        SlidrPanel.simpleSwipeBack(binding.nsvContainer, this, toolbar::onStackFragmentSlided)
 
         enabledMediaPlayersDialogFragmentRunner = DialogFragmentRunner(
             childFragmentManager,
@@ -68,30 +68,30 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
     }
 
     override fun showDecreaseVolumeOnAudioFocusLossEnabled(checked: Boolean) {
-        ViewUtils.setChecked(viewBinding.cbDecreaseVolume, checked)
+        ViewUtils.setChecked(binding.cbDecreaseVolume, checked)
     }
 
     override fun showPauseOnAudioFocusLossEnabled(checked: Boolean) {
-        ViewUtils.setChecked(viewBinding.cbPauseOnAudioFocusLoss, checked)
+        ViewUtils.setChecked(binding.cbPauseOnAudioFocusLoss, checked)
     }
 
     override fun showPauseOnZeroVolumeLevelEnabled(enabled: Boolean) {
-        ViewUtils.setChecked(viewBinding.cbPauseOnZeroVolumeLevel, enabled)
+        ViewUtils.setChecked(binding.cbPauseOnZeroVolumeLevel, enabled)
     }
 
     override fun showSoundBalance(soundBalance: SoundBalance) {
         val left = (soundBalance.left * 100).toInt()
         val right = (soundBalance.right * 100).toInt()
-        viewBinding.tvSoundBalanceState.text = getString(R.string.sound_balance_state, left, right)
+        binding.tvSoundBalanceState.text = getString(R.string.sound_balance_state, left, right)
     }
 
     override fun showSelectedEqualizerType(type: Int) {
-        viewBinding.tvEqualizerState.setText(getEqualizerTypeDescription(type))
+        binding.tvEqualizerState.setText(getEqualizerTypeDescription(type))
     }
 
     override fun showKeepNotificationTime(millis: Long) {
         val minutes = millis.millisToMinutes().toInt()
-        viewBinding.tvKeepNotificationTimeValue.text = resources.getQuantityString(
+        binding.tvKeepNotificationTimeValue.text = resources.getQuantityString(
             R.plurals.for_at_least_minutes,
             minutes,
             minutes
@@ -115,7 +115,7 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
                 sb.append(", ")
             }
         }
-        viewBinding.tvMediaPlayersState.text = sb.toString()
+        binding.tvMediaPlayersState.text = sb.toString()
     }
 
     override fun showSoundBalanceDialog(soundBalance: SoundBalance) {

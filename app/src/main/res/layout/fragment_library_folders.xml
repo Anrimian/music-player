@@ -75,6 +75,7 @@
                 android:layout_marginEnd="@dimen/margin_normal"
                 android:tint="@android:color/white"
                 android:contentDescription="@string/play_all_in_folder"
+                app:shapeAppearanceOverlay="@style/FabShapeAppearance"
                 app:fabSize="normal"
                 app:layout_anchor="@id/rvFileSources"
                 app:layout_anchorGravity="bottom|right|end"

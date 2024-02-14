@@ -19,7 +19,7 @@ import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaS
 import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
 import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
-import com.github.anrimian.musicplayer.domain.Constants;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlayListFileNameValidator;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.utils.rx.FastDebounceFilter;
 
@@ -33,7 +33,6 @@ import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-import kotlin.text.StringsKt;
 
 public class StoragePlayListsProvider {
 
@@ -258,8 +257,7 @@ public class StoragePlayListsProvider {
         if (name == null) {
             return null;
         }
-        name = name.replaceAll(Constants.PLAYLIST_NOT_ALLOWED_CHARACTERS, "").trim();
-        name = StringsKt.take(name, Constants.PLAYLIST_NAME_MAX_LENGTH);
+        name = PlayListFileNameValidator.INSTANCE.getFormattedPlaylistName(name);
 
         long dateAdded = cursorWrapper.getLong(Playlists.DATE_ADDED);
         long dateModified = cursorWrapper.getLong(Playlists.DATE_MODIFIED);

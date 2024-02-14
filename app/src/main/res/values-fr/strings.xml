@@ -13,7 +13,6 @@
     <string name="file_not_found">Fichier non trouvé</string>
     <string name="compositions_on_device_not_found">Aucune chanson trouvée sur l\'appareil</string>
     <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
-    <string name="compositions_for_search_not_found">Aucun résultat de recherche correspondant n\'a été trouvé</string>
     <string name="foreground_channel_description">Notification du lecteur au premier plan</string>
     <string name="previous_track">Piste précédante</string>
     <string name="next_track">Piste suivante</string>
@@ -286,6 +285,22 @@
     <string name="playlist_has_no_records">La liste de lecture n\'a aucun enregistrement</string>
     <string name="export_playlists_success">Le fichier \"%1$s.m3u\" a été enregistré dans le stockage interne</string>
     <!---->
+    <!--not verified-->
+    <string name="name_is_too_long">le nom est trop long</string>
+    <string name="play_queue_items_limit_error">Le nombre d\'éléments de la file d\'attente de lecture ne peut pas être supérieur à %d</string>
+    <string name="play_list_items_limit_error">Le nombre d\'éléments de la playlist ne peut pas dépasser %d</string>
+    <string name="volume_up">Augmenter le volume</string>
+    <string name="volume_down">Volume en baisse</string>
+    <string name="no_matching_search_results_found">Aucun résultat de recherche correspondant trouvé</string>
+    <string name="covers_shape">Couvre la forme</string>
+    <string name="play_once">Jouer une fois</string>
+    <string name="back">Retour</string>
+    <string name="duplicates_detected">Doublons détectés</string>
+    <string name="playlist_duplicates_description">Certaines compositions sont déjà dans la playlist \'%1$s\'. \nLes ajouter quand même ?</string>
+    <string name="check_for_duplicates">Vérifiez la liste de lecture pour les doublons avant d\'ajouter de nouvelles compositions</string>
+    <string name="more_template">…%d plus</string>
+    <string name="add_without_duplicates">Ajouter sans doublons</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s morceau</item>
@@ -364,6 +379,19 @@
         <item quantity="one">La liste de lecture a été importée avec succès, mais %d fichier n\'a pas été trouvé dans la bibliothèque</item>
         <item quantity="many">La liste de lecture a été importée avec succès, mais %d fichiers n\'ont pas été trouvés dans la bibliothèque</item>
         <item quantity="other">La liste de lecture a été importée avec succès, mais %d fichiers n\'ont pas été trouvés dans la bibliothèque</item>
+    </plurals>
+    <!---->
+    <!--not verified-->
+    <plurals name="delete_playlists_template">
+        <item quantity="one">Supprimer %d playlist</item>
+        <item quantity="many">Supprimer %d listes de lecture</item>
+        <item quantity="other">Supprimer %d listes de lecture</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d playlist supprimée</item>
+        <item quantity="many">%d listes de lecture supprimées</item>
+        <item quantity="other">%d listes de lecture supprimées</item>
     </plurals>
     <!---->
     

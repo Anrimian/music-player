@@ -1,9 +1,11 @@
 package com.github.anrimian.musicplayer.domain.interactors.player
 
+import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
+import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -12,7 +14,8 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 class ExternalPlayerInteractor(
     private val playerCoordinatorInteractor: PlayerCoordinatorInteractor,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val systemMusicController: SystemMusicController
 ) {
 
     private val playerDisposable = CompositeDisposable()
@@ -116,6 +119,10 @@ class ExternalPlayerInteractor(
     }
 
     fun getCurrentSource() = currentSource
+
+    fun getVolumeObservable(): Observable<VolumeState> {
+        return systemMusicController.volumeStateObservable
+    }
 
     private fun onMusicPlayerEventReceived(playerEvent: PlayerEvent) {
         when (playerEvent) {

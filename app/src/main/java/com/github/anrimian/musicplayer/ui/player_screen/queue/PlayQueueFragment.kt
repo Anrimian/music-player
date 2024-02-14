@@ -19,16 +19,18 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
-import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
-import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 import com.github.anrimian.musicplayer.ui.player_screen.queue.adapter.PlayQueueAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
@@ -42,7 +44,6 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.google.android.material.snackbar.Snackbar
-import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 import kotlin.math.abs
 
@@ -57,13 +58,13 @@ import kotlin.math.abs
  *    Repeat several times.
  *  + Manually scroll to position, rotate screen -> We should be on the scrolled position
  */
-class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
+class PlayQueueFragment: BaseLibraryFragment(), PlayQueueView {
 
     private val presenter by moxyPresenter {
         Components.getLibraryComponent().playQueuePresenter()
     }
 
-    private lateinit var viewBinding: FragmentPlayQueueBinding
+    private lateinit var binding: FragmentPlayQueueBinding
 
     private lateinit var clPlayQueueContainer: CoordinatorLayout
     private lateinit var acvToolbar: ActionMenuView
@@ -82,13 +83,15 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
 
     private var isActionMenuEnabled = false
 
+    override fun getLibraryPresenter(): BaseLibraryPresenter<*> = presenter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentPlayQueueBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentPlayQueueBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,21 +101,21 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
         acvToolbar = requireActivity().findViewById(R.id.acvPlayQueue)
         tvQueueSubtitle = requireActivity().findViewById(R.id.tvQueueSubtitle)
 
-        viewBinding.progressStateView.onTryAgainClick(presenter::onLoadAgainQueueClicked)
+        binding.progressStateView.onTryAgainClick(presenter::onLoadAgainQueueClicked)
 
         playQueueLayoutManager = LinearLayoutManager(requireContext())
-        viewBinding.rvPlayQueue.layoutManager = playQueueLayoutManager
+        binding.rvPlayQueue.layoutManager = playQueueLayoutManager
         playQueueAdapter = PlayQueueAdapter(
             this,
-            viewBinding.rvPlayQueue,
+            binding.rvPlayQueue,
             presenter::onQueueItemClicked,
             this::onPlayItemMenuClicked,
             presenter::onQueueItemIconClicked
         )
 
-        viewBinding.rvPlayQueue.adapter = playQueueAdapter
+        binding.rvPlayQueue.adapter = playQueueAdapter
         val callback = FormatUtils.withSwipeToDelete(
-            viewBinding.rvPlayQueue,
+            binding.rvPlayQueue,
             AndroidUtils.getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
             presenter::onItemSwipedToDelete,
             ItemTouchHelper.START,
@@ -123,7 +126,7 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
         callback.setOnStartDragListener { presenter.onDragStarted() }
         callback.setOnEndDragListener { presenter.onDragEnded() }
         val itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(viewBinding.rvPlayQueue)
+        itemTouchHelper.attachToRecyclerView(binding.rvPlayQueue)
 
         deletingErrorHandler = DeleteErrorHandler(
             this,
@@ -142,6 +145,8 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
         ) { fragment -> fragment.setOnCompleteListener(presenter::onPlayListForAddingSelected) }
     }
 
+    override fun getCoordinatorLayout() = clPlayQueueContainer
+
     override fun showPlayerState(isPlaying: Boolean) {
         playQueueAdapter.showPlaying(isPlaying)
     }
@@ -155,9 +160,9 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
     }
 
     override fun showCurrentQueueItem(item: PlayQueueItem?) {
-        ViewUtils.animateVisibility(viewBinding.rvPlayQueue, View.VISIBLE)
+        ViewUtils.animateVisibility(binding.rvPlayQueue, View.VISIBLE)
         if (item == null) {
-            viewBinding.rvPlayQueue.contentDescription = getString(R.string.no_current_composition)
+            binding.rvPlayQueue.contentDescription = getString(R.string.no_current_composition)
         } else {
             playQueueAdapter.onCurrentItemChanged(item)
         }
@@ -201,23 +206,6 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
             .show()
     }
 
-    override fun showErrorMessage(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(clPlayQueueContainer, errorCommand.message).show()
-    }
-
-    override fun showAddingToPlayListComplete(playList: PlayList?, compositions: List<Composition>) {
-        val text = MessagesUtils.getAddToPlayListCompleteMessage(requireActivity(), playList, compositions)
-        MessagesUtils.makeSnackbar(clPlayQueueContainer, text, Snackbar.LENGTH_SHORT).show()
-    }
-
-    override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            clPlayQueueContainer,
-            getString(R.string.add_to_playlist_error_template, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
     override fun setPlayQueueCoversEnabled(isCoversEnabled: Boolean) {
         playQueueAdapter.setCoversEnabled(isCoversEnabled)
     }
@@ -227,20 +215,20 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
 
         val isEmpty = itemsCount == 0
         val bgColor = if (isEmpty) {
-            viewBinding.progressStateView.showMessage(R.string.play_queue_is_empty)
+            binding.progressStateView.showMessage(R.string.play_queue_is_empty)
             requireContext().colorFromAttr(android.R.attr.colorBackground)
         } else {
-            viewBinding.progressStateView.hideAll()
+            binding.progressStateView.hideAll()
             requireContext().colorFromAttr(R.attr.listBackground)
         }
-        viewBinding.root.setBackgroundColor(bgColor)
+        binding.root.setBackgroundColor(bgColor)
 
         isActionMenuEnabled = !isEmpty
         showMenuState()
     }
 
     override fun showListError(errorCommand: ErrorCommand) {
-        viewBinding.progressStateView.showMessage(errorCommand.message, true)
+        binding.progressStateView.showMessage(errorCommand.message, true)
     }
 
     override fun updatePlayQueue(items: List<PlayQueueItem>?) {
@@ -267,7 +255,7 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
                 || position == playQueueLayoutManager.findFirstVisibleItemPosition()
                 || position == playQueueLayoutManager.findLastVisibleItemPosition()
         RecyclerViewUtils.scrollToPosition(
-            viewBinding.rvPlayQueue,
+            binding.rvPlayQueue,
             playQueueLayoutManager,
             position,
             isSmoothScrollAllowed && smooth
@@ -287,10 +275,10 @@ class PlayQueueFragment: MvpAppCompatFragment(), PlayQueueView {
 
     private fun onPlayItemMenuClicked(view: View, playQueueItem: PlayQueueItem) {
         val composition = playQueueItem.composition
-        PopupMenuWindow.showPopup(view, R.menu.play_queue_item_menu) { item ->
+        showCompositionPopupMenu(view, R.menu.play_queue_item_menu, composition) { item ->
             when (item.itemId) {
                 R.id.menu_add_to_playlist -> presenter.onAddQueueItemToPlayListButtonClicked(composition)
-                R.id.menu_edit -> startActivity(newCompositionEditorIntent(requireContext(), composition.id))
+                R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.id))
                 R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), composition)
                 R.id.menu_share -> shareComposition(this, composition)
                 R.id.menu_delete_from_queue -> presenter.onDeleteQueueItemClicked(playQueueItem)

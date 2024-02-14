@@ -18,7 +18,7 @@ class FolderRootPresenter(
 
     fun onCreateFolderTreeRequested() {
         viewState.showProgress()
-        interactor.currentFolderScreens
+        interactor.getCurrentFolderScreens()
             .subscribeOnUi(this::onScreensReceived, this::onScreensReceivingError)
     }
 

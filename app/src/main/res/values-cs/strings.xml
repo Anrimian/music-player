@@ -13,7 +13,6 @@
     <string name="file_not_found">Soubor nenalezen</string>
     <string name="compositions_on_device_not_found">Na zařízení nebyla nalezena žádná skladba</string>
     <string name="compositions_and_folders_for_search_not_found">Skladby a složky odpovídající výsledkům hledání nebyly nalezeny</string>
-    <string name="compositions_for_search_not_found">Nebyly nalezeny žádné odpovídající výsledky vyhledávání</string>
     <string name="foreground_channel_description">Oznámení přehrávače při běhu na popředí</string>
     <string name="previous_track">Předchozí skladba</string>
     <string name="next_track">Další skladba</string>
@@ -283,6 +282,22 @@
     <string name="overwrite_playlist">Seznam skladeb s tímto názvem již existuje. \nPřepsat?</string>
     <string name="playlist_has_no_records">Seznam skladeb neobsahuje žádné skladby</string>
     <string name="export_playlists_success">Soubor \"%1$s.m3u\" byl uložen do vnitřního úložiště</string>
+    <!--not verified-->
+    <string name="name_is_too_long">název je příliš dlouhý</string>
+    <string name="play_queue_items_limit_error">Počet položek ve frontě přehrávání nemůže být vyšší než %d</string>
+    <string name="play_list_items_limit_error">Počet položek seznamu videí nemůže být vyšší než %d</string>
+    <string name="volume_up">Zvýšení hlasitosti</string>
+    <string name="volume_down">Snížit hlasitost</string>
+    <string name="no_matching_search_results_found">Nebyly nalezeny žádné odpovídající výsledky vyhledávání</string>
+    <string name="covers_shape">Pokrývá tvar</string>
+    <string name="play_once">Přehrát jednou</string>
+    <string name="back">Zpět</string>
+    <string name="duplicates_detected">Byly zjištěny duplikáty</string>
+    <string name="playlist_duplicates_description">Některé skladby již jsou v seznamu skladeb \'%1$s\'. \nChcete je přesto přidat?</string>
+    <string name="check_for_duplicates">Před přidáním nových skladeb zkontrolujte seznam skladeb, zda neobsahuje duplikáty</string>
+    <string name="more_template">…%d dalších</string>
+    <string name="add_without_duplicates">Přidat bez duplikátů</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s píseň</item>
@@ -374,5 +389,21 @@
         <item quantity="many">Seznam skladeb byly úspěšně importován, ale %d souborů nebyl nalezen v knihovně</item>
         <item quantity="other">Seznam skladeb byly úspěšně importován, ale %d souborů nebyl nalezen v knihovně</item>
     </plurals>
+
+    <!--not verified-->
+    <plurals name="delete_playlists_template">
+        <item quantity="one">Smazat %d seznam skladeb</item>
+        <item quantity="few">Smazat %d seznam skladeb</item>
+        <item quantity="many">Odebrat %d seznamy videí</item>
+        <item quantity="other">Odebrat %d seznamy videí</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d seznam skladeb byl smazán</item>
+        <item quantity="few">%d seznam videí odstraněn</item>
+        <item quantity="many">Bylo odstraněno %d seznamů videí</item>
+        <item quantity="other">%d seznamů videí odstraněno</item>
+    </plurals>
+    <!---->
 
 </resources>

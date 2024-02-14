@@ -5,7 +5,7 @@ import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.
 import androidx.annotation.Nullable;
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
@@ -23,16 +23,16 @@ import io.reactivex.rxjava3.core.Single;
 
 public class AlbumsDaoWrapper {
 
-    private final AppDatabase appDatabase;
+    private final LibraryDatabase libraryDatabase;
     private final AlbumsDao albumsDao;
     private final ArtistsDao artistsDao;
     private final ArtistsDaoWrapper artistsDaoWrapper;
 
-    public AlbumsDaoWrapper(AppDatabase appDatabase,
+    public AlbumsDaoWrapper(LibraryDatabase libraryDatabase,
                             AlbumsDao albumsDao,
                             ArtistsDao artistsDao,
                             ArtistsDaoWrapper artistsDaoWrapper) {
-        this.appDatabase = appDatabase;
+        this.libraryDatabase = libraryDatabase;
         this.albumsDao = albumsDao;
         this.artistsDao = artistsDao;
         this.artistsDaoWrapper = artistsDaoWrapper;
@@ -81,7 +81,7 @@ public class AlbumsDaoWrapper {
     }
 
     public void updateAlbumName(String name, long id) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             albumsDao.updateAlbumCompositionsModifyTime(id, new Date());
 
             Long artistId = albumsDao.getArtistId(id);
@@ -96,7 +96,7 @@ public class AlbumsDaoWrapper {
     }
 
     public void updateAlbumArtist(long albumId, String artistName) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             albumsDao.updateAlbumCompositionsModifyTime(albumId, new Date());
 
             Long artistId = artistsDao.findArtistIdByName(artistName);

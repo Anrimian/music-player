@@ -46,7 +46,7 @@ public class FolderHelper {
 
     public static boolean hasChanges(@Nonnull FolderFileSource first, @Nonnull FolderFileSource second) {
         return first.getFilesCount() != second.getFilesCount()
-                || first.hasAnyStorageFile() != second.hasAnyStorageFile()
+                || first.getHasAnyStorageFile() != second.getHasAnyStorageFile()
                 || !Objects.equals(first.getName(), second.getName());
     }
 

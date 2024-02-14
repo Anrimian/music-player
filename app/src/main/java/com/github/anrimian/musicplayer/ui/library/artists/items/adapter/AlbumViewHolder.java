@@ -22,14 +22,14 @@ import java.util.List;
 
 public class AlbumViewHolder extends BaseViewHolder {
 
-    private final ItemAlbumHorizontalBinding viewBinding;
+    private final ItemAlbumHorizontalBinding binding;
 
     private Album album;
 
     AlbumViewHolder(@NonNull ViewGroup parent,
                     Callback<Album> itemClickListener) {
         super(parent, R.layout.item_album_horizontal);
-        viewBinding = ItemAlbumHorizontalBinding.bind(itemView);
+        binding = ItemAlbumHorizontalBinding.bind(itemView);
 
         itemView.setOnClickListener(v -> itemClickListener.call(album));
     }
@@ -58,7 +58,7 @@ public class AlbumViewHolder extends BaseViewHolder {
     }
 
     private void showAlbumName() {
-        viewBinding.tvAlbumName.setText(album.getName());
+        binding.tvAlbumName.setText(album.getName());
     }
 
     private void showCompositionsCount() {
@@ -71,11 +71,11 @@ public class AlbumViewHolder extends BaseViewHolder {
                 getContext(),
                 album.getCompositionsCount())
         );
-        viewBinding.tvCompositionsCount.setText(sb);
+        binding.tvCompositionsCount.setText(sb);
     }
 
     private void showCover() {
-        Components.getAppComponent().imageLoader().displayImage(viewBinding.ivMusicIcon,
+        Components.getAppComponent().imageLoader().displayImage(binding.ivMusicIcon,
                 album,
                 R.drawable.ic_album_placeholder);
     }

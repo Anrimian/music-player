@@ -1,12 +1,12 @@
 package com.github.anrimian.musicplayer.data.controllers.music.players
 
+import androidx.media3.common.PlaybackException
+import androidx.media3.exoplayer.upstream.Loader
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
 import com.github.anrimian.musicplayer.domain.models.composition.content.RelaunchSourceException
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
 import com.github.anrimian.musicplayer.domain.models.player.events.MediaPlayerEvent
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.upstream.Loader.UnexpectedLoaderException
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -154,7 +154,7 @@ class CompositeMediaPlayer(
     private fun isOutOfMemoryError(throwable: Throwable): Boolean {
         if (throwable is PlaybackException) {
             val cause = throwable.cause
-            return cause is UnexpectedLoaderException && cause.cause is OutOfMemoryError
+            return cause is Loader.UnexpectedLoaderException && cause.cause is OutOfMemoryError
         }
         return false
     }

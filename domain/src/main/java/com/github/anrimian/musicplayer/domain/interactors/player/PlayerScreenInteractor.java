@@ -2,10 +2,12 @@ package com.github.anrimian.musicplayer.domain.interactors.player;
 
 import com.github.anrimian.filesync.SyncInteractor;
 import com.github.anrimian.filesync.models.state.file.FileSyncState;
+import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerInteractor;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData;
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState;
+import com.github.anrimian.musicplayer.domain.models.volume.VolumeState;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
@@ -22,6 +24,7 @@ public class PlayerScreenInteractor {
     private final UiStateRepository uiStateRepository;
     private final SettingsRepository settingsRepository;
     private final MediaScannerRepository mediaScannerRepository;
+    private final SystemMusicController systemMusicController;
 
     public PlayerScreenInteractor(SleepTimerInteractor sleepTimerInteractor,
                                   LibraryPlayerInteractor libraryPlayerInteractor,
@@ -29,7 +32,8 @@ public class PlayerScreenInteractor {
                                   PlayQueueRepository playQueueRepository,
                                   UiStateRepository uiStateRepository,
                                   SettingsRepository settingsRepository,
-                                  MediaScannerRepository mediaScannerRepository) {
+                                  MediaScannerRepository mediaScannerRepository,
+                                  SystemMusicController systemMusicController) {
         this.sleepTimerInteractor = sleepTimerInteractor;
         this.libraryPlayerInteractor = libraryPlayerInteractor;
         this.syncInteractor = syncInteractor;
@@ -37,6 +41,7 @@ public class PlayerScreenInteractor {
         this.uiStateRepository = uiStateRepository;
         this.settingsRepository = settingsRepository;
         this.mediaScannerRepository = mediaScannerRepository;
+        this.systemMusicController = systemMusicController;
     }
 
     public void setPlayerPanelOpen(boolean open) {
@@ -65,6 +70,18 @@ public class PlayerScreenInteractor {
 
     public int getSelectedLibraryScreen() {
         return uiStateRepository.getSelectedLibraryScreen();
+    }
+
+    public long getSelectedArtistScreenId() {
+        return uiStateRepository.getSelectedArtistScreenId();
+    }
+
+    public long getSelectedAlbumScreenId() {
+        return uiStateRepository.getSelectedAlbumScreenId();
+    }
+
+    public long getSelectedGenreScreenId() {
+        return uiStateRepository.getSelectedGenreScreenId();
     }
 
     public void setPlayerContentPage(int position) {
@@ -105,4 +122,9 @@ public class PlayerScreenInteractor {
     public Observable<Boolean> getPlayerScreensSwipeObservable() {
         return settingsRepository.getPlayerScreensSwipeObservable();
     }
+
+    public Observable<VolumeState> getVolumeObservable() {
+        return systemMusicController.getVolumeStateObservable();
+    }
+
 }

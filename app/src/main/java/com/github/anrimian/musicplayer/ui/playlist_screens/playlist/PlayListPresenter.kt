@@ -17,13 +17,14 @@ import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
-import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilter
 import com.github.anrimian.musicplayer.ui.utils.wrappers.DeferredObject2
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
-import java.util.*
+import java.util.Collections
+import java.util.LinkedList
 
 class PlayListPresenter(
     private val playListId: Long,
@@ -33,7 +34,12 @@ class PlayListPresenter(
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
-) : AppPresenter<PlayListView>(uiScheduler, errorParser) {
+) : BaseLibraryPresenter<PlayListView>(
+    playerInteractor,
+    playListsInteractor,
+    uiScheduler,
+    errorParser
+) {
 
     private val listDragFilter = ListDragFilter()
 
@@ -100,11 +106,14 @@ class PlayListPresenter(
     }
 
     fun onAddToQueueCompositionClicked(composition: Composition) {
-        addCompositionsToEnd(listOf(composition))
+        addCompositionsToEndOfQueue(listOf(composition))
     }
 
     fun onPlayListToAddingSelected(playList: PlayList) {
-        addPreparedCompositionsToPlayList(playList)
+        performAddToPlaylist(
+            compositionsForPlayList,
+            playList
+        ) { onAddingToPlayListCompleted() }
     }
 
     fun onDeleteFromPlayListButtonClicked(playListItem: PlayListItem) {
@@ -120,7 +129,7 @@ class PlayListPresenter(
             .subscribeOnUi({ onPlayListDeleted(playList) }, this::onPlayListDeletingError)
     }
 
-    fun onFragmentMovedToTop() {
+    fun onFragmentResumed() {
         playListsInteractor.setSelectedPlayListScreen(playListId)
     }
 
@@ -148,11 +157,9 @@ class PlayListPresenter(
         if (!ListUtils.isIndexInRange(items, startDragPosition) || !ListUtils.isIndexInRange(items, position)) {
             return
         }
-        playList.call { playList ->
-            listDragFilter.increaseEventsToSkip()
-            playListsInteractor.moveItemInPlayList(playList, startDragPosition, position)
-                .justSubscribe(this::onDefaultError)
-        }
+        listDragFilter.increaseEventsToSkip()
+        playListsInteractor.moveItemInPlayList(playListId, startDragPosition, position)
+            .justSubscribe(this::onDefaultError)
     }
 
     fun onPlayActionSelected(position: Int) {
@@ -201,16 +208,6 @@ class PlayListPresenter(
 
     fun getSearchText() = searchText
 
-    private fun addCompositionsToPlayNext(compositions: List<Composition>) {
-        playerInteractor.addCompositionsToPlayNext(compositions)
-            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
-    }
-
-    private fun addCompositionsToEnd(compositions: List<Composition>) {
-        playerInteractor.addCompositionsToEnd(compositions)
-            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
-    }
-
     private fun onDefaultError(throwable: Throwable) {
         val errorCommand = errorParser.parseError(throwable)
         viewState.showErrorMessage(errorCommand)
@@ -248,18 +245,7 @@ class PlayListPresenter(
         viewState.showDeleteItemError(errorCommand)
     }
 
-    private fun addPreparedCompositionsToPlayList(playList: PlayList) {
-        playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
-            .subscribeOnUi({ onAddingToPlayListCompleted(playList) }, this::onAddingToPlayListError)
-    }
-
-    private fun onAddingToPlayListError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showAddingToPlayListError(errorCommand)
-    }
-
-    private fun onAddingToPlayListCompleted(playList: PlayList) {
-        viewState.showAddingToPlayListComplete(playList, compositionsForPlayList)
+    private fun onAddingToPlayListCompleted() {
         compositionsForPlayList.clear()
     }
 
@@ -343,7 +329,8 @@ class PlayListPresenter(
     }
 
     private fun startPlaying(position: Int = Constants.NO_POSITION) {
-        playerInteractor.startPlaying(items.map { item -> item.composition.id }, position)
+        playerInteractor.setQueueAndPlay(items.map { item -> item.composition.id }, position)
+            .runOnUi(viewState::showErrorMessage)
     }
 
 }

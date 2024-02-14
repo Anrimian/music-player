@@ -12,7 +12,6 @@
     <string name="file_not_found">File not found</string>
     <string name="compositions_on_device_not_found">No songs found on the device</string>
     <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
-    <string name="compositions_for_search_not_found">No matching search results found</string>
     <string name="foreground_channel_description">Foreground player notification</string>
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
@@ -282,8 +281,20 @@
     <string name="overwrite_playlist">Playlist with this name already exists. \nOverwrite it?</string>
     <string name="playlist_has_no_records">Playlist has no records</string>
     <string name="export_playlists_success">File \"%1$s.m3u\" was saved to internal storage</string>
-
-    <string name="name_is_too_long" translatable="false">name is too long</string>
+    <string name="name_is_too_long">name is too long</string>
+    <string name="play_queue_items_limit_error">Play queue items count can not be more than %d</string>
+    <string name="play_list_items_limit_error">Playlist items count can not be more than %d</string>
+    <string name="volume_up">Volume up</string>
+    <string name="volume_down">Volume down</string>
+    <string name="no_matching_search_results_found">No matching search results found</string>
+    <string name="covers_shape">Covers shape</string>
+    <string name="play_once">Play once</string>
+    <string name="back">Back</string>
+    <string name="duplicates_detected">Duplicates detected</string>
+    <string name="playlist_duplicates_description">Some compositions already are in the playlist \'%1$s\'. \nAdd them anyway?</string>
+    <string name="check_for_duplicates">Check playlist for duplicates before adding new compositions</string>
+    <string name="more_template">…%d more</string>
+    <string name="add_without_duplicates">Add without duplicates</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s song</item>
@@ -348,6 +359,16 @@
     <plurals name="playlist_import_partial_success">
         <item quantity="one">Playlist was imported successfully, but %d file was not found in library</item>
         <item quantity="other">Playlist was imported successfully, but %d files were not found in library</item>
+    </plurals>
+
+    <plurals name="delete_playlists_template">
+        <item quantity="one">Delete %d playlist</item>
+        <item quantity="other">Delete %d playlists</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d playlist deleted</item>
+        <item quantity="other">%d playlists deleted</item>
     </plurals>
 
 </resources>

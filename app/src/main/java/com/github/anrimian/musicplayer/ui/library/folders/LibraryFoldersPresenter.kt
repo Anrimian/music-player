@@ -1,8 +1,11 @@
 package com.github.anrimian.musicplayer.ui.library.folders
 
 import com.github.anrimian.filesync.SyncInteractor
+import com.github.anrimian.musicplayer.data.utils.rx.mapError
+import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
@@ -18,12 +21,13 @@ import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
+import com.github.anrimian.musicplayer.ui.common.dialogs.share.models.ReceiveCompositionsForSendException
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
-import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
-import java.util.*
+import java.util.LinkedList
 
 /**
  * Created on 23.10.2017.
@@ -35,9 +39,15 @@ class LibraryFoldersPresenter(
     private val playerInteractor: LibraryPlayerInteractor,
     private val displaySettingsInteractor: DisplaySettingsInteractor,
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
+    playListsInteractor: PlayListsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
-) : AppPresenter<LibraryFoldersView>(uiScheduler, errorParser) {
+) : BaseLibraryPresenter<LibraryFoldersView>(
+    playerInteractor,
+    playListsInteractor,
+    uiScheduler,
+    errorParser
+) {
 
     private var filesDisposable: Disposable? = null
     private var currentCompositionDisposable: Disposable? = null
@@ -82,7 +92,7 @@ class LibraryFoldersPresenter(
             if (composition == currentComposition) {
                 playerInteractor.playOrPause()
             } else {
-                interactor.play(sourceList, position)
+                startPlaying(sourceList, position)
                 viewState.showCurrentComposition(CurrentComposition(composition, true))
             }
         }
@@ -92,13 +102,13 @@ class LibraryFoldersPresenter(
         if (composition == currentComposition) {
             playerInteractor.playOrPause()
         } else {
-            interactor.play(sourceList, position)
+            startPlaying(sourceList, position)
             viewState.showCurrentComposition(CurrentComposition(composition, true))
         }
     }
 
     fun onPlayCompositionActionSelected(position: Int) {
-        interactor.play(sourceList, position)
+        startPlaying(sourceList, position)
     }
 
     fun onPlayNextSourceClicked(position: Int) {
@@ -114,28 +124,24 @@ class LibraryFoldersPresenter(
     }
 
     fun onAddToQueueCompositionClicked(composition: Composition) {
-        addCompositionsToEnd(ListUtils.asList(composition))
+        addCompositionsToEndOfQueue(ListUtils.asList(composition))
     }
 
     fun onPlayFolderClicked(folder: FolderFileSource) {
-        interactor.play(folder)
+        startPlaying(listOf(folder))
     }
 
     fun onPlayNextFolderClicked(folder: FolderFileSource) {
-        interactor.getAllCompositionsInFolder(folder.id)
-            .flatMap(playerInteractor::addCompositionsToPlayNext)
-            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
+        addCompositionsToPlayNext(interactor.getAllCompositionsInFolder(folder.id))
     }
 
     fun onAddToQueueFolderClicked(folder: FolderFileSource) {
-        interactor.getAllCompositionsInFolder(folder.id)
-            .flatMap(playerInteractor::addCompositionsToEnd)
-            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
+        addCompositionsToEndOfQueue(interactor.getAllCompositionsInFolder(folder.id))
     }
 
     fun onPlayAllButtonClicked() {
         if (selectedFiles.isEmpty()) {
-            interactor.playAllMusicInFolder(folderId)
+            interactor.playAllMusicInFolder(folderId).runOnUi(viewState::showErrorMessage)
         } else {
             playSelectedCompositions()
         }
@@ -150,7 +156,7 @@ class LibraryFoldersPresenter(
     fun onDeleteCompositionButtonClicked(composition: Composition) {
         filesToDelete.clear()
         filesToDelete.add(CompositionFileSource(composition))
-        viewState.showConfirmDeleteDialog(ListUtils.asList(composition))
+        viewState.showConfirmDeleteDialog(listOf(composition))
     }
 
     fun onDeleteFolderButtonClicked(folder: FolderFileSource) {
@@ -161,7 +167,7 @@ class LibraryFoldersPresenter(
         deletePreparedFiles()
     }
 
-    fun onDeleteFolderDialogConfirmed(folder: FolderFileSource?) {
+    fun onDeleteFolderDialogConfirmed(folder: FolderFileSource) {
         lastDeleteAction = interactor.deleteFolder(folder)
             .observeOn(uiScheduler)
             .doOnSubscribe { viewState.showDeleteProgress() }
@@ -173,14 +179,14 @@ class LibraryFoldersPresenter(
     }
 
     fun onOrderMenuItemClicked() {
-        viewState.showSelectOrderScreen(interactor.folderOrder)
+        viewState.showSelectOrderScreen(interactor.getFolderOrder())
     }
 
-    fun onOrderSelected(order: Order?) {
-        interactor.folderOrder = order
+    fun onOrderSelected(order: Order) {
+        interactor.setFolderOrder(order)
     }
 
-    fun onAddToPlayListButtonClicked(composition: Composition?) {
+    fun onAddToPlayListButtonClicked(composition: Composition) {
         filesForPlayList.clear()
         filesForPlayList.add(CompositionFileSource(composition))
         viewState.showSelectPlayListDialog()
@@ -195,11 +201,7 @@ class LibraryFoldersPresenter(
     }
 
     fun onPlayListForFolderSelected(folderId: Long, playList: PlayList) {
-        interactor.addCompositionsToPlayList(folderId, playList)
-            .subscribeOnUi(
-                { addedCompositions -> viewState.showAddingToPlayListComplete(playList, addedCompositions) },
-                this::onAddingToPlayListError
-            )
+        performAddToPlaylist(interactor.getAllCompositionsInFolder(folderId), playList) {}
     }
 
     fun onSearchTextChanged(text: String?) {
@@ -235,7 +237,7 @@ class LibraryFoldersPresenter(
         viewState.showInputFolderNameDialog(folder)
     }
 
-    fun onNewFolderNameEntered(folderId: Long, name: String?) {
+    fun onNewFolderNameEntered(folderId: Long, name: String) {
         if (RxUtils.isActive(fileActionDisposable)) {
             return
         }
@@ -263,20 +265,13 @@ class LibraryFoldersPresenter(
         viewState.setItemsSelected(true)
     }
 
-    private fun playSelectedCompositions() {
-        interactor.play(selectedFiles)
-        closeSelectionMode()
-    }
-
     fun onPlayNextSelectedSourcesClicked() {
-        interactor.addCompositionsToPlayNext(ArrayList(selectedFiles))
-            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
+        addCompositionsToPlayNext(interactor.getAllCompositionsInFileSources(ArrayList(selectedFiles)))
         closeSelectionMode()
     }
 
     fun onAddToQueueSelectedSourcesClicked() {
-        interactor.addCompositionsToEnd(ArrayList(selectedFiles))
-            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
+        addCompositionsToEndOfQueue(interactor.getAllCompositionsInFileSources(ArrayList(selectedFiles)))
         closeSelectionMode()
     }
 
@@ -333,7 +328,7 @@ class LibraryFoldersPresenter(
         viewState.showInputNewFolderNameDialog()
     }
 
-    fun onNewFileNameForPasteEntered(name: String?) {
+    fun onNewFileNameForPasteEntered(name: String) {
         if (RxUtils.isActive(fileActionDisposable)) {
             return
         }
@@ -346,7 +341,7 @@ class LibraryFoldersPresenter(
         fileActionDisposable = lastEditAction!!.subscribe({}, this::onDefaultError)
     }
 
-    fun onExcludeFolderClicked(folder: FolderFileSource?) {
+    fun onExcludeFolderClicked(folder: FolderFileSource) {
         interactor.addFolderToIgnore(folder)
             .subscribeOnUi(this::onIgnoreFolderAdded, this::onDefaultError)
     }
@@ -377,11 +372,20 @@ class LibraryFoldersPresenter(
         playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
     }
 
-    fun getSelectedMoveFiles(): LinkedHashSet<FileSource> = interactor.filesToMove
+    fun getSelectedMoveFiles(): LinkedHashSet<FileSource> = interactor.getFilesToMove()
 
     fun getSelectedFiles() = selectedFiles
 
     fun getSearchText() = searchText
+
+    private fun playSelectedCompositions() {
+        startPlaying(selectedFiles)
+        closeSelectionMode()
+    }
+
+    private fun startPlaying(sources: Collection<FileSource>, position: Int = Constants.NO_POSITION) {
+        interactor.play(sources, position).runOnUi(viewState::showErrorMessage)
+    }
 
     private fun onIgnoreFolderAdded(folder: IgnoredFolder) {
         recentlyAddedIgnoredFolder = folder
@@ -390,7 +394,8 @@ class LibraryFoldersPresenter(
 
     private fun shareFileSources(fileSources: List<FileSource>) {
         interactor.getAllCompositionsInFileSources(fileSources)
-            .subscribeOnUi(viewState::sendCompositions, this::onReceiveCompositionsError)
+            .mapError(::ReceiveCompositionsForSendException)
+            .launchOnUi(viewState::sendCompositions, viewState::showErrorMessage)
     }
 
     private fun processMultiSelectClick(position: Int, folder: FileSource, onClick: () -> Unit) {
@@ -415,24 +420,9 @@ class LibraryFoldersPresenter(
         viewState.setItemsSelected(false)
     }
 
-    private fun addCompositionsToPlayNext(compositions: List<Composition>) {
-        playerInteractor.addCompositionsToPlayNext(compositions)
-            .subscribeOnUi(viewState::onCompositionsAddedToPlayNext, this::onDefaultError)
-    }
-
-    private fun addCompositionsToEnd(compositions: List<Composition>) {
-        playerInteractor.addCompositionsToEnd(compositions)
-            .subscribeOnUi(viewState::onCompositionsAddedToQueue, this::onDefaultError)
-    }
-
     private fun onDefaultError(throwable: Throwable) {
         val errorCommand = errorParser.parseError(throwable)
         viewState.showErrorMessage(errorCommand)
-    }
-
-    private fun onReceiveCompositionsError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showReceiveCompositionsForSendError(errorCommand)
     }
 
     private fun deletePreparedFiles() {
@@ -450,7 +440,7 @@ class LibraryFoldersPresenter(
     private fun onDeleteCompositionsSuccess(compositions: List<DeletedComposition>) {
         viewState.showDeleteCompositionMessage(compositions)
         filesToDelete.clear()
-        if (!selectedFiles.isEmpty()) {
+        if (selectedFiles.isNotEmpty()) {
             closeSelectionMode()
         }
     }
@@ -461,20 +451,13 @@ class LibraryFoldersPresenter(
     }
 
     private fun addPreparedCompositionsToPlayList(playList: PlayList) {
-        interactor.addCompositionsToPlayList(filesForPlayList, playList)
-            .subscribeOnUi(
-                { compositions -> onAddingToPlayListCompleted(compositions, playList) },
-                this::onAddingToPlayListError
-            )
+        performAddToPlaylist(
+            interactor.getAllCompositionsInFileSources(filesForPlayList),
+            playList
+        ) { onAddingToPlayListCompleted() }
     }
 
-    private fun onAddingToPlayListError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showAddingToPlayListError(errorCommand)
-    }
-
-    private fun onAddingToPlayListCompleted(compositions: List<Composition>, playList: PlayList) {
-        viewState.showAddingToPlayListComplete(playList, compositions)
+    private fun onAddingToPlayListCompleted() {
         filesForPlayList.clear()
         if (selectedFiles.isNotEmpty()) {
             closeSelectionMode()
@@ -562,7 +545,7 @@ class LibraryFoldersPresenter(
     }
 
     private fun subscribeOnMoveEnabledState() {
-        interactor.moveModeObservable.unsafeSubscribeOnUi(viewState::showMoveFileMenu)
+        interactor.getMoveModeObservable().unsafeSubscribeOnUi(viewState::showMoveFileMenu)
     }
 
     private fun subscribeOnRepeatMode() {

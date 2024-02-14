@@ -25,6 +25,7 @@ class ItemDrawable: Drawable() {
     override fun setColorFilter(colorFilter: ColorFilter?) {
     }
 
+    @Deprecated("")
     override fun getOpacity(): Int = PixelFormat.UNKNOWN
 
     fun setColor(@ColorInt color: Int) {

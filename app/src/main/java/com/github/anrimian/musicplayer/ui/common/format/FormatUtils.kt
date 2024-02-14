@@ -128,3 +128,8 @@ fun getRemoteViewPlayerStateIcon(playerState: Int): Int {
 fun Context.getHighlightColor(): Int {
     return ColorUtils.setAlphaComponent(colorFromAttr(R.attr.colorAccent), 76)
 }
+
+@DrawableRes
+fun getVolumeIcon(volume: Int): Int {
+    return if (volume > 0) R.drawable.ic_volume_up else R.drawable.ic_volume_off
+}

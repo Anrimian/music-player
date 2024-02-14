@@ -47,6 +47,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String AUDIO_FILE_MIN_DURATION = "audio_file_min_duration";
     private static final String SHOW_ALL_AUDIO_FILES = "show_all_audio_files";
     private static final String PLAY_LIST_INSERT_START = "play_list_insert_start";
+    private static final String PLAY_LIST_DUPLICATE_CHECK = "play_list_duplicate_check";
 
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
     private static final String PAUSE_ON_AUDIO_FOCUS_LOSS = "pause_on_audio_focus_loss";
@@ -82,6 +83,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Boolean> showFileNameSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAppConfirmDeleteDialog = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> showAllAudioFilesSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> playlistDuplicateCheckSubject = BehaviorSubject.create();
     private final BehaviorSubject<Integer> selectedEqualizerSubject = BehaviorSubject.create();
     private final BehaviorSubject<Long> audioFileMinDurationSubject = BehaviorSubject.create();
 
@@ -422,6 +424,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public boolean isPlaylistInsertStartEnabled() {
         return preferences.getBoolean(PLAY_LIST_INSERT_START);
+    }
+
+    @Override
+    public void setPlaylistDuplicateCheckEnabled(boolean enabled) {
+        if (enabled != isPlaylistDuplicateCheckEnabled()) {
+            preferences.putBoolean(PLAY_LIST_DUPLICATE_CHECK, enabled);
+            playlistDuplicateCheckSubject.onNext(enabled);
+        }
+    }
+
+    @Override
+    public boolean isPlaylistDuplicateCheckEnabled() {
+        return preferences.getBoolean(PLAY_LIST_DUPLICATE_CHECK, true);
+    }
+
+    @Override
+    public Observable<Boolean> getPlaylistDuplicateCheckObservable() {
+        return withDefaultValue(playlistDuplicateCheckSubject, this::isPlaylistDuplicateCheckEnabled);
     }
 
     @Override

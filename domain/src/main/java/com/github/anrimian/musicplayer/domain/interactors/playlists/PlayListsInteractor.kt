@@ -1,7 +1,8 @@
 package com.github.anrimian.musicplayer.domain.interactors.playlists
 
-import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlayListFileNameValidator
 import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlayListNameValidator
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.folders.FileReference
@@ -9,21 +10,24 @@ import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
 class PlayListsInteractor(
+    private val playerInteractor: LibraryPlayerInteractor,
     private val playListsRepository: PlayListsRepository,
+    private val settingsRepository: SettingsRepository,
     private val uiStateRepository: UiStateRepository,
     private val analytics: Analytics
 ) {
 
     private val nameValidator = PlayListNameValidator()
 
-    fun getPlayListsObservable(): Observable<List<PlayList>> {
-        return playListsRepository.playListsObservable
+    fun getPlayListsObservable(searchQuery: String? = null): Observable<List<PlayList>> {
+        return playListsRepository.getPlayListsObservable(searchQuery)
     }
 
     fun getPlayListObservable(playListId: Long): Observable<PlayList> {
@@ -38,23 +42,23 @@ class PlayListsInteractor(
     }
 
     fun createPlayList(name: String): Single<PlayList> {
-        return nameValidator.validate(normalizePlayListName(name))
+        return nameValidator.validate(PlayListFileNameValidator.normalizePlayListName(name))
             .flatMap(playListsRepository::createPlayList)
     }
 
     fun addCompositionsToPlayList(
         compositions: List<Composition>,
         playList: PlayList,
-        position: Int
-    ): Completable {
-        return playListsRepository.addCompositionsToPlayList(compositions, playList, position)
-    }
-
-    fun addCompositionsToPlayList(
-        compositions: List<Composition>,
-        playList: PlayList
-    ): Completable {
-        return playListsRepository.addCompositionsToPlayList(compositions, playList, false)
+        checkForDuplicates: Boolean,
+        ignoreDuplicates: Boolean
+    ): Single<List<Composition>> {
+        val duplicateCheck = checkForDuplicates && settingsRepository.isPlaylistDuplicateCheckEnabled
+        return playListsRepository.addCompositionsToPlayList(
+            compositions,
+            playList,
+            duplicateCheck,
+            ignoreDuplicates
+        )
     }
 
     fun deleteItemFromPlayList(playListItem: PlayListItem, playListId: Long): Completable {
@@ -69,13 +73,18 @@ class PlayListsInteractor(
         return playListsRepository.deletePlayList(playListId)
     }
 
-    fun moveItemInPlayList(playList: PlayList, from: Int, to: Int): Completable {
-        return playListsRepository.moveItemInPlayList(playList, from, to)
+    fun deletePlayLists(playlists: Collection<PlayList>): Completable {
+        return Observable.fromIterable(playlists)
+            .flatMapCompletable { playlist -> playListsRepository.deletePlayList(playlist.id) }
+    }
+
+    fun moveItemInPlayList(playListId: Long, from: Int, to: Int): Completable {
+        return playListsRepository.moveItemInPlayList(playListId, from, to)
             .doOnError(analytics::processNonFatalError)
     }
 
     fun updatePlayListName(playListId: Long, name: String): Completable {
-        return nameValidator.validate(normalizePlayListName(name))
+        return nameValidator.validate(PlayListFileNameValidator.normalizePlayListName(name))
             .flatMapCompletable { playListsRepository.updatePlayListName(playListId, name) }
     }
 
@@ -97,6 +106,12 @@ class PlayListsInteractor(
         return uiStateRepository.getSavedPlaylistListPosition(playListId)
     }
 
+    fun isPlaylistDuplicateCheckEnabled() = settingsRepository.isPlaylistDuplicateCheckEnabled
+
+    fun setPlaylistDuplicateCheckEnabled(isEnabled: Boolean) {
+        settingsRepository.isPlaylistDuplicateCheckEnabled = isEnabled
+    }
+
     fun exportPlaylistsToFolder(playlists: List<PlayList>, folder: FileReference): Completable {
         return playListsRepository.exportPlaylistsToFolder(playlists, folder)
     }
@@ -105,7 +120,17 @@ class PlayListsInteractor(
         return playListsRepository.importPlaylistFile(file, overwriteExisting)
     }
 
-    private fun normalizePlayListName(name: String): String {
-        return name.replace(Constants.PLAYLIST_NOT_ALLOWED_CHARACTERS.toRegex(), "").trim()
+    fun startPlaying(playlists: List<PlayList>): Completable {
+        return playListsRepository.getCompositionIdsInPlaylists(playlists)
+            .flatMapCompletable(playerInteractor::setQueueAndPlay)
     }
+
+    fun getCompositionsByPlaylistsIds(playlistIds: LongArray): Single<List<Composition>> {
+        return playListsRepository.getCompositionsByPlaylistsIds(playlistIds.asIterable())
+    }
+
+    fun getCompositionsInPlaylists(playlists: List<PlayList>): Single<List<Composition>> {
+        return playListsRepository.getCompositionsInPlaylists(playlists)
+    }
+
 }

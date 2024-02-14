@@ -14,7 +14,7 @@ import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
-import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ListDragFilter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
@@ -24,12 +24,17 @@ import java.util.LinkedList
 
 class PlayQueuePresenter(
     private val playerInteractor: LibraryPlayerInteractor,
-    private val playListsInteractor: PlayListsInteractor,
     private val playerScreenInteractor: PlayerScreenInteractor,
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
+    playListsInteractor: PlayListsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
-): AppPresenter<PlayQueueView>(uiScheduler, errorParser) {
+): BaseLibraryPresenter<PlayQueueView>(
+    playerInteractor,
+    playListsInteractor,
+    uiScheduler,
+    errorParser
+) {
 
     private val listDragFilter = ListDragFilter()
 
@@ -142,11 +147,7 @@ class PlayQueuePresenter(
 
     fun onPlayListForAddingCreated(playList: PlayList) {
         val compositionsToAdd = playQueue.map(PlayQueueItem::getComposition)
-        playListsInteractor.addCompositionsToPlayList(compositionsToAdd, playList)
-            .subscribeOnUi(
-                { viewState.showAddingToPlayListComplete(playList, compositionsToAdd) },
-                this::onAddingToPlayListError
-            )
+        performAddToPlaylist(compositionsToAdd, playList) {}
     }
 
     fun onClearPlayQueueClicked() {
@@ -189,18 +190,7 @@ class PlayQueuePresenter(
     }
 
     private fun addPreparedCompositionsToPlayList(playList: PlayList) {
-        playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
-            .subscribeOnUi({ onAddingToPlayListCompleted(playList) }, this::onAddingToPlayListError)
-    }
-
-    private fun onAddingToPlayListError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showAddingToPlayListError(errorCommand)
-    }
-
-    private fun onAddingToPlayListCompleted(playList: PlayList) {
-        viewState.showAddingToPlayListComplete(playList, compositionsForPlayList)
-        compositionsForPlayList.clear()
+        performAddToPlaylist(compositionsForPlayList, playList) { compositionsForPlayList.clear() }
     }
 
     private fun subscribeOnUiSettings() {

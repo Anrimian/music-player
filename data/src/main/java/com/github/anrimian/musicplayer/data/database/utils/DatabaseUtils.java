@@ -4,6 +4,10 @@ import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 public class DatabaseUtils {
 
+    public static String getSearchArg(String arg) {
+        return arg == null ? null : '%' + arg + '%';
+    }
+
     public static String[] getSearchArgs(String arg, int count) {
         if (isEmpty(arg)) {
             arg = null;

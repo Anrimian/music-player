@@ -1,5 +1,6 @@
 package com.github.anrimian.musicplayer.ui.settings
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
+import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsFragment
 import com.github.anrimian.musicplayer.ui.settings.headset.HeadsetSettingsFragment
 import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsFragment
@@ -26,7 +28,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 class SettingsFragment : Fragment(),
     FragmentNavigationListener {
     
-    private lateinit var viewBinding: FragmentSettingsBinding
+    private lateinit var binding: FragmentSettingsBinding
     private lateinit var navigation: FragmentNavigation
     
     override fun onCreateView(
@@ -34,32 +36,34 @@ class SettingsFragment : Fragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentSettingsBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val toolbar = requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar)
         navigation = FragmentNavigation.from(parentFragmentManager)
-        viewBinding.tvDisplay.setOnClickListener { navigation.addNewFragment(DisplaySettingsFragment()) }
-        viewBinding.tvLibrary.setOnClickListener { navigation.addNewFragment(LibrarySettingsFragment()) }
-        viewBinding.tvPlayer.setOnClickListener { navigation.addNewFragment(PlayerSettingsFragment()) }
-        viewBinding.tvTheme.setOnClickListener { navigation.addNewFragment(ThemeSettingsFragment()) }
-        viewBinding.tvHeadset.setOnClickListener { navigation.addNewFragment(HeadsetSettingsFragment()) }
-        viewBinding.llRunRescanStorage.setOnClickListener { onRescanStorageButtonClicked() }
+        binding.tvDisplay.setOnClickListener { navigation.addNewFragment(DisplaySettingsFragment()) }
+        binding.tvLibrary.setOnClickListener { navigation.addNewFragment(LibrarySettingsFragment()) }
+        binding.tvPlayer.setOnClickListener { navigation.addNewFragment(PlayerSettingsFragment()) }
+        binding.tvTheme.setOnClickListener { navigation.addNewFragment(ThemeSettingsFragment()) }
+        binding.tvHeadset.setOnClickListener { navigation.addNewFragment(HeadsetSettingsFragment()) }
+        binding.llRunRescanStorage.setOnClickListener { onRescanStorageButtonClicked() }
+        ViewUtils.onLongVibrationClick(binding.llRunRescanStorage) { onRescanStorageButtonLongClick() }
 
-        SlidrPanel.simpleSwipeBack(viewBinding.flContainer, this, toolbar::onStackFragmentSlided)
+        SlidrPanel.simpleSwipeBack(binding.flContainer, this, toolbar::onStackFragmentSlided)
     }
 
     override fun onFragmentResumed() {
         val toolbar = requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar)
         toolbar.setTitle(R.string.settings)
-        toolbar.subtitle = null
+        toolbar.setSubtitle(null)
         toolbar.setTitleClickListener(null)
         toolbar.clearOptionsMenu()
     }
 
+    @SuppressLint("CheckResult")
     private fun onRescanStorageButtonClicked() {
         val appContext = requireContext().applicationContext
         Components.getAppComponent()
@@ -70,4 +74,17 @@ class SettingsFragment : Fragment(),
                 Toast.makeText(appContext, R.string.scanning_completed, Toast.LENGTH_SHORT).show()
             }
     }
+
+    @SuppressLint("CheckResult")
+    private fun onRescanStorageButtonLongClick() {
+        val appContext = requireContext().applicationContext
+        Components.getAppComponent()
+            .mediaScannerRepository()
+            .rescanStoragePlaylists()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                Toast.makeText(appContext, R.string.playlists_scanning_completed, Toast.LENGTH_SHORT).show()
+            }
+    }
+
 }

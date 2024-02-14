@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.data.storage.providers.albums;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -13,12 +12,9 @@ import androidx.collection.LongSparseArray;
 
 import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
-import com.github.anrimian.musicplayer.data.utils.rx.content_observer.RxContentObserver;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-
-import io.reactivex.rxjava3.core.Observable;
 
 public class StorageAlbumsProvider {
 
@@ -28,23 +24,13 @@ public class StorageAlbumsProvider {
         contentResolver = context.getContentResolver();
     }
 
-    public Observable<LongSparseArray<StorageAlbum>> getAlbumsObservable() {
-        return RxContentObserver.getObservable(contentResolver, Albums.EXTERNAL_CONTENT_URI)
-                .map(o -> getAlbums());
-    }
-
     public LongSparseArray<StorageAlbum> getAlbums() {
         try(Cursor cursor = MediaStoreUtils.query(contentResolver,
                 Albums.EXTERNAL_CONTENT_URI,
                 new String[] {
                         Albums._ID,
                         Albums.ALBUM,
-//                        Albums.ALBUM_ID,
-//                        Albums.ALBUM_KEY,
-//                        Albums.FIRST_YEAR,
-//                        Albums.LAST_YEAR,
                         Albums.ARTIST,
-//                        Albums.ARTIST_ID
                 },
                 null,
                 null,
@@ -69,24 +55,6 @@ public class StorageAlbumsProvider {
         Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
         Uri uri = ContentUris.withAppendedId(sArtworkUri, id);
         return contentResolver.openInputStream(uri);
-    }
-
-    public void updateAlbumName(String oldName, String artist, String name) {
-        ContentValues cv = new ContentValues();
-        cv.put(Albums.ALBUM, name);
-        contentResolver.update(Albums.EXTERNAL_CONTENT_URI,
-                cv,
-                Albums.ALBUM + " = ? AND " + Albums.ARTIST + " = ?",
-                new String[] { oldName, artist });
-    }
-
-    public void updateAlbumArtist(String albumName, String oldArtist, String newArtistName) {
-        ContentValues cv = new ContentValues();
-        cv.put(Albums.ARTIST, newArtistName);
-        contentResolver.update(Albums.EXTERNAL_CONTENT_URI,
-                cv,
-                Albums.ALBUM + " = ? AND " + Albums.ARTIST + " = ?",
-                new String[] { albumName, oldArtist });
     }
 
     private long getAlbumIdByName(String name) {

@@ -1,9 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common.format.wrappers
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.RippleDrawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -30,7 +28,6 @@ import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
 import com.github.anrimian.musicplayer.ui.utils.getHighlightAnimator
 import com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressView
-import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.ItemDrawable
 
 open class CompositionItemWrapper<T: Composition>(
     itemView: View,
@@ -47,9 +44,7 @@ open class CompositionItemWrapper<T: Composition>(
     private val iconClickableArea: View = itemView.findViewById(R.id.icon_clickable_area)
     private val pvFileState: ProgressView = itemView.findViewById(R.id.pvFileState)
 
-    private val backgroundDrawable = ItemDrawable()
-    private val stateDrawable = ItemDrawable()
-    private val rippleMaskDrawable = ItemDrawable()
+    private val itemBackgroundWrapper = ItemBackgroundWrapper(itemView, clickableItem)
 
     protected lateinit var composition: T
 
@@ -63,16 +58,6 @@ open class CompositionItemWrapper<T: Composition>(
     init {
         iconClickableArea.setOnClickListener { onIconClickListener(composition) }
         clickableItem.setOnClickListener { onClickListener(composition) }
-
-        backgroundDrawable.setColor(this.getContext().colorFromAttr(R.attr.listItemBackground))
-        itemView.background = backgroundDrawable
-        stateDrawable.setColor(Color.TRANSPARENT)
-        clickableItem.background = stateDrawable
-        clickableItem.foreground = RippleDrawable(
-            ColorStateList.valueOf(this.getContext().colorFromAttr(android.R.attr.colorControlHighlight)),
-            null,
-            rippleMaskDrawable
-        )
     }
 
     fun bind(composition: T, showCovers: Boolean) {
@@ -151,14 +136,7 @@ open class CompositionItemWrapper<T: Composition>(
             val from = if (swiping) 0f else swipedCorners
             val to = if (swiping) swipedCorners else 0f
             val duration = getResources().getInteger(R.integer.swiped_item_animation_time)
-            AndroidUtils.animateItemDrawableCorners(
-                from,
-                to,
-                duration,
-                backgroundDrawable,
-                stateDrawable,
-                rippleMaskDrawable
-            )
+            itemBackgroundWrapper.animateItemDrawableCorners(from, to, duration)
         }
     }
 
@@ -178,18 +156,14 @@ open class CompositionItemWrapper<T: Composition>(
     }
 
     fun showStateColor(@ColorInt color: Int, animate: Boolean) {
-        if (animate) {
-            stateDrawable.setColor(color)
-        } else {
-            ViewUtils.animateItemDrawableColor(stateDrawable, color)
-        }
+        itemBackgroundWrapper.showStateColor(color, animate)
     }
 
     fun runHighlightAnimation() {
         getHighlightAnimator(
             getContext().colorFromAttr(R.attr.listItemBackground),
             getContext().getHighlightColor(),
-            backgroundDrawable::setColor
+            itemBackgroundWrapper::setBackgroundColor
         ).start()
     }
 
@@ -238,7 +212,7 @@ open class CompositionItemWrapper<T: Composition>(
             getContext(),
             if (isPlaying) 25 else 0
         )
-        ViewUtils.animateItemDrawableColor(stateDrawable, endColor)
+        itemBackgroundWrapper.showStateColor(endColor, true)
     }
 
     private fun showCompositionName() {
@@ -260,7 +234,7 @@ open class CompositionItemWrapper<T: Composition>(
 
     private fun showAsDragging(dragging: Boolean) {
         val endColor = ColorFormatUtils.getItemDragColor(getContext(), if (dragging) 20 else 0)
-        ViewUtils.animateItemDrawableColor(stateDrawable, endColor)
+        itemBackgroundWrapper.showStateColor(endColor, true)
     }
 
     private fun getCorruptionTypeHint(composition: Composition): String? {

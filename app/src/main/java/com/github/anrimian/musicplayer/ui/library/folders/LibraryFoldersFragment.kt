@@ -31,11 +31,9 @@ import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
-import com.github.anrimian.musicplayer.ui.common.dialogs.input.newInputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
@@ -47,8 +45,10 @@ import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
-import com.github.anrimian.musicplayer.ui.editor.composition.newCompositionEditorIntent
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
@@ -70,38 +70,36 @@ import com.google.android.material.snackbar.Snackbar
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
 /**
  * Created on 23.10.2017.
  */
-
-private const val LOCKED_SEARCH_MODE = "locked_search_mode"
-private const val LAUNCHED_SEARCH_MODE = "launched_search_mode"
-
-fun newFolderFragment(
-    folderId: Long?,
-    highlightCompositionId: Long = 0,
-    lockedSearchMode: Boolean = false,
-): LibraryFoldersFragment {
-    val args = Bundle()
-    args.putLong(ID_ARG, folderId ?: 0)
-    args.putLong(HIGHLIGHT_COMPOSITION_ID, highlightCompositionId)
-    args.putBoolean(LOCKED_SEARCH_MODE, lockedSearchMode)
-    val fragment = LibraryFoldersFragment()
-    fragment.arguments = args
-    return fragment
-}
-
-class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackButtonListener,
+class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView, BackButtonListener,
     FragmentNavigationListener {
+
+    companion object {
+        private const val LOCKED_SEARCH_MODE = "locked_search_mode"
+        private const val LAUNCHED_SEARCH_MODE = "launched_search_mode"
+
+        fun newInstance(
+            folderId: Long?,
+            highlightCompositionId: Long = 0,
+            lockedSearchMode: Boolean = false,
+        ) = LibraryFoldersFragment().apply {
+            arguments = Bundle().apply {
+                putLong(ID_ARG, folderId ?: 0)
+                putLong(HIGHLIGHT_COMPOSITION_ID, highlightCompositionId)
+                putBoolean(LOCKED_SEARCH_MODE, lockedSearchMode)
+            }
+        }
+    }
 
     private val presenter by moxyPresenter {
         Components.getLibraryFolderComponent(getFolderId()).storageLibraryPresenter()
     }
 
-    private lateinit var viewBinding: FragmentLibraryFoldersBinding
+    private lateinit var binding: FragmentLibraryFoldersBinding
 
     private val fragmentDisposable = CompositeDisposable()
 
@@ -121,13 +119,15 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     private var subToolbarAnimator: ValueAnimator? = null
 
+    override fun getLibraryPresenter(): BaseLibraryPresenter<*> = presenter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        viewBinding = FragmentLibraryFoldersBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentLibraryFoldersBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -136,14 +136,14 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         fragmentDisposable.add(toolbar.getSelectionModeObservable()
             .subscribe(this::onSelectionModeChanged)
         )
-        viewBinding.progressStateView.onTryAgainClick { presenter.onTryAgainButtonClicked() }
+        binding.progressStateView.onTryAgainClick { presenter.onTryAgainButtonClicked() }
 
         layoutManager = LinearLayoutManager(context)
-        viewBinding.rvFileSources.layoutManager = layoutManager
-        RecyclerViewUtils.attachFastScroller(viewBinding.rvFileSources, true)
+        binding.rvFileSources.layoutManager = layoutManager
+        RecyclerViewUtils.attachFastScroller(binding.rvFileSources, true)
         adapter = MusicFileSourceAdapter(
             this,
-            viewBinding.rvFileSources,
+            binding.rvFileSources,
             presenter.getSelectedFiles(),
             presenter.getSelectedMoveFiles(),
             presenter::onCompositionClicked,
@@ -153,7 +153,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
             presenter::onCompositionIconClicked,
             this::onCompositionMenuClicked
         )
-        viewBinding.rvFileSources.adapter = adapter
+        binding.rvFileSources.adapter = adapter
 
         val callback = ShortSwipeCallback(requireContext(),
             R.drawable.ic_play_next,
@@ -161,20 +161,20 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
             swipeCallback = presenter::onPlayNextSourceClicked
         )
         val itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(viewBinding.rvFileSources)
+        itemTouchHelper.attachToRecyclerView(binding.rvFileSources)
 
-        viewBinding.flHeader.setOnClickListener { presenter.onBackPathButtonClicked() }
+        binding.flHeader.setOnClickListener { presenter.onBackPathButtonClicked() }
 
-        viewBinding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
-        ViewUtils.onLongVibrationClick(viewBinding.fab, presenter::onChangeRandomModePressed)
+        binding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
+        ViewUtils.onLongVibrationClick(binding.fab, presenter::onChangeRandomModePressed)
 
-        viewBinding.vgFileMenu.visibility = View.INVISIBLE
-        viewBinding.vgMoveFileMenu.visibility = View.INVISIBLE
-        FormatUtils.formatLinkedFabView(viewBinding.vgFileMenu, viewBinding.fab)
-        FormatUtils.formatLinkedFabView(viewBinding.vgMoveFileMenu, viewBinding.fab)
+        binding.vgFileMenu.visibility = View.INVISIBLE
+        binding.vgMoveFileMenu.visibility = View.INVISIBLE
+        FormatUtils.formatLinkedFabView(binding.vgFileMenu, binding.fab)
+        FormatUtils.formatLinkedFabView(binding.vgMoveFileMenu, binding.fab)
 
-        viewBinding.btnCut.setOnClickListener { presenter.onMoveSelectedFoldersButtonClicked() }
-        viewBinding.ivCopy.setOnClickListener { presenter.onCopySelectedFoldersButtonClicked() }
+        binding.btnCut.setOnClickListener { presenter.onMoveSelectedFoldersButtonClicked() }
+        binding.ivCopy.setOnClickListener { presenter.onCopySelectedFoldersButtonClicked() }
 
         //maybe will be moved to root fragment later
         view.findViewById<View>(R.id.iv_close)
@@ -227,16 +227,16 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
         val isSearchLaunched = requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)
         showSubToolbar(isSearchLaunched, animate = false)
-        viewBinding.btnPaste.isEnabled = !isSearchLaunched
-        viewBinding.btnPasteInNewFolder.isEnabled = !isSearchLaunched
+        binding.btnPaste.isEnabled = !isSearchLaunched
+        binding.btnPasteInNewFolder.isEnabled = !isSearchLaunched
         if (isSearchLaunched) {
-            presenter.onSearchTextChanged(toolbar.searchText)
+            presenter.onSearchTextChanged(toolbar.getSearchText())
         }
 
         if (getFolderId() != null) {
             val slidrConfig = SlidrConfig.Builder().position(SlidrPosition.LEFT).build()
             SlidrPanel.replace(
-                viewBinding.contentContainer,
+                binding.contentContainer,
                 {
                     if (requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)) {
                         toolbar.setSearchModeEnabled(false)
@@ -265,16 +265,18 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
         val act = requireActivity()
         val toolbar: AdvancedToolbar = act.findViewById(R.id.toolbar)
         if (inLockedSearchMode) {
-            toolbar.isSearchLocked = true
+            toolbar.setSearchLocked(true)
         } else {
             toolbar.setupSearch(presenter::onSearchTextChanged)
             if (requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)) {
-                toolbar.isSearchLocked = false
+                toolbar.setSearchLocked(false)
             }
         }
         toolbar.setupSelectionModeMenu(R.menu.library_folders_selection_menu, this::onActionModeItemClicked)
         toolbar.setupOptionsMenu(R.menu.library_files_menu, this::onOptionsItemClicked)
     }
+
+    override fun getCoordinatorLayout() = binding.listContainer
 
     override fun updateList(list: List<FileSource>) {
         adapter.submitList(list)
@@ -286,39 +288,39 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun showFolderInfo(folder: FolderFileSource?) {
         if (folder != null) {
-            viewBinding.tvHeader.text = folder.name
+            binding.tvHeader.text = folder.name
         }
     }
 
     override fun showEmptyList() {
-        viewBinding.fab.visibility = View.GONE
+        binding.fab.visibility = View.GONE
         val message = if (getFolderId() == null) {
             R.string.compositions_on_device_not_found
         } else {
             R.string.no_compositions_in_folder
         }
-        viewBinding.progressStateView.showMessage(message, false)
+        binding.progressStateView.showMessage(message, false)
     }
 
     override fun showEmptySearchResult() {
-        viewBinding.fab.visibility = View.GONE
-        viewBinding.progressStateView.showMessage(
+        binding.fab.visibility = View.GONE
+        binding.progressStateView.showMessage(
             R.string.compositions_and_folders_for_search_not_found,
             false
         )
     }
 
     override fun showList() {
-        viewBinding.fab.visibility = View.VISIBLE
-        viewBinding.progressStateView.hideAll()
+        binding.fab.visibility = View.VISIBLE
+        binding.progressStateView.hideAll()
     }
 
     override fun showLoading() {
-        viewBinding.progressStateView.showProgress()
+        binding.progressStateView.showProgress()
     }
 
     override fun showError(errorCommand: ErrorCommand) {
-        viewBinding.progressStateView.showMessage(errorCommand.message, true)
+        binding.progressStateView.showMessage(errorCommand.message, true)
     }
 
     override fun goBackToParentFolderScreen() {
@@ -326,11 +328,11 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     }
 
     override fun onBackPressed(): Boolean {
-        if (toolbar.isInActionMode) {
+        if (toolbar.isInActionMode()) {
             presenter.onSelectionModeBackPressed()
             return true
         }
-        if (toolbar.isInSearchMode && !requireArguments().getBoolean(LOCKED_SEARCH_MODE)) {
+        if (toolbar.isInSearchMode() && !requireArguments().getBoolean(LOCKED_SEARCH_MODE)) {
             setSearchModeActive(false)
             return true
         }
@@ -339,19 +341,6 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
             return true
         }
         return false
-    }
-
-    override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
-            getString(R.string.add_to_playlist_error_template, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
-    override fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>) {
-        val text = MessagesUtils.getAddToPlayListCompleteMessage(requireActivity(), playList, compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun showSelectPlayListForFolderDialog(folder: FolderFileSource) {
@@ -395,7 +384,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     override fun showDeleteCompositionError(errorCommand: ErrorCommand) {
         deletingErrorHandler.handleError(errorCommand) {
             MessagesUtils.makeSnackbar(
-                viewBinding.listContainer,
+                binding.listContainer,
                 getString(R.string.delete_composition_error_template, errorCommand.message),
                 Snackbar.LENGTH_SHORT
             ).show()
@@ -404,37 +393,25 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun showDeleteCompositionMessage(compositionsToDelete: List<DeletedComposition>) {
         val text = MessagesUtils.getDeleteCompleteMessage(requireActivity(), compositionsToDelete)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, text, Snackbar.LENGTH_SHORT).show()
+        MessagesUtils.makeSnackbar(binding.listContainer, text, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun sendCompositions(compositions: List<Composition>) {
         shareCompositions(this, compositions)
     }
 
-    override fun showReceiveCompositionsForSendError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
-            getString(R.string.can_not_receive_file_for_send, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
     override fun goToMusicStorageScreen(folderId: Long) {
-        var lockedSearchMode = toolbar.isInSearchMode
-        if (lockedSearchMode && toolbar.searchText.isNullOrEmpty()) {
+        var lockedSearchMode = toolbar.isInSearchMode()
+        if (lockedSearchMode && toolbar.getSearchText().isEmpty()) {
             setSearchModeActive(false)
             lockedSearchMode = false
         }
         FragmentNavigation.from(parentFragmentManager)
-            .addNewFragment(newFolderFragment(folderId, lockedSearchMode = lockedSearchMode))
+            .addNewFragment(newInstance(folderId, lockedSearchMode = lockedSearchMode))
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {
-        editorErrorHandler.handleError(errorCommand) {
-            MessagesUtils.makeSnackbar(
-                viewBinding.listContainer, errorCommand.message, Snackbar.LENGTH_LONG
-            ).show()
-        }
+        editorErrorHandler.handleError(errorCommand) { super.showErrorMessage(errorCommand) }
     }
 
     override fun setDisplayCoversEnabled(isCoversEnabled: Boolean) {
@@ -442,13 +419,13 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     }
 
     override fun showRandomMode(isRandomModeEnabled: Boolean) {
-        FormatUtils.formatPlayAllButton(viewBinding.fab, isRandomModeEnabled)
+        FormatUtils.formatPlayAllButton(binding.fab, isRandomModeEnabled)
     }
 
     override fun showInputFolderNameDialog(folder: FolderFileSource) {
         val extra = Bundle()
         extra.putLong(ID_ARG, folder.id)
-        val fragment = newInputTextDialogFragment(
+        val fragment = InputTextDialogFragment.newInstance(
             R.string.rename_folder,
             R.string.change,
             R.string.cancel,
@@ -461,7 +438,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     }
 
     override fun showInputNewFolderNameDialog() {
-        val fragment = newInputTextDialogFragment(
+        val fragment = InputTextDialogFragment.newInstance(
             R.string.new_folder,
             R.string.create,
             R.string.cancel,
@@ -494,7 +471,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun showMoveFileMenu(show: Boolean) {
         com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility(
-            viewBinding.vgMoveFileMenu,
+            binding.vgMoveFileMenu,
             if (show) View.VISIBLE else View.INVISIBLE
         )
     }
@@ -509,19 +486,9 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
 
     override fun showAddedIgnoredFolderMessage(folder: IgnoredFolder) {
         val message = getString(R.string.ignored_folder_added, folder.relativePath)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_LONG)
+        MessagesUtils.makeSnackbar(binding.listContainer, message, Snackbar.LENGTH_LONG)
             .setAction(R.string.cancel, presenter::onRemoveIgnoredFolderClicked)
             .show()
-    }
-
-    override fun onCompositionsAddedToPlayNext(compositions: List<Composition>) {
-        val message = MessagesUtils.getPlayNextMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
-    }
-
-    override fun onCompositionsAddedToQueue(compositions: List<Composition>) {
-        val message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(viewBinding.listContainer, message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun hideProgressDialog() {
@@ -555,13 +522,13 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     }
 
     private fun highlightComposition(targetCompositionId: Long) {
-        viewBinding.rvFileSources.post {
+        binding.rvFileSources.post {
             val position = adapter.currentList.indexOfFirst { source ->
                 source is CompositionFileSource && source.composition.id == targetCompositionId
             }
             if (position != -1) {
-                viewBinding.rvFileSources.scrollToPosition(position)
-                viewBinding.rvFileSources.post { adapter.highlightItem(position) }
+                binding.rvFileSources.scrollToPosition(position)
+                binding.rvFileSources.post { adapter.highlightItem(position) }
                 requireArguments().remove(HIGHLIGHT_COMPOSITION_ID)
             }
         }
@@ -581,7 +548,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     private fun onSelectionModeChanged(enabled: Boolean) {
         val show = enabled && !requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)
         com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility(
-            viewBinding.vgFileMenu,
+            binding.vgFileMenu,
             if (show) View.VISIBLE else View.INVISIBLE
         )
     }
@@ -596,7 +563,7 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
             R.id.menu_play_next -> presenter.onPlayNextCompositionClicked(composition)
             R.id.menu_add_to_queue -> presenter.onAddToQueueCompositionClicked(composition)
             R.id.menu_add_to_playlist -> presenter.onAddToPlayListButtonClicked(composition)
-            R.id.menu_edit -> startActivity(newCompositionEditorIntent(requireContext(), composition.id))
+            R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.id))
             R.id.menu_share -> shareComposition(this, composition)
             R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(composition)
         }
@@ -648,8 +615,8 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
     private fun setSearchModeActive(isActive: Boolean) {
         toolbar.setSearchModeEnabled(isActive)
         requireArguments().putBoolean(LAUNCHED_SEARCH_MODE, isActive)
-        viewBinding.btnPaste.isEnabled = !isActive
-        viewBinding.btnPasteInNewFolder.isEnabled = !isActive
+        binding.btnPaste.isEnabled = !isActive
+        binding.btnPasteInNewFolder.isEnabled = !isActive
         if (getFolderId() != null) {
             showSubToolbar(isActive, true)
         }
@@ -674,12 +641,12 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
                     animator.addListener(
                         onStart = {
                             if (show) {
-                                viewBinding.flHeader.visibility = View.VISIBLE
+                                binding.flHeader.visibility = View.VISIBLE
                             }
                         },
                         onEnd = {
                             if (!show) {
-                                viewBinding.flHeader.visibility = visibility
+                                binding.flHeader.visibility = visibility
                             }
                         },
                     )
@@ -691,23 +658,23 @@ class LibraryFoldersFragment : MvpAppCompatFragment(), LibraryFoldersView, BackB
                     animator.start()
                 }
         } else {
-            viewBinding.flHeader.visibility = visibility
+            binding.flHeader.visibility = visibility
             setSubtitleY(targetTranslationY)
         }
     }
 
     private fun getSubtitleY() =
-        (viewBinding.guidelineSubtitle.layoutParams as ConstraintLayout.LayoutParams).guideBegin
+        (binding.guidelineSubtitle.layoutParams as ConstraintLayout.LayoutParams).guideBegin
 
     private fun setSubtitleY(translationY: Int) {
-        viewBinding.guidelineSubtitle.updateLayoutParams<ConstraintLayout.LayoutParams> {
+        binding.guidelineSubtitle.updateLayoutParams<ConstraintLayout.LayoutParams> {
             guideBegin = translationY
         }
     }
 
     private fun showEditorRequestDeniedMessage() {
         MessagesUtils.makeSnackbar(
-            viewBinding.listContainer,
+            binding.listContainer,
             R.string.android_r_edit_file_permission_denied,
             Snackbar.LENGTH_LONG
         ).show()

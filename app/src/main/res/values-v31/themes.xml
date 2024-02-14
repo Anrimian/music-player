@@ -22,6 +22,7 @@
         <item name="subToolbarBackground">@android:color/system_neutral1_10</item>
         <item name="actionModeBackgroundColor">@android:color/system_neutral2_10</item>
         <item name="actionModeStatusBarColor">@android:color/system_neutral2_300</item>
+        <item name="chipBackground">@android:color/system_neutral1_100</item>
 
         <!--text-->
         <item name="dialogButtonColor">@android:color/system_accent1_500</item>
@@ -59,6 +60,7 @@
         <item name="dialogBackground">@android:color/system_neutral2_800</item>
         <item name="popupMenuBackgroundColor">@android:color/system_neutral2_700</item>
         <item name="subToolbarBackground">@android:color/system_neutral2_800</item>
+        <item name="chipBackground">@android:color/system_neutral1_600</item>
 
         <!--text-->
         <item name="dialogButtonColor">@android:color/system_accent1_300</item>

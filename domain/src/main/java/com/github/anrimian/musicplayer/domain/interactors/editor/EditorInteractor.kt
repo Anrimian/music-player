@@ -5,9 +5,9 @@ import com.github.anrimian.musicplayer.domain.interactors.player.CompositionSour
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
-import com.github.anrimian.musicplayer.domain.models.genres.ShortGenre
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
+import com.github.anrimian.musicplayer.domain.models.utils.toKeyPair
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository
@@ -26,8 +26,8 @@ class EditorInteractor(
 
     fun changeCompositionGenre(
         compositionId: Long,
-        oldGenre: ShortGenre?,
-        newGenre: String?,
+        oldGenre: String,
+        newGenre: String,
     ): Completable {
         return runEditAction(compositionId) { source ->
             editorRepository.changeCompositionGenre(compositionId, source, oldGenre, newGenre)
@@ -40,10 +40,20 @@ class EditorInteractor(
         }
     }
 
-    fun removeCompositionGenre(compositionId: Long, genre: ShortGenre): Completable {
+    fun moveGenre(compositionId: Long, from: Int, to: Int): Completable {
+        return runEditAction(compositionId) { source ->
+            editorRepository.moveGenre(compositionId, source, from, to)
+        }
+    }
+
+    fun removeCompositionGenre(compositionId: Long, genre: String): Completable {
         return runEditAction(compositionId) { source ->
             editorRepository.removeCompositionGenre(compositionId, source, genre)
         }
+    }
+
+    fun restoreRemovedCompositionGenre(): Completable {
+        return editorRepository.restoreRemovedCompositionGenre()
     }
 
     fun editCompositionAuthor(compositionId: Long, newAuthor: String?): Completable {
@@ -94,16 +104,14 @@ class EditorInteractor(
         }
     }
 
-    fun editCompositionFileName(composition: FullComposition, newFileName: String): Completable {
-        return editorRepository.changeCompositionFileName(composition, newFileName)
+    fun editCompositionFileName(compositionId: Long, newFileName: String): Completable {
+        return editorRepository.changeCompositionFileName(compositionId, newFileName)
+            .doOnSuccess { path -> syncInteractor.onLocalFileKeyChanged(path.toKeyPair()) }
+            .ignoreElement()
     }
 
     fun getCompositionObservable(id: Long): Observable<FullComposition> {
         return libraryRepository.getFullCompositionObservable(id)
-    }
-
-    fun getShortGenresInComposition(compositionId: Long): Observable<List<ShortGenre>> {
-        return libraryRepository.getShortGenresInComposition(compositionId)
     }
 
     fun getAlbumObservable(albumId: Long): Observable<Album> {
@@ -160,7 +168,7 @@ class EditorInteractor(
     }
 
     fun updateGenreName(
-        name: String?,
+        name: String,
         genreId: Long,
         affectedFilesCount: (Int) -> Unit,
         downloadingSubject: BehaviorSubject<Long>,
@@ -179,7 +187,7 @@ class EditorInteractor(
 
     fun getAlbumNames() = libraryRepository.albumNames
 
-    fun getGenreNames() = libraryRepository.genreNames
+    fun getGenreNames(forCompositionId: Long) = libraryRepository.getGenreNames(forCompositionId)
 
     fun changeCompositionAlbumArt(compositionId: Long, imageSource: ImageSource?): Completable {
         return runEditAction(compositionId) { source ->
@@ -191,6 +199,11 @@ class EditorInteractor(
         return runEditAction(compositionId) { source ->
             editorRepository.removeCompositionAlbumArt(compositionId, source)
         }
+    }
+
+    fun getCompositionLyrics(compositionId: Long): Single<String> {
+        return libraryRepository.getLyricsObservable(compositionId)
+            .firstOrError()
     }
 
     private fun runEditAction(compositionId: Long, action: (CompositionContentSource) -> Completable): Completable {

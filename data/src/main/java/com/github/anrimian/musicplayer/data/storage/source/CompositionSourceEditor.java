@@ -4,14 +4,17 @@ import android.net.Uri;
 import android.os.Build;
 
 import com.github.anrimian.musicplayer.data.models.composition.file.StorageCompositionSource;
+import com.github.anrimian.musicplayer.data.storage.exceptions.GenreAlreadyPresentException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.IllegalInputException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 import com.github.anrimian.musicplayer.domain.utils.functions.ThrowsCallback;
@@ -32,7 +35,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -41,12 +48,14 @@ import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import kotlin.collections.ArraysKt;
 
 public class CompositionSourceEditor {
 
-    private static final char GENRE_DIVIDER_CHAR = ',';
-    private static final String GENRE_DIVIDER = GENRE_DIVIDER_CHAR + " ";
+    private static final char GENRE_DIVIDER_CHAR = Constants.GENRE_DIVIDER_CHAR;
+    private static final String GENRE_DIVIDER = Constants.GENRE_DIVIDER;
     private static final int MAX_COVER_SIZE = 1000;
+    private static final int NO_POSITION = -1;
 
     private final StorageMusicProvider storageMusicProvider;
     private final FileSourceProvider fileSourceProvider;
@@ -152,6 +161,10 @@ public class CompositionSourceEditor {
         return Completable.fromAction(() -> editFile(source, FieldKey.COMMENT, text));
     }
 
+    public Completable setCompositionRawGenre(CompositionContentSource source, String genreValue) {
+        return Completable.fromAction(() -> editFile(source, FieldKey.GENRE, genreValue));
+    }
+
     public Completable setCompositionsGenre(List<CompositionContentSource> sources,
                                             String oldName,
                                             String genre,
@@ -180,64 +193,104 @@ public class CompositionSourceEditor {
                 throw new IllegalInputException(String.valueOf(GENRE_DIVIDER_CHAR));
             }
             String genres = tag.getFirst(FieldKey.GENRE);
-            genres = genres.replace(oldGenre, newGenre);
+            String[] genresArray = genres.split(GENRE_DIVIDER);
+            if (ArraysKt.contains(genresArray, newGenre)) {
+                throw new GenreAlreadyPresentException();
+            }
+            //replace first occurrence of old genre
+            genres = genres.replaceFirst(Pattern.quote(oldGenre), Matcher.quoteReplacement(newGenre));
             tag.setField(FieldKey.GENRE, genres);
         }));
     }
 
-    //genre position support?
     public Completable addCompositionGenre(CompositionContentSource source, String newGenre) {
+        return addCompositionGenre(source, newGenre, NO_POSITION);
+    }
+
+    public Completable addCompositionGenre(CompositionContentSource source,
+                                           String newGenre,
+                                           int position) {
         return Completable.fromAction(() -> editAudioFileTag(source, tag -> {
             if (newGenre.indexOf(GENRE_DIVIDER_CHAR) != -1) {
                 throw new IllegalInputException(String.valueOf(GENRE_DIVIDER_CHAR));
             }
             String newFormattedGenre = newGenre.trim();
             String genres = tag.getFirst(FieldKey.GENRE);
-            if (genres.contains(newFormattedGenre)) {
-                return;
+            String[] genresArray = genres.split(GENRE_DIVIDER);
+            if (ArraysKt.contains(genresArray, newFormattedGenre)) {
+                throw new GenreAlreadyPresentException();
             }
             String updatedGenres;
             if (genres.isEmpty()) {
                 updatedGenres = newFormattedGenre;
             } else {
-                updatedGenres = genres + GENRE_DIVIDER + newFormattedGenre;
+                if (position == NO_POSITION) {
+                    updatedGenres = genres + GENRE_DIVIDER + newFormattedGenre;
+                } else {
+                    if (position == genresArray.length) {
+                        updatedGenres = genres + GENRE_DIVIDER + newFormattedGenre;
+                    } else {
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < genresArray.length; i++) {
+                            String genre = genresArray[i];
+                            if (position == i) {
+                                sb.append(newFormattedGenre);
+                                sb.append(GENRE_DIVIDER);
+                            }
+                            sb.append(genre);
+                            if (i < genresArray.length - 1) {
+                                sb.append(GENRE_DIVIDER);
+                            }
+                        }
+                        updatedGenres = sb.toString();
+                    }
+                }
             }
             tag.setField(FieldKey.GENRE, updatedGenres);
+        }));
+    }
+
+    public Completable moveGenre(CompositionContentSource source, int from, int to) {
+        return Completable.fromAction(() -> editAudioFileTag(source, tag -> {
+            String genres = tag.getFirst(FieldKey.GENRE);
+            String[] genresArray = splitGenres(genres);
+            if (from < to) {
+                for (int i = from; i < to; i++) {
+                    ListUtils.swap(genresArray, i, i + 1);
+                }
+            } else {
+                for (int i = from; i > to; i--) {
+                    ListUtils.swap(genresArray, i, i - 1);
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+            //can be joinToString after refactoring to kt
+            for (int i = 0; i < genresArray.length; i++) {
+                sb.append(genresArray[i]);
+                if (i < genresArray.length - 1) {
+                    sb.append(GENRE_DIVIDER);
+                }
+            }
+            tag.setField(FieldKey.GENRE, sb.toString());
         }));
     }
 
     public Completable removeCompositionGenre(CompositionContentSource source, String genre) {
         return Completable.fromAction(() -> editAudioFileTag(source, tag -> {
             String genres = tag.getFirst(FieldKey.GENRE);
-            int startIndex = genres.indexOf(genre);
-            if (startIndex == -1) {
-                return;
-            }
-            int endIndex = startIndex + genre.length();
-            StringBuilder sb = new StringBuilder(genres);
-
-            int dividerLength = GENRE_DIVIDER.length();
-            if (genres.length() > endIndex) {
-                //we're not in the end
-                int endIndexWithDivider = endIndex + dividerLength;
-                if (endIndexWithDivider <= genres.length()
-                        && sb.substring(endIndex, endIndexWithDivider).equals(GENRE_DIVIDER)) {
-                    //clear divider on end
-                    endIndex = endIndexWithDivider;
-                }
-            } else {
-                //we're in the end
-                int startIndexWithDivider = startIndex - dividerLength;
-                if (startIndexWithDivider > 0
-                        && sb.substring(startIndexWithDivider, startIndex).equals(GENRE_DIVIDER)) {
-                    //clear divider on start
-                    startIndex = startIndexWithDivider;
+            String[] genresArray = splitGenres(genres);
+            List<String> genresList = new ArrayList<>(Arrays.asList(genresArray));
+            int removedGenresCount = 0;
+            for (int i = 0; i < genresArray.length; i++) {
+                String genreEntry = genresArray[i];
+                if (genreEntry.equals(genre)) {
+                    genresList.remove(i - removedGenresCount);
+                    removedGenresCount++;
                 }
             }
-
-            sb.delete(startIndex, endIndex);
-
-            tag.setField(FieldKey.GENRE, sb.toString());
+            String resultGenres = String.join(GENRE_DIVIDER, genresList);
+            tag.setField(FieldKey.GENRE, resultGenres);
         }));
     }
 
@@ -280,7 +333,8 @@ public class CompositionSourceEditor {
                         TextUtils.safeParseLong(tag.getFirst(FieldKey.TRACK), null),
                         TextUtils.safeParseLong(tag.getFirst(FieldKey.DISC_NO), null),
                         tag.getFirst(FieldKey.COMMENT),
-                        tag.getFirst(FieldKey.LYRICS));
+                        tag.getFirst(FieldKey.LYRICS),
+                        splitGenres(tag.getFirst(FieldKey.GENRE)));
                 return new AudioFileInfo(fileSize, tags);
             } catch (FileNotFoundException e) {
                 throw e;
@@ -320,20 +374,20 @@ public class CompositionSourceEditor {
         return getFileTag(source).getFirst(FieldKey.ALBUM_ARTIST);
     }
 
-    String getCompositionGenre(CompositionContentSource source) {
+    String getCompositionRawGenre(CompositionContentSource source) {
         return getFileTag(source).getFirst(FieldKey.GENRE);
     }
 
     String[] getCompositionGenres(CompositionContentSource source) {
-        String rawGenre = getCompositionGenre(source);
-        if (rawGenre.isEmpty()) {
-            return new String[0];
-        }
-        return rawGenre.split(GENRE_DIVIDER);
+        return splitGenres(getCompositionRawGenre(source));
     }
 
     String getCompositionLyrics(CompositionContentSource source) {
         return getFileTag(source).getFirst(FieldKey.LYRICS);
+    }
+
+    private String[] splitGenres(String genres) {
+        return CompositionHelper.splitGenres(genres);
     }
 
     private Tag getFileTag(CompositionContentSource source) {

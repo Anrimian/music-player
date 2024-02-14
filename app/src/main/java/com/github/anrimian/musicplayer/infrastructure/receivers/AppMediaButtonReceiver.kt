@@ -79,9 +79,9 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
             KeyEvent.KEYCODE_MEDIA_PAUSE,
             KeyEvent.KEYCODE_MEDIA_STOP -> AppAndroidUtils.playPause(context, playerInteractor)
             KeyEvent.KEYCODE_MEDIA_STEP_FORWARD,
-            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> playerInteractor.fastSeekForward()
+            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> playerInteractor.fastSeekForward().subscribe()
             KeyEvent.KEYCODE_MEDIA_STEP_BACKWARD,
-            KeyEvent.KEYCODE_MEDIA_REWIND -> playerInteractor.fastSeekBackward()
+            KeyEvent.KEYCODE_MEDIA_REWIND -> playerInteractor.fastSeekBackward().subscribe()
             else -> {
                 val mediaSession = appComponent.mediaSessionHandler().getMediaSession()
                 handleIntent(mediaSession, intent)

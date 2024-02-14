@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.getRemoteViewPlayerState
+import com.github.anrimian.musicplayer.ui.common.theme.ThemeController
 import com.github.anrimian.musicplayer.ui.widgets.binders.MediumWidgetBinder
 import com.github.anrimian.musicplayer.ui.widgets.binders.SmallExtWidgetBinder
 import com.github.anrimian.musicplayer.ui.widgets.binders.SmallWidgetBinder
@@ -24,6 +25,7 @@ class WidgetUpdater(
     private val context: Context,
     private val musicPlayerInteractor: LibraryPlayerInteractor,
     private val displaySettingsInteractor: DisplaySettingsInteractor,
+    private val themeController: ThemeController,
     private val uiScheduler: Scheduler,
 ) {
 
@@ -47,6 +49,7 @@ class WidgetUpdater(
             displaySettingsInteractor.getCoversEnabledObservable(),
             musicPlayerInteractor.getRepeatModeObservable(),
             musicPlayerInteractor.getRandomPlayingObservable(),
+            themeController.getRoundCoversObservable(),
             this::applyWidgetState
         ).observeOn(uiScheduler)
             .retryWithDelay(10, 10, TimeUnit.SECONDS)
@@ -60,7 +63,8 @@ class WidgetUpdater(
         playerState: PlayerState,
         isCoversEnabled: Boolean,
         repeatMode: Int,
-        randomPlay: Boolean
+        randomPlay: Boolean,
+        isRoundCoversEnabled: Boolean
     ): Boolean {
         var compositionName: String? = null
         var compositionAuthor: String? = null
@@ -95,7 +99,8 @@ class WidgetUpdater(
             remotePlayerState,
             randomPlay,
             repeatMode,
-            isCoversEnabled
+            isCoversEnabled,
+            isRoundCoversEnabled
         )
     }
 

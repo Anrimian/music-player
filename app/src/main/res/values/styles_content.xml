@@ -138,6 +138,9 @@
         <item name="android:padding">4dp</item>
     </style>
 
+    <style name="TextStyleVolumeButton" parent="TextStyleSpeedButton">
+    </style>
+
     <style name="TextStyleContentSubtitle.Small">
         <item name="android:textSize">11sp</item>
     </style>
@@ -205,14 +208,29 @@
     <style name="ImageStyle.ItemImage">
         <item name="android:layout_width">40dp</item>
         <item name="android:layout_height">40dp</item>
-        <item name="shapeAppearance">@style/ShapeAppearance.CircleImageView</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.CoverImageView</item>
     </style>
 
     <style name="ImageStyle.QueueItemImage" parent="ImageStyle.ItemImage"/>
 
+    <style name="ShapeAppearance.CoverImageView" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">?attr/coverImageCornerSize</item>
+    </style>
+
     <style name="ShapeAppearance.CircleImageView" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShapeAppearance.RectangleImageView" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">35%</item>
+    </style>
+
+    <style name="FabShapeAppearance">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">?attr/coverImageCornerSize</item>
     </style>
 
     <style name="ImageStyle.Small">

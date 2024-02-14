@@ -28,17 +28,17 @@ public class LibraryCompositionsModule {
     @Provides
     @Nonnull
     LibraryCompositionsPresenter libraryCompositionsPresenter(LibraryCompositionsInteractor interactor,
-                                                              PlayListsInteractor playListsInteractor,
                                                               LibraryPlayerInteractor playerInteractor,
                                                               DisplaySettingsInteractor displaySettingsInteractor,
                                                               SyncInteractor<FileKey, ?, Long> syncInteractor,
+                                                              PlayListsInteractor playListsInteractor,
                                                               ErrorParser errorParser,
                                                               @Named(UI_SCHEDULER) Scheduler uiScheduler) {
         return new LibraryCompositionsPresenter(interactor,
-                playListsInteractor,
                 playerInteractor,
                 displaySettingsInteractor,
                 syncInteractor,
+                playListsInteractor,
                 errorParser,
                 uiScheduler);
     }

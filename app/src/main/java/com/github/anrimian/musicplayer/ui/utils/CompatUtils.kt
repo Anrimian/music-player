@@ -8,11 +8,16 @@ import android.text.StaticLayout
 import android.text.TextDirectionHeuristics
 import android.text.TextPaint
 import android.text.TextUtils.TruncateAt
+import androidx.annotation.ColorLong
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 
 fun Context.getDrawableCompat(@DrawableRes resId: Int): Drawable {
     return ContextCompat.getDrawable(this, resId) ?: throw IllegalStateException("resource not found")
+}
+
+fun Context.getColorCompat(@ColorLong resId: Int): Int {
+    return ContextCompat.getColor(this, resId)
 }
 
 fun createStaticLayout(text: CharSequence,

@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteCantOpenDatabaseException;
 
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
-import com.github.anrimian.musicplayer.data.database.AppDatabase;
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueItemDto;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -29,7 +29,7 @@ import io.reactivex.rxjava3.core.Observable;
  */
 public class PlayQueueDaoWrapper {
 
-    private final AppDatabase appDatabase;
+    private final LibraryDatabase libraryDatabase;
     private final PlayQueueDao playQueueDao;
 
     private static final int DB_OBSERVABLE_RETRY_COUNT = 5;
@@ -37,8 +37,8 @@ public class PlayQueueDaoWrapper {
     @Nullable
     private PlayQueueEntity deletedItem;
 
-    public PlayQueueDaoWrapper(AppDatabase appDatabase, PlayQueueDao playQueueDao) {
-        this.appDatabase = appDatabase;
+    public PlayQueueDaoWrapper(LibraryDatabase libraryDatabase, PlayQueueDao playQueueDao) {
+        this.libraryDatabase = libraryDatabase;
         this.playQueueDao = playQueueDao;
     }
 
@@ -51,7 +51,7 @@ public class PlayQueueDaoWrapper {
     }
 
     public void reshuffleQueue(long currentItemId) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             List<PlayQueueEntity> list = playQueueDao.getPlayQueue();
             if (list.isEmpty()) {
                 return;
@@ -82,7 +82,7 @@ public class PlayQueueDaoWrapper {
     public long insertNewPlayQueue(List<Long> compositionIds,
                                    boolean randomPlayingEnabled,
                                    int startPosition) {
-        return appDatabase.runInTransaction(() -> {
+        return libraryDatabase.runInTransaction(() -> {
             List<Long> shuffledList = new ArrayList<>(compositionIds);
             long randomSeed = System.nanoTime();
             Collections.shuffle(shuffledList, new Random(randomSeed));
@@ -149,7 +149,7 @@ public class PlayQueueDaoWrapper {
     }
 
     public void swapItems(PlayQueueItem firstItem, PlayQueueItem secondItem, boolean shuffleMode) {
-        appDatabase.runInTransaction(() -> {
+        libraryDatabase.runInTransaction(() -> {
             long firstId = firstItem.getId();
             long secondId = secondItem.getId();
             if (shuffleMode) {
@@ -171,7 +171,7 @@ public class PlayQueueDaoWrapper {
     }
 
     public long addCompositionsToEndQueue(List<Composition> compositions) {
-        return appDatabase.runInTransaction(() -> {
+        return libraryDatabase.runInTransaction(() -> {
             int positionToInsert = playQueueDao.getLastPosition() + 1;
             int shuffledPositionToInsert = playQueueDao.getLastShuffledPosition() + 1;
             List<PlayQueueEntity> entities = toEntityList(compositions,
@@ -183,7 +183,7 @@ public class PlayQueueDaoWrapper {
     }
 
     public long addCompositionsToQueue(List<Composition> compositions, long currentItemId) {
-        return appDatabase.runInTransaction(() -> {
+        return libraryDatabase.runInTransaction(() -> {
             int positionToInsert = 0;
             int shuffledPositionToInsert = 0;
             if (currentItemId != NO_ITEM) {
@@ -293,6 +293,10 @@ public class PlayQueueDaoWrapper {
 
     public void deletePlayQueue() {
         playQueueDao.deletePlayQueue();
+    }
+
+    public int getPlayQueueSize() {
+        return playQueueDao.getPlayQueueSize();
     }
 
     public Observable<Integer> getPlayQueueSizeObservable() {

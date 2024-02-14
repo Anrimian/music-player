@@ -8,17 +8,15 @@ java {
 dependencies {
     implementation project(':libs:filesync:core')
 
-    def deps = rootProject.ext
+    implementation rxJava
 
-    implementation deps.rxJava
+    compileOnly javaxAnnotation
 
-    compileOnly deps.javaxAnnotation
-
-    testImplementation deps.junit5
-    testImplementation deps.junit5Params
-    testRuntimeOnly deps.junit5Engine
+    testImplementation junit5
+    testImplementation junit5Params
+    testRuntimeOnly junit5Engine
     test.useJUnitPlatform()
-    testImplementation deps.mockito
-    testImplementation deps.mockitoKt
+    testImplementation mockito
+    testImplementation mockitoKt
 }
 

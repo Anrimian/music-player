@@ -25,7 +25,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mockito
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class LibraryPlayerInteractorTest {
 
@@ -97,7 +103,7 @@ class LibraryPlayerInteractorTest {
     @Test
     fun `start playing test`() {
         val queue: List<Long> = mock()
-        libraryPlayerInteractor.startPlaying(queue, 0)
+        libraryPlayerInteractor.setQueueAndPlay(queue, 0).subscribe()
 
         playQueueRepository.setPlayQueue(eq(queue), eq(0))
 

@@ -12,7 +12,6 @@
     <string name="file_not_found">Archivo no encontrado</string>
     <string name="compositions_on_device_not_found">No se encontraron canciones en el dispositivo</string>
     <string name="compositions_and_folders_for_search_not_found">No se han encontrado composiciones y carpetas que coincidan con los resultados de búsqueda</string>
-    <string name="compositions_for_search_not_found">No se encontraron coincidencias en los resultados de búsqueda</string>
     <string name="foreground_channel_description">Notificación del reproductor en primer plano</string>
     <string name="previous_track">Canción anterior</string>
     <string name="next_track">Proxima canción</string>
@@ -294,6 +293,22 @@
     <string name="playlist_has_no_records">La lista de reproducción no tiene registros</string>
     <string name="export_playlists_success">El archivo \"%1$s.m3u\" se guardó en el almacenamiento interno</string>
     <!---->
+    <!--not verified-->
+    <string name="name_is_too_long">el nombre es demasiado largo</string>
+    <string name="play_queue_items_limit_error">El recuento de elementos de la cola de reproducción no puede ser superior a %d</string>
+    <string name="play_list_items_limit_error">El recuento de elementos de la lista de reproducción no puede ser superior a %d</string>
+    <string name="volume_up">Subir volumen</string>
+    <string name="volume_down">Bajar volumen</string>
+    <string name="no_matching_search_results_found">No se encontraron resultados de búsqueda coincidentes</string>
+    <string name="covers_shape">Forma de las fundas</string>
+    <string name="play_once">Jugar una vez</string>
+    <string name="back">Atrás</string>
+    <string name="duplicates_detected">Duplicados detectados</string>
+    <string name="playlist_duplicates_description">Algunas composiciones ya están en la lista de reproducción \'%1$s\'. \n¿Agregarlos de todos modos?</string>
+    <string name="check_for_duplicates">Compruebe la lista de reproducción en busca de duplicados antes de agregar nuevas composiciones</string>
+    <string name="more_template">…%d más</string>
+    <string name="add_without_duplicates">Agregar sin duplicados</string>
+    <!---->
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s canción</item>
@@ -363,6 +378,18 @@
     <plurals name="playlist_import_partial_success">
         <item quantity="one">La lista de reproducción se importó correctamente, pero el archivo %d no se encontró en la biblioteca</item>
         <item quantity="other">La lista de reproducción se importó con éxito, pero %d archivos no se encontraron en la biblioteca</item>
+    </plurals>
+    <!---->
+
+    <!--not verified-->
+    <plurals name="delete_playlists_template">
+        <item quantity="one">Eliminar %d lista de reproducción</item>
+        <item quantity="other">Eliminar %d listas de reproducción</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d lista de reproducción eliminada</item>
+        <item quantity="other">%d listas de reproducción eliminadas</item>
     </plurals>
     <!---->
 

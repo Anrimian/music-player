@@ -133,8 +133,14 @@ public class AppModule {
     WidgetUpdater widgetUpdater(Context context,
                                 LibraryPlayerInteractor playerInteractor,
                                 DisplaySettingsInteractor displaySettingsInteractor,
+                                ThemeController themeController,
                                 @Named(UI_SCHEDULER) Scheduler scheduler) {
-        return new WidgetUpdater(context, playerInteractor, displaySettingsInteractor, scheduler);
+        return new WidgetUpdater(context,
+                playerInteractor,
+                displaySettingsInteractor,
+                themeController,
+                scheduler
+        );
     }
 
     @Provides

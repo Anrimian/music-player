@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        style="@style/TextStyle.Medium"
+        android:id="@+id/tvMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="6dp"
+        android:layout_marginHorizontal="@dimen/dialog_content_margin_start_text"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="@string/playlist_duplicates_description"/>
+
+    <TextView
+        style="@style/TextStyle.Medium"
+        android:id="@+id/tvDuplicates"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        app:layout_constraintTop_toBottomOf="@id/tvMessage"
+        app:layout_constraintStart_toStartOf="@id/tvMessage"
+        app:layout_constraintEnd_toEndOf="@id/tvMessage"
+        tools:text="@string/playlist_duplicates_description"/>
+
+    <CheckBox
+        style="@style/BaseCheckboxStyle"
+        android:id="@+id/cbCheck"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/check_for_duplicates"
+        android:layout_marginHorizontal="@dimen/content_horizontal_margin"
+        app:layout_constraintTop_toBottomOf="@id/tvDuplicates"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/btnAdd"
+        style="@style/ButtonBorderlessStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add"
+        android:layout_marginEnd="@dimen/dialog_button_margin_horizontal"
+        android:layout_marginBottom="@dimen/dialog_button_margin_vertical"
+        app:layout_constraintTop_toBottomOf="@id/cbCheck"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <Button
+        android:id="@+id/btnCancel"
+        style="@style/ButtonBorderlessStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        app:layout_constraintTop_toTopOf="@id/btnAdd"
+        app:layout_constraintEnd_toStartOf="@id/btnAdd"
+        app:layout_constraintBottom_toBottomOf="@id/btnAdd"/>
+
+    <Button
+        android:id="@+id/btnAddWithoutDuplicates"
+        style="@style/ButtonBorderlessStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_without_duplicates"
+        android:layout_marginHorizontal="@dimen/dialog_button_margin_horizontal"
+        android:maxLines="2"
+        app:layout_constraintTop_toTopOf="@id/btnAdd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/btnAdd"
+        app:layout_constraintEnd_toStartOf="@+id/btnCancel"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0"
+        tools:text="long long long long long long long long long"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

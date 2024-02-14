@@ -8,6 +8,10 @@ import com.github.anrimian.musicplayer.di.app.editor.artist.ArtistEditorComponen
 import com.github.anrimian.musicplayer.di.app.editor.artist.ArtistEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.genre.GenreEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.genre.GenreEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.lyrics.LyricsEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.lyrics.LyricsEditorModule;
 import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerComponent;
 import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
@@ -129,6 +133,14 @@ public class Components {
 
     public static ArtistEditorComponent getArtistEditorComponent(long artistId, String name) {
         return getAppComponent().artistEditorComponent(new ArtistEditorModule(artistId, name));
+    }
+
+    public static GenreEditorComponent getGenreEditorComponent(long genreId, String name) {
+        return getAppComponent().genreEditorComponent(new GenreEditorModule(genreId, name));
+    }
+
+    public static LyricsEditorComponent getLyricsEditorComponent(long genreId) {
+        return getAppComponent().lyricsEditorComponent(new LyricsEditorModule(genreId));
     }
 
     public static SettingsComponent getSettingsComponent() {

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.common.menu;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
@@ -13,9 +14,11 @@ import android.widget.PopupWindow;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.ui.utils.ViewUtils;
 
 import javax.annotation.Nullable;
 
+@SuppressLint("RtlHardcoded")
 public class AppPopupWindow {
 
     private static final long POPUP_OPEN_WINDOW_MILLIS = 200L;
@@ -24,6 +27,20 @@ public class AppPopupWindow {
     @Nullable
     public static PopupWindow showPopupWindow(View anchorView,
                                               View popupView,
+                                              int anchorGravity,
+                                              int screenMargin) {
+        return showPopupWindow(anchorView, popupView, anchorGravity, Gravity.NO_GRAVITY, screenMargin);
+    }
+
+    /**
+        @param anchorGravity values: TOP, BOTTOM, START, END, CENTER
+        @param gravity values: NO_GRAVITY, TOP, BOTTOM, CENTER_VERTICAL, START, END,
+        CENTER_HORIZONTAL
+     */
+    @Nullable
+    public static PopupWindow showPopupWindow(View anchorView,
+                                              View popupView,
+                                              int anchorGravity,
                                               int gravity,
                                               int screenMargin) {
         long currentTime = System.currentTimeMillis();
@@ -71,22 +88,75 @@ public class AppPopupWindow {
         int viewWidth = popupView.getMeasuredWidth();
         int viewHeight = popupView.getMeasuredHeight();
 
-        int showX = anchorX - viewWidth - screenMargin;
-        int showY = anchorY - screenMargin;
+        int showX = anchorX;
+        int showY = anchorY;
 
-        switch (gravity) {
-            case Gravity.CENTER: {
-                showX += anchorWidth;
+        anchorGravity = normalizeGravity(anchorView, anchorGravity);
+        gravity = normalizeGravity(anchorView, gravity);
+        switch (anchorGravity) {
+            case Gravity.TOP: {
+                showY -= viewHeight - screenMargin;
                 break;
             }
             case Gravity.BOTTOM: {
-                showX += viewWidth;
+                showY += anchorHeight - screenMargin;
+                break;
+            }
+            case Gravity.LEFT: {
+                showX = showX - screenMargin - viewWidth;
+                break;
+            }
+            case Gravity.RIGHT: {
+                showX += anchorWidth;
+                break;
+            }
+            case Gravity.CENTER: {
+                showX = showX + anchorWidth - viewWidth;
+            }
+        }
+        switch (gravity) {
+            case Gravity.NO_GRAVITY: {
+                switch (anchorGravity) {
+                    case Gravity.LEFT:
+                    case Gravity.RIGHT: {
+                        showY -= screenMargin;
+                        break;
+                    }
+                    case Gravity.TOP:
+                    case Gravity.BOTTOM: {
+                        showX -= screenMargin;
+                        break;
+                    }
+                    case Gravity.CENTER: {
+                        showY -= screenMargin;
+                        showX -= screenMargin;
+                    }
+                }
+
+                break;
+            }
+            case Gravity.TOP: {
+                showY = showY + anchorHeight - viewHeight - screenMargin;
+                break;
+            }
+            case Gravity.BOTTOM: {
                 showY += anchorHeight;
                 break;
             }
-            case Gravity.END: {
-                showX += anchorWidth + viewWidth + screenMargin;
+            case Gravity.CENTER_VERTICAL: {
+                showY = showY + anchorHeight/2 - viewHeight/2  - screenMargin;
                 break;
+            }
+            case Gravity.LEFT: {
+                showX -= viewWidth;
+                break;
+            }
+            case Gravity.RIGHT: {
+                showX += viewWidth;
+                break;
+            }
+            case Gravity.CENTER_HORIZONTAL: {
+                showX = showX + anchorWidth/2 - viewWidth/2;
             }
         }
 
@@ -104,9 +174,28 @@ public class AppPopupWindow {
                 anchorView.removeOnAttachStateChangeListener(listener)
         );
 
-        popupWindow.showAtLocation(anchorView, Gravity.START | Gravity.TOP, showX, showY);
+        popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, showX, showY);
 
         return popupWindow;
+    }
+
+    private static int normalizeGravity(View view, int gravity) {
+        boolean isRtl = ViewUtils.isRtl(view);
+        if (gravity == Gravity.START) {
+            if (isRtl) {
+                return Gravity.RIGHT;
+            } else {
+                return Gravity.LEFT;
+            }
+        }
+        if (gravity == Gravity.END) {
+            if (isRtl) {
+                return Gravity.LEFT;
+            } else {
+                return Gravity.RIGHT;
+            }
+        }
+        return gravity;
     }
 
 }

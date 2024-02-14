@@ -8,7 +8,7 @@ public class FileUtilsTest {
 
     @Test
     public void getChangedFilePath() {
-        String result = FileUtils.getNewPath("1/2/3/same/4/5/same", "new");
+        String result = FileUtils.replaceFileName("1/2/3/same/4/5/same", "new");
         assertEquals("1/2/3/same/4/5/new", result);
     }
 }

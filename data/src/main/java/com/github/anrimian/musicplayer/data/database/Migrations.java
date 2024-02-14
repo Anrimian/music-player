@@ -14,6 +14,7 @@ import androidx.room.util.CursorUtil;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
+import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionCorruptionDetector;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
@@ -21,14 +22,82 @@ import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullC
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
 import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
+import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlayListFileNameValidator;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 @SuppressLint("RestrictedApi")
 class Migrations {
+
+    static Migration MIGRATION_14_15 = new Migration(14, 15) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP TABLE `genres`");
+            database.execSQL("DROP TABLE `genre_entries`");
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS `genres` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `genre_entries` (`genreId` INTEGER NOT NULL, `compositionId` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`genreId`, `compositionId`), FOREIGN KEY(`compositionId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`genreId`) REFERENCES `genres`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_genres_name` ON `genres` (`name`)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_genre_entries_compositionId` ON `genre_entries` (`compositionId`)");
+
+            try (Cursor c = database.query("SELECT id, name FROM play_lists")) {
+                CursorWrapper cursorWrapper = new CursorWrapper(c);
+                while (c.moveToNext()) {
+                    String name = cursorWrapper.getString("name");
+                    if (name == null) {
+                        continue;
+                    }
+                    String newName = PlayListFileNameValidator.INSTANCE.getFormattedPlaylistName(name);
+
+                    if (!name.equals(newName)) {
+                        int i = 0;
+
+                        while (isPlaylistWithNameExists(database, newName)) {
+                            StringBuilder sb = new StringBuilder(newName);
+                            sb.setCharAt(0, (char) i);
+                            newName = sb.toString();
+                        }
+
+                        long id = cursorWrapper.getLong("id");
+                        database.execSQL("UPDATE play_lists SET name = ? WHERE id = ?", new Object[] { newName, id });
+                    }
+                }
+            }
+        }
+    };
+
+    private static boolean isPlaylistWithNameExists(SupportSQLiteDatabase database, String name) {
+        try (Cursor c = database.query("SELECT exists(SELECT 1 FROM play_lists WHERE name = ? LIMIT 1)", new Object[] { name })) {
+            c.moveToNext();
+            return c.getInt(0) != 0;
+        }
+    }
+
+    static Migration getMigration13_14(Context context) {
+        return new Migration(13, 14) {
+            @Override
+            public void migrate(@NonNull SupportSQLiteDatabase database) {
+                DatabaseManager databaseManager = new DatabaseManager(context);
+                IgnoredFoldersDao dao = databaseManager.getConfigsDatabase().ignoredFoldersDao();
+
+                try (Cursor c = database.query("SELECT relativePath, addDate FROM ignored_folders")) {
+                    CursorWrapper cursorWrapper = new CursorWrapper(c);
+                    while (c.moveToNext()) {
+                        String path = cursorWrapper.getString("relativePath");
+                        long date = cursorWrapper.getLong("addDate");
+                        //noinspection ConstantConditions
+                        dao.insert(path, new Date(date));
+                    }
+                }
+                database.execSQL("DROP TABLE ignored_folders");
+            }
+        };
+    }
 
     static Migration MIGRATION_12_13 = new Migration(12, 13) {
         @Override

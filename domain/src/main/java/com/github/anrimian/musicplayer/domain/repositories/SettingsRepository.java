@@ -135,6 +135,12 @@ public interface SettingsRepository {
 
     boolean isPlaylistInsertStartEnabled();
 
+    void setPlaylistDuplicateCheckEnabled(boolean enabled);
+
+    boolean isPlaylistDuplicateCheckEnabled();
+
+    Observable<Boolean> getPlaylistDuplicateCheckObservable();
+
     void setPauseOnZeroVolumeLevelEnabled(boolean enabled);
 
     boolean isPauseOnZeroVolumeLevelEnabled();

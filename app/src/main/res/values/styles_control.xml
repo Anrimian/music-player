@@ -5,6 +5,7 @@
         <item name="android:textColor">@color/color_text_primary</item>
         <item name="android:paddingTop">@dimen/checkbox_text_vertical_padding</item>
         <item name="android:paddingBottom">@dimen/checkbox_text_vertical_padding</item>
+        <item name="android:paddingStart">8dp</item>
         <item name="android:textAlignment">viewStart</item>
     </style>
 
@@ -19,6 +20,11 @@
     </style>
 
     <style name="SeekBarStyle" parent="@style/Widget.AppCompat.SeekBar"/>
+
+    <style name="VerticalSeekbarStyle" parent="SeekBarStyle">
+        <!--wrap_content for api 21 - fixes thumb position-->
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 
     <style name="SliderStyle">
         <item name="colorOnBackground">#fff</item>
@@ -42,10 +48,10 @@
         <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:background">@drawable/bg_time_field</item>
-        <item name="android:paddingTop">9dp</item>
-        <item name="android:paddingBottom">9dp</item>
-        <item name="android:paddingStart">13dp</item>
-        <item name="android:paddingEnd">13dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
         <item name="android:inputType">number</item>
         <item name="android:maxLength">2</item>
         <item name="android:gravity">center</item>
@@ -55,6 +61,21 @@
         <item name="android:textSelectHandleLeft">@drawable/bg_empty</item>
         <item name="android:textSelectHandleRight">@drawable/bg_empty</item>
         <item name="android:textSelectHandle">@drawable/bg_empty</item>
+    </style>
+
+    <style name="TimeDividerTextStyle" parent="@style/TextStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:text">:</item>
+        <item name="android:padding">4dp</item>
+    </style>
+
+    <style name="ChangeSpeedButtonStyle">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">?actionBarItemBackground</item>
+        <item name="android:scaleType">center</item>
+        <item name="tint">@color/color_accent_state</item>
     </style>
 
 </resources>

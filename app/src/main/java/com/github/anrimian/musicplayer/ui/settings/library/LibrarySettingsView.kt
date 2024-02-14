@@ -18,6 +18,9 @@ interface LibrarySettingsView : MvpView {
     @AddToEndSingle
     fun showPlaylistInsertStartEnabled(enabled: Boolean)
 
+    @AddToEndSingle
+    fun showPlaylistDuplicateCheckEnabled(enabled: Boolean)
+
     @Skip
     fun showSelectMinAudioDurationDialog(currentValue: Long)
 

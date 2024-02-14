@@ -11,6 +11,7 @@ import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.settings.folders.view.ExcludedFolderAdapter
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
@@ -24,7 +25,7 @@ class ExcludedFoldersFragment : MvpAppCompatFragment(), ExcludedFoldersView,
     
     private val presenter by moxyPresenter { Components.getLibraryComponent().excludedFoldersPresenter() }
 
-    private lateinit var viewBinding: FragmentExcludedFoldersBinding
+    private lateinit var binding: FragmentExcludedFoldersBinding
 
     private lateinit var adapter: ExcludedFolderAdapter
 
@@ -33,8 +34,8 @@ class ExcludedFoldersFragment : MvpAppCompatFragment(), ExcludedFoldersView,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentExcludedFoldersBinding.inflate(inflater, container, false)
-        return viewBinding.root
+        binding = FragmentExcludedFoldersBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,14 +43,14 @@ class ExcludedFoldersFragment : MvpAppCompatFragment(), ExcludedFoldersView,
 
         val toolbar = requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar)
         toolbar.setTitle(R.string.excluded_folders)
-        toolbar.subtitle = null
+        toolbar.setSubtitle(null)
         toolbar.setTitleClickListener(null)
 
-        adapter = ExcludedFolderAdapter(viewBinding.rvExcludedFolders, presenter::onDeleteFolderClicked)
-        viewBinding.rvExcludedFolders.adapter = adapter
-        viewBinding.rvExcludedFolders.layoutManager = LinearLayoutManager(requireContext())
+        adapter = ExcludedFolderAdapter(binding.rvExcludedFolders, presenter::onDeleteFolderClicked)
+        binding.rvExcludedFolders.adapter = adapter
+        binding.rvExcludedFolders.layoutManager = LinearLayoutManager(requireContext())
 
-        SlidrPanel.simpleSwipeBack(viewBinding.clContainer, this, toolbar::onStackFragmentSlided)
+        SlidrPanel.simpleSwipeBack(binding.clContainer, this, toolbar::onStackFragmentSlided)
     }
 
     override fun onFragmentResumed() {
@@ -58,15 +59,15 @@ class ExcludedFoldersFragment : MvpAppCompatFragment(), ExcludedFoldersView,
     }
 
     override fun showListState() {
-        viewBinding.progressStateView.hideAll()
+        binding.progressStateView.hideAll()
     }
 
     override fun showEmptyListState() {
-        viewBinding.progressStateView.showMessage(R.string.no_excluded_folders)
+        binding.progressStateView.showMessage(R.string.no_excluded_folders)
     }
 
     override fun showErrorState(errorCommand: ErrorCommand) {
-        viewBinding.progressStateView.showMessage(errorCommand.message, false)
+        binding.progressStateView.showMessage(errorCommand.message, false)
     }
 
     override fun showExcludedFoldersList(folders: List<IgnoredFolder>) {
@@ -75,7 +76,7 @@ class ExcludedFoldersFragment : MvpAppCompatFragment(), ExcludedFoldersView,
 
     override fun showRemovedFolderMessage(folder: IgnoredFolder) {
         MessagesUtils.makeSnackbar(
-            viewBinding.clContainer,
+            binding.clContainer,
             R.string.ignored_folder_removed,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.cancel, presenter::onRestoreRemovedFolderClicked)
@@ -83,7 +84,6 @@ class ExcludedFoldersFragment : MvpAppCompatFragment(), ExcludedFoldersView,
     }
 
     override fun showErrorMessage(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(viewBinding.clContainer, errorCommand.message, Snackbar.LENGTH_SHORT)
-            .show()
+        binding.clContainer.showSnackbar(errorCommand.message)
     }
 }

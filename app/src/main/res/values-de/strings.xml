@@ -13,7 +13,6 @@
     <string name="file_not_found">Datei nicht gefunden</string>
     <string name="compositions_on_device_not_found">Keine Musik auf dem Gerät gefunden</string>
     <string name="compositions_and_folders_for_search_not_found">Keine passenden Titel oder Ordner gefunden</string>
-    <string name="compositions_for_search_not_found">Keine passenden Suchergebnisse gefunden</string>
     <string name="foreground_channel_description">Musikwiedergabe</string>
     <string name="previous_track">Voriger Titel</string>
     <string name="next_track">Nächster Titel</string>
@@ -283,6 +282,20 @@
     <string name="overwrite_playlist">Es gibt bereits eine Playlist mit diesem Namen. \nDiese überschreiben?</string>
     <string name="playlist_has_no_records">Playlist ist leer</string>
     <string name="export_playlists_success">Datei „%1$s.m3u“ erfolgreich auf internen Speicher gesichert</string>
+    <string name="name_is_too_long">Name ist zu lang</string>
+    <string name="play_queue_items_limit_error">Wiedergabeliste darf nicht mehr als %d Titel enthalten</string>
+    <string name="play_list_items_limit_error">Playlist darf nicht mehr als %d Titel enthalten</string>
+    <string name="volume_up">Lauter</string>
+    <string name="volume_down">Leiser</string>
+    <string name="no_matching_search_results_found">Keine passenden Suchtreffer gefunden</string>
+    <string name="covers_shape">Form des Covers</string>
+    <string name="play_once">Einmal abspielen</string>
+    <string name="back">Zurück</string>
+    <string name="duplicates_detected">Doppelte Einträge entdeckt</string>
+    <string name="playlist_duplicates_description">Einige Titel sind schon in der Playlist „%1$s“. \nTrotzdem hinzufügen?</string>
+    <string name="check_for_duplicates">Playlist auf Dopplungen prüfen, bevor neue Titel hinzugefügt werden</string>
+    <string name="more_template">… %d mehr</string>
+    <string name="add_without_duplicates">Ohne Dopplungen hinzufügen</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s Titel</item>
@@ -347,6 +360,16 @@
     <plurals name="playlist_import_partial_success">
         <item quantity="one">Playlist erfolgreich importiert, aber %d Datei wurde nicht in der Sammlung gefunden</item>
         <item quantity="other">Playlist erfolgreich importiert, aber %d Dateien wurden nicht in der Sammlung gefunden</item>
+    </plurals>
+
+    <plurals name="delete_playlists_template">
+        <item quantity="one">%d Playlist löschen</item>
+        <item quantity="other">%d Playlists löschen</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d Playlist gelöscht</item>
+        <item quantity="other">%d Playlists gelöscht</item>
     </plurals>
 
 </resources>

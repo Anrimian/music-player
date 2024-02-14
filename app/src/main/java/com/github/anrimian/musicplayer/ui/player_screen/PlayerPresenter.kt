@@ -12,21 +12,26 @@ import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
-import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Scheduler
-import java.util.*
+import java.util.LinkedList
 
 /**
  * Created on 02.11.2017.
  */
 class PlayerPresenter(
     private val playerInteractor: LibraryPlayerInteractor,
-    private val playListsInteractor: PlayListsInteractor,
     private val playerScreenInteractor: PlayerScreenInteractor,
+    playListsInteractor: PlayListsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
-) : AppPresenter<PlayerView>(uiScheduler, errorParser) {
+) : BaseLibraryPresenter<PlayerView>(
+    playerInteractor,
+    playListsInteractor,
+    uiScheduler,
+    errorParser
+) {
 
     private var currentItem: PlayQueueItem? = null
 
@@ -53,6 +58,7 @@ class PlayerPresenter(
         subscribeOnFileScannerState()
         playerScreenInteractor.playerScreensSwipeObservable
             .unsafeSubscribeOnUi(viewState::showScreensSwipeEnabled)
+        playerScreenInteractor.volumeObservable.unsafeSubscribeOnUi(viewState::onVolumeChanged)
     }
 
     fun onSetupScreenStateRequested() {
@@ -83,7 +89,12 @@ class PlayerPresenter(
     }
 
     fun onLibraryScreenSelected() {
-        viewState.showLibraryScreen(playerScreenInteractor.selectedLibraryScreen)
+        viewState.showLibraryScreen(
+            playerScreenInteractor.selectedLibraryScreen,
+            playerScreenInteractor.selectedArtistScreenId,
+            playerScreenInteractor.selectedAlbumScreenId,
+            playerScreenInteractor.selectedGenreScreenId,
+        )
     }
 
     fun onLibraryScreenSelected(screenId: Int) {
@@ -124,10 +135,6 @@ class PlayerPresenter(
 
     fun onTrackRewoundTo(progress: Int) {
         playerInteractor.seekTo(progress.toLong())
-    }
-
-    fun onDeleteCompositionButtonClicked(composition: Composition) {
-        viewState.showConfirmDeleteDialog(listOf(composition))
     }
 
     fun onDeleteCurrentCompositionButtonClicked() {
@@ -182,7 +189,7 @@ class PlayerPresenter(
         if (lastDeleteAction != null) {
             lastDeleteAction!!
                 .doFinally { lastDeleteAction = null }
-                .subscribe({}, this::onDeleteCompositionError)
+                .justSubscribe(this::onDeleteCompositionError)
         }
     }
 
@@ -196,8 +203,7 @@ class PlayerPresenter(
     }
 
     private fun addPreparedCompositionsToPlayList(playList: PlayList) {
-        playListsInteractor.addCompositionsToPlayList(compositionsForPlayList, playList)
-            .subscribeOnUi({ onAddingToPlayListCompleted(playList) }, this::onAddingToPlayListError)
+        performAddToPlaylist(compositionsForPlayList, playList) { compositionsForPlayList.clear() }
     }
 
     private fun deletePreparedCompositions(compositionsToDelete: List<Composition>) {
@@ -211,16 +217,6 @@ class PlayerPresenter(
     private fun onDeleteCompositionError(throwable: Throwable) {
         val errorCommand = errorParser.parseError(throwable)
         viewState.showDeleteCompositionError(errorCommand)
-    }
-
-    private fun onAddingToPlayListError(throwable: Throwable) {
-        val errorCommand = errorParser.parseError(throwable)
-        viewState.showAddingToPlayListError(errorCommand)
-    }
-
-    private fun onAddingToPlayListCompleted(playList: PlayList) {
-        viewState.showAddingToPlayListComplete(playList, compositionsForPlayList)
-        compositionsForPlayList.clear()
     }
 
     private fun subscribeOnCurrentCompositionSyncState() {

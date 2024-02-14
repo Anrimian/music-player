@@ -13,7 +13,6 @@
     <string name="file_not_found">Dosya bulunamadı</string>
     <string name="compositions_on_device_not_found">Cihazda şarkı bulunamadı</string>
     <string name="compositions_and_folders_for_search_not_found">Arama sonuçlarıyla eşleşen kompozisyonlar ve klasörler bulunamadı</string>
-    <string name="compositions_for_search_not_found">Eşleşen arama sonucu bulunamadı</string>
     <string name="foreground_channel_description">Ön plan oyuncu bildirimi</string>
     <string name="previous_track">Önceki parça</string>
     <string name="next_track">Sonraki parça</string>
@@ -283,6 +282,20 @@
     <string name="overwrite_playlist">Bu ada sahip oynatma listesi zaten var.  \nÜzerine yazılsın mı?</string>
     <string name="playlist_has_no_records">Oynatma listesinde kayıt yok</string>
     <string name="export_playlists_success">\"%1$s.m3u\" dosyası dahili depolamaya kaydedildi</string>
+    <string name="name_is_too_long">İsim çok uzun</string>
+    <string name="play_queue_items_limit_error">Oynatma kuyruğu öğe sayısı %d\'den fazla olamaz</string>
+    <string name="play_list_items_limit_error">Oynatma listesi öğe sayısı %d\'den fazla olamaz</string>
+    <string name="volume_up">Sesi aç</string>
+    <string name="volume_down">Sesi kıs</string>
+    <string name="no_matching_search_results_found">Eşleşen arama sonucu bulunamadı</string>
+    <string name="covers_shape">Şekli Kapaklar</string>
+    <string name="play_once">Bir kez oynat</string>
+    <string name="back">Geri</string>
+    <string name="duplicates_detected">Çiftler tespit edildi</string>
+    <string name="playlist_duplicates_description">Bazı besteler zaten \'%1$s\' çalma listesinde bulunmaktadır. \nBunları yine de ekleyin?</string>
+    <string name="check_for_duplicates">Yeni kompozisyonlar eklemeden önce çalma listesinde yinelenen kompozisyon olup olmadığını kontrol edin</string>
+    <string name="more_template">…%d fazla</string>
+    <string name="add_without_duplicates">Yinelemeler olmadan ekle</string>
 
     <plurals name="compositions_count">
         <item quantity="one">%1$s şarkı</item>
@@ -347,6 +360,16 @@
     <plurals name="playlist_import_partial_success">
         <item quantity="one">Oynatma listesi başarıyla içe aktarıldı, ancak %d dosya kitaplıkta bulunamadı</item>
         <item quantity="other">Oynatma listesi başarıyla içe aktarıldı, ancak kitaplıkta %d dosya bulunamadı</item>
+    </plurals>
+
+    <plurals name="delete_playlists_template">
+        <item quantity="one">d oynatma listesini sil</item>
+        <item quantity="other">d oynatma listelerini sil</item>
+    </plurals>
+
+    <plurals name="delete_playlists_success">
+        <item quantity="one">%d oynatma listesi silindi</item>
+        <item quantity="other">d oynatma listeleri silindi</item>
     </plurals>
 
 </resources>

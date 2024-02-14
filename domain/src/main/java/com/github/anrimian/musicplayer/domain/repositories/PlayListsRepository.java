@@ -15,21 +15,24 @@ import io.reactivex.rxjava3.core.Single;
 
 public interface PlayListsRepository {
 
-    Observable<List<PlayList>> getPlayListsObservable();
+    Observable<List<PlayList>> getPlayListsObservable(String searchQuery);
 
     Observable<PlayList> getPlayListObservable(long playlistId);
 
     Observable<List<PlayListItem>> getCompositionsObservable(long playlistId, @Nullable String searchText);
 
+    Single<List<Long>> getCompositionIdsInPlaylists(Iterable<PlayList> playlists);
+
+    Single<List<Composition>> getCompositionsInPlaylists(Iterable<PlayList> playlists);
+
+    Single<List<Composition>> getCompositionsByPlaylistsIds(Iterable<Long> playlistsIds);
+
     Single<PlayList> createPlayList(String name);
 
-    Completable addCompositionsToPlayList(List<Composition> compositions,
-                                          PlayList playList,
-                                          int position);
-
-    Completable addCompositionsToPlayList(List<Composition> compositions,
-                                          PlayList playList,
-                                          boolean checkForDuplicates);
+    Single<List<Composition>> addCompositionsToPlayList(List<Composition> compositions,
+                                                        PlayList playList,
+                                                        boolean checkForDuplicates,
+                                                        boolean ignoreDuplicates);
 
     Completable deleteItemFromPlayList(PlayListItem playListItem, long playListId);
 
@@ -37,11 +40,13 @@ public interface PlayListsRepository {
 
     Completable deletePlayList(long playListId);
 
-    Completable moveItemInPlayList(PlayList playList, int from, int to);
+    Completable moveItemInPlayList(long playListId, int from, int to);
 
     Completable updatePlayListName(long playListId, String name);
 
     Completable exportPlaylistsToFolder(List<PlayList> playlists, FileReference folder);
 
     Single<Long> importPlaylistFile(FileReference file, boolean overwriteExisting);
+
+    void updatePlaylistCache(long playlistId);
 }

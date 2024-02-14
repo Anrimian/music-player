@@ -24,6 +24,7 @@ object WidgetDataHolder {
     private const val RANDOM_PLAY = "random_play"
     private const val REPEAT = "repeat"
     private const val COVERS_ENABLED = "covers_enabled"
+    private const val ROUND_COVERS_ENABLED = "round_covers_enabled"
     private const val COLOR_BACKGROUND = "color_background"
     private const val COLOR_ACCENT = "color_accent"
     private const val COLOR_BUTTON = "color_button"
@@ -51,6 +52,7 @@ object WidgetDataHolder {
         randomPlayModeEnabled: Boolean,
         repeatMode: Int,
         isCoversEnabled: Boolean,
+        isRoundCoversEnabled: Boolean
     ): Boolean {
         val widgetData = getWidgetData(context)
 
@@ -118,6 +120,11 @@ object WidgetDataHolder {
             widgetData.isCoversEnabled = isCoversEnabled
             savableDataChanged = true
         }
+        if (widgetData.isRoundCoversEnabled != isRoundCoversEnabled) {
+            editor.putBoolean(ROUND_COVERS_ENABLED, isRoundCoversEnabled)
+            widgetData.isRoundCoversEnabled = isRoundCoversEnabled
+            savableDataChanged = true
+        }
 
         if (savableDataChanged) {
             editor.apply()
@@ -181,6 +188,7 @@ object WidgetDataHolder {
             preferences.getBoolean(RANDOM_PLAY),
             preferences.getInt(REPEAT),
             preferences.getBoolean(COVERS_ENABLED),
+            preferences.getBoolean(ROUND_COVERS_ENABLED)
         )
     }
 }

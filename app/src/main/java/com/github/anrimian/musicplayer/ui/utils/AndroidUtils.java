@@ -52,7 +52,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.view.SupportMenuInflater;
-import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
@@ -211,9 +211,7 @@ public class AndroidUtils {
 
     @SuppressLint("RestrictedApi")
     public static Menu createMenu(Context context, @MenuRes int menuRes) {
-        //noinspection ConstantConditions
-        PopupMenu p  = new PopupMenu(context, null);
-        Menu menu = p.getMenu();
+        MenuBuilder menu = new MenuBuilder(context);
         new SupportMenuInflater(context).inflate(menuRes, menu);
         return menu;
     }

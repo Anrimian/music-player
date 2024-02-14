@@ -35,8 +35,8 @@
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/swMediaPlayer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         app:layout_constraintTop_toTopOf="@id/ivDrag"
         app:layout_constraintBottom_toBottomOf="@id/ivDrag"

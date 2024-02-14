@@ -88,7 +88,7 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
         binding.ivClose.setOnClickListener { dismissAllowingStateLoss() }
         binding.btnRestartSystemEqualizer.setOnClickListener { presenter.onRestartAppEqClicked() }
         
-        showActiveEqualizer(equalizerController.selectedEqualizerType)
+        showActiveEqualizer(equalizerController.getSelectedEqualizerType())
         
         CompatUtils.setOutlineButtonStyle(binding.btnOpenSystemEqualizer)
         CompatUtils.setOutlineButtonStyle(binding.tvPresets)
@@ -184,7 +184,7 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
     }
 
     private fun openSystemEqualizer() {
-        equalizerController.launchExternalEqualizerSetup(activity)
+        equalizerController.launchExternalEqualizerSetup(requireActivity())
         showActiveEqualizer(EqualizerType.EXTERNAL)
     }
 

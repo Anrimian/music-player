@@ -18,9 +18,9 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
+import com.github.anrimian.musicplayer.ui.playlist_screens.choose.adapter.PlayListsAdapter
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.adapter.PlayListsAdapter
-import com.github.anrimian.musicplayer.ui.playlist_screens.rename.RenamePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlist_screens.rename.newRenamePlaylistDialog
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
@@ -147,8 +147,7 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
     }
 
     override fun showEditPlayListNameDialog(playList: PlayList) {
-        val fragment = RenamePlayListDialogFragment.newInstance(playList.id)
-        fragment.safeShow(childFragmentManager)
+        newRenamePlaylistDialog(playList.id).safeShow(childFragmentManager)
     }
 
     override fun showPlayListDeleteSuccess(playList: PlayList) {

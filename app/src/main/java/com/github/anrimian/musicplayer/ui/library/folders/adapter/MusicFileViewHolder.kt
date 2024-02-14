@@ -150,6 +150,6 @@ class MusicFileViewHolder(
 
     @ColorInt
     private fun getPlaySelectionColor(): Int {
-        return ColorFormatUtils.getPlayingCompositionColor(context, 25)
+        return ColorFormatUtils.getPlayingCompositionColor(getContext(), 25)
     }
 }

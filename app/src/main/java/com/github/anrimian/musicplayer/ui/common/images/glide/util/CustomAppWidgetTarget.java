@@ -110,11 +110,13 @@ public class CustomAppWidgetTarget extends CustomTarget<Bitmap> {
   /** Updates the AppWidget after the ImageView has loaded the Bitmap. */
   private void update() {
     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this.context);
-    if (this.componentName != null) {
-      appWidgetManager.updateAppWidget(this.componentName, this.remoteViews);
-    } else {
-      appWidgetManager.updateAppWidget(this.widgetIds, this.remoteViews);
-    }
+    try {
+        if (this.componentName != null) {
+            appWidgetManager.updateAppWidget(this.componentName, this.remoteViews);
+        } else {
+            appWidgetManager.updateAppWidget(this.widgetIds, this.remoteViews);
+        }
+    } catch (Exception ignored) {}
   }
 
   @Override

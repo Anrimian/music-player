@@ -16,21 +16,21 @@ import com.github.anrimian.musicplayer.domain.models.artist.Artist
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.toLongArray
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
-import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
-import com.github.anrimian.musicplayer.ui.editor.artist.newRenameArtistDialog
+import com.github.anrimian.musicplayer.ui.editor.artist.RenameArtistDialogFragment
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
-import com.github.anrimian.musicplayer.ui.library.LibraryFragment
-import com.github.anrimian.musicplayer.ui.library.artists.items.newInstance
+import com.github.anrimian.musicplayer.ui.library.artists.items.ArtistItemsFragment
 import com.github.anrimian.musicplayer.ui.library.artists.list.adapter.ArtistsAdapter
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFragment
+import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
+import com.github.anrimian.musicplayer.ui.library.common.setupLibraryTitle
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
@@ -41,11 +41,9 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNav
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback
-import com.google.android.material.snackbar.Snackbar
 import moxy.ktx.moxyPresenter
 
-class ArtistsListFragment : LibraryFragment(), ArtistsListView,
-    FragmentNavigationListener,
+class ArtistsListFragment : BaseLibraryFragment(), ArtistsListView, FragmentNavigationListener,
     BackButtonListener {
 
     private val presenter by moxyPresenter { Components.artistsComponent().artistsListPresenter() }
@@ -58,6 +56,8 @@ class ArtistsListFragment : LibraryFragment(), ArtistsListView,
 
     private lateinit var selectOrderDialogRunner: DialogFragmentRunner<SelectOrderDialogFragment>
     private lateinit var choosePlayListDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
+
+    override fun getLibraryPresenter(): BaseLibraryPresenter<*> = presenter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -111,8 +111,9 @@ class ArtistsListFragment : LibraryFragment(), ArtistsListView,
     }
 
     override fun onFragmentResumed() {
-        super.onFragmentResumed()
+        presenter.onFragmentResumed()
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
+        toolbar.setupLibraryTitle(this)
         toolbar.setSubtitle(R.string.artists)
         toolbar.setupSearch(presenter::onSearchTextChanged, presenter.getSearchText())
         toolbar.setupSelectionModeMenu(R.menu.library_artists_selection_menu, this::onActionModeItemClicked)
@@ -125,23 +126,25 @@ class ArtistsListFragment : LibraryFragment(), ArtistsListView,
     }
 
     override fun onBackPressed(): Boolean {
-        if (toolbar.isInActionMode) {
+        if (toolbar.isInActionMode()) {
             presenter.onSelectionModeBackPressed()
             return true
         }
-        if (toolbar.isInSearchMode) {
+        if (toolbar.isInSearchMode()) {
             toolbar.setSearchModeEnabled(false)
             return true
         }
         return false
     }
 
+    override fun getCoordinatorLayout() = binding.listContainer
+
     override fun showEmptyList() {
         binding.progressStateView.showMessage(R.string.no_artists_in_library)
     }
 
     override fun showEmptySearchResult() {
-        binding.progressStateView.showMessage(R.string.compositions_for_search_not_found)
+        binding.progressStateView.showMessage(R.string.no_matching_search_results_found)
     }
 
     override fun showList() {
@@ -174,7 +177,8 @@ class ArtistsListFragment : LibraryFragment(), ArtistsListView,
     }
 
     override fun goToArtistScreen(artist: Artist) {
-        FragmentNavigation.from(parentFragmentManager).addNewFragment(newInstance(artist.id))
+        FragmentNavigation.from(parentFragmentManager)
+            .addNewFragment(ArtistItemsFragment.newInstance(artist.id))
     }
 
     override fun onArtistSelected(artist: Artist, position: Int) {
@@ -193,57 +197,20 @@ class ArtistsListFragment : LibraryFragment(), ArtistsListView,
         toolbar.showSelectionMode(count)
     }
 
-    override fun onCompositionsAddedToPlayNext(compositions: List<Composition>) {
-        val message = MessagesUtils.getPlayNextMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(binding.listContainer, message, Snackbar.LENGTH_SHORT).show()
-    }
-
-    override fun onCompositionsAddedToQueue(compositions: List<Composition>) {
-        val message = MessagesUtils.getAddedToQueueMessage(requireContext(), compositions)
-        MessagesUtils.makeSnackbar(binding.listContainer, message, Snackbar.LENGTH_SHORT).show()
-    }
-
     override fun showSelectPlayListDialog(artists: Collection<Artist>, closeMultiselect: Boolean) {
         val args = Bundle().apply {
-            putLongArray(Arguments.IDS_ARG, artists.toLongArray(Artist::getId))
+            putLongArray(Arguments.IDS_ARG, artists.toLongArray(Artist::id))
             putBoolean(Arguments.CLOSE_MULTISELECT_ARG, closeMultiselect)
         }
         choosePlayListDialogRunner.show(newChoosePlayListDialogFragment(args))
-    }
-
-    override fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>) {
-        val text = MessagesUtils.getAddToPlayListCompleteMessage(requireActivity(), playList, compositions)
-        MessagesUtils.makeSnackbar(binding.listContainer, text, Snackbar.LENGTH_SHORT).show()
-    }
-
-    override fun showAddingToPlayListError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            binding.listContainer,
-            getString(R.string.add_to_playlist_error_template, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
-    override fun showErrorMessage(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            binding.listContainer, errorCommand.message, Snackbar.LENGTH_LONG
-        ).show()
     }
 
     override fun sendCompositions(compositions: List<Composition>) {
         shareCompositions(this, compositions)
     }
 
-    override fun showReceiveCompositionsForSendError(errorCommand: ErrorCommand) {
-        MessagesUtils.makeSnackbar(
-            binding.listContainer,
-            getString(R.string.can_not_receive_file_for_send, errorCommand.message),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
     private fun showEditArtistNameDialog(artist: Artist) {
-        newRenameArtistDialog(artist.id, artist.name).safeShow(childFragmentManager)
+        RenameArtistDialogFragment.newInstance(artist.id, artist.name).safeShow(childFragmentManager)
     }
 
     private fun onArtistMenuClicked(view: View, artist: Artist) {

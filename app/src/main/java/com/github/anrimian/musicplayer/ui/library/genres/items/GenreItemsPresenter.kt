@@ -9,32 +9,29 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
-import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsPresenter
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.disposables.Disposable
 
 class GenreItemsPresenter(
     private val genreId: Long,
     private val interactor: LibraryGenresInteractor,
-    playListsInteractor: PlayListsInteractor,
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
     syncInteractor: SyncInteractor<FileKey, *, Long>,
+    playListsInteractor: PlayListsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : BaseLibraryCompositionsPresenter<Composition, GenreItemsView>(
-    playerInteractor,
-    playListsInteractor,
     displaySettingsInteractor,
     syncInteractor,
+    playerInteractor,
+    playListsInteractor,
     errorParser,
     uiScheduler
 ) {
 
-    private var changeDisposable: Disposable? = null
     private var genre: Genre? = null
 
     override fun onFirstViewAttach() {
@@ -52,21 +49,12 @@ class GenreItemsPresenter(
 
     override fun saveListPosition(listPosition: ListPosition) {}
 
-    fun onFragmentMovedToTop() {
-        //save selected genre screen. Wait a little for all screens
+    fun onFragmentResumed() {
+        interactor.setSelectedGenreScreen(genreId)
     }
 
     fun onRenameGenreClicked() {
         genre?.let(viewState::showRenameGenreDialog)
-    }
-
-    fun onNewGenreNameEntered(name: String?, genreId: Long) {
-        RxUtils.dispose(changeDisposable)
-        changeDisposable = interactor.updateGenreName(name, genreId)
-            .observeOn(uiScheduler)
-            .doOnSubscribe { viewState.showRenameProgress() }
-            .doFinally { viewState.hideRenameProgress() }
-            .subscribe({}, this::onDefaultError)
     }
 
     private fun subscribeOnGenreInfo() {

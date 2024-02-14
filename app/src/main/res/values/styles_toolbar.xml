@@ -26,8 +26,14 @@
         <item name="editTextColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="SelectionOverflowButtonStyle">
+    <style name="ActionMenuViewStyle">
+        <item name="android:tint">?attr/toolbarTextColorPrimary</item>
+        <item name="drawableTint">?attr/toolbarTextColorPrimary</item>
+    </style>
+
+    <style name="SelectionActionMenuViewStyle">
         <item name="android:tint">?attr/actionModeTextColor</item>
+        <item name="drawableTint">?attr/actionModeTextColor</item>
     </style>
 
     <style name="ToolbarTitleStyle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">

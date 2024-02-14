@@ -4,22 +4,29 @@ import android.app.RecoverableSecurityException;
 import android.content.Context;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal.EqInitializationException;
+import com.github.anrimian.musicplayer.data.models.exceptions.NoCompositionsToInsertException;
 import com.github.anrimian.musicplayer.data.models.exceptions.NoPlaylistItemsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
-import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.DuplicateFolderNamesException;
+import com.github.anrimian.musicplayer.data.models.exceptions.PlaylistEntryInsertException;
+import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayListItemsException;
+import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayQueueItemsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.EditorTimeoutException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.FileExistsException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveFolderToItselfException;
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.M3UEditorException;
+import com.github.anrimian.musicplayer.data.storage.exceptions.GenreAlreadyPresentException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.NotAllowedPathException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
+import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CorruptedMediaFileException;
 import com.github.anrimian.musicplayer.domain.models.composition.content.LocalSourceNotFoundException;
@@ -29,6 +36,7 @@ import com.github.anrimian.musicplayer.domain.models.exceptions.FolderAlreadyIgn
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateException;
+import com.github.anrimian.musicplayer.ui.common.dialogs.share.models.ReceiveCompositionsForSendException;
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
 import com.github.anrimian.musicplayer.ui.editor.common.EditorErrorCommand;
 
@@ -48,8 +56,9 @@ public class DefaultErrorParser extends ErrorParser {
         this.analytics = analytics;
     }
 
+    @NonNull
     @Override
-    public ErrorCommand parseError(Throwable throwable) {
+    public ErrorCommand parseError(@NonNull Throwable throwable) {
         if (throwable instanceof ValidateException) {
             ValidateException exception = (ValidateException) throwable;
             List<ValidateError> validateErrors = exception.getValidateErrors();
@@ -74,6 +83,16 @@ public class DefaultErrorParser extends ErrorParser {
         if (throwable instanceof NoPlaylistItemsException) {
             return error(R.string.playlist_has_no_records);
         }
+        if (throwable instanceof PlaylistEntryInsertException) {
+            ErrorCommand errorCommand = parseError(throwable.getCause());
+            return new ErrorCommand(getString(R.string.add_to_playlist_error_template,
+                    errorCommand.getMessage().toLowerCase()));
+        }
+        if (throwable instanceof ReceiveCompositionsForSendException) {
+            ErrorCommand errorCommand = parseError(throwable.getCause());
+            return new ErrorCommand(getString(R.string.can_not_receive_file_for_send,
+                    errorCommand.getMessage().toLowerCase()));
+        }
         if (throwable instanceof FileNotFoundException || throwable instanceof LocalSourceNotFoundException) {
             return error(R.string.file_not_found);
         }
@@ -82,9 +101,6 @@ public class DefaultErrorParser extends ErrorParser {
         }
         if (throwable instanceof MoveFolderToItselfException) {
             return error(R.string.moving_and_destination_folders_matches);
-        }
-        if (throwable instanceof DuplicateFolderNamesException) {
-            return error(R.string.folder_with_this_name_already_exists_in_dest_folder);
         }
         if (throwable instanceof FileExistsException) {
             return error(R.string.file_already_exists);
@@ -129,6 +145,18 @@ public class DefaultErrorParser extends ErrorParser {
         if (throwable instanceof M3UEditorException) {
             return new ErrorCommand(getString(R.string.unexpected_error, throwable.getMessage()));
         }
+        if (throwable instanceof NoCompositionsToInsertException) {
+            return new ErrorCommand(getString(R.string.no_compositions));
+        }
+        if (throwable instanceof TooManyPlayQueueItemsException) {
+            return new ErrorCommand(getString(R.string.play_queue_items_limit_error, Constants.PLAY_QUEUE_MAX_ITEMS_COUNT));
+        }
+        if (throwable instanceof TooManyPlayListItemsException) {
+            return new ErrorCommand(getString(R.string.play_list_items_limit_error, Constants.PLAY_LIST_MAX_ITEMS_COUNT));
+        }
+        if (throwable instanceof GenreAlreadyPresentException) {
+            return error(R.string.genre_already_exists);
+        }
         if (throwable instanceof FileWriteNotAllowedException) {
             logException(throwable);
             return error(R.string.write_to_this_is_not_allowed);
@@ -138,7 +166,7 @@ public class DefaultErrorParser extends ErrorParser {
     }
 
     @Override
-    public void logError(Throwable throwable) {
+    public void logError(@NonNull Throwable throwable) {
         logException(throwable);
     }
 

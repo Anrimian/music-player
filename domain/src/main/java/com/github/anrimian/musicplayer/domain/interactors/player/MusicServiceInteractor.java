@@ -7,12 +7,14 @@ import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsI
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
 import com.github.anrimian.musicplayer.domain.models.albums.Album;
 import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
 import com.github.anrimian.musicplayer.domain.models.artist.Artist;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
+import com.github.anrimian.musicplayer.domain.models.genres.Genre;
 import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
@@ -35,6 +37,7 @@ public class MusicServiceInteractor {
     private final LibraryFoldersInteractor libraryFoldersInteractor;
     private final LibraryArtistsInteractor libraryArtistsInteractor;
     private final LibraryAlbumsInteractor libraryAlbumsInteractor;
+    private final LibraryGenresInteractor libraryGenresInteractor;
     private final PlayListsInteractor playListsInteractor;
     private final SettingsRepository settingsRepository;
 
@@ -45,6 +48,7 @@ public class MusicServiceInteractor {
                                   LibraryFoldersInteractor libraryFoldersInteractor,
                                   LibraryArtistsInteractor libraryArtistsInteractor,
                                   LibraryAlbumsInteractor libraryAlbumsInteractor,
+                                  LibraryGenresInteractor libraryGenresInteractor,
                                   PlayListsInteractor playListsInteractor,
                                   SettingsRepository settingsRepository) {
         this.playerCoordinatorInteractor = playerCoordinatorInteractor;
@@ -54,6 +58,7 @@ public class MusicServiceInteractor {
         this.libraryFoldersInteractor = libraryFoldersInteractor;
         this.libraryArtistsInteractor = libraryArtistsInteractor;
         this.libraryAlbumsInteractor = libraryAlbumsInteractor;
+        this.libraryGenresInteractor = libraryGenresInteractor;
         this.playListsInteractor = playListsInteractor;
         this.settingsRepository = settingsRepository;
     }
@@ -123,11 +128,10 @@ public class MusicServiceInteractor {
     public Completable shuffleAllAndPlay() {
         return libraryCompositionsInteractor.getCompositionsObservable(null)
                 .firstOrError()
-                .doOnSuccess(compositions -> {
+                .flatMapCompletable(compositions -> {
                     libraryPlayerInteractor.setRandomPlayingEnabled(true);
-                    libraryPlayerInteractor.startPlayingCompositions(compositions);
-                })
-                .ignoreElement();
+                    return libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions);
+                });
     }
 
     public Completable playFromSearch(@Nullable String searchQuery) {
@@ -137,8 +141,9 @@ public class MusicServiceInteractor {
     public Completable playFromSearch(@Nullable String searchQuery, int position) {
         return libraryCompositionsInteractor.getCompositionsObservable(searchQuery)
                 .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlayingCompositions(compositions, position))
-                .ignoreElement();
+                .flatMapCompletable(compositions ->
+                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+                );
     }
 
     public Observable<Integer> getRepeatModeObservable() {
@@ -186,16 +191,17 @@ public class MusicServiceInteractor {
     public Completable startPlayingFromCompositions(int position) {
         return libraryCompositionsInteractor.getCompositionsObservable(null)
                 .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlayingCompositions(compositions, position))
-                .ignoreElement();
+                .flatMapCompletable(compositions ->
+                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+                );
     }
 
     public Observable<List<FileSource>> getFoldersObservable(@Nullable Long folderId) {
         return libraryFoldersInteractor.getFoldersInFolder(folderId, null);
     }
 
-    public void play(Long folderId, long compositionId) {
-        libraryFoldersInteractor.play(folderId, compositionId);
+    public Completable play(@Nullable Long folderId, long compositionId) {
+        return libraryFoldersInteractor.play(folderId, compositionId);
     }
 
     public Observable<List<Artist>> getArtistsObservable() {
@@ -209,8 +215,9 @@ public class MusicServiceInteractor {
     public Completable startPlayingFromArtistCompositions(long artistId, int position) {
         return getCompositionsByArtist(artistId)
                 .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlayingCompositions(compositions, position))
-                .ignoreElement();
+                .flatMapCompletable(compositions ->
+                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+                );
     }
 
     public Observable<List<Album>> getAlbumsObservable() {
@@ -224,12 +231,29 @@ public class MusicServiceInteractor {
     public Completable startPlayingFromAlbumCompositions(long albumId, int position) {
         return getAlbumItemsObservable(albumId)
                 .firstOrError()
-                .doOnSuccess(compositions -> libraryPlayerInteractor.startPlayingCompositions(compositions, position))
-                .ignoreElement();
+                .flatMapCompletable(compositions ->
+                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+                );
+    }
+
+    public Observable<List<Genre>> getGenresObservable() {
+        return libraryGenresInteractor.getGenresObservable(null);
+    }
+
+    public Observable<List<Composition>> getGenreItemsObservable(long genreId) {
+        return libraryGenresInteractor.getGenreItemsObservable(genreId);
+    }
+
+    public Completable startPlayingFromGenreCompositions(long genreId, int position) {
+        return getGenreItemsObservable(genreId)
+                .firstOrError()
+                .flatMapCompletable(compositions ->
+                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+                );
     }
 
     public Observable<List<PlayList>> getPlayListsObservable() {
-        return playListsInteractor.getPlayListsObservable();
+        return playListsInteractor.getPlayListsObservable(null);
     }
 
     public Observable<List<PlayListItem>> getPlaylistItemsObservable(long playListId) {
@@ -239,13 +263,12 @@ public class MusicServiceInteractor {
     public Completable startPlayingFromPlaylistItems(long playListId, int position) {
         return getPlaylistItemsObservable(playListId)
                 .firstOrError()
-                .doOnSuccess(compositions ->
-                        libraryPlayerInteractor.startPlayingCompositions(
+                .flatMapCompletable(compositions ->
+                        libraryPlayerInteractor.setCompositionsQueueAndPlay(
                                 ListUtils.mapList(compositions, PlayListItem::getComposition),
                                 position
                         )
-                )
-                .ignoreElement();
+                );
     }
 
     public MusicNotificationSetting getNotificationSettings() {

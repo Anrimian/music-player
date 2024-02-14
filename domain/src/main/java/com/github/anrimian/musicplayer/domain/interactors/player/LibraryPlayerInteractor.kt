@@ -74,24 +74,23 @@ class LibraryPlayerInteractor(
     }
 
     @JvmOverloads
-    fun startPlayingCompositions(
+    fun setCompositionsQueueAndPlay(
         compositions: List<Composition>,
         firstPosition: Int = Constants.NO_POSITION,
-    ) {
-        startPlaying(compositions.map(Composition::getId), firstPosition)
+    ): Completable {
+        return setQueueAndPlay(compositions.map(Composition::id), firstPosition)
     }
 
-    @JvmOverloads
-    fun startPlaying(
+    fun setQueueAndPlay(
         compositionIds: List<Long>,
         firstPosition: Int = Constants.NO_POSITION,
-    ) {
+    ): Completable {
+        if (compositionIds.isEmpty()) {
+            return Completable.complete()
+        }
         ignoredPreviousCurrentItem = currentItem
-        playQueueRepository.setPlayQueue(compositionIds, firstPosition)
+        return playQueueRepository.setPlayQueue(compositionIds, firstPosition)
             .doOnComplete { playerCoordinatorInteractor.playAfterPrepare(PlayerType.LIBRARY) }
-            .doOnError(analytics::processNonFatalError)
-            .onErrorComplete()
-            .subscribe()
     }
 
     @JvmOverloads
@@ -157,9 +156,10 @@ class LibraryPlayerInteractor(
 
     fun changeRepeatMode() {
         settingsRepository.repeatMode = when (settingsRepository.repeatMode) {
-            RepeatMode.NONE -> RepeatMode.REPEAT_PLAY_QUEUE
+            RepeatMode.PLAY_COMPOSITION_ONCE -> RepeatMode.REPEAT_PLAY_QUEUE
             RepeatMode.REPEAT_PLAY_QUEUE -> RepeatMode.REPEAT_COMPOSITION
             RepeatMode.REPEAT_COMPOSITION -> RepeatMode.NONE
+            RepeatMode.NONE -> RepeatMode.PLAY_COMPOSITION_ONCE
             else -> RepeatMode.NONE
         }
     }
@@ -441,6 +441,11 @@ class LibraryPlayerInteractor(
     }
 
     private fun onCompositionPlayFinished() {
+        if (settingsRepository.repeatMode == RepeatMode.PLAY_COMPOSITION_ONCE) {
+            onSeekFinished(0)
+            pause()
+            return
+        }
         if (settingsRepository.repeatMode == RepeatMode.REPEAT_COMPOSITION) {
             onSeekFinished(0)
             return

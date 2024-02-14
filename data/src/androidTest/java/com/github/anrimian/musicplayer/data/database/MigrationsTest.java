@@ -12,6 +12,8 @@ import androidx.room.testing.MigrationTestHelper;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlayListFileNameValidator;
+
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -25,8 +27,36 @@ public class MigrationsTest {
 
     public MigrationTestHelper testHelper = new MigrationTestHelper(
                     instrumentation,
-                    AppDatabase.class.getCanonicalName()
+                    LibraryDatabase.class.getCanonicalName()
     );
+
+    @Test
+    public void testMigrationFrom14To15() throws Exception {
+        SupportSQLiteDatabase db = testHelper.createDatabase(TEST_DB_NAME, 14);
+        String longName = "আমার-সোনার-বাংলা-আমি-তোমায়-ভালোবাসি-চিরদিন-তোমার-আকাশ-তোমার-বাতাস-আমার-প্রাণে-বাজায়-বাঁশি-ও-মা-ফাগুনে-তোর";
+        String cutLongName = PlayListFileNameValidator.INSTANCE.getFormattedPlaylistName(longName);
+        ContentValues cv = new ContentValues();
+        cv.put("name", longName);
+        cv.put("dateAdded", 0L);
+        cv.put("dateModified", 0L);
+        db.insert("play_lists", SQLiteDatabase.CONFLICT_ABORT, cv);
+        cv.put("name", cutLongName);
+        db.insert("play_lists", SQLiteDatabase.CONFLICT_ABORT, cv);
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                15,
+                false,
+                Migrations.MIGRATION_14_15);
+    }
+
+    @Test
+    public void testMigrationFrom13To14() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 13);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                14,
+                false,
+                Migrations.getMigration13_14(context));
+    }
 
     @Test
     public void testMigrationFrom12To13() throws Exception {

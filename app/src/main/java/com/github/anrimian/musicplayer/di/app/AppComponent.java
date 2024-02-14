@@ -12,6 +12,10 @@ import com.github.anrimian.musicplayer.di.app.editor.artist.ArtistEditorComponen
 import com.github.anrimian.musicplayer.di.app.editor.artist.ArtistEditorModule;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.composition.CompositionEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.genre.GenreEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.genre.GenreEditorModule;
+import com.github.anrimian.musicplayer.di.app.editor.lyrics.LyricsEditorComponent;
+import com.github.anrimian.musicplayer.di.app.editor.lyrics.LyricsEditorModule;
 import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerComponent;
 import com.github.anrimian.musicplayer.di.app.external_player.ExternalPlayerModule;
 import com.github.anrimian.musicplayer.di.app.library.LibraryComponent;
@@ -23,6 +27,7 @@ import com.github.anrimian.musicplayer.di.app.play_list.PlayListModule;
 import com.github.anrimian.musicplayer.di.app.settings.SettingsComponent;
 import com.github.anrimian.musicplayer.di.app.share.ShareComponent;
 import com.github.anrimian.musicplayer.di.app.share.ShareModule;
+import com.github.anrimian.musicplayer.domain.controllers.SystemMusicController;
 import com.github.anrimian.musicplayer.domain.controllers.SystemServiceController;
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
 import com.github.anrimian.musicplayer.domain.interactors.player.CompositionSourceInteractor;
@@ -82,6 +87,8 @@ public interface AppComponent {
     CompositionEditorComponent compositionEditorComponent(CompositionEditorModule module);
     AlbumEditorComponent albumEditorComponent(AlbumEditorModule module);
     ArtistEditorComponent artistEditorComponent(ArtistEditorModule module);
+    GenreEditorComponent genreEditorComponent(GenreEditorModule module);
+    LyricsEditorComponent lyricsEditorComponent(LyricsEditorModule module);
     ExternalPlayerComponent externalPlayerComponent(ExternalPlayerModule module);
     ShareComponent shareComponent(ShareModule module);
     OrderComponent orderComponent(OrderModule orderModule);
@@ -123,6 +130,7 @@ public interface AppComponent {
     ThemeController themeController();
     LocaleController localeController();
     EqualizerController equalizerController();
+    SystemMusicController systemMusicController();
 
     SystemServiceController systemServiceController();
     SpecialNavigation specificNavigation();

@@ -10,13 +10,14 @@ import com.github.anrimian.musicplayer.databinding.FragmentRootLibraryFoldersBin
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
-import com.github.anrimian.musicplayer.ui.library.LibraryFragment
+import com.github.anrimian.musicplayer.ui.library.common.setupLibraryTitle
 import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersFragment
-import com.github.anrimian.musicplayer.ui.library.folders.newFolderFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
+import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.JugglerView
 import com.github.anrimian.musicplayer.ui.utils.wrappers.DefferedObject
+import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
 fun newLibraryFoldersRootFragment(
@@ -27,7 +28,8 @@ fun newLibraryFoldersRootFragment(
     }
 }
 
-class LibraryFoldersRootFragment : LibraryFragment(), FolderRootView, BackButtonListener {
+class LibraryFoldersRootFragment : MvpAppCompatFragment(), FolderRootView, BackButtonListener,
+    FragmentNavigationListener {
 
     private val presenter by moxyPresenter {
         Components.getLibraryRootFolderComponent().folderRootPresenter()
@@ -67,8 +69,8 @@ class LibraryFoldersRootFragment : LibraryFragment(), FolderRootView, BackButton
     }
 
     override fun onFragmentResumed() {
-        super.onFragmentResumed()
         val toolbar = requireActivity().findViewById<AdvancedToolbar>(R.id.toolbar)
+        toolbar.setupLibraryTitle(this)
         toolbar.setSubtitle(R.string.folders)
         val folderNavigation = FragmentNavigation.from(childFragmentManager)
         if (folderNavigation.isInitialized) {
@@ -98,11 +100,11 @@ class LibraryFoldersRootFragment : LibraryFragment(), FolderRootView, BackButton
         // just proceed call without creation
         val currentFragment = navigation.fragmentOnTop
         if (highlightCompositionId != 0L && currentFragment is LibraryFoldersFragment) {
-            val isSearchActive = toolbar.isInSearchMode
+            val isSearchActive = toolbar.isInSearchMode()
             if (isSearchActive) {
                 toolbar.setSearchModeEnabled(false)
-                if (toolbar.isSearchLocked) {
-                    toolbar.isSearchLocked = false
+                if (toolbar.isSearchLocked()) {
+                    toolbar.setSearchLocked(false)
                 }
             }
             if (!isSearchActive && currentFragment.getFolderId() == ids.last()) {
@@ -116,9 +118,9 @@ class LibraryFoldersRootFragment : LibraryFragment(), FolderRootView, BackButton
             ids.mapIndexed { index, folderId ->
                 if (index == ids.lastIndex && highlightCompositionId != 0L) {
                     requireArguments().remove(HIGHLIGHT_COMPOSITION_ID)
-                    newFolderFragment(folderId, highlightCompositionId)
+                    LibraryFoldersFragment.newInstance(folderId, highlightCompositionId)
                 } else {
-                    newFolderFragment(folderId)
+                    LibraryFoldersFragment.newInstance(folderId)
                 }
             },
             R.anim.anim_alpha_appear

@@ -388,6 +388,32 @@ public class StorageMusicProvider {
         updateComposition(id, MediaStore.Audio.AudioColumns.DATA, filePath);
     }
 
+    public void updateCompositionFilePath(long id,
+                                          String fileName,
+                                          String filePath,
+                                          String newFileName,
+                                          String newFilePath) {
+        ContentValues cv = new ContentValues();
+        if (!fileName.equals(newFileName)) {
+            cv.put(MediaStore.Audio.AudioColumns.DISPLAY_NAME, newFileName);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!filePath.equals(newFilePath)) {
+                cv.put(MediaStore.Audio.AudioColumns.RELATIVE_PATH, newFilePath);
+            }
+        } else {
+            String fullPath = getCompositionFilePath(id);
+            if (fullPath == null) {
+                return;
+            }
+            String newFullPath = fullPath.replace(filePath, newFilePath);
+            newFullPath = FileUtils.replaceFileName(newFullPath, newFileName);
+            //it should be unique
+            cv.put(MediaStore.Audio.AudioColumns.DATA, newFullPath);
+        }
+        contentResolver.update(getCompositionUri(id), cv, null, null);
+    }
+
     public void updateCompositionsFilePath(List<FilePathComposition> compositions) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
@@ -396,11 +422,15 @@ public class StorageMusicProvider {
             if (storageId == null) {
                 continue;
             }
-            ContentProviderOperation operation = ContentProviderOperation.newUpdate(getCompositionUri(storageId))
-                    .withValue(Media.DATA, composition.getFilePath())
-                    .build();
+            ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(getCompositionUri(storageId))
+                    .withValue(Media.DATA, composition.getFilePath());
 
-            operations.add(operation);
+            String newFileName = FileUtils.getFileName(composition.getFilePath());
+            if (!newFileName.equals(getCompositionFileName(storageId))) {
+                builder = builder.withValue(Media.DISPLAY_NAME, newFileName);
+            }
+
+            operations.add(builder.build());
         }
 
         applyBatch(operations);
@@ -814,7 +844,12 @@ public class StorageMusicProvider {
         if (e instanceof IllegalArgumentException
                 && message != null
                 && message.contains("not allowed for content")) {
-            throw new NotAllowedPathException();
+            int indexOfFirstQuotes = message.indexOf('[') + 1;
+            String allowedFolders = message.substring(
+                    indexOfFirstQuotes,
+                    message.indexOf(']', indexOfFirstQuotes)
+            );
+            throw new NotAllowedPathException(allowedFolders);
         }
     }
 }

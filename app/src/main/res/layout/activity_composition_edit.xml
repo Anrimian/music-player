@@ -51,7 +51,7 @@
                     android:scaleType="centerCrop"
                     android:layout_marginTop="@dimen/content_internal_margin"
                     android:importantForAccessibility="no"
-                    app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
+                    app:shapeAppearance="@style/ShapeAppearance.CoverImageView"
                     app:layout_constraintStart_toStartOf="@+id/tv_cover_hint"
                     app:layout_constraintTop_toBottomOf="@id/tv_cover_hint"
                     tools:src="@drawable/ic_music_placeholder"/>
@@ -454,13 +454,56 @@
                     app:layout_constraintBottom_toTopOf="@id/divider_track_number"/>
 
                 <TextView
+                    android:id="@+id/tv_genre_hint"
+                    style="@style/TextStyle.Subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/genres"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    app:layout_constraintTop_toBottomOf="@id/divider_track_number"
+                    app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
+                    app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
+
+                <ImageView
+                    android:id="@+id/iv_genre_edit"
+                    style="@style/ButtonStyle"
+                    android:background="?actionBarItemBackground"
+                    android:contentDescription="@string/add_composition_genre"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_genre_hint"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_genre_hint"
+                    app:srcCompat="@drawable/ic_shape_circle_plus" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_genres"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/content_internal_margin"
+                    android:layout_marginBottom="@dimen/content_vertical_margin"
+                    app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
+                    app:layout_constraintTop_toBottomOf="@id/tv_genre_hint"
+                    app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
+                    app:layout_constraintHeight_min="@dimen/chip_container_min_height"
+                    tools:listitem="@layout/item_genre_chip"
+                    tools:text="genre"/>
+
+                <View
+                    android:id="@+id/divider_genre"
+                    style="@style/Divider.Horizontal.Constraint"
+                    android:layout_marginTop="@dimen/content_vertical_margin"
+                    android:layout_marginStart="@dimen/toolbar_content_start"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/rv_genres"/>
+
+                <TextView
                     android:id="@+id/tv_comment_hint"
                     style="@style/TextStyle.Subtitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/comment"
                     android:layout_marginTop="@dimen/content_vertical_margin"
-                    app:layout_constraintTop_toBottomOf="@id/divider_track_number"
+                    app:layout_constraintTop_toBottomOf="@id/divider_genre"
                     app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
                     app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
 
@@ -490,7 +533,7 @@
                     android:layout_height="0dp"
                     android:foreground="?selectableItemBackground"
                     android:contentDescription="@string/change_comment"
-                    app:layout_constraintTop_toBottomOf="@id/divider_track_number"
+                    app:layout_constraintTop_toBottomOf="@id/divider_genre"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/divider_comment"/>
@@ -521,9 +564,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/content_internal_margin"
+                    android:layout_marginBottom="@dimen/content_vertical_margin"
                     app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
                     app:layout_constraintTop_toBottomOf="@id/tv_lyrics_hint"
                     app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     tools:text="lyrics"/>
 
                 <ImageView
@@ -540,64 +585,11 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:foreground="?selectableItemBackground"
-                    android:contentDescription="@string/change_album_artist"
+                    android:contentDescription="@string/lyrics"
                     app:layout_constraintTop_toBottomOf="@id/divider_comment"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/divider_lyrics"/>
-
-                <View
-                    android:id="@+id/divider_lyrics"
-                    style="@style/Divider.Horizontal.Constraint"
-                    android:layout_marginTop="@dimen/content_vertical_margin"
-                    android:layout_marginStart="@dimen/toolbar_content_start"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_lyrics"/>
-
-                <TextView
-                    android:id="@+id/tv_genre_hint"
-                    style="@style/TextStyle.Subtitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/genres"
-                    android:layout_marginTop="@dimen/content_vertical_margin"
-                    app:layout_constraintTop_toBottomOf="@id/divider_lyrics"
-                    app:layout_constraintStart_toStartOf="@+id/tv_filename_hint"
-                    app:layout_constraintEnd_toEndOf="@id/tv_filename_hint"/>
-
-                <ImageView
-                    android:id="@+id/iv_genre_edit"
-                    style="@style/ButtonStyle"
-                    android:importantForAccessibility="no"
-                    app:layout_constraintEnd_toStartOf="@+id/tv_genre_hint"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/tv_genre_hint"
-                    app:srcCompat="@drawable/ic_shape_circle_plus" />
-
-                <FrameLayout
-                    android:id="@+id/change_genre_clickable_area"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:background="?selectableItemBackground"
-                    android:contentDescription="@string/add_composition_genre"
-                    app:layout_constraintTop_toBottomOf="@id/divider_lyrics"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_genres"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/content_internal_margin"
-                    android:layout_marginBottom="@dimen/content_vertical_margin"
-                    app:layout_constraintStart_toStartOf="@+id/tv_title_hint"
-                    app:layout_constraintTop_toBottomOf="@id/tv_genre_hint"
-                    app:layout_constraintEnd_toEndOf="@id/tv_title_hint"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    tools:listitem="@layout/item_genre_chip"
-                    tools:text="genre"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

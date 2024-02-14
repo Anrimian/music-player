@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 apply from: 'dependencies.gradle'
 
 buildscript {
@@ -6,9 +8,9 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.0'
+        classpath 'com.android.tools.build:gradle:8.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.8.2.1"
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.10.0.0"
     }
 }
 
@@ -17,29 +19,28 @@ allprojects {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testJunit5Builder = "de.mannodermaus.junit5.AndroidJUnit5Builder"
     }
-    configurations.all {
+    configurations.configureEach {
         //fix for test running
         resolutionStrategy.force 'org.objenesis:objenesis:2.6'
     }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)
-        .all {
-            kotlinOptions {
-                freeCompilerArgs += [
-                        '-Xno-call-assertions',
-                        '-Xno-receiver-assertions',
-                        '-Xno-param-assertions'
-                ]
-            }
-        }
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions.freeCompilerArgs += [
+            '-Xno-call-assertions',
+            '-Xno-receiver-assertions',
+            '-Xno-param-assertions'
+    ]
+}
 
 subprojects {
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    tasks.withType(KotlinCompile).tap {
+        configureEach {
+            kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+        }
     }
 }

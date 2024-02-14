@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.utils.Permissions
 import com.github.anrimian.musicplayer.databinding.FragmentStartBinding
 import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.ui.player_screen.newPlayerFragment
+import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment
 import com.github.anrimian.musicplayer.ui.utils.PermissionRequester
 import com.github.anrimian.musicplayer.ui.utils.startAppSettings
 import moxy.MvpAppCompatFragment
@@ -70,7 +70,7 @@ class SetupFragment : MvpAppCompatFragment(), SetupView {
         parentFragmentManager
             .beginTransaction()
             .setCustomAnimations(R.anim.anim_alpha_appear, R.anim.anim_alpha_disappear)
-            .replace(R.id.main_activity_container, newPlayerFragment(false))
+            .replace(R.id.main_activity_container, PlayerFragment.newInstance(false))
             .commit()
     }
 
