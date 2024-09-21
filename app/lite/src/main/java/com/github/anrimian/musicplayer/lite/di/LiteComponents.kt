@@ -1,34 +1,24 @@
-package com.github.anrimian.musicplayer.lite.di;
+package com.github.anrimian.musicplayer.lite.di
 
-import android.content.Context;
+import android.content.Context
+import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.di.app.AppModule
+import com.github.anrimian.musicplayer.lite.di.app.DaggerLiteAppComponent
+import com.github.anrimian.musicplayer.lite.di.app.LiteAppComponent
 
-import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.di.app.AppModule;
-import com.github.anrimian.musicplayer.lite.di.app.DaggerLiteAppComponent;
-import com.github.anrimian.musicplayer.lite.di.app.LiteAppComponent;
+object LiteComponents {
 
-public class LiteComponents {
+    private lateinit var liteAppComponent: LiteAppComponent
 
-    private static LiteComponents instance;
-
-    private final LiteAppComponent liteAppComponent;
-
-    public static void init(Context appContext) {
-        instance = new LiteComponents(appContext);
-    }
-
-    private static LiteComponents getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("components must be initialized first");
-        }
-        return instance;
-    }
-
-    private LiteComponents(Context appContext) {
+    fun init(appContext: Context) {
         liteAppComponent = DaggerLiteAppComponent.builder()
-                .appModule(new AppModule(appContext))
-                .build();
-        Components.init(liteAppComponent);
+            .appModule(AppModule(appContext))
+            .build()
+        Components.init(liteAppComponent)
+    }
+
+    fun getLiteAppComponent(): LiteAppComponent {
+        return liteAppComponent
     }
 
 }

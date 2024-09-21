@@ -45,6 +45,7 @@ import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
 import com.github.anrimian.musicplayer.infrastructure.MediaSessionHandler;
 import com.github.anrimian.musicplayer.ui.about.AboutTextBinder;
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
+import com.github.anrimian.musicplayer.ui.common.format.MessageTextFormatter;
 import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
 import com.github.anrimian.musicplayer.ui.common.locale.LocaleController;
 import com.github.anrimian.musicplayer.ui.common.navigation.SpecialNavigation;
@@ -52,6 +53,7 @@ import com.github.anrimian.musicplayer.ui.common.theme.ThemeController;
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerPresenter;
 import com.github.anrimian.musicplayer.ui.notifications.MediaNotificationsDisplayer;
 import com.github.anrimian.musicplayer.ui.notifications.NotificationsDisplayer;
+import com.github.anrimian.musicplayer.ui.player_screen.view.ActionStateBinder;
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
 import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
@@ -131,8 +133,10 @@ public interface AppComponent {
     LocaleController localeController();
     EqualizerController equalizerController();
     SystemMusicController systemMusicController();
-
     SystemServiceController systemServiceController();
+
     SpecialNavigation specificNavigation();
     AboutTextBinder aboutTextBinder();
+    ActionStateBinder actionStateBinder();
+    MessageTextFormatter messageTextFormatter();
 }

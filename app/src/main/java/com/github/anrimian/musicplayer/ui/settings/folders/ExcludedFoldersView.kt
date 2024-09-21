@@ -8,8 +8,6 @@ import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle
 import moxy.viewstate.strategy.alias.OneExecution
 
-private const val LIST_STATE = "list_state"
-
 interface ExcludedFoldersView : MvpView {
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
@@ -29,5 +27,9 @@ interface ExcludedFoldersView : MvpView {
 
     @OneExecution
     fun showErrorMessage(errorCommand: ErrorCommand)
+
+    private companion object {
+        const val LIST_STATE = "list_state"
+    }
 
 }

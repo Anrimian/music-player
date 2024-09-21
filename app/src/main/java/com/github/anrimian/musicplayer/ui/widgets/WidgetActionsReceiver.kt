@@ -33,9 +33,7 @@ class WidgetActionsReceiver : BroadcastReceiver() {
                 AppAndroidUtils.playPause(context, appComponent.playerInteractor())
             }
             Constants.Actions.CHANGE_REPEAT_MODE -> interactor.changeRepeatMode()
-            Constants.Actions.CHANGE_SHUFFLE_NODE -> {
-                interactor.setRandomPlayingEnabled(!interactor.isRandomPlayingEnabled())
-            }
+            Constants.Actions.CHANGE_SHUFFLE_NODE -> interactor.changeRandomMode()
             Constants.Actions.REWIND -> interactor.fastSeekBackward()
             Constants.Actions.FAST_FORWARD -> interactor.fastSeekForward()
         }

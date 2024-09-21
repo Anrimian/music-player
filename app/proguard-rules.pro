@@ -32,7 +32,7 @@
 #don't remember why
 -dontwarn java.lang.invoke**
 
-#RxJava2
+#RxJava3
 -dontwarn io.reactivex**
 
 #slidr
@@ -40,16 +40,16 @@
 
 #chips layout manager
 #https://github.com/BelooS/ChipsLayoutManager/issues/31
+-keep class com.beloo.widget.chipslayoutmanager.Orientation { *; }
 
 #kotlin
 -dontwarn kotlin.**
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+        public static void checkNotNull(...);
         public static void checkExpressionValueIsNotNull(...);
         public static void checkNotNullExpressionValue(...);
         public static void checkReturnedValueIsNotNull(...);
         public static void checkFieldIsNotNull(...);
         public static void checkParameterIsNotNull(...);
+        public static void checkNotNullParameter(...);
 }
-
-
-

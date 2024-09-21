@@ -44,10 +44,12 @@ class GenreItemsPresenter(
     }
 
     override fun getSavedListPosition(): ListPosition? {
-        return null
+        return interactor.getSavedItemsListPosition(genreId)
     }
 
-    override fun saveListPosition(listPosition: ListPosition) {}
+    override fun saveListPosition(listPosition: ListPosition) {
+        interactor.saveItemsListPosition(genreId, listPosition)
+    }
 
     fun onFragmentResumed() {
         interactor.setSelectedGenreScreen(genreId)

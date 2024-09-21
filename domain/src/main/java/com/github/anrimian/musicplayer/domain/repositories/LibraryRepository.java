@@ -9,8 +9,10 @@ import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposit
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ import javax.annotation.Nullable;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
+import kotlin.Pair;
 
 /**
  * Created on 24.10.2017.
@@ -45,7 +48,7 @@ public interface LibraryRepository {
     Observable<List<FileSource>> getFoldersInFolder(@Nullable Long folderId,
                                                     @Nullable String searchQuery);
 
-    Observable<FolderFileSource> getFolderObservable(long folderId);
+    Observable<FolderInfo> getFolderObservable(long folderId);
 
     Single<List<Composition>> getAllCompositionsInFolder(@Nullable Long folderId);
 
@@ -58,6 +61,8 @@ public interface LibraryRepository {
     Single<List<Long>> getAllParentFolders(@Nullable Long folder);
 
     Single<List<Long>> getAllParentFoldersForComposition(long id);
+
+    Single<List<String>> getFolderNamesInPath(@Nullable String path);
 
     //artists
     Observable<List<Artist>> getArtistsObservable(@Nullable String searchText);
@@ -113,13 +118,13 @@ public interface LibraryRepository {
     Observable<Genre> getGenreObservable(long genreId);
 
     //ignored folders
-    Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder);
+    Single<Pair<IgnoredFolder, List<FileKey>>> addFolderToIgnore(FolderFileSource folder);
 
-    Completable addFolderToIgnore(IgnoredFolder folder);
+    Single<List<FileKey>> addFolderToIgnore(IgnoredFolder folder);
 
     Observable<List<IgnoredFolder>> getIgnoredFoldersObservable();
 
-    Completable deleteIgnoredFolder(IgnoredFolder folder);
+    Single<List<FileKey>> deleteIgnoredFolder(IgnoredFolder folder);
 
     void deleteIgnoredFolder(String folderRelativePath);
 

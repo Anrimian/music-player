@@ -69,7 +69,7 @@ open class CompositionItemWrapper<T: Composition>(
         showCorrupted()
         showCompositionImage(showCovers)
         showAsPlaying(isPlaying = false, animate = false)
-        updateFileSyncState()
+        updateFileSyncState(false)
     }
 
     fun update(composition: T, payloads: List<*>) {
@@ -95,7 +95,7 @@ open class CompositionItemWrapper<T: Composition>(
                 showAdditionalInfo()
             }
             if (payload == Payloads.FILE_EXISTS) {
-                updateFileSyncState()
+                updateFileSyncState(true)
             }
             onUpdate(payload)
         }
@@ -169,7 +169,7 @@ open class CompositionItemWrapper<T: Composition>(
 
     fun showFileSyncState(fileSyncState: FileSyncState?) {
         this.fileSyncState = fileSyncState
-        updateFileSyncState()
+        updateFileSyncState(true)
     }
 
     protected fun showAdditionalInfo() {
@@ -226,10 +226,6 @@ open class CompositionItemWrapper<T: Composition>(
         val alpha = if (composition.corruptionType == null) 1f else 0.5f
         tvMusicName.alpha = alpha
         tvAdditionalInfo.alpha = alpha
-        ivMusicIcon.alpha = alpha
-        ivPlay.alpha = alpha
-        btnActionsMenu.alpha = alpha
-        pvFileState.alpha = alpha
     }
 
     private fun showAsDragging(dragging: Boolean) {
@@ -250,12 +246,11 @@ open class CompositionItemWrapper<T: Composition>(
         }
     }
 
-    private fun updateFileSyncState() {
-        //TODO play queue small-land placement
-        showFileSyncState(
+    private fun updateFileSyncState(animate: Boolean) {
+        pvFileState.showFileSyncState(
             fileSyncState,
             CompositionHelper.isCompositionFileRemote(composition),
-            pvFileState
+            animate
         )
     }
 

@@ -34,7 +34,8 @@ public class DatabaseManager {
                         Migrations.MIGRATION_11_12,
                         Migrations.MIGRATION_12_13,
                         Migrations.getMigration13_14(context),
-                        Migrations.MIGRATION_14_15)
+                        Migrations.MIGRATION_14_15,
+                        Migrations.getMigration15_16(context))
                 .build();
     }
 

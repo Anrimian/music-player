@@ -27,6 +27,7 @@ class StoragePlaylistsAnalyzer(
     private val playlistsFilesStorage: PlaylistFilesStorage
 ) {
 
+    @Synchronized
     fun applyPlayListsData(storagePlayLists: Map<String, StoragePlayList>) {
         //compare media storage and db
         val newDbPlaylistsFromStorage = ArrayList<StoragePlayList>()

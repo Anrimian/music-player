@@ -58,4 +58,13 @@ public class DescriptionSpannableStringBuilder extends SpannableStringBuilder {
         }
         return super.append(text);
     }
+
+    public SpannableStringBuilder appendNewLine(CharSequence text) {
+        if (length() > 0) {
+            super.append("\n");
+            super.append(text);
+        }
+        return this;
+    }
+
 }

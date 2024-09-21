@@ -1,9 +1,22 @@
 package com.github.anrimian.musicplayer.domain.utils;
 
 
+import java.security.SecureRandom;
+
 import javax.annotation.Nullable;
 
 public class TextUtils {
+
+    private static final String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final SecureRandom RND = new SecureRandom();
+
+    public static String randomString(int len){
+        StringBuilder sb = new StringBuilder(len);
+        for(int i = 0; i < len; i++) {
+            sb.append(CHARS.charAt(RND.nextInt(CHARS.length())));
+        }
+        return sb.toString();
+    }
 
     public static String getLastPathSegment(String text) {
         String result = text;

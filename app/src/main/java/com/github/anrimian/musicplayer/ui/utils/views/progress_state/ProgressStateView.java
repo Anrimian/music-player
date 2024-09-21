@@ -209,7 +209,7 @@ public class ProgressStateView extends LinearLayout {
             root.setVisibility(VISIBLE);
             root.setClickable(true);
             progressBar.setIndeterminate(true);
-            animateVisibility(progressBar, VISIBLE);
+            progressBar.setVisibility(VISIBLE);
             tvMessage.setVisibility(GONE);
             btnTryAgain.setVisibility(GONE);
             ivEmpty.setVisibility(GONE);

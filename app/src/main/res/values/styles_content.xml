@@ -259,11 +259,12 @@
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="EditTextStyle" parent="@style/Widget.AppCompat.EditText">
+    <style name="EditTextStyle">
         <item name="android:minHeight">48dp</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textColorHint">?android:attr/textColorSecondary</item>
         <item name="android:textAlignment">viewStart</item>
+        <item name="android:textCursorDrawable">@drawable/bg_accent_text_cursor</item>
     </style>
 
     <style name="TextStyle.ContentTitle">
@@ -274,6 +275,7 @@
 
     <style name="EditTextStyle.Toolbar">
         <item name="android:colorControlActivated">?attr/colorAccentDark</item>
+        <item name="android:textCursorDrawable">@drawable/bg_toolbar_text_cursor</item>
     </style>
 
     <style name="CircularProgressIndicatorStyle">

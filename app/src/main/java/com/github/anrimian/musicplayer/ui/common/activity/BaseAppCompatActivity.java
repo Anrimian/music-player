@@ -6,17 +6,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.anrimian.musicplayer.di.Components;
 
+
 public class BaseAppCompatActivity extends AppCompatActivity {
 
-    /*
-     * Experiment:
-     * After refactor MainActivity to kt crashes started to appear: uninitialized components here
-     *  Moved this method to base java class
-     *  Observe how it works
-     *   - has no effect
-     */
     @Override
     protected void attachBaseContext(Context base) {
-        super.attachBaseContext(Components.getAppComponent().localeController().dispatchAttachBaseContext(base));
+        // should be always initialized here, but bug is somewhere in Android sdk
+        // so initialize manually in this case
+        Components.checkInitialization(base.getApplicationContext());
+        Context localizedContext = Components.getAppComponent()
+                .localeController()
+                .dispatchAttachBaseContext(base);
+        super.attachBaseContext(localizedContext);
     }
+
 }

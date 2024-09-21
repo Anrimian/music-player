@@ -9,15 +9,18 @@ import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettin
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
+import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.getRemoteViewPlayerState
 import com.github.anrimian.musicplayer.ui.common.theme.ThemeController
+import com.github.anrimian.musicplayer.ui.utils.safeUpdateAppWidget
 import com.github.anrimian.musicplayer.ui.widgets.binders.MediumWidgetBinder
 import com.github.anrimian.musicplayer.ui.widgets.binders.SmallExtWidgetBinder
 import com.github.anrimian.musicplayer.ui.widgets.binders.SmallWidgetBinder
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 
 
@@ -35,25 +38,42 @@ class WidgetUpdater(
         MediumWidgetBinder()
     )
 
+    private val widgetActiveSubject = BehaviorSubject.create<Boolean>()
+
+    private val disposable = CompositeDisposable()
     private val updateDisposable = CompositeDisposable()
 
     fun start() {
-        if (updateDisposable.size() > 0) {
-            return
+        disposable.add(RxUtils.withDefaultValue(widgetActiveSubject) { isAnyWidgetActive() }
+            .distinctUntilChanged()
+            .subscribe(this::onWidgetsActiveStateReceived))
+    }
+
+    fun onAnyWidgetEnabledStateChanged() {
+        widgetActiveSubject.onNext(isAnyWidgetActive())
+    }
+
+    private fun onWidgetsActiveStateReceived(isActive: Boolean) {
+        if (isActive) {
+            if (updateDisposable.size() > 0) {
+                return
+            }
+            updateDisposable.add(Observable.combineLatest(
+                musicPlayerInteractor.getCurrentQueueItemObservable(),
+                musicPlayerInteractor.getPlayQueueSizeObservable(),
+                musicPlayerInteractor.getIsPlayingStateObservable(),
+                musicPlayerInteractor.getPlayerStateObservable(),
+                displaySettingsInteractor.getCoversEnabledObservable(),
+                musicPlayerInteractor.getRepeatModeObservable(),
+                musicPlayerInteractor.getRandomPlayingObservable(),
+                themeController.getRoundCoversObservable(),
+                this::applyWidgetState
+            ).observeOn(uiScheduler)
+                .retryWithDelay(10, 10, TimeUnit.SECONDS)
+                .subscribe(this::onWidgetStateChanged))
+        } else {
+            updateDisposable.clear()
         }
-        updateDisposable.add(Observable.combineLatest(
-            musicPlayerInteractor.getCurrentQueueItemObservable(),
-            musicPlayerInteractor.getPlayQueueSizeObservable(),
-            musicPlayerInteractor.getIsPlayingStateObservable(),
-            musicPlayerInteractor.getPlayerStateObservable(),
-            displaySettingsInteractor.getCoversEnabledObservable(),
-            musicPlayerInteractor.getRepeatModeObservable(),
-            musicPlayerInteractor.getRandomPlayingObservable(),
-            themeController.getRoundCoversObservable(),
-            this::applyWidgetState
-        ).observeOn(uiScheduler)
-            .retryWithDelay(10, 10, TimeUnit.SECONDS)
-            .subscribe(this::onWidgetStateChanged))
     }
 
     private fun applyWidgetState(
@@ -75,14 +95,13 @@ class WidgetUpdater(
         var isFileExists = false
         val item = playQueueEvent.playQueueItem
         if (item != null) {
-            val composition = item.composition
-            compositionName = CompositionHelper.formatCompositionName(composition)
-            compositionAuthor = FormatUtils.formatCompositionAuthor(composition, context).toString()
-            compositionId = composition.id
-            compositionUpdateTime = composition.dateModified.time
-            coverModifyTime = composition.coverModifyTime.time
-            compositionSize = composition.size
-            isFileExists = composition.isFileExists
+            compositionName = CompositionHelper.formatCompositionName(item)
+            compositionAuthor = FormatUtils.formatCompositionAuthor(item, context).toString()
+            compositionId = item.id
+            compositionUpdateTime = item.dateModified.time
+            coverModifyTime = item.coverModifyTime.time
+            compositionSize = item.size
+            isFileExists = item.isFileExists
         }
 
         val remotePlayerState = getRemoteViewPlayerState(isPlaying, playerState)
@@ -110,7 +129,7 @@ class WidgetUpdater(
         }
         val appWidgetManager = AppWidgetManager.getInstance(context)
         widgetBinders.forEach { widgetBinder ->
-            appWidgetManager.updateAppWidget(
+            appWidgetManager.safeUpdateAppWidget(
                 ComponentName(context, widgetBinder.getWidgetProviderClass()),
                 widgetBinder.getBoundRemoteViews(
                     context,
@@ -118,6 +137,16 @@ class WidgetUpdater(
                     WidgetDataHolder.getWidgetData(context)
                 ))
         }
+    }
+
+    private fun isAnyWidgetActive(): Boolean {
+        var count = 0
+        for (widgetBinder in widgetBinders) {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val cn = ComponentName(context, widgetBinder.getWidgetProviderClass())
+            count += appWidgetManager.getAppWidgetIds(cn).size
+        }
+        return count > 0
     }
 
 }

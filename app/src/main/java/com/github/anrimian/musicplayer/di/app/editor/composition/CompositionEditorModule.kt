@@ -1,35 +1,31 @@
-package com.github.anrimian.musicplayer.di.app.editor.composition;
+package com.github.anrimian.musicplayer.di.app.editor.composition
 
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
-
-import com.github.anrimian.filesync.SyncInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
-import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorPresenter;
-
-import javax.annotation.Nonnull;
-import javax.inject.Named;
-
-import dagger.Module;
-import dagger.Provides;
-import io.reactivex.rxjava3.core.Scheduler;
+import com.github.anrimian.filesync.SyncInteractor
+import com.github.anrimian.musicplayer.di.app.SchedulerModule
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorPresenter
+import dagger.Module
+import dagger.Provides
+import io.reactivex.rxjava3.core.Scheduler
+import javax.inject.Named
 
 @Module
-public class CompositionEditorModule {
-
-    private final long compositionId;
-
-    public CompositionEditorModule(long compositionId) {
-        this.compositionId = compositionId;
-    }
-
+class CompositionEditorModule(private val compositionId: Long) {
+    
     @Provides
-    @Nonnull
-    CompositionEditorPresenter compositionEditorPresenter(EditorInteractor interactor,
-                                                          SyncInteractor<FileKey, ?,Long> syncInteractor,
-                                                          @Named(UI_SCHEDULER) Scheduler uiScheduler,
-                                                          ErrorParser errorParser) {
-        return new CompositionEditorPresenter(compositionId, interactor, syncInteractor, uiScheduler, errorParser);
-    }
+    fun compositionEditorPresenter(
+        interactor: EditorInteractor,
+        syncInteractor: SyncInteractor<FileKey, *, Long>,
+        @Named(SchedulerModule.UI_SCHEDULER) uiScheduler: Scheduler,
+        errorParser: ErrorParser
+    ) = CompositionEditorPresenter(
+        compositionId,
+        interactor,
+        syncInteractor,
+        uiScheduler,
+        errorParser
+    )
+
 }

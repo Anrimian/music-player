@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.CompositionItemWrapper
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.mvp.MvpDiffAdapter
@@ -19,7 +20,7 @@ class PlayListItemViewHolder(
     inflater: LayoutInflater,
     parent: ViewGroup,
     menuClickListener: (View, Int, PlayListItem) -> Unit,
-    onIconClickListener: (Int) -> Unit,
+    onItemClickListener: (PlayListItem, Int) -> Unit,
 ) : MvpDiffAdapter.MvpViewHolder(inflater.inflate(R.layout.item_storage_music, parent, false)),
     DragListener, SwipeListener {
 
@@ -27,11 +28,14 @@ class PlayListItemViewHolder(
 
     private lateinit var item: PlayListItem
 
+    private var isCurrent = false
+
     init {
         compositionItemWrapper = CompositionItemWrapper(
             itemView,
-            { onIconClickListener(bindingAdapterPosition) }
-        ) { onIconClickListener(bindingAdapterPosition) }
+            { onItemClickListener(item, bindingAdapterPosition) },
+            { onItemClickListener(item, bindingAdapterPosition) }
+        )
         itemView.findViewById<View>(R.id.btnActionsMenu).setOnClickListener { v ->
             menuClickListener(v, bindingAdapterPosition, item)
         }
@@ -51,11 +55,32 @@ class PlayListItemViewHolder(
 
     fun bind(item: PlayListItem, coversEnabled: Boolean) {
         this.item = item
-        val composition = item.composition
-        compositionItemWrapper.bind(composition, coversEnabled)
+        compositionItemWrapper.bind(item, coversEnabled)
     }
 
     fun setFileSyncStates(fileSyncStates: Map<Long, FileSyncState>) {
-        compositionItemWrapper.showFileSyncState(fileSyncStates[item.composition.id])
+        compositionItemWrapper.showFileSyncState(fileSyncStates[item.id])
     }
+
+    fun showCurrentComposition(
+        currentComposition: CurrentComposition?,
+        animate: Boolean
+    ) {
+        var isCurrent = false
+        var isPlaying = false
+        if (currentComposition != null) {
+            isCurrent = item.id == currentComposition.composition?.id
+            isPlaying = isCurrent && currentComposition.isPlaying
+        }
+        showAsCurrentComposition(isCurrent)
+        compositionItemWrapper.showAsPlaying(isPlaying, animate)
+    }
+
+    private fun showAsCurrentComposition(isCurrent: Boolean) {
+        if (this.isCurrent != isCurrent) {
+            this.isCurrent = isCurrent
+            compositionItemWrapper.showAsCurrentComposition(isCurrent)
+        }
+    }
+
 }

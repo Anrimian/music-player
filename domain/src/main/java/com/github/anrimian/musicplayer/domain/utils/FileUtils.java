@@ -2,6 +2,8 @@ package com.github.anrimian.musicplayer.domain.utils;
 
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
+import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException;
+
 import java.io.File;
 
 public class FileUtils {
@@ -100,4 +102,39 @@ public class FileUtils {
         }
         return file.getPath();
     }
+
+    public static void moveFile(String oldPath, String newPath) {
+        String destDirectoryPath = FileUtils.getParentDirPath(newPath);
+        File destDirectory = new File(destDirectoryPath);
+        if (!destDirectory.exists()) {
+            boolean created = destDirectory.mkdirs();
+            if (!created) {
+                throw new RuntimeException("parent directory wasn't created");
+            }
+        }
+        renameFile(oldPath, newPath);
+        String oldDirectoryPath = FileUtils.getParentDirPath(oldPath);
+        File oldDirectory = new File(oldDirectoryPath);
+        String[] files = oldDirectory.list();
+        if (oldDirectory.isDirectory() && files != null && files.length == 0) {
+            //not necessary to check
+            oldDirectory.delete();
+        }
+    }
+
+    public static void renameFile(String oldPath, String newPath) {
+        File oldFile = new File(oldPath);
+        if (!oldFile.exists()) {
+            throw new RuntimeException("target file not exists");
+        }
+        if (!oldFile.canWrite()) {
+            throw new FileWriteNotAllowedException("file write is not allowed");
+        }
+        File newFile = new File(newPath);
+        boolean renamed = oldFile.renameTo(newFile);
+        if (!renamed) {
+            throw new RuntimeException("file wasn't renamed");
+        }
+    }
+
 }

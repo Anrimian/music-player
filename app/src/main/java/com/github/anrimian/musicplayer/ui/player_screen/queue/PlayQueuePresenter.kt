@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen.queue
 
 import com.github.anrimian.filesync.SyncInteractor
+import com.github.anrimian.musicplayer.data.utils.rx.retryWithDelay
 import com.github.anrimian.musicplayer.domain.Constants.NO_POSITION
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
@@ -21,6 +22,7 @@ import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.Collections
 import java.util.LinkedList
+import java.util.concurrent.TimeUnit
 
 class PlayQueuePresenter(
     private val playerInteractor: LibraryPlayerInteractor,
@@ -74,7 +76,7 @@ class PlayQueuePresenter(
         }
         currentPosition = position
         currentItem = item
-        playerInteractor.skipToItem(item.id)
+        playerInteractor.skipToItem(item.itemId)
         viewState.showCurrentQueueItem(currentItem)
     }
 
@@ -146,7 +148,7 @@ class PlayQueuePresenter(
     }
 
     fun onPlayListForAddingCreated(playList: PlayList) {
-        val compositionsToAdd = playQueue.map(PlayQueueItem::getComposition)
+        val compositionsToAdd = ArrayList(playQueue)
         performAddToPlaylist(compositionsToAdd, playList) {}
     }
 
@@ -252,7 +254,11 @@ class PlayQueuePresenter(
         currentPosition = NO_POSITION
         positionDisposable = playerInteractor.getCurrentItemPositionObservable()
             .observeOn(uiScheduler)
-            .subscribe(this::onItemPositionReceived)
+            .retryWithDelay(10, 10, TimeUnit.SECONDS)
+            .subscribe(
+                this::onItemPositionReceived,
+                { t -> viewState.showErrorMessage(errorParser.parseError(t)) }
+            )
         presenterDisposable.add(positionDisposable!!)
     }
 

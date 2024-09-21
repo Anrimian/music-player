@@ -1,54 +1,43 @@
-package com.github.anrimian.musicplayer.di.app.library.files.folder;
+package com.github.anrimian.musicplayer.di.app.library.files.folder
 
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
-
-import com.github.anrimian.filesync.SyncInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersPresenter;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.inject.Named;
-
-import dagger.Module;
-import dagger.Provides;
-import io.reactivex.rxjava3.core.Scheduler;
+import com.github.anrimian.filesync.SyncInteractor
+import com.github.anrimian.musicplayer.di.app.SchedulerModule
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersScreenInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersPresenter
+import dagger.Module
+import dagger.Provides
+import io.reactivex.rxjava3.core.Scheduler
+import javax.inject.Named
 
 /**
  * Created on 31.10.2017.
  */
-
 @Module
-public class FolderModule {
-
-    @Nullable
-    private final Long folderId;
-
-    public FolderModule(@Nullable Long folderId) {
-        this.folderId = folderId;
-    }
-
+class FolderModule(private val folderId: Long?) {
+    
     @Provides
-    @Nonnull
-    LibraryFoldersPresenter libraryFoldersPresenter(LibraryFoldersScreenInteractor interactor,
-                                                    LibraryPlayerInteractor playerInteractor,
-                                                    DisplaySettingsInteractor displaySettingsInteractor,
-                                                    SyncInteractor<FileKey, ?, Long> syncInteractor,
-                                                    PlayListsInteractor playListsInteractor,
-                                                    ErrorParser errorParser,
-                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler) {
-        return new LibraryFoldersPresenter(folderId,
-                interactor,
-                playerInteractor,
-                displaySettingsInteractor,
-                syncInteractor,
-                playListsInteractor,
-                errorParser,
-                uiScheduler);
-    }
+    fun libraryFoldersPresenter(
+        interactor: LibraryFoldersScreenInteractor,
+        playerInteractor: LibraryPlayerInteractor,
+        displaySettingsInteractor: DisplaySettingsInteractor,
+        syncInteractor: SyncInteractor<FileKey, *, Long>,
+        playListsInteractor: PlayListsInteractor,
+        errorParser: ErrorParser,
+        @Named(SchedulerModule.UI_SCHEDULER) uiScheduler: Scheduler
+    ) = LibraryFoldersPresenter(
+        folderId,
+        interactor,
+        playerInteractor,
+        displaySettingsInteractor,
+        syncInteractor,
+        playListsInteractor,
+        errorParser,
+        uiScheduler
+    )
+    
 }

@@ -13,21 +13,26 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
 interface SyncInteractor<K, T, I> {
-
     fun onAppStarted()
-    fun requestFileSync()
+    fun requestFileSync(ignoreConditions: Boolean = false)
+    fun cancelCurrentTask()
     fun runFileTasks()
     fun addRemoteRepository(template: RepoSetupTemplate): Completable
     fun removeRemoteRepository(repo: RemoteRepoInfo): Completable
     fun setRemoteRepositoryEnabled(repo: RemoteRepoInfo): Completable
     fun onLocalFileAdded()
-    fun onLocalFileDeleted(key: K)
-    fun onLocalFilesDeleted(keys: List<K>)
-    fun onLocalFileKeyChanged(key: Pair<K, K>)
-    fun onLocalFilesKeyChanged(keys: List<Pair<K, K>>)
+    fun onLocalFileDeleted(key: K, time: Long = System.currentTimeMillis()): Completable
+    fun onLocalFilesDeleted(keys: List<K>, time: Long = System.currentTimeMillis()): Completable
+    fun onLocalFileRestored(key: K, time: Long = System.currentTimeMillis()): Completable
+    fun onLocalFilesRestored(keys: List<K>, time: Long = System.currentTimeMillis()): Completable
+    fun onLocalFileKeyChanged(key: Pair<K, K>, time: Long = System.currentTimeMillis()): Completable
+    fun onLocalFilesKeyChanged(keys: List<Pair<K, K>>, time: Long = System.currentTimeMillis()): Completable
     fun notifyLocalFileChanged()
     fun isSyncEnabled(): Boolean
     fun setSyncEnabled(enabled: Boolean)
+    fun isSyncEnabledAndSet(): Boolean
+    fun resetReposState(): Completable
+    fun resetReposStateAndLogout(): Completable
     fun onScheduledSyncCalled(): Completable
     fun getSyncConditions(): List<SyncEnvCondition>
     fun setSyncConditionEnabled(condition: SyncEnvCondition, enabled: Boolean)

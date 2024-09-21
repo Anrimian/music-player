@@ -12,7 +12,9 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_COMPOSITIONS_POSITION;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_FOLDERS_POSITIONS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_GENRES_COMPOSITIONS_POSITIONS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_GENRES_POSITION;
+import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.LIBRARY_GENRES_POSITIONS_MAX_CACHE_SIZE;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYER_CONTENT_PAGE;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYLISTS_COMPOSITIONS_POSITIONS;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.PLAYLISTS_COMPOSITIONS_POSITIONS_MAX_CACHE_SIZE;
@@ -25,7 +27,6 @@ import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRep
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_GENRE_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_LIBRARY_SCREEN;
 import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.SELECTED_PLAYLIST_SCREEN;
-import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.Constants.TRACK_POSITION;
 import static com.github.anrimian.musicplayer.domain.utils.rx.RxUtils.withDefaultValue;
 
 import android.content.Context;
@@ -54,7 +55,6 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     interface Constants {
         String PREFERENCES_NAME = "ui_preferences";
 
-        String TRACK_POSITION = "track_position";
         String CURRENT_QUEUE_ITEM_ID = "current_play_queue_id";
         String CURRENT_QUEUE_ITEM_LAST_POSITION = "current_queue_item_last_position";
         String SELECTED_DRAWER_SCREEN = "selected_drawer_screen";
@@ -69,10 +69,11 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         String LIBRARY_COMPOSITIONS_POSITION = "library_compositions_position";
         String LIBRARY_ARTISTS_POSITION = "library_artists_position";
         String LIBRARY_ALBUMS_POSITION = "library_albums_position";
-        String LIBRARY_GENRES_POSITION = "library_agenres_position";
+        String LIBRARY_GENRES_POSITION = "library_genres_position";
         String LIBRARY_FOLDERS_POSITIONS = "library_folders_positions";
         String LIBRARY_ALBUMS_COMPOSITIONS_POSITIONS = "library_albums_compositions_positions";
         String LIBRARY_ARTISTS_COMPOSITIONS_POSITIONS = "library_artists_compositions_positions";
+        String LIBRARY_GENRES_COMPOSITIONS_POSITIONS = "library_genres_compositions_positions";
         String PLAYLISTS_POSITION = "playlists_positions";
         String PLAYLISTS_COMPOSITIONS_POSITIONS = "playlists_compositions_positions";
         String PLAYBACK_SPEED = "playback_speed";
@@ -80,6 +81,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         int LIBRARY_FOLDERS_POSITIONS_MAX_CACHE_SIZE = 15;
         int LIBRARY_ALBUMS_POSITIONS_MAX_CACHE_SIZE = 5;
         int LIBRARY_ARTISTS_POSITIONS_MAX_CACHE_SIZE = 5;
+        int LIBRARY_GENRES_POSITIONS_MAX_CACHE_SIZE = 5;
         int PLAYLISTS_COMPOSITIONS_POSITIONS_MAX_CACHE_SIZE = 5;
     }
 
@@ -91,6 +93,7 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     private final LruCachePreference foldersPositionsPreference;
     private final LruCachePreference albumsPositionsPreference;
     private final LruCachePreference artistsPositionsPreference;
+    private final LruCachePreference genresPositionsPreference;
     private final LruCachePreference playlistsPositionsPreference;
 
     public UiStateRepositoryImpl(Context context) {
@@ -113,6 +116,11 @@ public class UiStateRepositoryImpl implements UiStateRepository {
                 LIBRARY_ARTISTS_COMPOSITIONS_POSITIONS,
                 LIBRARY_ARTISTS_POSITIONS_MAX_CACHE_SIZE);
 
+        genresPositionsPreference = new LruCachePreference(
+                preferences,
+                LIBRARY_GENRES_COMPOSITIONS_POSITIONS,
+                LIBRARY_GENRES_POSITIONS_MAX_CACHE_SIZE);
+
         playlistsPositionsPreference = new LruCachePreference(
                 preferences,
                 PLAYLISTS_COMPOSITIONS_POSITIONS,
@@ -127,16 +135,6 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     @Override
     public int getCurrentItemLastPosition() {
         return preferences.getInt(CURRENT_QUEUE_ITEM_LAST_POSITION);
-    }
-
-    @Override
-    public void setTrackPosition(long position) {
-        preferences.putLong(TRACK_POSITION, position);
-    }
-
-    @Override
-    public long getTrackPosition() {
-        return preferences.getLong(TRACK_POSITION);
     }
 
     @Override
@@ -332,6 +330,16 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     }
 
     @Override
+    public void saveGenreListPosition(@Nullable Long id, ListPosition listPosition) {
+        genresPositionsPreference.put(id, listPosition);
+    }
+
+    @Override
+    public ListPosition getSavedGenreListPosition(@Nullable Long id) {
+        return genresPositionsPreference.get(id);
+    }
+
+    @Override
     public void savePlaylistsListPosition(@Nullable Long id, ListPosition listPosition) {
         playlistsPositionsPreference.put(id, listPosition);
     }
@@ -376,8 +384,8 @@ public class UiStateRepositoryImpl implements UiStateRepository {
             this.cacheSize = cacheSize;
         }
 
-        public void put(@Nullable Long folderId, ListPosition listPosition) {
-            long key = mapToNonNull(folderId);
+        public void put(@Nullable Long id, ListPosition listPosition) {
+            long key = mapToNonNull(id);
 
             LruCache<Long, ListPosition> positions = getCachedData();
             positions.put(key, listPosition);
@@ -385,8 +393,8 @@ public class UiStateRepositoryImpl implements UiStateRepository {
         }
 
         @Nullable
-        public ListPosition get(@Nullable Long folderId) {
-            return getCachedData().get(mapToNonNull(folderId));
+        public ListPosition get(@Nullable Long id) {
+            return getCachedData().get(mapToNonNull(id));
         }
 
         private LruCache<Long, ListPosition> getCachedData() {

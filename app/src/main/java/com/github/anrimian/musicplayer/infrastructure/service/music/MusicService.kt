@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
+import androidx.core.app.ServiceCompat
 import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.utils.Permissions
@@ -49,7 +50,7 @@ class MusicService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) {
-            stopForeground(true)
+            stopForegroundCompat(true)
             stopSelf()
             return START_NOT_STICKY
         }
@@ -58,7 +59,7 @@ class MusicService : Service() {
                 this,
                 R.string.no_file_permission
             )
-            stopForeground(true)
+            stopForegroundCompat(true)
             stopSelf()
             return START_NOT_STICKY
         }
@@ -108,7 +109,7 @@ class MusicService : Service() {
         when (requestCode) {
             Constants.Actions.PLAY -> {
                 val playDelay = intent.getLongExtra(PLAY_DELAY_MILLIS, 0)
-                playerInteractor().play(playDelay)
+                musicServiceInteractor().play(playDelay)
             }
             Constants.Actions.PAUSE -> playerInteractor().pause()
             Constants.Actions.SKIP_TO_NEXT -> musicServiceInteractor().skipToNext()
@@ -136,7 +137,8 @@ class MusicService : Service() {
         serviceDisposable.add(Components.getAppComponent().systemServiceController()
             .getStopForegroundSignal()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { stopForeground(false) })
+            .subscribe(::stopForegroundCompat)
+        )
     }
 
     private fun onServiceStateReceived(serviceState: ServiceState) {
@@ -188,7 +190,7 @@ class MusicService : Service() {
         }
         if (stopService) {
             mediaNotificationsDisplayer().cancelCoverLoadingForForegroundNotification()
-            stopForeground(true)
+            stopForegroundCompat(true)
             stopSelf()
         } else {
             if (!mediaSession().isActive) {
@@ -242,7 +244,7 @@ class MusicService : Service() {
             compositionSource: Optional<CompositionSource>,
             repeatMode: Int,
             settings: MusicNotificationSetting,
-            appTheme: AppTheme
+            appTheme: AppTheme,
         ): ServiceState {
             this.isPlaying = isPlaying
             this.playerState = playerState
@@ -252,6 +254,15 @@ class MusicService : Service() {
             this.appTheme = appTheme
             return this
         }
+    }
+
+    private fun stopForegroundCompat(removeNotification: Boolean) {
+        val flags = if (removeNotification) {
+            ServiceCompat.STOP_FOREGROUND_REMOVE
+        } else {
+            0
+        }
+        ServiceCompat.stopForeground(this, flags)
     }
 
     inner class LocalBinder : Binder() {

@@ -10,16 +10,16 @@ public class PlayQueueItemHelper {
 
     public static boolean areSourcesTheSame(@Nonnull PlayQueueItem first,
                                             @Nonnull PlayQueueItem second) {
-        return CompositionHelper.areSourcesTheSame(first.getComposition(), second.getComposition());
+        return CompositionHelper.areSourcesTheSame(first, second);
     }
 
     public static List<Object> getChangePayload(@Nonnull PlayQueueItem first,
                                                 @Nonnull PlayQueueItem second) {
-        return CompositionHelper.getChangePayload(first.getComposition(), second.getComposition());
+        return CompositionHelper.getChangePayload(first, second);
     }
 
     public static boolean hasSourceChanges(@Nonnull PlayQueueItem first,
                                            @Nonnull PlayQueueItem second) {
-        return CompositionHelper.hasSourceChanges(first.getComposition(), second.getComposition());
+        return CompositionHelper.hasSourceChanges(first, second);
     }
 }

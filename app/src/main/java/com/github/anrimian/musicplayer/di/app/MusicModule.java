@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.di.app;
 
 
+import static com.github.anrimian.musicplayer.di.app.SchedulerModule.COMPUTATION_SCHEDULER;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
 import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
@@ -86,6 +87,7 @@ public class MusicModule {
                                       SystemMusicController systemMusicController,
                                       SystemServiceController systemServiceController,
                                       SettingsRepository settingsRepository,
+                                      @Named(COMPUTATION_SCHEDULER) Scheduler delayedEventsScheduler,
                                       Analytics analytics) {
         return new PlayerInteractor(musicPlayerController,
                 compositionSourceInteractor,
@@ -93,6 +95,7 @@ public class MusicModule {
                 systemMusicController,
                 systemServiceController,
                 settingsRepository,
+                delayedEventsScheduler,
                 analytics,
                 2);
     }
@@ -131,6 +134,7 @@ public class MusicModule {
                                                     PlayQueueRepository playQueueRepository,
                                                     LibraryRepository musicProviderRepository,
                                                     UiStateRepository uiStateRepository,
+                                                    SystemServiceController systemServiceController,
                                                     Analytics analytics) {
         return new LibraryPlayerInteractor(playerCoordinatorInteractor,
                 syncInteractor,
@@ -138,6 +142,7 @@ public class MusicModule {
                 playQueueRepository,
                 musicProviderRepository,
                 uiStateRepository,
+                systemServiceController,
                 analytics);
     }
 

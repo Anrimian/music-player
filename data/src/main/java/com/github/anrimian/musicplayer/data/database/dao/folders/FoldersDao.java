@@ -10,6 +10,7 @@ import androidx.sqlite.db.SupportSQLiteQuery;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo;
 
 import java.util.List;
 
@@ -24,13 +25,30 @@ public interface FoldersDao {
     @RawQuery
     List<Long> getFoldersIds(SupportSQLiteQuery query);
 
-    @Query("SELECT id, name, " +
-            "0 as filesCount, " +//we don't use it for now
-            "1 as hasAnyStorageFile " +//we don't use it for now
+    @Query("WITH RECURSIVE path(level, name, parentId) AS (" +
+            "    SELECT 0, name, parentId" +
+            "    FROM folders" +
+            "    WHERE id = :folderId" +
+            "    UNION ALL" +
+            "    SELECT path.level + 1," +
+            "           folders.name," +
+            "           folders.parentId" +
+            "    FROM folders" +
+            "    JOIN path ON folders.id = path.parentId" +
+            ")," +
+            "path_from_root AS (" +
+            "    SELECT name" +
+            "    FROM path" +
+            "    ORDER BY level DESC" +
+            ")" +
+            "SELECT " +
+            "(SELECT IFNULL(group_concat(name, '/'), '') FROM path_from_root) AS path," +
+            "id AS id," +
+            "(SELECT count() < 2 FROM path_from_root) AS isParentOfParentRoot " +
             "FROM folders " +
             "WHERE id = :folderId OR (id IS NULL AND :folderId IS NULL) " +
             "LIMIT 1")
-    Observable<List<FolderFileSource>> getFolderObservable(Long folderId);
+    Observable<List<FolderInfo>> getFolderObservable(Long folderId);
 
     @Insert
     long insertFolder(FolderEntity entity);
@@ -83,6 +101,11 @@ public interface FoldersDao {
             ")" +
             "SELECT id FROM path ORDER BY level DESC")
     List<Long> getAllParentFoldersId(Long folderId);
+
+    @Query("SELECT name " +
+            "FROM folders " +
+            "WHERE parentId = :parentId OR (parentId IS NULL AND :parentId IS NULL)")
+    List<String> getFolderNamesInFolder(Long parentId);
 
     @Nullable
     @Query("SELECT parentId FROM folders WHERE id = :folderId")

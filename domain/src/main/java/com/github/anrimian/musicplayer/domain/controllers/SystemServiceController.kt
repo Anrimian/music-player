@@ -6,8 +6,8 @@ interface SystemServiceController {
 
     fun startMusicService()
 
-    fun stopMusicService(forceStop: Boolean = false)
+    fun stopMusicService(forceStop: Boolean = false, hideUi: Boolean = false)
 
-    fun getStopForegroundSignal(): Observable<Any>
+    fun getStopForegroundSignal(): Observable<Boolean>
 
 }

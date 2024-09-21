@@ -12,7 +12,6 @@ import com.github.anrimian.musicplayer.data.repositories.scanner.folders.FolderT
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition
 import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils
-import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.domain.utils.validation.DateUtils
@@ -32,12 +31,13 @@ class StorageCompositionAnalyzer(
         StorageFullComposition::getStorageId
     )
 
+    @Synchronized
     fun applyCompositionsData(actualCompositions: LongSparseArray<StorageFullComposition>) {
         val currentCompositions = compositionsDao.selectAllAsStorageCompositions()
 
         actualTreeBuilder.createFileTree(actualCompositions)
             .cutCommonRoots(actualCompositions)
-            .excludeCompositions(actualCompositions, currentCompositions, ignoredFoldersDao.getIgnoredFolders())
+            .excludeCompositions(actualCompositions, ignoredFoldersDao.getIgnoredFolders())
 
         val addedCompositions = ArrayList<StorageFullComposition>()
         val deletedCompositions = ArrayList<StorageComposition>()
@@ -90,18 +90,13 @@ class StorageCompositionAnalyzer(
 
     private fun FolderNode<Long>.excludeCompositions(
         compositions: LongSparseArray<StorageFullComposition>,
-        currentCompositions: LongSparseArray<StorageComposition>,
         excludedFolderPaths: Array<String>,
     ) {
         for (ignoredFolderPath in excludedFolderPaths) {
             val ignoreNode = findFolder(ignoredFolderPath) ?: continue
             ignoreNode.parentFolder?.removeFolder(ignoreNode.keyPath)
             for (id in getAllCompositionsInNode(ignoreNode)) {
-                //do not remove compositions not from storage
-                val currentComposition = currentCompositions[id]
-                if (currentComposition == null || currentComposition.initialSource != InitialSource.REMOTE) {
-                    compositions.remove(id)
-                }
+                compositions.remove(id)
             }
         }
     }

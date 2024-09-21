@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer;
 
 import android.app.Application;
+import android.content.Context;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -18,14 +19,21 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 
 public abstract class App extends Application {
 
+    public App() {
+        super();
+        RxJavaPlugins.setErrorHandler(new RxJavaErrorConsumer());
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        initComponents(base);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
-        RxJavaPlugins.setErrorHandler(new RxJavaErrorConsumer());
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-
-        initComponents();
-
         DevTools.run(this);
 
         AppComponent appComponent = Components.getAppComponent();
@@ -39,6 +47,6 @@ public abstract class App extends Application {
         }
     }
 
-    protected abstract void initComponents();
+    protected abstract void initComponents(Context appContext);
 
 }

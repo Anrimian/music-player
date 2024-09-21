@@ -17,6 +17,7 @@ import com.github.anrimian.musicplayer.data.models.folders.UriFileReference
 import com.github.anrimian.musicplayer.databinding.FragmentBaseFabListBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
@@ -127,7 +128,7 @@ class PlayListFragment : BaseLibraryFragment(), PlayListView, BackButtonListener
             binding.recyclerView,
             presenter.isCoversEnabled(),
             this::onItemMenuClicked,
-            presenter::onItemIconClicked
+            presenter::onItemClicked
         )
         binding.recyclerView.adapter = adapter
 
@@ -297,6 +298,10 @@ class PlayListFragment : BaseLibraryFragment(), PlayListView, BackButtonListener
         FormatUtils.formatPlayAllButton(binding.fab, isRandomModeEnabled)
     }
 
+    override fun showCurrentComposition(currentComposition: CurrentComposition) {
+        adapter.showCurrentComposition(currentComposition)
+    }
+
     override fun setDragEnabled(enabled: Boolean) {
         touchHelperCallback.setDragEnabled(enabled)
     }
@@ -312,8 +317,7 @@ class PlayListFragment : BaseLibraryFragment(), PlayListView, BackButtonListener
     }
 
     private fun onItemMenuClicked(view: View, position: Int, playListItem: PlayListItem) {
-        val composition = playListItem.composition
-        showCompositionPopupMenu(view, R.menu.play_list_item_menu, composition) { item ->
+        showCompositionPopupMenu(view, R.menu.play_list_item_menu, playListItem) { item ->
             onCompositionActionSelected(playListItem, item.itemId, position)
         }
     }
@@ -323,18 +327,17 @@ class PlayListFragment : BaseLibraryFragment(), PlayListView, BackButtonListener
         @MenuRes menuItemId: Int,
         position: Int
     ) {
-        val composition = item.composition
         when (menuItemId) {
             R.id.menu_play -> presenter.onPlayActionSelected(position)
-            R.id.menu_play_next -> presenter.onPlayNextCompositionClicked(composition)
-            R.id.menu_add_to_queue -> presenter.onAddToQueueCompositionClicked(composition)
-            R.id.menu_add_to_playlist -> presenter.onAddToPlayListButtonClicked(composition)
+            R.id.menu_play_next -> presenter.onPlayNextCompositionClicked(item)
+            R.id.menu_add_to_queue -> presenter.onAddToQueueCompositionClicked(item)
+            R.id.menu_add_to_playlist -> presenter.onAddToPlayListButtonClicked(item)
             R.id.menu_edit ->
-                startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.id))
-            R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), composition)
-            R.id.menu_share -> shareComposition(this, composition)
+                startActivity(CompositionEditorActivity.newIntent(requireContext(), item.id))
+            R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), item)
+            R.id.menu_share -> shareComposition(this, item)
             R.id.menu_delete_from_play_list -> presenter.onDeleteFromPlayListButtonClicked(item)
-            R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(composition)
+            R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(item)
         }
     }
 

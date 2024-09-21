@@ -5,10 +5,22 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.ui.widgets.WidgetDataHolder
 import com.github.anrimian.musicplayer.ui.widgets.binders.WidgetBinder
 
 abstract class BaseWidgetProvider : AppWidgetProvider() {
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        Components.checkInitialization(context.applicationContext)
+        Components.getAppComponent().widgetUpdater().onAnyWidgetEnabledStateChanged()
+    }
+
+    override fun onDisabled(context: Context?) {
+        super.onDisabled(context)
+        Components.getAppComponent().widgetUpdater().onAnyWidgetEnabledStateChanged()
+    }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)

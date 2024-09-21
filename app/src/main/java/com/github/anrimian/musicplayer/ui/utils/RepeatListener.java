@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-//support levels?
+//support levels - just pass callCount to action listener
 public class RepeatListener implements OnTouchListener {
 
     private final static int TOUCH_OFFSET = 20;
@@ -23,7 +23,7 @@ public class RepeatListener implements OnTouchListener {
     private final Rect touchHoldRect = new Rect();
 
     private View touchedView;
-    private boolean calledAtLeastOnce = false;
+    private boolean calledAtLeastOnce = false;//can it be replaced with callCount?
 
     private short callCount = 0;
 

@@ -6,12 +6,13 @@ import java.util.Date
  * Created on 24.10.2017.
  */
 open class Composition(
-    val artist: String?,
+    val id: Long,
     val title: String,
+    val artist: String?,
     val album: String?,
     val duration: Long,
     val size: Long,
-    val id: Long,
+    val comment: String?,
     val storageId: Long?,
     val dateAdded: Date,
     val dateModified: Date,

@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.database;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -16,6 +17,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
 import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
 import com.github.anrimian.musicplayer.data.database.mappers.CompositionCorruptionDetector;
+import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
 import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
@@ -32,6 +34,30 @@ import java.util.Map;
 
 @SuppressLint("RestrictedApi")
 class Migrations {
+
+    static Migration getMigration15_16(Context context) {
+        return new Migration(15, 16) {
+            @Override
+            public void migrate(@NonNull SupportSQLiteDatabase db) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `track_positions` (`queueItemId` INTEGER NOT NULL, `trackPosition` INTEGER NOT NULL, `writeTime` INTEGER NOT NULL, PRIMARY KEY(`queueItemId`), FOREIGN KEY(`queueItemId`) REFERENCES `play_queue`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+
+                SharedPreferences prefs = context.getSharedPreferences("ui_preferences", Context.MODE_PRIVATE);
+                long itemId = prefs.getLong("current_play_queue_id", UiStateRepositoryImpl.NO_ITEM);
+                if (itemId == UiStateRepositoryImpl.NO_ITEM) {
+                    return;
+                }
+                long position = prefs.getLong("track_position", 0L);
+                if (position != 0L) {
+                    db.execSQL("INSERT INTO track_positions (queueItemId, trackPosition, writeTime) VALUES (" + itemId + ", + " + position + ", " + System.currentTimeMillis() + ")");
+                }
+                prefs.edit()
+                        .putLong("library_genres_position", prefs.getLong("library_agenres_position", 0L))
+                        .remove("library_agenres_position")
+                        .remove("track_position")
+                        .apply();
+            }
+        };
+    }
 
     static Migration MIGRATION_14_15 = new Migration(14, 15) {
         @Override

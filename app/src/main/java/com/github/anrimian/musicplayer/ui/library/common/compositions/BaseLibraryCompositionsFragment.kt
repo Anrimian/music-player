@@ -38,13 +38,14 @@ abstract class BaseLibraryCompositionsFragment : BaseLibraryFragment() {
         @MenuRes menuItemId: Int,
         position: Int
     ) {
+        val act = activity ?: return
         when (menuItemId) {
             R.id.menu_play -> getLibraryPresenter().onPlayActionSelected(position)
             R.id.menu_play_next -> getLibraryPresenter().onPlayNextCompositionClicked(composition)
             R.id.menu_add_to_queue -> getLibraryPresenter().onAddToQueueCompositionClicked(composition)
             R.id.menu_add_to_playlist -> getLibraryPresenter().onAddToPlayListButtonClicked(composition)
-            R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.id))
-            R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), composition)
+            R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(act, composition.id))
+            R.id.menu_show_in_folders -> MainActivity.showInFolders(act, composition)
             R.id.menu_share -> shareComposition(this, composition)
             R.id.menu_delete -> getLibraryPresenter().onDeleteCompositionButtonClicked(composition)
         }

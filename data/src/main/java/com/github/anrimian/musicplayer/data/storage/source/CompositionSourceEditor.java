@@ -8,7 +8,7 @@ import com.github.anrimian.musicplayer.data.storage.exceptions.GenreAlreadyPrese
 import com.github.anrimian.musicplayer.data.storage.exceptions.IllegalInputException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
-import com.github.anrimian.musicplayer.data.utils.file.FileUtils;
+import com.github.anrimian.musicplayer.data.utils.image.BitmapUtils;
 import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
@@ -302,7 +302,7 @@ public class CompositionSourceEditor {
                         if (stream == null) {
                             return;
                         }
-                        byte[] data = FileUtils.getScaledBitmapByteArray(stream, MAX_COVER_SIZE);
+                        byte[] data = BitmapUtils.getScaledBitmapByteArray(stream, MAX_COVER_SIZE);
                         Artwork artwork = new AndroidArtwork();
                         artwork.setBinaryData(data);
                         artwork.setMimeType(ImageFormats.getMimeTypeForBinarySignature(data));

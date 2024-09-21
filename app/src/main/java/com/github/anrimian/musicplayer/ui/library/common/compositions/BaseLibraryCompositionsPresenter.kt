@@ -203,7 +203,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
     }
 
     fun onChangeRandomModePressed() {
-        playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
+        playerInteractor.changeRandomMode()
     }
 
     fun getSelectedCompositions(): HashSet<C> = selectedCompositions
@@ -272,7 +272,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
 
     private fun subscribeOnCurrentComposition() {
         playerInteractor.getCurrentCompositionObservable()
-            .subscribeOnUi(this::onCurrentCompositionReceived, errorParser::logError)
+            .runOnUi(this::onCurrentCompositionReceived, viewState::showErrorMessage)
     }
 
     private fun onCompositionsReceivingError(throwable: Throwable) {

@@ -19,7 +19,6 @@ import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.databinding.FragmentDrawerBinding;
 import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding;
 import com.github.anrimian.musicplayer.databinding.PartialQueueToolbarBinding;
-import com.github.anrimian.musicplayer.databinding.PartialToolbarBinding;
 import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar;
 import com.github.anrimian.musicplayer.ui.player_screen.view.slide.ToolbarDelegate;
@@ -44,7 +43,6 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
     private final PartialDetailedMusicBinding panelBinding;
     private final FragmentDrawerBinding viewBinding;
     private final PartialQueueToolbarBinding queueToolbarBinding;
-    private final PartialToolbarBinding toolbarBinding;
     private final MotionLayout mlBottomSheet;
     @Nullable
     private final CoordinatorLayout bottomSheetCoordinator;
@@ -86,11 +84,10 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         this.bottomSheetStateListener = bottomSheetStateListener;
 
         queueToolbarBinding = viewBinding.toolbarPlayQueue;
-        toolbarBinding = viewBinding.toolbar;
         clPlayQueueContainer = viewBinding.clPlayQueueContainer;
         bottomSheetCoordinator = view.findViewById(R.id.coordinator_bottom_sheet);
         tvCurrentComposition = panelBinding.tvCurrentComposition;
-        toolbar = toolbarBinding.getRoot();
+        toolbar = viewBinding.toolbar;
         bottomSheetLeftShadow = view.findViewById(R.id.bottom_sheet_left_shadow);
         bottomSheetTopLeftShadow = view.findViewById(R.id.bottom_sheet_top_left_shadow);
         contentViewContainer = view.findViewById(R.id.drawer_fragment_container);
@@ -198,9 +195,9 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         boundDelegateManager
                 .addDelegate(new BoundValuesDelegate(0.4f, 1f, new VisibilityDelegate(queueToolbarBinding.getRoot())))
                 .addDelegate(new ReverseDelegate(new BoundValuesDelegate(0.0f, 0.8f, new ToolbarVisibilityDelegate(toolbar))))
-                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(toolbarBinding.flToolbarContentContainer))))
+                .addDelegate(new BoundValuesDelegate(0f, 0.6f, new ReverseDelegate(new VisibilityDelegate(toolbar.getToolbarModesViewGroup()))))
                 .addDelegate(new BoundValuesDelegate(1f, 1f, new ReverseDelegate(new VisibilityDelegate(contentViewContainer))))
-                .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))
+                .addDelegate(new TextSizeDelegate(tvCurrentComposition, R.dimen.current_composition_expand_text_size, R.dimen.current_composition_expand_text_size))//no sense
                 .addDelegate(new MotionLayoutDelegate(mlBottomSheet))
                 .addDelegate(new BoundValuesDelegate(0.7f, 0.95f, new ReverseDelegate(new VisibilityDelegate(viewBinding.drawerFragmentContainer))))
                 .addDelegate(new BoundValuesDelegate(0.3f, 1.0f, new ExpandViewDelegate(R.dimen.panel_cover_size, panelBinding.ivMusicIcon)))
@@ -247,7 +244,7 @@ public class PlayerPanelWrapperImpl implements PlayerPanelWrapper {
         clPlayQueueContainer.setVisibility(INVISIBLE);
         queueToolbarBinding.getRoot().setVisibility(INVISIBLE);
         queueToolbarBinding.getRoot().setAlpha(0f);
-        toolbarBinding.flToolbarContentContainer.setVisibility(INVISIBLE);
+        toolbar.getToolbarModesViewGroup().setVisibility(INVISIBLE);
         toolbar.setContentAlpha(0f);
         contentViewContainer.setVisibility(INVISIBLE);
     }

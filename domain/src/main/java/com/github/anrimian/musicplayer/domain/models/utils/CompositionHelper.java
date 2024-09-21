@@ -31,7 +31,7 @@ public class CompositionHelper {
                 && Objects.equals(first.getArtist(), second.getArtist())
                 && Objects.equals(first.getDateAdded(), second.getDateAdded())
                 && Objects.equals(first.getDateModified(), second.getDateModified())
-                && first.getCoverModifyTime() == second.getCoverModifyTime()
+                && Objects.equals(first.getCoverModifyTime(), second.getCoverModifyTime())
                 && first.getDuration() == second.getDuration()
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
@@ -57,7 +57,7 @@ public class CompositionHelper {
         if (!Objects.equals(first.getDateModified(), second.getDateModified())) {
             payloads.add(DATE_MODIFIED);
         }
-        if (first.getCoverModifyTime() != second.getCoverModifyTime()) {
+        if (!Objects.equals(first.getCoverModifyTime(), second.getCoverModifyTime())) {
             payloads.add(COVER_MODIFY_TIME);
         }
         if (first.getDuration() != second.getDuration()) {

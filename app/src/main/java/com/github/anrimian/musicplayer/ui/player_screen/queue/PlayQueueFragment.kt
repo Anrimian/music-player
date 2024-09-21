@@ -18,7 +18,6 @@ import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
@@ -36,8 +35,8 @@ import com.github.anrimian.musicplayer.ui.player_screen.queue.adapter.PlayQueueA
 import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.attrColor
 import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
@@ -116,7 +115,7 @@ class PlayQueueFragment: BaseLibraryFragment(), PlayQueueView {
         binding.rvPlayQueue.adapter = playQueueAdapter
         val callback = FormatUtils.withSwipeToDelete(
             binding.rvPlayQueue,
-            AndroidUtils.getColorFromAttr(requireContext(), R.attr.listItemBottomBackground),
+            attrColor(R.attr.listItemBottomBackground),
             presenter::onItemSwipedToDelete,
             ItemTouchHelper.START,
             R.drawable.ic_remove_from_queue,
@@ -273,16 +272,15 @@ class PlayQueueFragment: BaseLibraryFragment(), PlayQueueView {
         }
     }
 
-    private fun onPlayItemMenuClicked(view: View, playQueueItem: PlayQueueItem) {
-        val composition = playQueueItem.composition
-        showCompositionPopupMenu(view, R.menu.play_queue_item_menu, composition) { item ->
+    private fun onPlayItemMenuClicked(view: View, queueItem: PlayQueueItem) {
+        showCompositionPopupMenu(view, R.menu.play_queue_item_menu, queueItem) { item ->
             when (item.itemId) {
-                R.id.menu_add_to_playlist -> presenter.onAddQueueItemToPlayListButtonClicked(composition)
-                R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(requireContext(), composition.id))
-                R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), composition)
-                R.id.menu_share -> shareComposition(this, composition)
-                R.id.menu_delete_from_queue -> presenter.onDeleteQueueItemClicked(playQueueItem)
-                R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(composition)
+                R.id.menu_add_to_playlist -> presenter.onAddQueueItemToPlayListButtonClicked(queueItem)
+                R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(requireContext(), queueItem.id))
+                R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), queueItem)
+                R.id.menu_share -> shareComposition(this, queueItem)
+                R.id.menu_delete_from_queue -> presenter.onDeleteQueueItemClicked(queueItem)
+                R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(queueItem)
             }
         }
     }

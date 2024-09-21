@@ -6,9 +6,8 @@ import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerIn
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.folders.FileReference
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
@@ -52,7 +51,7 @@ class PlayListPresenter(
     private val compositionsToDelete: MutableList<Composition> = LinkedList()
 
     private var startDragPosition = 0
-    private var currentItem: PlayQueueItem? = null
+    private var currentComposition: Composition? = null
 
     private var lastDeleteAction: Completable? = null
 
@@ -62,8 +61,10 @@ class PlayListPresenter(
         super.onFirstViewAttach()
         subscribeOnCompositions()
         subscribePlayList()
-        subscribeOnCurrentComposition()
-        subscribeOnRepeatMode()
+        playerInteractor.getCurrentCompositionObservable()
+            .subscribeOnUi(this::onCurrentCompositionReceived, errorParser::logError)
+        playerInteractor.getRandomPlayingObservable()
+            .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
         syncInteractor.getFilesSyncStateObservable()
             .unsafeSubscribeOnUi(viewState::showFilesSyncState)
     }
@@ -77,8 +78,14 @@ class PlayListPresenter(
         playListsInteractor.saveItemsListPosition(playListId, listPosition)
     }
 
-    fun onItemIconClicked(position: Int) {
-        startPlaying(position)
+    fun onItemClicked(item: PlayListItem, position: Int) {
+        if (item.id == currentComposition?.id) {
+            playerInteractor.playOrPause()
+        } else {
+            startPlaying(position)
+            viewState.showCurrentComposition(CurrentComposition(item, true))
+        }
+        return
     }
 
     fun onPlayAllButtonClicked() {
@@ -191,7 +198,7 @@ class PlayListPresenter(
     }
 
     fun onChangeRandomModePressed() {
-        playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
+        playerInteractor.changeRandomMode()
     }
 
     fun onFolderForExportSelected(folder: FileReference) {
@@ -314,22 +321,13 @@ class PlayListPresenter(
         }
     }
 
-    private fun subscribeOnCurrentComposition() {
-        playerInteractor.getCurrentQueueItemObservable()
-            .subscribeOnUi(this::onCurrentCompositionReceived, errorParser::logError)
-    }
-
-    private fun onCurrentCompositionReceived(playQueueEvent: PlayQueueEvent) {
-        currentItem = playQueueEvent.playQueueItem
-    }
-
-    private fun subscribeOnRepeatMode() {
-        playerInteractor.getRandomPlayingObservable()
-            .subscribeOnUi(viewState::showRandomMode, errorParser::logError)
+    private fun onCurrentCompositionReceived(currentComposition: CurrentComposition) {
+        this.currentComposition = currentComposition.composition
+        viewState.showCurrentComposition(currentComposition)
     }
 
     private fun startPlaying(position: Int = Constants.NO_POSITION) {
-        playerInteractor.setQueueAndPlay(items.map { item -> item.composition.id }, position)
+        playerInteractor.setQueueAndPlay(items.map { item -> item.id }, position)
             .runOnUi(viewState::showErrorMessage)
     }
 

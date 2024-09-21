@@ -19,12 +19,11 @@ android {
 
         vectorDrawables.useSupportLibrary = true
         resConfigs 'en', 'be', 'cs', 'de', 'el', 'es', 'fr', 'in', 'pt', 'ru', 'tr', 'uk'
-
     }
     buildTypes {
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled false
+            consumerProguardFiles 'proguard-rules.pro'
         }
         QA {
             initWith release
@@ -33,7 +32,9 @@ android {
             minifyEnabled false
         }
     }
-
+    lintOptions {
+        abortOnError false
+    }
     buildFeatures {
         viewBinding true
     }
@@ -51,7 +52,7 @@ android {
                     '**/kotlin/**',
                     '**/*.txt',
                     '**/*.xml',
-                    '**/*.properties'
+                    '/*.properties'
             ]
         }
     }

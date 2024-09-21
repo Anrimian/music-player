@@ -183,7 +183,7 @@ public class PlayListsRepositoryImpl implements PlayListsRepository {
             return Completable.complete();
         }
         return addCompositionsToPlayList(
-                asList(deletedItem.getComposition()),
+                asList(deletedItem),
                 deletedItemPlayListId,
                 deletedItemPosition,
                 false,

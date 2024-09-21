@@ -1,15 +1,14 @@
-package com.github.anrimian.musicplayer.di.app.library.genres;
+package com.github.anrimian.musicplayer.di.app.library.genres
 
-import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsComponent;
-import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsModule;
-import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListPresenter;
+import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsComponent
+import com.github.anrimian.musicplayer.di.app.library.genres.items.GenreItemsModule
+import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListPresenter
+import dagger.Subcomponent
 
-import dagger.Subcomponent;
+@Subcomponent(modules = [ GenresModule::class ])
+interface GenresComponent {
 
-@Subcomponent(modules = GenresModule.class)
-public interface GenresComponent {
+    fun genreItemsComponent(module: GenreItemsModule): GenreItemsComponent
+    fun genresListPresenter(): GenresListPresenter
 
-    GenreItemsComponent genreItemsComponent(GenreItemsModule module);
-
-    GenresListPresenter genresListPresenter();
 }

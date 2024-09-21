@@ -65,10 +65,10 @@
 
     <com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressView
         android:id="@+id/pvFileState"
-        android:layout_width="@dimen/file_sync_state_icon_size"
-        android:layout_height="@dimen/file_sync_state_icon_size"
-        android:layout_marginBottom="@dimen/file_sync_state_icon_margin"
-        android:layout_marginEnd="@dimen/file_sync_state_icon_margin"
+        android:layout_width="@dimen/file_sync_state_queue_icon_size"
+        android:layout_height="@dimen/file_sync_state_queue_icon_size"
+        android:layout_marginBottom="@dimen/file_sync_state_queue_icon_margin"
+        android:layout_marginEnd="@dimen/file_sync_state_queue_icon_margin"
         app:layout_constraintBottom_toBottomOf="@id/ivMusicIcon"
         app:layout_constraintEnd_toEndOf="@id/ivMusicIcon"/>
 

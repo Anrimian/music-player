@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.utils.moxy.RxMvpPresenter
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
@@ -72,6 +73,24 @@ abstract class AppPresenter<T : MvpView>(
             .autoDispose()
     }
 
+    //--Flowable
+
+    protected fun <K: Any> Flowable<K>.runOnUi(
+        onNext: (K) -> Unit,
+        onError: (ErrorCommand) -> Unit
+    ) {
+        this.subscribeOnUi(onNext) { t -> onError(errorParser.parseError(t)) }
+    }
+
+    protected fun <K: Any> Flowable<K>.subscribeOnUi(
+        onNext: (K) -> Unit,
+        onError: (Throwable) -> Unit
+    ) {
+        this.observeOn(uiScheduler)
+            .subscribe(onNext, onError)
+            .autoDispose()
+    }
+
     //--Single
 
     protected fun <K: Any> Single<K>.runOnUi(onNext: (K) -> Unit, onError: (ErrorCommand) -> Unit) {
@@ -131,6 +150,10 @@ abstract class AppPresenter<T : MvpView>(
 
     protected fun Completable.subscribe(onError: (ErrorCommand) -> Unit): Disposable {
         return subscribe({}, { t -> onError(errorParser.parseError(t)) }, presenterDisposable)
+    }
+
+    protected fun Completable.justRunOnUi(onError: (ErrorCommand) -> Unit) {
+        this.justSubscribe { t -> onError(errorParser.parseError(t)) }
     }
 
     protected fun Completable.justSubscribe(onError: (Throwable) -> Unit) {

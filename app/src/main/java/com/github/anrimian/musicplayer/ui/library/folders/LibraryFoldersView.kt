@@ -6,6 +6,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposit
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
+import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
@@ -38,7 +39,7 @@ interface LibraryFoldersView : BaseLibraryView {
     fun showError(errorCommand: ErrorCommand)
 
     @AddToEndSingle
-    fun showFolderInfo(folder: FolderFileSource?)
+    fun showFolderInfo(folder: FolderInfo?)
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
     fun hideProgressDialog()

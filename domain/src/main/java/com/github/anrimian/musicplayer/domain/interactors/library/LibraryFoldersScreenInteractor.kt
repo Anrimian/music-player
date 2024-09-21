@@ -5,6 +5,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
+import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
@@ -39,7 +40,7 @@ class LibraryFoldersScreenInteractor(
         return foldersInteractor.getFoldersInFolder(folderId, searchQuery)
     }
 
-    fun getFolderObservable(folderId: Long): Observable<FolderFileSource> {
+    fun getFolderObservable(folderId: Long): Observable<FolderInfo> {
         return foldersInteractor.getFolderObservable(folderId)
     }
 
@@ -151,8 +152,8 @@ class LibraryFoldersScreenInteractor(
         return foldersInteractor.addFolderToIgnore(folder)
     }
 
-    fun deleteIgnoredFolder(folder: IgnoredFolder?): Completable {
-        return libraryRepository.deleteIgnoredFolder(folder)
+    fun deleteIgnoredFolder(folder: IgnoredFolder): Completable {
+        return foldersInteractor.deleteIgnoredFolder(folder)
     }
 
     fun saveListPosition(folderId: Long?, listPosition: ListPosition) {

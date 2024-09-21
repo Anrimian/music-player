@@ -46,7 +46,7 @@ class StorageFilesDataSourceImpl(
         }
 
         for (paths in filesToRename) {
-            renameFile(paths.first, paths.second)
+            FileUtils.renameFile(paths.first, paths.second)
         }
         renameFolder(folderPath!!, folderNewFullPath!!)
         storageMusicProvider.updateCompositionsFilePath(updatedCompositions)
@@ -60,7 +60,7 @@ class StorageFilesDataSourceImpl(
         val newPath = FileUtils.replaceFileName(oldPath, fileName)
         val formattedNewPath = FileUtils.getUniqueFilePath(newPath)
 
-        renameFile(oldPath, formattedNewPath)
+        FileUtils.renameFile(oldPath, formattedNewPath)
 
         storageMusicProvider.updateCompositionsFilePath(
             listOf(FilePathComposition(storageId, formattedNewPath))
@@ -100,7 +100,7 @@ class StorageFilesDataSourceImpl(
             filesToMove.add(filePath to formattedNewPath)
         }
         for (paths in filesToMove) {
-            moveFile(paths.first, paths.second)
+            FileUtils.moveFile(paths.first, paths.second)
         }
         storageMusicProvider.updateCompositionsFilePath(updatedCompositions)
         return updatedNames
@@ -143,40 +143,6 @@ class StorageFilesDataSourceImpl(
     private fun getCompositionFilePath(storageId: Long): String {
         return storageMusicProvider.getCompositionFilePath(storageId)
             ?: throw RuntimeException("composition path not found in system media store")
-    }
-
-    private fun moveFile(oldPath: String, newPath: String) {
-        val destDirectoryPath = FileUtils.getParentDirPath(newPath)
-        val destDirectory = File(destDirectoryPath)
-        if (!destDirectory.exists()) {
-            val created = destDirectory.mkdirs()
-            if (!created) {
-                throw RuntimeException("parent directory wasn't created")
-            }
-        }
-        renameFile(oldPath, newPath)
-        val oldDirectoryPath = FileUtils.getParentDirPath(oldPath)
-        val oldDirectory = File(oldDirectoryPath)
-        val files = oldDirectory.list()
-        if (oldDirectory.isDirectory && files != null && files.isEmpty()) {
-            //not necessary to check
-            oldDirectory.delete()
-        }
-    }
-
-    private fun renameFile(oldPath: String, newPath: String) {
-        val oldFile = File(oldPath)
-        if (!oldFile.exists()) {
-            throw RuntimeException("target file not exists")
-        }
-        if (!oldFile.canWrite()) {
-            throw FileWriteNotAllowedException("file write is not allowed")
-        }
-        val newFile = File(newPath)
-        val renamed = oldFile.renameTo(newFile)
-        if (!renamed) {
-            throw RuntimeException("file wasn't renamed")
-        }
     }
 
     private fun renameFolder(oldPath: String, newPath: String) {

@@ -31,24 +31,25 @@ import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotific
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.ALBUM_ID_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.ALBUM_ITEMS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.ARTIST_ID_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.ARTIST_ITEMS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.COMPOSITIONS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.COMPOSITION_ID_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.FOLDERS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.FOLDER_ID_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.GENRE_ID_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.GENRE_ITEMS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.PAUSE_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.PLAYLIST_ID_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.PLAYLIST_ITEMS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.POSITION_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.RESUME_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SEARCH_ITEMS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SEARCH_QUERY_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.SHUFFLE_ALL_AND_PLAY_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ALBUM_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ALBUM_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ARTIST_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ARTIST_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.COMPOSITIONS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.COMPOSITION_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.FOLDERS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.FOLDER_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.GENRE_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.GENRE_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.PAUSE_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.PLAYLIST_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.PLAYLIST_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.POSITION_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.RESUME_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SEARCH_ITEMS_ACTION_ID
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SEARCH_QUERY_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SHUFFLE_ALL_AND_PLAY_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.music.CompositionSourceModelHelper
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
@@ -78,7 +79,7 @@ class MediaSessionHandler(
     private val musicServiceInteractor: MusicServiceInteractor,
     private val ioScheduler: Scheduler,
     private val uiScheduler: Scheduler,
-    private val errorParser: ErrorParser
+    private val errorParser: ErrorParser,
 ) {
 
     private var mediaSession: MediaSessionCompat? = null
@@ -240,7 +241,7 @@ class MediaSessionHandler(
 //      }
         setMediaState(playbackStateBuilder, playbackState)
 
-        val playQueueCurrentItemId = playbackState.playQueueCurrentItem.playQueueItem?.id ?: 0L
+        val playQueueCurrentItemId = playbackState.playQueueCurrentItem.playQueueItem?.itemId ?: 0L
         playbackStateBuilder.setActiveQueueItemId(playQueueCurrentItemId)
 
         getMediaSession().setPlaybackState(playbackStateBuilder.build())
@@ -307,35 +308,36 @@ class MediaSessionHandler(
 
     private fun toSessionQueueItems(
         playQueue: List<PlayQueueItem>,
-        isLibrarySource: Boolean
+        isLibrarySource: Boolean,
     ): List<MediaSessionCompat.QueueItem> {
         return if (isLibrarySource) playQueue.map(this::toSessionQueueItem) else emptyList()
     }
 
     private fun toSessionQueueItem(item: PlayQueueItem): MediaSessionCompat.QueueItem {
-        val composition = item.composition
         val mediaDescription = MediaDescriptionCompat.Builder()
-            .setTitle(CompositionHelper.formatCompositionName(composition))
-            .setSubtitle(formatCompositionAdditionalInfoForMediaBrowser(context, composition))
+            .setTitle(CompositionHelper.formatCompositionName(item))
+            .setSubtitle(formatCompositionAdditionalInfoForMediaBrowser(context, item))
             .build()
-        return MediaSessionCompat.QueueItem(mediaDescription, item.id)
+        return MediaSessionCompat.QueueItem(mediaDescription, item.itemId)
     }
 
     private fun setMediaState(
         playbackStateBuilder: PlaybackStateCompat.Builder,
-        playbackState: PlaybackState
+        playbackState: PlaybackState,
     ) {
         val playerState = when (val playerState = playbackState.playerState) {
             PlayerState.IDLE -> PlaybackStateCompat.STATE_NONE
             PlayerState.PREPARING,
-            PlayerState.LOADING -> PlaybackStateCompat.STATE_CONNECTING
+            PlayerState.LOADING,
+            -> PlaybackStateCompat.STATE_CONNECTING
             PlayerState.PAUSE -> PlaybackStateCompat.STATE_PAUSED
             PlayerState.PLAY -> PlaybackStateCompat.STATE_PLAYING
             PlayerState.STOP -> PlaybackStateCompat.STATE_STOPPED
             is PlayerState.Error -> {
                 val errorCode = when(playerState.throwable) {
                     is UnsupportedSourceException,
-                    is CorruptedMediaFileException -> PlaybackStateCompat.ERROR_CODE_NOT_SUPPORTED
+                    is CorruptedMediaFileException,
+                    -> PlaybackStateCompat.ERROR_CODE_NOT_SUPPORTED
                     else -> PlaybackStateCompat.ERROR_CODE_APP_ERROR
                 }
                 val errorMessage = errorParser.parseError(playerState.throwable).message
@@ -355,7 +357,7 @@ class MediaSessionHandler(
 
         fun set(
             currentSource: Optional<CompositionSource>,
-            settings: MusicNotificationSetting
+            settings: MusicNotificationSetting,
         ): MetadataState {
             this.currentSource = currentSource
             this.settings = settings
@@ -379,7 +381,7 @@ class MediaSessionHandler(
             trackPosition: Long,
             playbackSpeed: Float,
             repeatMode: Int,
-            randomMode: Boolean
+            randomMode: Boolean,
         ): PlaybackState {
             this.playerState = playerState
             this.playQueueCurrentItem = playQueueCurrentItem
@@ -423,11 +425,13 @@ class MediaSessionHandler(
         override fun onSetRepeatMode(repeatMode: Int) {
             val appRepeatMode = when (repeatMode) {
                 PlaybackStateCompat.REPEAT_MODE_INVALID,
-                PlaybackStateCompat.REPEAT_MODE_NONE -> {
+                PlaybackStateCompat.REPEAT_MODE_NONE,
+                -> {
                     RepeatMode.NONE
                 }
                 PlaybackStateCompat.REPEAT_MODE_GROUP,
-                PlaybackStateCompat.REPEAT_MODE_ALL -> {
+                PlaybackStateCompat.REPEAT_MODE_ALL,
+                -> {
                     RepeatMode.REPEAT_PLAY_QUEUE
                 }
                 PlaybackStateCompat.REPEAT_MODE_ONE -> {
@@ -456,7 +460,7 @@ class MediaSessionHandler(
 
         override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
             when(mediaId) {
-                RESUME_ACTION_ID -> libraryPlayerInteractor.play()
+                RESUME_ACTION_ID -> SystemServiceControllerImpl.startPlayForegroundService(context)
                 PAUSE_ACTION_ID -> libraryPlayerInteractor.pause()
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     actionDisposable = musicServiceInteractor.shuffleAllAndPlay()
@@ -528,13 +532,13 @@ class MediaSessionHandler(
                 .subscribe({}, this::processError)
         }
 
+        override fun onPrepare() {
+            musicServiceInteractor.prepare()
+        }
+
         //next - not implemented
         override fun onCommand(command: String, extras: Bundle, cb: ResultReceiver) {
             super.onCommand(command, extras, cb)
-        }
-
-        override fun onPrepare() {
-            super.onPrepare()
         }
 
         override fun onPrepareFromMediaId(mediaId: String, extras: Bundle) {

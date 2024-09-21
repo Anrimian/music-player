@@ -12,6 +12,7 @@ import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +29,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposit
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
+import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
@@ -40,6 +42,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
@@ -56,7 +59,6 @@ import com.github.anrimian.musicplayer.ui.playlist_screens.choose.newChoosePlayL
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.BackButtonListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -163,7 +165,8 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView, BackBu
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(binding.rvFileSources)
 
-        binding.flHeader.setOnClickListener { presenter.onBackPathButtonClicked() }
+        binding.tvHeader.setOnClickListener { presenter.onBackPathButtonClicked() }
+        binding.ivBackToRoot.setOnClickListener { goToRootFolder() }
 
         binding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
         ViewUtils.onLongVibrationClick(binding.fab, presenter::onChangeRandomModePressed)
@@ -286,10 +289,13 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView, BackBu
         }
     }
 
-    override fun showFolderInfo(folder: FolderFileSource?) {
+    override fun showFolderInfo(folder: FolderInfo?) {
+        var showRootButton = false
         if (folder != null) {
-            binding.tvHeader.text = folder.name
+            binding.tvHeader.text = folder.path
+            showRootButton = !folder.isParentOfParentRoot
         }
+        binding.ivBackToRoot.isVisible = showRootButton
     }
 
     override fun showEmptyList() {
@@ -534,8 +540,8 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView, BackBu
         }
     }
 
-    private fun showProgressDialog(@StringRes resId: Int) {
-        progressDialogRunner.show(newProgressDialogFragment(resId))
+    private fun showProgressDialog(@StringRes messageResId: Int) {
+        progressDialogRunner.show(ProgressDialogFragment.newInstance(messageResId))
     }
 
     private fun onCompositionMenuClicked(view: View, position: Int, source: CompositionFileSource) {
@@ -673,10 +679,14 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView, BackBu
     }
 
     private fun showEditorRequestDeniedMessage() {
-        MessagesUtils.makeSnackbar(
-            binding.listContainer,
+        binding.listContainer.showSnackbar(
             R.string.android_r_edit_file_permission_denied,
             Snackbar.LENGTH_LONG
-        ).show()
+        )
     }
+
+    private fun goToRootFolder() {
+        FragmentNavigation.from(parentFragmentManager).newRootFragment(newInstance(null))
+    }
+
 }

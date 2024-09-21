@@ -70,7 +70,7 @@ class AlbumEditorPresenter(
         if (lastEditAction != null) {
             RxUtils.dispose(changeDisposable, presenterDisposable)
             changeDisposable = lastEditAction!!
-                .doFinally { lastEditAction = null }
+                .doOnComplete { lastEditAction = null }
                 .subscribe(viewState::showErrorMessage)
         }
     }

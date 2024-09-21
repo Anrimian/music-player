@@ -1,4 +1,4 @@
-package com.github.anrimian.musicplayer.data.utils.file;
+package com.github.anrimian.musicplayer.data.utils.image;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -6,31 +6,8 @@ import android.graphics.BitmapFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.SecureRandom;
 
-public class FileUtils {
-
-    private static final String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    private static final SecureRandom RND = new SecureRandom();
-
-    public static String randomString(int len){
-        StringBuilder sb = new StringBuilder(len);
-        for(int i = 0; i < len; i++) {
-            sb.append(CHARS.charAt(RND.nextInt(CHARS.length())));
-        }
-        return sb.toString();
-    }
-
-    public static byte[] toByteArray(InputStream is) throws IOException {
-        try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
-            byte[] buff = new byte[is.available()];
-            int i;
-            while ((i = is.read(buff, 0, buff.length)) > 0) {
-                stream.write(buff, 0, i);
-            }
-            return stream.toByteArray();
-        }
-    }
+public class BitmapUtils {
 
     public static byte[] getScaledBitmapByteArray(InputStream stream, int maxSize) throws IOException {
         byte[] rawBytes = toByteArray(stream);
@@ -40,13 +17,13 @@ public class FileUtils {
         return scaledBitmapBytes;
     }
 
-    public static byte[] convertBitmapToByteArray(Bitmap bitmap) {
+    private static byte[] convertBitmapToByteArray(Bitmap bitmap) {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream(bitmap.getWidth() * bitmap.getHeight());
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, buffer);
         return buffer.toByteArray();
     }
 
-    public static Bitmap createScaledBitmap(byte[] byteArray, int maxSize) {
+    private static Bitmap createScaledBitmap(byte[] byteArray, int maxSize) {
         BitmapFactory.Options decodeBitmapOptions = new BitmapFactory.Options();
         decodeBitmapOptions.inPreferredConfig = Bitmap.Config.RGB_565;
 
@@ -61,6 +38,17 @@ public class FileUtils {
             decodeBitmapOptions.inSampleSize = Math.max(1, Math.min(originalWidth / maxSize, originalHeight / maxSize));
         }
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, decodeBitmapOptions);
+    }
+
+    private static byte[] toByteArray(InputStream is) throws IOException {
+        try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
+            byte[] buff = new byte[is.available()];
+            int i;
+            while ((i = is.read(buff, 0, buff.length)) > 0) {
+                stream.write(buff, 0, i);
+            }
+            return stream.toByteArray();
+        }
     }
 
 }

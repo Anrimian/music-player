@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.filesync.models.state.file.FileSyncState
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
 import com.github.anrimian.musicplayer.domain.models.utils.PlayListItemHelper
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.diff_utils.SimpleDiffItemCallback
@@ -19,13 +20,14 @@ class PlayListItemAdapter(
     recyclerView: RecyclerView,
     private val coversEnabled: Boolean,
     private val menuClickListener: (View, Int, PlayListItem) -> Unit,
-    private val onIconClickListener: (Int) -> Unit
+    private val onItemClickListener: (PlayListItem, Int) -> Unit
 ) : MvpDiffAdapter<PlayListItem, PlayListItemViewHolder>(
     lifecycleOwner,
     recyclerView,
     SimpleDiffItemCallback(PlayListItemHelper::areSourcesTheSame, PlayListItemHelper::getChangePayload)
 ) {
 
+    private var currentComposition: CurrentComposition? = null
     private var syncStates = emptyMap<Long, FileSyncState>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayListItemViewHolder {
@@ -33,7 +35,7 @@ class PlayListItemAdapter(
             LayoutInflater.from(parent.context),
             parent,
             menuClickListener,
-            onIconClickListener
+            onItemClickListener
         )
     }
 
@@ -41,7 +43,15 @@ class PlayListItemAdapter(
         super.onBindViewHolder(holder, position)
         val composition = getItem(position)
         holder.bind(composition, coversEnabled)
+        holder.showCurrentComposition(currentComposition, false)
         holder.setFileSyncStates(syncStates)
+    }
+
+    fun showCurrentComposition(currentComposition: CurrentComposition?) {
+        this.currentComposition = currentComposition
+        forEachHolder { holder ->
+            holder.showCurrentComposition(currentComposition, true)
+        }
     }
 
     fun showFileSyncStates(states: Map<Long, FileSyncState>) {

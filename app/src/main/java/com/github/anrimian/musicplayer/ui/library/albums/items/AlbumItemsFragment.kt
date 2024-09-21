@@ -24,6 +24,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorActivity
@@ -279,17 +280,16 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView,
     private fun onOptionsItemClicked(item: MenuItem) {
         when (item.itemId) {
             R.id.menu_edit -> presenter.onEditAlbumClicked()
-            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(childFragmentManager)
-            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(childFragmentManager)
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(this)
+            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(this)
         }
     }
 
     private fun showEditorRequestDeniedMessage() {
-        MessagesUtils.makeSnackbar(
-            binding.listContainer,
+        binding.listContainer.showSnackbar(
             R.string.android_r_edit_file_permission_denied,
             Snackbar.LENGTH_LONG
-        ).show()
+        )
     }
 
 }

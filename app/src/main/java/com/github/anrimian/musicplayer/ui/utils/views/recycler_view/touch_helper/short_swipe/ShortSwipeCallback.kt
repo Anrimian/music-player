@@ -14,7 +14,11 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.musicplayer.R
-import com.github.anrimian.musicplayer.ui.utils.*
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
+import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
+import com.github.anrimian.musicplayer.ui.utils.createStaticLayout
+import com.github.anrimian.musicplayer.ui.utils.getDimensionPixelSize
+import com.github.anrimian.musicplayer.ui.utils.getDrawableCompat
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.short_swipe.SwipeListener
 import kotlin.math.abs
 import kotlin.math.max
@@ -137,7 +141,7 @@ class ShortSwipeCallback(
                 val swipeEffectAnimator = this.swipeEffectAnimator
                 if (swipeEffectAnimator?.isRunning == true) {
                     start = swipeEffectAnimator.animatedValue as Float
-                    animationDuration = swipeEffectAnimator.currentPlayTime
+                    animationDuration = swipeEffectAnimator.currentPlayTime.coerceAtLeast(0L)
                     swipeEffectAnimator.cancel()
                 }
                 val end = if (isInfoVisible) APPEAR_ANIM_SCALE_END else APPEAR_ANIM_SCALE_START

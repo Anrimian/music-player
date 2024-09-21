@@ -101,7 +101,7 @@ class LibrarySettingsFragment : MvpAppCompatFragment(),
         showNumberPickerDialog(
             requireContext(),
             0,
-            60,
+            120,
             currentValue / 1000L
         ) { value -> presenter.onAudioFileMinDurationMillisPicked(value * 1000L) }
     }

@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.player_screen
 
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException
+import com.github.anrimian.musicplayer.domain.interactors.player.ActionState
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
 import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
@@ -44,6 +45,7 @@ class PlayerPresenter(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.setButtonPanelState(playerScreenInteractor.isPlayerPanelOpen)
+        viewState.showActionState(ActionState.NO_STATE)
         subscribeOnUiSettings()
         subscribeOnRandomMode()
         subscribeOnSpeedAvailableState()
@@ -59,6 +61,7 @@ class PlayerPresenter(
         playerScreenInteractor.playerScreensSwipeObservable
             .unsafeSubscribeOnUi(viewState::showScreensSwipeEnabled)
         playerScreenInteractor.volumeObservable.unsafeSubscribeOnUi(viewState::onVolumeChanged)
+        playerScreenInteractor.actionStateObservable.unsafeSubscribeOnUi(viewState::showActionState)
     }
 
     fun onSetupScreenStateRequested() {
@@ -130,7 +133,7 @@ class PlayerPresenter(
     }
 
     fun onShareCompositionButtonClicked() {
-        currentItem?.let { item -> viewState.showShareCompositionDialog(item.composition) }
+        currentItem?.let { item -> viewState.showShareCompositionDialog(item) }
     }
 
     fun onTrackRewoundTo(progress: Int) {
@@ -138,13 +141,13 @@ class PlayerPresenter(
     }
 
     fun onDeleteCurrentCompositionButtonClicked() {
-        currentItem?.let { item -> viewState.showConfirmDeleteDialog(listOf(item.composition)) }
+        currentItem?.let { item -> viewState.showConfirmDeleteDialog(listOf(item)) }
     }
 
     fun onAddCurrentCompositionToPlayListButtonClicked() {
         currentItem?.let { item ->
             compositionsForPlayList.clear()
-            compositionsForPlayList.add(item.composition)
+            compositionsForPlayList.add(item)
             viewState.showSelectPlayListDialog()
         }
     }
@@ -166,11 +169,11 @@ class PlayerPresenter(
     }
 
     fun onEditCompositionButtonClicked() {
-        currentItem?.let { item -> viewState.startEditCompositionScreen(item.composition.id) }
+        currentItem?.let { item -> viewState.startEditCompositionScreen(item.id) }
     }
 
     fun onShowCurrentCompositionInFoldersClicked() {
-        currentItem?.let { item -> viewState.locateCompositionInFolders(item.composition) }
+        currentItem?.let { item -> viewState.locateCompositionInFolders(item) }
     }
 
     fun onRestoreDeletedItemClicked() {
@@ -239,18 +242,16 @@ class PlayerPresenter(
 
         if (currentItem == null
             || currentItem != newItem
-            || !CompositionHelper.areSourcesTheSame(newItem.composition, currentItem.composition)) {
+            || !CompositionHelper.areSourcesTheSame(newItem, currentItem)) {
 
             var updateCover = false
             if ((currentItem == null) != (newItem == null)) {
                 updateCover = true
             } else if (currentItem != null && newItem != null)  {
-                val newComposition = newItem.composition
-                val currentComposition = currentItem.composition
-                updateCover = currentComposition.dateModified != newComposition.dateModified
-                        || currentComposition.coverModifyTime != newComposition.coverModifyTime
-                        || currentComposition.size != newComposition.size
-                        || currentComposition.isFileExists != newComposition.isFileExists
+                updateCover = currentItem.dateModified != newItem.dateModified
+                        || currentItem.coverModifyTime != newItem.coverModifyTime
+                        || currentItem.size != newItem.size
+                        || currentItem.isFileExists != newItem.isFileExists
             }
 
             this.currentItem = newItem
@@ -293,10 +294,7 @@ class PlayerPresenter(
     }
 
     private fun onTrackPositionChanged(currentPosition: Long) {
-        currentItem?.let { item ->
-            val duration = item.composition.duration
-            viewState.showTrackState(currentPosition, duration)
-        }
+        currentItem?.let { item -> viewState.showTrackState(currentPosition, item.duration) }
     }
 
     private fun subscribeOnUiSettings() {

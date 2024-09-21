@@ -5,9 +5,11 @@ import com.github.anrimian.filesync.models.repo.RemoteRepoInfo
 
 sealed interface FileSyncState {
 
-    object NotActive : FileSyncState
+    data object NotActive : FileSyncState
 
-    class Uploading(val repoInfo: RemoteRepoInfo) : FileSyncState {
+    abstract class Active(val repoInfo: RemoteRepoInfo): FileSyncState
+
+    class Uploading(repoInfo: RemoteRepoInfo) : Active(repoInfo) {
         private var progressInfo = ProgressInfo()
         fun setProgress(progressInfo: ProgressInfo): Uploading {
             this.progressInfo = progressInfo
@@ -21,7 +23,7 @@ sealed interface FileSyncState {
         }
     }
 
-    class Downloading(val repoInfo: RemoteRepoInfo) : FileSyncState {
+    class Downloading(repoInfo: RemoteRepoInfo) : Active(repoInfo) {
         private var progressInfo = ProgressInfo()
         fun setProgress(progressInfo: ProgressInfo): Downloading {
             this.progressInfo = progressInfo

@@ -183,4 +183,5 @@ public class AppModule {
                                             ErrorParser errorParser) {
         return new WidgetMenuPresenter(libraryPlayerInteractor, uiScheduler, errorParser);
     }
+
 }

@@ -5,10 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingStart="@dimen/content_horizontal_margin"
-    android:paddingEnd="@dimen/content_horizontal_margin"
-    android:paddingTop="@dimen/content_vertical_margin"
-    android:paddingBottom="@dimen/content_vertical_margin">
+    android:paddingHorizontal="@dimen/content_horizontal_margin"
+    android:paddingVertical="@dimen/content_vertical_margin">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         style="@style/CircularProgressIndicatorStyle"

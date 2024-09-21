@@ -1,5 +1,3 @@
-//include ':presentation'
-//include ':presentation:lite'
 include ':app'
 include ':app:lite'
 include ':data'

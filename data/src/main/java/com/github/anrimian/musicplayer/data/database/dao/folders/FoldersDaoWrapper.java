@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
@@ -70,7 +71,7 @@ public class FoldersDaoWrapper {
                 });
     }
 
-    public Observable<FolderFileSource> getFolderObservable(long folderId) {
+    public Observable<FolderInfo> getFolderObservable(long folderId) {
         return foldersDao.getFolderObservable(folderId)
                 .takeWhile(list -> !list.isEmpty())
                 .map(list -> list.get(0));
@@ -149,6 +150,10 @@ public class FoldersDaoWrapper {
             result.addAll(foldersDao.getAllParentFoldersId(currentFolder));
         }
         return result;
+    }
+
+    public List<String> getFolderNamesInFolder(@Nullable Long folderId) {
+        return foldersDao.getFolderNamesInFolder(folderId);
     }
 
     public void updateFolderId(Collection<FileSource> files, @Nullable Long toFolderId) {

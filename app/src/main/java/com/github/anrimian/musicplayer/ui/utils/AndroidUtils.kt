@@ -4,8 +4,12 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -16,16 +20,24 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RemoteViews
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
+import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.IntegerRes
 import androidx.annotation.MenuRes
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import java.io.Serializable
 
 fun Context.getDimensionPixelSize(@DimenRes resId: Int): Int {
@@ -35,6 +47,28 @@ fun Context.getDimensionPixelSize(@DimenRes resId: Int): Int {
 fun Context.colorFromAttr(@AttrRes attr: Int) = AndroidUtils.getColorFromAttr(this, attr)
 
 fun Context.attrColor(@AttrRes attr: Int) = AndroidUtils.getColorFromAttr(this, attr)
+
+val Fragment.args get() = arguments!!
+
+fun Fragment.attrColor(@AttrRes attr: Int) = context!!.attrColor(attr)
+
+fun Fragment.getDimensionPixelSize(@DimenRes resId: Int): Int {
+    return resources.getDimensionPixelSize(resId)
+}
+
+val RecyclerView.ViewHolder.context: Context get() = itemView.context
+
+val RecyclerView.ViewHolder.resources: Resources get() = itemView.resources
+
+fun RecyclerView.ViewHolder.getString(@StringRes id: Int) = context.getString(id)
+
+fun RecyclerView.ViewHolder.getString(@StringRes id: Int, vararg format: Any): String {
+    return context.getString(id, *format)
+}
+
+fun RecyclerView.ViewHolder.getColor(@ColorRes id: Int) = ContextCompat.getColor(context, id)
+
+fun RecyclerView.ViewHolder.getInteger(@IntegerRes id: Int) = this.resources.getInteger(id)
 
 fun startAppSettings(activity: Activity) {
     val intent = Intent()
@@ -99,7 +133,7 @@ inline fun <reified T : Serializable> Bundle.getSerializableExtra(key: String): 
 fun getMenuItems(
     context: Context,
     @MenuRes menuRes: Int,
-    menuModifier: (MenuItem) -> Unit
+    menuModifier: (MenuItem) -> Unit,
 ): List<MenuItem> {
     val menu = MenuBuilder(context)
     SupportMenuInflater(context).inflate(menuRes, menu)
@@ -122,6 +156,20 @@ fun TextView.setDrawableStart(@DrawableRes id: Int, @DimenRes sizeRes: Int) {
         setCompoundDrawables(null, null, drawable, null)
     } else {
         setCompoundDrawables(drawable, null, null, null)
+    }
+}
+
+fun AppWidgetManager.safeUpdateAppWidget(provider: ComponentName, views: RemoteViews) {
+    try {
+        updateAppWidget(provider, views)
+    } catch (ignored: Exception) {}
+}
+
+fun  <I> ActivityResultLauncher<I>.safeLaunch(context: Context, input: I) {
+    try {
+        launch(input)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(context, "App to launch not found", Toast.LENGTH_SHORT).show()
     }
 }
 

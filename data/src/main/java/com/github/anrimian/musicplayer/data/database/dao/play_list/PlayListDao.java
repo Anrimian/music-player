@@ -10,12 +10,12 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListEntry;
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlayList;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 
 import java.util.Date;
 import java.util.List;
@@ -108,7 +108,7 @@ public interface PlayListDao {
     Observable<List<PlayList>> getPlayListObservable(long id);
 
     @RawQuery(observedEntities = { PlayListEntryEntity.class, ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
-    Observable<List<PlayListEntryDto>> getPlayListItemsObservable(SimpleSQLiteQuery query);
+    Observable<List<PlayListItem>> getPlayListItemsObservable(SimpleSQLiteQuery query);
 
     @Query("SELECT playlistId FROM play_lists_entries WHERE audioId = :compositionId")
     List<Long> getPlaylistsForComposition(long compositionId);

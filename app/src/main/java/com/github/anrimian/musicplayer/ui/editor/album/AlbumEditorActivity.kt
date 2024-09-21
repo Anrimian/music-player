@@ -12,6 +12,7 @@ import com.github.anrimian.musicplayer.databinding.ActivityAlbumEditBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
+import com.github.anrimian.musicplayer.ui.common.activity.BaseMvpAppCompatActivity
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
@@ -21,16 +22,14 @@ import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.setToolbar
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.google.android.material.snackbar.Snackbar
-import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 
-class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
+class AlbumEditorActivity : BaseMvpAppCompatActivity(), AlbumEditorView {
 
     companion object {
         fun newIntent(
@@ -96,12 +95,6 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
         })
     }
 
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(
-            Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
-        )
-    }
-
     override fun closeScreen() {
         finish()
     }
@@ -124,7 +117,7 @@ class AlbumEditorActivity : MvpAppCompatActivity(), AlbumEditorView {
     }
 
     override fun showRenameProgress() {
-        progressDialogRunner.show(newProgressDialogFragment(R.string.rename_progress))
+        progressDialogRunner.show(ProgressDialogFragment.newInstance(R.string.rename_progress))
     }
 
     override fun hideRenameProgress() {

@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.player_screen
 
 import com.github.anrimian.filesync.models.state.file.FileSyncState
+import com.github.anrimian.musicplayer.domain.interactors.player.ActionState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
@@ -99,5 +100,8 @@ interface PlayerView : BaseLibraryView {
 
     @AddToEndSingle
     fun onVolumeChanged(volume: VolumeState)
+
+    @AddToEndSingle
+    fun showActionState(actionState: ActionState)
 
 }

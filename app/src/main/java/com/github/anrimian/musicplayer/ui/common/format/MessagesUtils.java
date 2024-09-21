@@ -44,7 +44,7 @@ public class MessagesUtils {
         int size = items.size();
         if (size == 1) {
             return context.getString(R.string.delete_from_playlist_success_template,
-                    formatCompositionName(items.get(0).getComposition()),
+                    formatCompositionName(items.get(0)),
                     playList.getName());
         } else {
             return context.getResources().getQuantityString(

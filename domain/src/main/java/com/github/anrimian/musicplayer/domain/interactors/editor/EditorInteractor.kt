@@ -106,8 +106,7 @@ class EditorInteractor(
 
     fun editCompositionFileName(compositionId: Long, newFileName: String): Completable {
         return editorRepository.changeCompositionFileName(compositionId, newFileName)
-            .doOnSuccess { path -> syncInteractor.onLocalFileKeyChanged(path.toKeyPair()) }
-            .ignoreElement()
+            .flatMapCompletable { path -> syncInteractor.onLocalFileKeyChanged(path.toKeyPair()) }
     }
 
     fun getCompositionObservable(id: Long): Observable<FullComposition> {

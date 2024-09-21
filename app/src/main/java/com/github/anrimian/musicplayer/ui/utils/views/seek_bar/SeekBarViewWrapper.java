@@ -15,6 +15,7 @@ public class SeekBarViewWrapper {
 
     private boolean isOnTouch;
     private int progress;
+    private int max;
 
     public SeekBarViewWrapper(SeekBar seekBar) {
         this.seekBar = seekBar;
@@ -52,21 +53,23 @@ public class SeekBarViewWrapper {
         }
     }
 
+    public void setProgress(long progress, long max) {
+        int newMax = (int) max;
+        if (this.max != newMax) {
+            this.max = newMax;
+            seekBar.setMax(newMax);
+        }
+        if (!isOnTouch) {
+            this.progress = (int) progress;
+            seekBar.setProgress(this.progress);
+        }
+    }
+
     public void setProgress(int progress) {
         if (!isOnTouch) {
             this.progress = progress;
             seekBar.setProgress(this.progress);
         }
-    }
-
-    public void setMax(long max) {
-        seekBar.setMax((int) max);
-        seekBar.setProgress(progress);
-    }
-
-    public void setMax(int max) {
-        seekBar.setMax(max);
-        seekBar.setProgress(progress);
     }
 
     public void setOnSeekStartListener(OnSeekStartListener onSeekStartListener) {

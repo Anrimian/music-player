@@ -22,6 +22,7 @@ public class SchedulerModule {
 
     public static final String IO_SCHEDULER = "io_scheduler";
     public static final String UI_SCHEDULER = "ui_scheduler";
+    public static final String COMPUTATION_SCHEDULER = "computation_scheduler";
     //replace db scheduler with io scheduler. Check sequential write operations
     //+play queue skipTo
     public static final String DB_SCHEDULER = "db_scheduler";
@@ -41,6 +42,14 @@ public class SchedulerModule {
     @Singleton
     Scheduler provideUiScheduler() {
         return AndroidSchedulers.mainThread();
+    }
+
+    @Provides
+    @NonNull
+    @Named(COMPUTATION_SCHEDULER)
+    @Singleton
+    Scheduler provideComputationScheduler() {
+        return Schedulers.computation();
     }
 
     @Provides

@@ -4,11 +4,12 @@ apply from: 'dependencies.gradle'
 
 buildscript {
     repositories {
+        gradlePluginPortal()
         mavenCentral()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath 'com.android.tools.build:gradle:8.5.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:1.10.0.0"
     }

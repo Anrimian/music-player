@@ -1,10 +1,9 @@
-package com.github.anrimian.musicplayer.di.app.editor.album;
+package com.github.anrimian.musicplayer.di.app.editor.album
 
-import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorPresenter;
+import com.github.anrimian.musicplayer.ui.editor.album.AlbumEditorPresenter
+import dagger.Subcomponent
 
-import dagger.Subcomponent;
-
-@Subcomponent(modules = AlbumEditorModule.class)
-public interface AlbumEditorComponent {
-    AlbumEditorPresenter albumEditorPresenter();
+@Subcomponent(modules = [ AlbumEditorModule::class ])
+interface AlbumEditorComponent {
+    fun albumEditorPresenter(): AlbumEditorPresenter
 }

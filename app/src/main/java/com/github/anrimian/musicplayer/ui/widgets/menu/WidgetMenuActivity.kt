@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.widgets.menu
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -14,6 +13,7 @@ import com.github.anrimian.musicplayer.databinding.PartialWidgetMenuHeaderBindin
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
+import com.github.anrimian.musicplayer.ui.common.activity.BaseMvpAppCompatActivity
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -25,10 +25,9 @@ import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuAdapter
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SingleItemAdapter
-import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 
-class WidgetMenuActivity: MvpAppCompatActivity(), WidgetMenuView {
+class WidgetMenuActivity: BaseMvpAppCompatActivity(), WidgetMenuView {
 
     private val presenter by moxyPresenter { Components.getAppComponent().widgetMenuPresenter() }
 
@@ -64,12 +63,6 @@ class WidgetMenuActivity: MvpAppCompatActivity(), WidgetMenuView {
         if (savedInstanceState == null) {
             applyCompositionId(intent)
         }
-    }
-
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(
-            Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
-        )
     }
 
     override fun onNewIntent(intent: Intent) {

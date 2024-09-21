@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.data.utils.rx
 
 import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -19,6 +20,23 @@ fun <T: Any> Observable<T>.retryWithDelay(
                 Observable.timer(delay, unit)
             } else {
                 Observable.error(throwable)
+            }
+        }
+    }
+}
+
+fun <T: Any> Flowable<T>.retryWithDelay(
+    maxRetryCount: Int,
+    delay: Long,
+    unit: TimeUnit
+): Flowable<T> {
+    var retryCount = 0
+    return retryWhen { observable ->
+        observable.flatMap { throwable ->
+            if (++retryCount < maxRetryCount) {
+                Flowable.timer(delay, unit)
+            } else {
+                Flowable.error(throwable)
             }
         }
     }

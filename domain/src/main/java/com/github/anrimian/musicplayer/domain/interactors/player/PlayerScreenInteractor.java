@@ -111,8 +111,12 @@ public class PlayerScreenInteractor {
                     if (item == null) {
                         return Observable.just(FileSyncState.NotActive.INSTANCE);
                     }
-                    return syncInteractor.getFileSyncStateObservable(item.getComposition().getId());
+                    return syncInteractor.getFileSyncStateObservable(item.getId());
                 });
+    }
+
+    public Observable<ActionState> getActionStateObservable() {
+        return Observable.just(ActionState.NO_STATE);
     }
 
     public Observable<PlayQueueData> getPlayQueueDataObservable() {

@@ -1,6 +1,8 @@
 package com.github.anrimian.musicplayer.di;
 
 
+import android.content.Context;
+
 import com.github.anrimian.musicplayer.di.app.AppComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorComponent;
 import com.github.anrimian.musicplayer.di.app.editor.album.AlbumEditorModule;
@@ -43,6 +45,10 @@ import com.github.anrimian.musicplayer.di.app.share.ShareComponent;
 import com.github.anrimian.musicplayer.di.app.share.ShareModule;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
 import javax.annotation.Nullable;
 
 
@@ -62,6 +68,66 @@ public class Components {
         instance = new Components(appComponent);
     }
 
+    /*
+     * Experiment:
+     * After refactor MainActivity to kt crashes started to appear: uninitialized components here
+     *  1) Moved this method to base java class
+     *     Observe how it works
+     *      - has no effect
+     *  2) Moved components initialization to Application.attachBaseContext
+     *     Based on answer https://stackoverflow.com/a/56676594/5541688
+     *     Observe how it works - doesn't work
+     *  3) Possible next option: separate singleton and builder for locale controller
+     *     Implemented separate initialization for this case
+     *     Observe how it works - crashes later
+     *  4) Initialize here if not initialized - observe how it works
+     *     Doesn't work either
+     *  5) Add to proguard rule to keep getInstance() in LiteComponents
+     *     If it helps - remove initialization from attempt 4
+     *     Issue: can't find method init()
+     *  5) Remake LiteComponents to kotlin object
+     *     If works: try to remote reflection initializer(with r8 rules?); copy approach to SyncComponents;
+     *     No, doesn't work
+     *  5.1) Fixed reflection initializer
+     *  Spotted crashes in AppWidgets(after system restart) and in MediaBrowserService
+     */
+    public static void checkInitialization(Context appContext) {
+        if (!Components.isInitialized()) {
+            try {
+                Class<?> clazz;
+                try {
+                    clazz = Class.forName("com.github.anrimian.musicplayer.lite.di.LiteComponents");
+                } catch (ClassNotFoundException e) {
+                    clazz = Class.forName("com.github.anrimian.musicplayer.sync.di.SyncComponents");
+                }
+                // looking for method init(Context)
+                Method method = null;
+                for (Method m : clazz.getDeclaredMethods()) {
+                    if (m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(Context.class)) {
+                        method = m;
+                        break;
+                    }
+                }
+                if (method == null) {
+                    throw new NoSuchMethodException();
+                }
+                Field[] fields = clazz.getDeclaredFields();
+                Object instance = null;
+                for (Field field : fields) {
+                    if (Modifier.isFinal(field.getModifiers())) {
+                        instance = field.get(null);
+                    }
+                }
+                if (instance == null) {
+                    throw new NoSuchFieldException();
+                }
+                method.invoke(instance, appContext);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     private static Components getInstance() {
         if (instance == null) {
             throw new IllegalStateException("components must be initialized first");
@@ -75,6 +141,10 @@ public class Components {
 
     public static AppComponent getAppComponent() {
         return getInstance().appComponent;
+    }
+
+    public static boolean isInitialized() {
+        return instance != null;
     }
 
     public static LibraryComponent getLibraryComponent() {

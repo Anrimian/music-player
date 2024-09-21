@@ -1,24 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:background="?attr/colorPrimary"
-    android:theme="@style/ToolbarStyle">
+    tools:layout_width="match_parent"
+    tools:layout_height="?attr/actionBarSize"
+    tools:background="?attr/colorPrimary"
+    tools:theme="@style/ToolbarStyle"
+    tools:parentTag="android.widget.FrameLayout">
 
-    <!--margin end fixes offset on tablets-->
-    <androidx.appcompat.widget.Toolbar
+    <LinearLayout
         android:id="@+id/toolbarInternal"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:paddingEnd="0dp"
-        tools:navigationIcon="@drawable/ic_menu"
-        tools:ignore="RtlSymmetry">
+        android:layout_height="?attr/actionBarSize">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/ivNavigation"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:contentDescription="@string/open_drawer"
+                android:background="?actionBarItemBackground"
+                android:layout_marginStart="@dimen/toolbar_nav_icon_margin_start"
+                android:layout_marginEnd="20dp"
+                tools:src="@drawable/ic_back"/>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivNavHint"
+                style="@style/BaseShapeableImageStyle"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="?colorPrimary"
+                android:layout_marginStart="@dimen/toolbar_nav_icon_margin_start"
+                android:translationX="28dp"
+                android:translationY="12dp"
+                app:tint="?attr/toolbarTextColorPrimary"
+                app:shapeAppearance="@style/ShapeAppearance.CircleImageView"
+                tools:src="@drawable/ic_repeat" />
+
+        </FrameLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/titleContainer"
+            android:id="@+id/clTitleContainer"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize">
 
@@ -95,10 +122,10 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.appcompat.widget.Toolbar>
+    </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/flToolbarContentContainer"
+        android:id="@+id/flToolbarModes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/toolbar_content_start">
@@ -116,12 +143,11 @@
             android:background="@android:color/transparent"
             android:textColor="@color/color_text_toolbar_primary"
             android:textColorHint="@color/color_text_secondary_inverse"
-            android:textCursorDrawable="@drawable/bg_toolbar_text_cursor"
             android:maxLines="1"
             tools:ignore="UnusedAttribute" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/selectionModeContainer"
+            android:id="@+id/clSelectionMode"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -150,4 +176,4 @@
 
     </FrameLayout>
 
-</com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar>
+</merge>

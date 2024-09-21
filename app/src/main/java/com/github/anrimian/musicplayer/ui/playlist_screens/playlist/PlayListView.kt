@@ -2,6 +2,7 @@ package com.github.anrimian.musicplayer.ui.playlist_screens.playlist
 
 import com.github.anrimian.filesync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
@@ -78,6 +79,9 @@ interface PlayListView : BaseLibraryView {
 
     @AddToEndSingle
     fun showRandomMode(isRandomModeEnabled: Boolean)
+
+    @AddToEndSingle
+    fun showCurrentComposition(currentComposition: CurrentComposition)
 
     @AddToEndSingle
     fun setDragEnabled(enabled: Boolean)

@@ -22,12 +22,6 @@ import java.io.FileNotFoundException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-//apply genres data
-
-private const val FILES_TO_SCAN_COUNT = 150
-private const val READ_RETRY_TIMES = 2L
-private const val READ_FILE_TIMEOUT_SECONDS = 6L
-
 class FileScanner(
     private val compositionsDao: CompositionsDaoWrapper,
     private val compositionSourceEditor: CompositionSourceEditor,
@@ -130,4 +124,11 @@ class FileScanner(
         }
         analytics.processNonFatalError(throwable)
     }
+
+    private companion object {
+        const val FILES_TO_SCAN_COUNT = 150
+        const val READ_RETRY_TIMES = 2L
+        const val READ_FILE_TIMEOUT_SECONDS = 6L
+    }
+
 }

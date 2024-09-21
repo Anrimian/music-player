@@ -1,15 +1,12 @@
-package com.github.anrimian.musicplayer.di.app.library.compositions;
+package com.github.anrimian.musicplayer.di.app.library.compositions
 
-import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsPresenter;
-import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersPresenter;
-
-import dagger.Subcomponent;
+import com.github.anrimian.musicplayer.ui.library.compositions.LibraryCompositionsPresenter
+import dagger.Subcomponent
 
 /**
  * Created on 31.10.2017.
  */
-@Subcomponent(modules = LibraryCompositionsModule.class)
-public interface LibraryCompositionsComponent {
-
-    LibraryCompositionsPresenter libraryCompositionsPresenter();
+@Subcomponent(modules = [ LibraryCompositionsModule::class ])
+interface LibraryCompositionsComponent {
+    fun libraryCompositionsPresenter(): LibraryCompositionsPresenter
 }

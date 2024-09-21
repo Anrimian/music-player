@@ -10,21 +10,16 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import androidx.annotation.DrawableRes
+import androidx.core.animation.addListener
+import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
 import kotlin.math.min
 
-//TODO (?) change design, draw circular progress bar in cover.
-// but where to draw download/upload icon?
-
-//TODO check redraw engine, consider copying circular progress indicator
-//TODO short blinking (cloud icon after start)
-//TODO close animation is too fast or just not works
-//TODO when state is translucent overlap is visible
-// A: just set different color to corrupted composition
-//based on https://github.com/2hamed/ProgressCircula/blob/master/progresscircula/src/main/java/com/hmomeni/progresscircula/ProgressCircula.kt
+//short blinking (cloud icon after start) - reproduce
 class ProgressView(
     context: Context,
     attributeSet: AttributeSet? = null,
@@ -35,31 +30,31 @@ class ProgressView(
         context: Context,
         attributeSet: AttributeSet? = null
     ) : this(context, attributeSet, 0) {
-        speed = 0.5f
         iconTint = context.colorFromAttr(android.R.attr.textColorPrimaryInverse)
     }
 
-    private val progressRect = RectF()
-    private var progressBarPadding = 2f
-
+    private val progressBarPadding = 2f
+    private val progressStrokeWidth = 4f
     private val intermediateSweepAngle = 6f
-    private var sweepAngle = 0f
-    private var sweepStep = 4
+    private val iconPaddingExtra = 1
+    private val strokeSize = 2f
+
+
+    private val progressRect = RectF()
+
     private var startAngle = 0f
-    private var speed = 4f
+    private var sweepAngle = 0f
 
     private var bgRadius = 0f
 
     private var centerX = 0f
     private var centerY = 0f
 
-    private var progressStrokeWidth = 3f
-
     private var progress = -1
     private var indeterminate = false
 
     private var iconDrawable: Drawable? = null
-    private var iconPadding = 10//can be calculated
+    private var iconPadding = 0
     private var iconTint = 0
 
     private var scale = 0f
@@ -72,8 +67,7 @@ class ProgressView(
         isAntiAlias = true
     }
 
-    private val cornerSize = 2f
-    private val cornerPaint = Paint().apply {
+    private val strokePaint = Paint().apply {
         color = context.colorFromAttr(R.attr.listItemBackground)
     }
 
@@ -81,6 +75,8 @@ class ProgressView(
         color = context.colorFromAttr(R.attr.colorAccent)
     }
 
+    private val invalidateAnimator = createInvalidateAnimator()
+    private var sweepAngleAnimator: ValueAnimator? = null
     private var visibilityAnimator: ValueAnimator? = null
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -90,7 +86,9 @@ class ProgressView(
 
         bgRadius = min(width, height)/2
 
-        val progressBarRadius = bgRadius - paddingBottom - progressStrokeWidth/2 - progressBarPadding - cornerSize
+        val pbCenter = paddingBottom + progressStrokeWidth/2 + progressBarPadding + strokeSize
+        val progressBarRadius = bgRadius - pbCenter
+        iconPadding = (pbCenter + progressStrokeWidth/2).toInt() + iconPaddingExtra
 
         centerX = width/2
         centerY = height/2
@@ -115,52 +113,33 @@ class ProgressView(
 
         canvas.scale(scale, scale, centerX, centerY)
 
-        if (iconDrawable != null || isProgressActive()) {
-            canvas.drawCircle(centerX, centerX, bgRadius, cornerPaint)
-            canvas.drawCircle(centerX, centerX, bgRadius - cornerSize, bgPaint)
-        }
+        canvas.drawCircle(centerX, centerX, bgRadius, strokePaint)
+        canvas.drawCircle(centerX, centerX, bgRadius - strokeSize, bgPaint)
 
         iconDrawable?.draw(canvas)
 
         if (isProgressActive()) {
-            startAngle += sweepStep * speed
-            if (startAngle > 360f) {
-                startAngle = 0f
-            }
-
-            sweepAngle = if (indeterminate) {
-                intermediateSweepAngle
-            } else {
-                (progress / 100f * 360).coerceAtLeast(intermediateSweepAngle)
-            }
-
             canvas.drawArc(progressRect, startAngle, sweepAngle, false, progressPaint)
-            postInvalidate()
         }
-
     }
 
     fun setProgress(progress: Int) {
-        this.progress = progress
-        this.indeterminate = false
-        invalidate()
-        startVisibilityAnimation()
+        updateProgress(progress, false)
+        setProgressInvalidation(true)
     }
 
     fun setIndeterminate(indeterminate: Boolean) {
-        this.indeterminate = indeterminate
-        invalidate()
-        startVisibilityAnimation()
+        updateProgress(progress, indeterminate)
+        setProgressInvalidation(true)
     }
 
     fun clearProgress() {
-        this.indeterminate = false
-        progress = -1
-        startVisibilityAnimation()
+        updateProgress(-1, false)
+        setProgressInvalidation(false)
     }
 
     fun setIconResource(@DrawableRes resId: Int) {
-        iconDrawable = ContextCompat.getDrawable(context, resId)
+        val iconDrawable = ContextCompat.getDrawable(context, resId)
         iconDrawable?.run {
             setBounds(
                 iconPadding,
@@ -170,26 +149,32 @@ class ProgressView(
             )
             setTint(iconTint)
         }
+        setIconDrawable(iconDrawable)
+    }
+
+    fun setIconDrawable(drawable: Drawable?) {
+        iconDrawable = drawable
         invalidate()
-        startVisibilityAnimation()
     }
 
     fun clearIcon() {
         iconDrawable = null
         invalidate()
-        startVisibilityAnimation()
     }
 
-    private fun isProgressActive() = indeterminate || progress >= 0
-
-    private fun startVisibilityAnimation() {
-        val targetScale = if (isProgressActive()) 1f else 0f
-        if (iconDrawable != null) {
-            scale = 1f
-            invalidate()
+    fun setVisible(
+        isVisible: Boolean,
+        animate: Boolean,
+        clearIcon: Boolean = false,
+        clearProgress: Boolean = false,
+    ) {
+        val targetScale = if (isVisible) 1f else 0f
+        if (targetScale == scale) {
             return
         }
-        if (targetScale == scale) {
+        if (!animate) {
+            scale = targetScale
+            invalidate()
             return
         }
         visibilityAnimator?.cancel()
@@ -198,10 +183,67 @@ class ProgressView(
                 scale = animator.animatedValue as Float
                 invalidate()
             }
-            interpolator = if (targetScale == 1f) DecelerateInterpolator() else AccelerateInterpolator()
-            duration = 300
+            addListener {
+                doOnEnd {
+                    if (clearIcon) {
+                        clearIcon()
+                    }
+                    if (clearProgress) {
+                        clearProgress()
+                    }
+                }
+            }
+            interpolator = if (isVisible) DecelerateInterpolator() else AccelerateInterpolator()
+            duration = if (isVisible) 300 else 150
             start()
         }
+    }
+
+    private fun isProgressActive() = indeterminate || progress >= 0
+
+    private fun setProgressInvalidation(isStarted: Boolean) {
+        if (isStarted) {
+            if (!invalidateAnimator.isRunning) {
+                invalidateAnimator.start()
+            }
+        } else {
+            invalidateAnimator.cancel()
+        }
+    }
+
+    private fun updateProgress(progress: Int, indeterminate: Boolean) {
+        this.indeterminate = indeterminate
+        this.progress = progress
+
+        val newSweepAngle = if (indeterminate) {
+            intermediateSweepAngle
+        } else {
+            (progress / 100f * 360).coerceAtLeast(intermediateSweepAngle)
+        }
+        if (sweepAngle != newSweepAngle) {
+            sweepAngleAnimator?.cancel()
+            val anim = ValueAnimator.ofFloat(sweepAngle, newSweepAngle)
+            anim.duration = 900
+            anim.addUpdateListener { a ->
+                sweepAngle = a.animatedValue as Float
+            }
+            anim.interpolator = LinearInterpolator()
+            anim.start()
+            sweepAngleAnimator = anim
+        }
+    }
+
+    private fun createInvalidateAnimator(): ValueAnimator {
+        val anim = ValueAnimator.ofFloat(0f, 360f)
+        anim.duration = 2500
+        anim.repeatCount = ValueAnimator.INFINITE
+        anim.repeatMode = ValueAnimator.RESTART
+        anim.addUpdateListener { a ->
+            startAngle = a.animatedValue as Float
+            invalidate()
+        }
+        anim.interpolator = LinearInterpolator()
+        return anim
     }
 
 }

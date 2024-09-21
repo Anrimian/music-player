@@ -15,7 +15,9 @@ import io.reactivex.rxjava3.core.Single
 
 class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
     override fun onAppStarted() {}
-    override fun requestFileSync() {}
+    override fun requestFileSync(ignoreConditions: Boolean) {}
+    override fun cancelCurrentTask() {}
+
     override fun runFileTasks() {}
 
     override fun addRemoteRepository(template: RepoSetupTemplate): Completable {
@@ -30,13 +32,18 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
         return Completable.never()
     }
     override fun onLocalFileAdded() {}
-    override fun onLocalFileDeleted(key: K) {}
-    override fun onLocalFilesDeleted(keys: List<K>) {}
-    override fun onLocalFileKeyChanged(key: Pair<K, K>) {}
-    override fun onLocalFilesKeyChanged(keys: List<Pair<K, K>>) {}
+    override fun onLocalFileDeleted(key: K, time: Long) = Completable.complete()
+    override fun onLocalFilesDeleted(keys: List<K>, time: Long) = Completable.complete()
+    override fun onLocalFileRestored(key: K, time: Long) = Completable.complete()
+    override fun onLocalFilesRestored(keys: List<K>, time: Long) = Completable.complete()
+    override fun onLocalFileKeyChanged(key: Pair<K, K>, time: Long) = Completable.complete()
+    override fun onLocalFilesKeyChanged(keys: List<Pair<K, K>>, time: Long) = Completable.complete()
     override fun notifyLocalFileChanged() {}
     override fun isSyncEnabled() = false
     override fun setSyncEnabled(enabled: Boolean) {}
+    override fun isSyncEnabledAndSet() = false
+    override fun resetReposState() = Completable.complete()
+    override fun resetReposStateAndLogout() = Completable.complete()
     override fun onScheduledSyncCalled(): Completable = Completable.never()
     override fun getSyncConditions(): List<SyncEnvCondition> {
         return emptyList()

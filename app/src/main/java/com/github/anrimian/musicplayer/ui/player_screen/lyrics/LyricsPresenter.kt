@@ -35,7 +35,7 @@ class LyricsPresenter(
     }
 
     private fun onCurrentQueueItemChanged(event: PlayQueueEvent) {
-        currentComposition = event.playQueueItem?.composition
+        currentComposition = event.playQueueItem
         viewState.resetTextPosition()
     }
 

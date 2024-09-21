@@ -216,6 +216,9 @@ public interface CompositionsDao {
     @Query("DELETE FROM compositions WHERE id in (:ids)")
     void delete(Long[] ids);
 
+    @Query("DELETE FROM compositions WHERE storageId IS NULL")
+    void deleteCompositionsWithoutStorageId();
+
     @Query("UPDATE compositions SET artistId = :artistId WHERE id = :id")
     void updateArtist(long id, Long artistId);
 
@@ -334,32 +337,37 @@ public interface CompositionsDao {
     @Query("SELECT folderId FROM compositions WHERE id = :id")
     Long getFolderId(long id);
 
-    @Query("WITH RECURSIVE allChildFolders(childFolderId, rootFolderId) AS (" +
-            "SELECT id as childFolderId, id as rootFolderId FROM folders " +
-            "WHERE parentId = :parentFolderId OR (parentId IS NULL AND :parentFolderId IS NULL)" +
+    @Query("WITH RECURSIVE allChildFolders(cfId, cfPId, name) AS (" +
+            "SELECT " +
+            "   folders.id as cfId, " +
+            "   folders.parentId as cfPId, " +
+            "   folders.name as name " +
+            "   FROM folders " +
+            "   WHERE parentId = :parentFolderId OR (parentId IS NULL AND :parentFolderId IS NULL)" +
             "UNION " +
-            "SELECT id as childFolderId, allChildFolders.rootFolderId as rootFolderId FROM folders INNER JOIN allChildFolders ON parentId = allChildFolders.childFolderId" +
+            "SELECT" +
+            "   folders.id as cfId, " +
+            "   folders.parentId as cfPId, " +
+            "   folders.name as name " +
+            "   FROM folders " +
+            "   INNER JOIN allChildFolders ON parentId = allChildFolders.cfId" +
             "), " +
             "entries(genreId, position) AS (SELECT genreId, position FROM genre_entries) " +
             "SELECT " +
             "(WITH RECURSIVE path(level, name, parentId) AS (" +
-            "                SELECT 0, name, parentId " +
-            "                FROM folders " +
-            "                WHERE id = compositions.folderId " +
-            "                UNION ALL " +
-            "                SELECT path.level + 1, " +
-            "                       folders.name, " +
-            "                       folders.parentId " +
-            "                FROM folders " +
-            "                JOIN path ON folders.id = path.parentId " +
-            "            ), " +
-            "            path_from_root AS ( " +
-            "                SELECT name " +
-            "                FROM path " +
-            "                ORDER BY level DESC " +
-            "            ) " +
-            "            SELECT IFNULL(group_concat(name, '/'), '') " +
-            "            FROM path_from_root" +
+            "   SELECT 0, name, cfPId " +
+            "   FROM allChildFolders " +
+            "   WHERE cfId = compositions.folderId " +
+            "   UNION ALL " +
+            "   SELECT path.level + 1, allChildFolders.name, allChildFolders.cfPId " +
+            "   FROM allChildFolders " +
+            "   JOIN path ON allChildFolders.cfId = path.parentId " +
+            "), " +
+            "path_from_root AS ( " +
+            "   SELECT name FROM path ORDER BY level DESC " +
+            ") " +
+            "   SELECT IFNULL(group_concat(name, '/'), '') " +
+            "   FROM path_from_root" +
             ") AS parentPath, " +
             "fileName as fileName, " +
             "title as title, " +
@@ -384,7 +392,7 @@ public interface CompositionsDao {
             "coverModifyTime as coverModifyTime, " +
             "storageId IS NOT NULL AS isFileExists " +
             "FROM compositions " +
-            "WHERE folderId IN (SELECT childFolderId FROM allChildFolders)" +
+            "WHERE folderId IN (SELECT cfId FROM allChildFolders)" +
             "   OR (folderId = :parentFolderId OR (folderId IS NULL AND :parentFolderId IS NULL))")
     List<ExternalComposition> getAllAsExternalCompositions(Long parentFolderId);
 
@@ -478,6 +486,7 @@ public interface CompositionsDao {
                 "(" + (useFileName? "fileName": "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END") + ") as title, " +
                 "compositions.duration AS duration, " +
                 "compositions.size AS size, " +
+                "compositions.comment AS comment, " +
                 "compositions.dateAdded AS dateAdded, " +
                 "compositions.dateModified AS dateModified, " +
                 "compositions.coverModifyTime AS coverModifyTime, " +

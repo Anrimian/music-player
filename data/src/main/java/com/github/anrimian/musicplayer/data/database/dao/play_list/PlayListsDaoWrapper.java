@@ -2,13 +2,11 @@ package com.github.anrimian.musicplayer.data.database.dao.play_list;
 
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArg;
 import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
-import static com.github.anrimian.musicplayer.domain.utils.ListUtils.mapList;
 
 import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
-import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryDto;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 import com.github.anrimian.musicplayer.data.models.exceptions.DuplicatePlaylistEntriesException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
@@ -140,8 +138,7 @@ public class PlayListsDaoWrapper {
         String[] searchArgs = getSearchArgs(searchText, 3);
         System.arraycopy(searchArgs, 0, args, 1, 3);
         SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, args);
-        return playListDao.getPlayListItemsObservable(sqlQuery)
-                .map(entities -> mapList(entities, this::toItem));
+        return playListDao.getPlayListItemsObservable(sqlQuery);
     }
 
     public Set<Long> getPlayListsForCompositions(List<Long> compositionIds) {
@@ -298,10 +295,6 @@ public class PlayListsDaoWrapper {
             }
         }
         return foundCompositions;
-    }
-
-    private PlayListItem toItem(PlayListEntryDto entryDto) {
-        return new PlayListItem(entryDto.getItemId(), entryDto.getComposition());
     }
 
     private String getUniquePlayListName(String name) {

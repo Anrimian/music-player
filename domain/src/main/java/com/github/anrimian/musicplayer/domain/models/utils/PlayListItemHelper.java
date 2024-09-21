@@ -10,10 +10,10 @@ public class PlayListItemHelper {
 
     public static boolean areSourcesTheSame(@Nonnull PlayListItem first,
                                             @Nonnull PlayListItem second) {
-        return CompositionHelper.areSourcesTheSame(first.getComposition(), second.getComposition());
+        return CompositionHelper.areSourcesTheSame(first, second);
     }
 
     public static List<Object> getChangePayload(PlayListItem first, PlayListItem second) {
-        return CompositionHelper.getChangePayload(first.getComposition(), second.getComposition());
+        return CompositionHelper.getChangePayload(first, second);
     }
 }

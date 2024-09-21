@@ -23,6 +23,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
 import com.github.anrimian.musicplayer.domain.utils.FileUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
+import com.github.anrimian.musicplayer.ui.common.activity.BaseMvpAppCompatActivity
 import com.github.anrimian.musicplayer.ui.common.activity.PickImageContract
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -39,7 +40,6 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.dialogs.menu.MenuDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.setDrawableStart
@@ -48,10 +48,9 @@ import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SingleItemAdapter
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.drag_and_drop.SimpleItemTouchHelperCallback
 import com.google.android.material.snackbar.Snackbar
-import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 
-class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView {
+class CompositionEditorActivity : BaseMvpAppCompatActivity(), CompositionEditorView {
 
     companion object {
         fun newIntent(context: Context, compositionId: Long): Intent {
@@ -205,12 +204,6 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
             fragmentInitializer = { fragment -> fragment.setCancellationListener {
                 presenter.onEditActionCancelled()
             } }
-        )
-    }
-
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(
-            Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
         )
     }
 
@@ -436,7 +429,7 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
     }
 
     override fun showChangeFileProgress() {
-        val fragment = newProgressDialogFragment(R.string.changing_file_progress)
+        val fragment = ProgressDialogFragment.newInstance(R.string.changing_file_progress)
         progressDialogRunner.show(fragment)
     }
 
@@ -446,7 +439,7 @@ class CompositionEditorActivity : MvpAppCompatActivity(), CompositionEditorView 
 
     override fun showSyncState(fileSyncState: FileSyncState, composition: FullComposition) {
         val isFileRemote = composition.storageId == null && composition.initialSource == InitialSource.REMOTE
-        showFileSyncState(fileSyncState, isFileRemote, binding.pvFileState)
+        binding.pvFileState.showFileSyncState(fileSyncState, isFileRemote)
         progressDialogRunner.runAction { dialog ->
             val message = if (fileSyncState is FileSyncState.Downloading) {
                 val progress = fileSyncState.getProgress()

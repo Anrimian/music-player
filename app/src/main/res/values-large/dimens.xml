@@ -28,7 +28,7 @@
 
 
     <!--toolbar-->
-
+    <dimen name="toolbar_nav_icon_margin_start">12dp</dimen>
     <dimen name="toolbar_content_start">80dp</dimen>
     <!--split toolbar_content_start    -->
     <dimen name="toolbar_player_content_start">64dp</dimen>

@@ -23,7 +23,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.content.Composi
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.ui.common.dialogs.share.ShareCompositionsDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
@@ -205,16 +204,9 @@ fun showConfirmDeleteDialog(
     compositions: List<Composition>,
     deleteCallback: () -> Unit,
 ) {
-    val count = compositions.size
-    val countMessage = if (count == 1) {
-        context.getString(
-            R.string.delete_composition_template,
-            CompositionHelper.formatCompositionName(compositions[0])
-        )
-    } else {
-        getDeleteCompositionsMessage(context, count)
-    }
-    val message = context.getString(R.string.undone_action_template, countMessage)
+    val message = Components.getAppComponent()
+        .messageTextFormatter()
+        .getConfirmDeleteCompositionsText(context, compositions)
     val hasExistingFiles = compositions.find { composition ->
         composition.isFileExists && composition.initialSource == InitialSource.LOCAL
     } != null
@@ -226,18 +218,9 @@ fun showConfirmDeleteDialog(
     folder: FolderFileSource,
     deleteCallback: () -> Unit,
 ) {
-    val filesCount = folder.filesCount
-    val name = folder.name
-    val countMessage = if (filesCount == 0) {
-        context.getString(R.string.delete_empty_folder, name)
-    } else {
-        context.getString(
-            R.string.delete_folder_template,
-            name,
-            getDeleteCompositionsMessage(context, filesCount)
-        )
-    }
-    val message = context.getString(R.string.undone_action_template, countMessage)
+    val message = Components.getAppComponent()
+        .messageTextFormatter()
+        .getConfirmDeleteFoldersText(context, folder)
     showConfirmDeleteFileDialog(context, message, deleteCallback, folder.hasAnyStorageFile)
 }
 
@@ -351,8 +334,4 @@ fun showNumberPickerDialog(
         .setPositiveButton(android.R.string.ok) { _, _ -> pickAction() }
         .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
         .show()
-}
-
-private fun getDeleteCompositionsMessage(context: Context, count: Int): String {
-    return context.resources.getQuantityString(R.plurals.delete_compositions_template, count, count)
 }

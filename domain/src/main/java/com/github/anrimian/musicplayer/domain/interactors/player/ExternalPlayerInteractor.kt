@@ -39,6 +39,10 @@ class ExternalPlayerInteractor(
         playerCoordinatorInteractor.playAfterPrepare(PlayerType.EXTERNAL)
     }
 
+    fun play(delay: Long) {
+        playerCoordinatorInteractor.play(PlayerType.EXTERNAL, delay)
+    }
+
     fun playOrPause() {
         playerCoordinatorInteractor.playOrPause(PlayerType.EXTERNAL)
     }

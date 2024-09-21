@@ -55,7 +55,7 @@ abstract class BatchEditorPresenter<T: BatchEditorView>(
 
     fun onRetryFailedEditActionClicked() {
         if (lastEditAction != null) {
-            lastEditAction!!.doFinally { lastEditAction = null }
+            lastEditAction!!.doOnComplete { lastEditAction = null }
                 .subscribe(viewState::closeScreen, viewState::showError)
         }
     }

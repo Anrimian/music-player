@@ -7,22 +7,21 @@ import com.github.anrimian.musicplayer.Constants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ActivityLyricsEditBinding
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.ui.common.activity.BaseMvpAppCompatActivity
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
-import com.github.anrimian.musicplayer.ui.utils.dialogs.newProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.setToolbar
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher
 import com.google.android.material.snackbar.Snackbar
-import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 
-class LyricsEditorActivity : MvpAppCompatActivity(), LyricsEditorView {
+class LyricsEditorActivity : BaseMvpAppCompatActivity(), LyricsEditorView {
 
     companion object {
         fun newIntent(context: Context, compositionId: Long): Intent {
@@ -78,12 +77,6 @@ class LyricsEditorActivity : MvpAppCompatActivity(), LyricsEditorView {
         )
     }
 
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(
-            Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
-        )
-    }
-
     override fun showLyrics(text: String) {
         binding.progressStateView.hideAll()
         ViewUtils.setEditableText(binding.evLyrics, text)
@@ -94,7 +87,7 @@ class LyricsEditorActivity : MvpAppCompatActivity(), LyricsEditorView {
     }
 
     override fun showChangeFileProgress() {
-        val fragment = newProgressDialogFragment(R.string.changing_file_progress)
+        val fragment = ProgressDialogFragment.newInstance(R.string.changing_file_progress)
         progressDialogRunner.show(fragment)
     }
 

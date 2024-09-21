@@ -12,13 +12,13 @@
         android:layout_height="match_parent"
         android:background="?android:attr/colorBackground">
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/flHeader"
             android:layout_width="0dp"
             android:layout_height="@dimen/sub_toolbar_height"
             android:background="?attr/subToolbarBackground"
-            android:foreground="?selectableItemBackground"
             android:elevation="@dimen/sub_toolbar_elevation"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/guidelineSubtitle"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent">
@@ -26,18 +26,31 @@
             <TextView
                 style="@style/TextStyle.Small"
                 android:id="@+id/tvHeader"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:singleLine="true"
-                android:ellipsize="end"
+                android:ellipsize="start"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="16dp"
                 android:drawablePadding="8dp"
+                android:background="?selectableItemBackground"
                 app:drawableStartCompat="@drawable/ic_folder_open"
-                app:drawableTint="@android:color/darker_gray"
+                app:drawableTint="?android:attr/textColorSecondary"
                 tools:text="path/path" />
 
-        </FrameLayout>
+            <ImageView
+                android:id="@+id/ivBackToRoot"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:contentDescription="@string/go_to_root_folder"
+                android:src="@drawable/ic_folder_up"
+                android:scaleType="centerInside"
+                android:background="?selectableItemBackgroundBorderless"
+                app:tint="?android:attr/textColorSecondary"/>
+
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineSubtitle"

@@ -64,6 +64,7 @@ class SetupFragment : MvpAppCompatFragment(), SetupView {
         appComponent.widgetUpdater().start()
         appComponent.notificationsDisplayer().removeErrorNotification()
         appComponent.mediaScannerRepository().runStorageObserver()
+        appComponent.musicServiceInteractor().prepare()
     }
 
     override fun goToMainScreen() {

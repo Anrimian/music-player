@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntit
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntity;
 import com.github.anrimian.musicplayer.data.database.entities.genres.GenreEntryEntity;
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity;
+import com.github.anrimian.musicplayer.data.database.entities.play_queue.TrackPositionEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntity;
 import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListEntryEntity;
 
@@ -36,8 +37,9 @@ import com.github.anrimian.musicplayer.data.database.entities.playlist.PlayListE
         AlbumEntity.class,
         GenreEntity.class,
         GenreEntryEntity.class,
-        FolderEntity.class
-}, version = 15)
+        FolderEntity.class,
+        TrackPositionEntity.class
+}, version = 16)
 @TypeConverters({
         DateConverter.class,
         EnumConverter.class

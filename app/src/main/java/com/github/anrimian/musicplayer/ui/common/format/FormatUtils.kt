@@ -25,26 +25,55 @@ fun getMediaPlayerName(mediaPlayerId: Int) = when(mediaPlayerId) {
     else -> R.string.android_media_player
 }
 
-fun showFileSyncState(
+fun ProgressView.showFileSyncState(
     fileSyncState: FileSyncState?,
     isFileRemote: Boolean,
-    progressView: ProgressView,
+    animate: Boolean = true
 ) {
+    /*//debug view
+    val time = 3000L
+    val timer = java.util.Timer()
+    timer.scheduleAtFixedRate(object : java.util.TimerTask() {
+        override fun run() {
+            post {
+                clearProgress()
+                setIconResource(R.drawable.ic_cloud)
+                setVisible(true, true)
+                postDelayed({
+                    setProgressInfo(ProgressInfo())
+                    setIconResource(R.drawable.ic_upload)
+                    setVisible(true, true)
+                    postDelayed({
+                        setProgressInfo(ProgressInfo(5, 10))
+                        setIconResource(R.drawable.ic_upload)
+                        setVisible(true, true)
+                        postDelayed({
+                            setVisible(false, true, true, true)
+                        }, time)
+                    }, time)
+                }, time)
+            }
+        }
+    }, 0, time * 4)
+    return*/
     when(fileSyncState) {
         is FileSyncState.Uploading -> {
-            progressView.setProgressInfo(fileSyncState.getProgress())
-            progressView.setIconResource(R.drawable.ic_upload)
+            setVisible(true, animate)
+            setProgressInfo(fileSyncState.getProgress())
+            setIconResource(R.drawable.ic_upload)
         }
         is FileSyncState.Downloading -> {
-            progressView.setProgressInfo(fileSyncState.getProgress())
-            progressView.setIconResource(R.drawable.ic_download)
+            setVisible(true, animate)
+            setProgressInfo(fileSyncState.getProgress())
+            setIconResource(R.drawable.ic_download)
         }
         else -> {
-            progressView.clearProgress()
             if (isFileRemote) {
-                progressView.setIconResource(R.drawable.ic_cloud)
+                clearProgress()
+                setVisible(true, animate)
+                setIconResource(R.drawable.ic_cloud)
             } else {
-                progressView.clearIcon()
+                setVisible(false, animate, clearIcon = true, clearProgress = true)
             }
         }
     }

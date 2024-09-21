@@ -38,6 +38,6 @@ public class PublicActionMenuPresenter extends ActionMenuPresenter {
     }
 
     public interface OverflowMenuRunnable {
-        void call(View anchorView, ArrayList<MenuItemImpl> items);
+        void call(View anchorView, @SuppressLint("RestrictedApi") ArrayList<MenuItemImpl> items);
     }
 }

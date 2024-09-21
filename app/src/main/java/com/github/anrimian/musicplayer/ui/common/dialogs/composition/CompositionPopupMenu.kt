@@ -57,6 +57,10 @@ fun showCompositionPopupMenu(
         sb.append(FormatUtils.formatCompositionAuthor(composition, context))
         sb.append(FormatUtils.formatMilliseconds(composition.duration))
         sb.append(FormatUtils.formatSize(context, composition.size))
+        val comment = composition.comment
+        if (!comment.isNullOrBlank()) {
+            sb.appendNewLine(comment)
+        }
         binding.tvCompositionInfo.text = sb
     }
 

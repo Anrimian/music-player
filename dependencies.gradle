@@ -25,8 +25,8 @@ ext {
     rxAndroidVersion = "3.0.2"
     rxJavaExtVersion = "3.1.1"
     moxyVersion = "2.2.2"
-    daggerVersion = "2.50"
-    media3Version = "1.2.0"
+    daggerVersion = "2.51.1"
+    media3Version = "1.3.1"
     roomVersion = "2.6.1"
     jTaggerVersion = '2.2.6c'
     glideVersion = "4.16.0"
@@ -41,9 +41,9 @@ ext {
 
     //remote repos libraries
     dropboxSdkVersion = "5.4.4"
-    playServicesAuthVersion = "20.5.0"
-    googleApiVersion = "2.0.1"
-    gDriveVersion = "v3-rev20220214-1.32.1"
+    playServicesAuthVersion = "20.7.0"
+    googleApiVersion = "2.3.0"
+    gDriveVersion = "v3-rev20240123-2.0.0"
 
     //Testing
     jUnit5Version = '5.10.1'
@@ -128,7 +128,6 @@ ext {
     junit5 = "org.junit.jupiter:junit-jupiter-api:${jUnit5Version}"
     junit5Engine = "org.junit.jupiter:junit-jupiter-engine:${jUnit5Version}"
     junit5Params = "org.junit.jupiter:junit-jupiter-params:${jUnit5Version}"
-    junitVintage = "org.junit.vintage:junit-vintage-engine:${jUnit5Version}"
     junit5PluginCore = "de.mannodermaus.junit5:android-test-core:${jUnit5PluginVersion}"
     junit5PluginRunner = "de.mannodermaus.junit5:android-test-runner:${jUnit5PluginVersion}"
     espresso = "androidx.test.espresso:espresso-core:$espressoVersion"

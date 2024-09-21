@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.domain.models.composition;
 
 
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 
 import javax.annotation.Nullable;
 
@@ -15,12 +14,7 @@ public class CurrentComposition {
     private final boolean isPlaying;
 
     public CurrentComposition(PlayQueueEvent playQueueEvent, boolean isPlaying) {
-        PlayQueueItem queueItem = playQueueEvent.getPlayQueueItem();
-        if (queueItem != null) {
-            composition = queueItem.getComposition();
-        } else {
-            composition = null;
-        }
+        this.composition = playQueueEvent.getPlayQueueItem();
         this.isPlaying = isPlaying;
     }
 

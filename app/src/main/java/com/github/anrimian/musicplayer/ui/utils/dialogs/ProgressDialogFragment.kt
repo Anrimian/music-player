@@ -14,19 +14,23 @@ import com.github.anrimian.musicplayer.ui.common.format.indeterminate
 import com.github.anrimian.musicplayer.ui.common.format.setExtProgress
 import com.google.android.material.progressindicator.CircularProgressIndicator
 
-fun newProgressDialogFragment(message: String?) = ProgressDialogFragment().apply {
-    arguments = Bundle().apply {
-        putString(Constants.Tags.MESSAGE_ARG, message)
-    }
-}
-
-fun newProgressDialogFragment(@StringRes messageResId: Int) = ProgressDialogFragment().apply {
-    arguments = Bundle().apply {
-        putInt(Constants.Tags.MESSAGE_RES_ARG, messageResId)
-    }
-}
-
 class ProgressDialogFragment : DialogFragment() {
+
+    companion object {
+
+        fun newInstance(message: String?) = ProgressDialogFragment().apply {
+            arguments = Bundle().apply {
+                putString(Constants.Arguments.MESSAGE_ARG, message)
+            }
+        }
+
+        fun newInstance(@StringRes messageResId: Int) = ProgressDialogFragment().apply {
+            arguments = Bundle().apply {
+                putInt(Constants.Arguments.MESSAGE_RES_ARG, messageResId)
+            }
+        }
+
+    }
 
     private lateinit var progressBar: CircularProgressIndicator
     private lateinit var tvProgress: TextView
@@ -60,7 +64,7 @@ class ProgressDialogFragment : DialogFragment() {
 
     fun setMessage(message: String?) {
         tvProgress.text = message
-        requireArguments().putString(Constants.Tags.MESSAGE_ARG, message)
+        requireArguments().putString(Constants.Arguments.MESSAGE_ARG, message)
     }
 
     fun setIndeterminate(indeterminate: Boolean) {
@@ -77,13 +81,13 @@ class ProgressDialogFragment : DialogFragment() {
 
     private fun getMessage(): String? {
         val args = requireArguments()
-        val message = args.getString(Constants.Tags.MESSAGE_ARG)
+        val message = args.getString(Constants.Arguments.MESSAGE_ARG)
         return if (message == null) {
-            val resId = args.getInt(Constants.Tags.MESSAGE_RES_ARG)
+            val resId = args.getInt(Constants.Arguments.MESSAGE_RES_ARG)
             if (resId == 0) {
                 null
             } else {
-                getString(args.getInt(Constants.Tags.MESSAGE_RES_ARG))
+                getString(args.getInt(Constants.Arguments.MESSAGE_RES_ARG))
             }
         } else {
             message

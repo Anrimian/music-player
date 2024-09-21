@@ -8,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.GravityCompat
@@ -26,6 +24,7 @@ import com.github.anrimian.musicplayer.databinding.PartialDetailedMusicBinding
 import com.github.anrimian.musicplayer.databinding.PartialDrawerHeaderBinding
 import com.github.anrimian.musicplayer.databinding.PartialQueueToolbarBinding
 import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.domain.interactors.player.ActionState
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.NO_TIMER
 import com.github.anrimian.musicplayer.domain.models.Screens
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
@@ -155,7 +154,7 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentDrawerBinding.inflate(inflater, container, false)
-        toolbar = binding.toolbar.root
+        toolbar = binding.toolbar
         toolbarPlayQueueBinding = binding.toolbarPlayQueue
         panelBinding = binding.clMusicPanel!!
         return binding.root
@@ -165,8 +164,7 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
         super.onViewCreated(view, savedInstanceState)
         AndroidUtils.setNavigationBarColorAttr(requireActivity(), R.attr.playerPanelBackground)
 
-        toolbar.initializeViews(requireActivity().window)
-        toolbar.setupWithActivity(requireActivity() as AppCompatActivity)
+        toolbar.setWindow(requireActivity().window)
 
         navigation = FragmentNavigation.from(childFragmentManager)
         navigation.initialize(binding.drawerFragmentContainer!!, savedInstanceState)
@@ -213,19 +211,14 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
         }
         drawerHeaderBinding = PartialDrawerHeaderBinding.bind(headerView)
 
-        val drawerToggle = ActionBarDrawerToggle(
-            requireActivity(),
-            binding.drawer,
-            R.string.open_drawer,
-            R.string.close_drawer
-        )
-        val drawerArrowDrawable = createDrawerArrowDrawable()
-        drawerToggle.drawerArrowDrawable = drawerArrowDrawable
         binding.drawer.addDrawerListener(SimpleDrawerListener(this::onDrawerClosed))
 
-        toolbar.setupWithNavigation(navigation, drawerArrowDrawable) {
-            playerPanelWrapper.isBottomPanelExpanded
-        }
+        toolbar.setupWithNavigation(
+            navigation,
+            createDrawerArrowDrawable(),
+            { playerPanelWrapper.isBottomPanelExpanded },
+            this::onNavigationClick
+        )
 
         panelBinding.ivSkipToPrevious.setOnClickListener { presenter.onSkipToPreviousButtonClicked() }
         panelBinding.ivSkipToPrevious.onRewindHold(presenter::onFastSeekBackwardCalled)
@@ -327,17 +320,6 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
         } else {
             headerContainer.moveToParent(drawerHeaderBinding.flDrawerHeaderContainer)
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            if (binding.drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
-                binding.drawer.openDrawer(GravityCompat.START)
-            } else {
-                onBackPressed()
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -474,13 +456,11 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
             panelBinding.sbTrackState.contentDescription = noCompositionMessage
             previousCoverComposition = null
         } else {
-            val composition = item.composition
-            val compositionName = CompositionHelper.formatCompositionName(composition)
+            val compositionName = CompositionHelper.formatCompositionName(item)
             panelBinding.tvCurrentComposition.text = compositionName
-            panelBinding.tvTotalTime.text = FormatUtils.formatMilliseconds(composition.duration)
+            panelBinding.tvTotalTime.text = FormatUtils.formatMilliseconds(item.duration)
             panelBinding.tvCurrentCompositionAuthor.text =
-                FormatUtils.formatCompositionAuthor(composition, requireContext())
-            seekBarViewWrapper.setMax(composition.duration)
+                FormatUtils.formatCompositionAuthor(item, requireContext())
             panelBinding.topPanel.contentDescription =
                 getString(R.string.now_playing_template, compositionName)
             panelBinding.sbTrackState.contentDescription = null
@@ -493,16 +473,15 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
             panelBinding.ivMusicIcon.setImageResource(R.drawable.ic_music_placeholder)
             return
         }
-        val composition = item.composition
         Components.getAppComponent()
             .imageLoader()
             .displayImageInReusableTarget(
                 panelBinding.ivMusicIcon,
-                composition,
+                item,
                 previousCoverComposition,
                 R.drawable.ic_music_placeholder
             )
-        previousCoverComposition = composition
+        previousCoverComposition = item
     }
 
     override fun showRepeatMode(mode: Int) {
@@ -529,7 +508,7 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
     }
 
     override fun showTrackState(currentPosition: Long, duration: Long) {
-        seekBarViewWrapper.setProgress(currentPosition)
+        seekBarViewWrapper.setProgress(currentPosition, duration)
         val formattedTime = FormatUtils.formatMilliseconds(currentPosition)
         panelBinding.sbTrackState.contentDescription = getString(R.string.position_template, formattedTime)
         panelBinding.tvPlayedTime.text = formattedTime
@@ -630,13 +609,9 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
             isFileRemote = false
         } else {
             formattedState = syncState
-            isFileRemote = CompositionHelper.isCompositionFileRemote(item.composition)
+            isFileRemote = CompositionHelper.isCompositionFileRemote(item)
         }
-        showFileSyncState(
-            formattedState,
-            isFileRemote,
-            panelBinding.pvFileState
-        )
+        panelBinding.pvFileState.showFileSyncState(formattedState, isFileRemote)
     }
 
     override fun locateCompositionInFolders(composition: Composition) {
@@ -664,6 +639,10 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
         val volumePercent = 100 * volume.getVolume() / volume.max
         panelBinding.tvVolume.text = getString(R.string.percentage_template, volumePercent)
         panelBinding.tvVolume.setSmallDrawableStart(getVolumeIcon(volumePercent))
+    }
+
+    override fun showActionState(actionState: ActionState) {
+        Components.getAppComponent().actionStateBinder().bind(binding.toolbar, actionState)
     }
 
     fun openPlayerPanel() {
@@ -793,6 +772,14 @@ class PlayerFragment : BaseLibraryFragment(), BackButtonListener, PlayerView {
             R.string.android_r_edit_file_permission_denied,
             Snackbar.LENGTH_LONG
         ).show()
+    }
+
+    private fun onNavigationClick() {
+        if (binding.drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+            binding.drawer.openDrawer(GravityCompat.START)
+        } else {
+            onBackPressed()
+        }
     }
 
 }

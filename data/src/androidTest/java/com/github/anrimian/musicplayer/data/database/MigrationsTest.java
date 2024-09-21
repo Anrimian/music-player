@@ -31,6 +31,15 @@ public class MigrationsTest {
     );
 
     @Test
+    public void testMigrationFrom15To16() throws Exception {
+        testHelper.createDatabase(TEST_DB_NAME, 15);
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME,
+                16,
+                false,
+                Migrations.getMigration15_16(context));
+    }
+
+    @Test
     public void testMigrationFrom14To15() throws Exception {
         SupportSQLiteDatabase db = testHelper.createDatabase(TEST_DB_NAME, 14);
         String longName = "আমার-সোনার-বাংলা-আমি-তোমায়-ভালোবাসি-চিরদিন-তোমার-আকাশ-তোমার-বাতাস-আমার-প্রাণে-বাজায়-বাঁশি-ও-মা-ফাগুনে-তোর";

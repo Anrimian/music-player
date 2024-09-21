@@ -66,6 +66,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView,
     private lateinit var toolbar: AdvancedToolbar
 
     private lateinit var adapter: CompositionsAdapter<Composition>
+    private lateinit var layoutManager: LinearLayoutManager
 
     private lateinit var choosePlayListDialogRunner: DialogFragmentRunner<ChoosePlayListDialogFragment>
 
@@ -99,7 +100,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView,
             this::onCompositionMenuClicked
         )
         binding.recyclerView.adapter = adapter
-        val layoutManager = LinearLayoutManager(context)
+        layoutManager = LinearLayoutManager(context)
         binding.recyclerView.layoutManager = layoutManager
 
         val callback = ShortSwipeCallback(requireContext(),
@@ -137,6 +138,11 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView,
         toolbar.setTitleClickListener(null)
         toolbar.setupSelectionModeMenu(R.menu.library_compositions_selection_menu, this::onActionModeItemClicked)
         toolbar.setupOptionsMenu(R.menu.library_genre_items_menu, this::onOptionsItemClicked)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop(ViewUtils.getListPosition(layoutManager))
     }
 
     override fun onBackPressed(): Boolean {
@@ -187,7 +193,9 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView,
         adapter.submitList(genres)
     }
 
-    override fun restoreListPosition(listPosition: ListPosition) {}
+    override fun restoreListPosition(listPosition: ListPosition) {
+        ViewUtils.scrollToPosition(layoutManager, listPosition)
+    }
 
     override fun onCompositionSelected(composition: Composition, position: Int) {
         adapter.setItemSelected(position)

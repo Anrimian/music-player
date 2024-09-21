@@ -16,14 +16,18 @@ import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposit
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource;
+import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo;
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder;
 import com.github.anrimian.musicplayer.domain.models.genres.Genre;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
 import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
 import com.github.anrimian.musicplayer.domain.utils.ListUtils;
+import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +37,7 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
+import kotlin.Pair;
 
 /**
  * Created on 24.10.2017.
@@ -148,7 +153,7 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Observable<FolderFileSource> getFolderObservable(long folderId) {
+    public Observable<FolderInfo> getFolderObservable(long folderId) {
         return foldersDao.getFolderObservable(folderId);
     }
 
@@ -209,6 +214,22 @@ public class LibraryRepositoryImpl implements LibraryRepository {
         return Single.fromCallable(() -> {
             Long folderId = compositionsDao.getFolderId(id);
             return foldersDao.getAllParentFoldersId(folderId);
+        }).subscribeOn(scheduler);
+    }
+
+    @Override
+    public Single<List<String>> getFolderNamesInPath(@Nullable String path) {
+        return Single.fromCallable(() -> {
+            Long folderId;
+            if (TextUtils.isEmpty(path)) {
+                folderId = null;
+            } else {
+                folderId = compositionsDao.findFolderId(path);
+                if (folderId == null) {
+                    return Collections.<String>emptyList();
+                }
+            }
+            return foldersDao.getFolderNamesInFolder(folderId);
         }).subscribeOn(scheduler);
     }
 
@@ -395,21 +416,24 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Single<IgnoredFolder> addFolderToIgnore(FolderFileSource folder) {
-        return Single.fromCallable(() -> foldersDao.getFullFolderPath(folder.getId()))
-                .map(ignoredFoldersDao::insertIgnoredFolder)
-                .flatMap(ignoredFolder ->
-                        mediaScannerRepository.runStorageScanner().toSingleDefault(ignoredFolder)
-                )
-                .subscribeOn(scheduler);
+    public Single<Pair<IgnoredFolder, List<FileKey>>> addFolderToIgnore(FolderFileSource folder) {
+        return Single.fromCallable(() -> {
+            var folderPath = foldersDao.getFullFolderPath(folder.getId());
+            var compositions = compositionsDao.getCompositionsInFolder(folder.getId());
+            var ignoredFolder = ignoredFoldersDao.insertIgnoredFolder(folderPath);
+            mediaScannerRepository.rescanStorage();
+            return new Pair<>(ignoredFolder, compositions);
+        }).subscribeOn(scheduler);
     }
 
     @Override
-    public Completable addFolderToIgnore(IgnoredFolder folder) {
-        return Completable.fromAction(() ->
-                ignoredFoldersDao.insert(folder.getRelativePath(), folder.getAddDate())
-        ).andThen(mediaScannerRepository.runStorageScanner())
-                .subscribeOn(scheduler);
+    public Single<List<FileKey>> addFolderToIgnore(IgnoredFolder folder) {
+        return Single.fromCallable(() -> {
+            var compositions = compositionsDao.getCompositionsInFolder(folder.getRelativePath());
+            var ignoredFolder = ignoredFoldersDao.insert(folder.getRelativePath(), folder.getAddDate());
+            mediaScannerRepository.rescanStorage();
+            return compositions;
+        }).subscribeOn(scheduler);
     }
 
     @Override
@@ -418,9 +442,11 @@ public class LibraryRepositoryImpl implements LibraryRepository {
     }
 
     @Override
-    public Completable deleteIgnoredFolder(IgnoredFolder folder) {
-        return Completable.fromAction(() -> deleteIgnoredFolder(folder.getRelativePath()))
-                .subscribeOn(scheduler);
+    public Single<List<FileKey>> deleteIgnoredFolder(IgnoredFolder folder) {
+        return Single.fromCallable(() -> {
+            deleteIgnoredFolder(folder.getRelativePath());
+            return compositionsDao.getCompositionsInFolder(folder.getRelativePath());
+        }).subscribeOn(scheduler);
     }
 
     @Override

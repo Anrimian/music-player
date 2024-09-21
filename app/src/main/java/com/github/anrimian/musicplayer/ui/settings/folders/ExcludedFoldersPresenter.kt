@@ -23,7 +23,7 @@ class ExcludedFoldersPresenter(
     fun onDeleteFolderClicked(folder: IgnoredFolder) {
         interactor.deleteIgnoredFolder(folder)
             .toSingleDefault(folder)
-            .subscribeOnUi(this::onFolderRemoved, this::onDefaultError)
+            .launchOnUi(this::onFolderRemoved, viewState::showErrorMessage)
     }
 
     fun onRestoreRemovedFolderClicked() {
@@ -31,7 +31,7 @@ class ExcludedFoldersPresenter(
             return
         }
         interactor.addFolderToIgnore(recentlyRemovedFolder!!)
-            .justSubscribe(this::onFoldersListError)
+            .justRunOnUi(viewState::showErrorMessage)
     }
 
     private fun onFolderRemoved(folder: IgnoredFolder) {
@@ -41,7 +41,7 @@ class ExcludedFoldersPresenter(
 
     private fun subscribeOnIgnoredFoldersList() {
         interactor.getIgnoredFoldersObservable()
-            .subscribeOnUi(this::onFoldersListReceived, this::onFoldersListError)
+            .runOnUi(this::onFoldersListReceived, viewState::showErrorState)
     }
 
     private fun onFoldersListReceived(folders: List<IgnoredFolder>) {
@@ -51,14 +51,6 @@ class ExcludedFoldersPresenter(
         } else {
             viewState.showListState()
         }
-    }
-
-    private fun onFoldersListError(throwable: Throwable) {
-        viewState.showErrorState(errorParser.parseError(throwable))
-    }
-
-    private fun onDefaultError(throwable: Throwable) {
-        viewState.showErrorMessage(errorParser.parseError(throwable))
     }
 
 }

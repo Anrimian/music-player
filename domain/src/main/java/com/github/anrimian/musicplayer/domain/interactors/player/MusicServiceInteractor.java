@@ -19,7 +19,6 @@ import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotific
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
 import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.utils.ListUtils;
 
 import java.util.List;
 
@@ -61,6 +60,21 @@ public class MusicServiceInteractor {
         this.libraryGenresInteractor = libraryGenresInteractor;
         this.playListsInteractor = playListsInteractor;
         this.settingsRepository = settingsRepository;
+    }
+
+    public void prepare() {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(EXTERNAL)) {
+            return;
+        }
+        libraryPlayerInteractor.prepare();
+    }
+
+    public void play(long delay) {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(EXTERNAL)) {
+            externalPlayerInteractor.play(delay);
+        } else {
+            libraryPlayerInteractor.play(delay);
+        }
     }
 
     public void skipToNext() {
@@ -264,10 +278,7 @@ public class MusicServiceInteractor {
         return getPlaylistItemsObservable(playListId)
                 .firstOrError()
                 .flatMapCompletable(compositions ->
-                        libraryPlayerInteractor.setCompositionsQueueAndPlay(
-                                ListUtils.mapList(compositions, PlayListItem::getComposition),
-                                position
-                        )
+                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
                 );
     }
 

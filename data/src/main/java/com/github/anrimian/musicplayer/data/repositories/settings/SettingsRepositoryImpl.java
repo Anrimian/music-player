@@ -267,8 +267,18 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public int getSkipConstraintMillis() {
-        return 15000;//just 15 seconds. Reserved setting for future
+    public long getSkipConstraintMillis() {
+        return 15000L;
+    }
+
+    @Override
+    public long getSkipSaveStartMillis() {
+        return 15000L;
+    }
+
+    @Override
+    public long getSkipSaveEndMillis() {
+        return 10000L;
     }
 
     @Override
@@ -531,7 +541,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public int[] getEnabledMediaPlayers() {
         return preferences.getIntArray(
                 ENABLED_MEDIA_PLAYERS,
-                new int[] { MediaPlayers.EXO_MEDIA_PLAYER, MediaPlayers.ANDROID_MEDIA_PLAYER }
+                new int[] { MediaPlayers.EXO_MEDIA_PLAYER }
         );
     }
 

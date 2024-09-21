@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 162,
-      "versionName": "0.9.7.1",
-      "outputFile": "com.github.anrimian.musicplayer-v0.9.7.1(162)-release.apk"
+      "versionCode": 167,
+      "versionName": "0.9.8",
+      "outputFile": "com.github.anrimian.musicplayer-v0.9.8(167)-release.apk"
     }
   ],
   "elementType": "File"

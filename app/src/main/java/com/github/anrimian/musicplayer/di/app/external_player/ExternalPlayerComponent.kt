@@ -1,11 +1,11 @@
-package com.github.anrimian.musicplayer.di.app.external_player;
+package com.github.anrimian.musicplayer.di.app.external_player
 
-import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerPresenter;
+import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerPresenter
+import dagger.Subcomponent
 
-import dagger.Subcomponent;
+@Subcomponent(modules = [ ExternalPlayerModule::class ])
+interface ExternalPlayerComponent {
 
-@Subcomponent(modules = ExternalPlayerModule.class)
-public interface ExternalPlayerComponent {
+    fun externalPlayerPresenter(): ExternalPlayerPresenter
 
-    ExternalPlayerPresenter externalPlayerPresenter();
 }

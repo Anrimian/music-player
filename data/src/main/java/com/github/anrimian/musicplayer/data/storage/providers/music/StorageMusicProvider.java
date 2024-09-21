@@ -161,13 +161,12 @@ public class StorageMusicProvider {
         for (Uri uri: uris) {
             try (Cursor cursor = query(uri, query, selection, projection, null)) {
                 if (cursor == null) {
-                    return new LongSparseArray<>();
+                    continue;
                 }
 
                 LongSparseArray<StorageAlbum> albums = albumsProvider.getAlbums();
 
                 CursorWrapper cursorWrapper = new CursorWrapper(cursor);
-                LongSparseArray<StorageFullComposition> volumeCompositions = new LongSparseArray<>(cursor.getCount());
 
                 int artistIndex = getColumnIndex(cursor, Media.ARTIST);
                 int titleIndex = getColumnIndex(cursor, Media.TITLE);
@@ -186,6 +185,7 @@ public class StorageMusicProvider {
                 int dateAddedIndex = getColumnIndex(cursor, Media.DATE_ADDED);
                 int dateModifiedIndex = getColumnIndex(cursor, Media.DATE_MODIFIED);
 
+                LongSparseArray<StorageFullComposition> volumeCompositions = new LongSparseArray<>(cursor.getCount());
                 while (MediaStoreUtils.moveToNext(cursor)) {
                     StorageFullComposition composition = buildStorageComposition(
                             artistIndex,
@@ -814,6 +814,12 @@ public class StorageMusicProvider {
     private List<Uri> getStorageUris() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Set<String> volumes = MediaStore.getExternalVolumeNames(context);
+            //if duplicate issue remains, switch to VOLUME_EXTERNAL_PRIMARY
+            String primaryVolume = MediaStore.VOLUME_EXTERNAL;
+            if (volumes.contains(primaryVolume)) {
+                //due to unreproducible duplication issues return only primary volume if it exists
+                return asList(MediaStore.Audio.Media.getContentUri(primaryVolume));
+            }
             List<Uri> uris = new ArrayList<>();
             volumes.forEach(volume -> uris.add(MediaStore.Audio.Media.getContentUri(volume)));
             return uris;

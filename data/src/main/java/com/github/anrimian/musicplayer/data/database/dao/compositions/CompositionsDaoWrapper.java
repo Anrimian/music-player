@@ -24,10 +24,10 @@ import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
-import com.github.anrimian.musicplayer.domain.models.composition.change.CompositionPath;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
 import com.github.anrimian.musicplayer.domain.utils.CollectionUtilsKt;
 import com.github.anrimian.musicplayer.domain.utils.FileUtils;
@@ -36,6 +36,7 @@ import com.github.anrimian.musicplayer.domain.utils.Objects;
 import com.github.anrimian.musicplayer.domain.utils.TextUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -213,6 +214,10 @@ public class CompositionsDaoWrapper {
             genreDao.deleteEmptyGenres();
             foldersDao.deleteFoldersWithoutContainment();
         });
+    }
+
+    public void deleteCompositionsWithoutStorageId() {
+        compositionsDao.deleteCompositionsWithoutStorageId();
     }
 
     public void updateFolderId(long id, Long folderId) {
@@ -515,7 +520,15 @@ public class CompositionsDaoWrapper {
     }
 
     public List<ExternalComposition> getAllAsExternalCompositions(String parentPath) {
-        Long folderId = findFolderId(parentPath);
+        Long folderId;
+        if (TextUtils.isEmpty(parentPath)) {
+            folderId = null;
+        } else {
+            folderId = findFolderId(parentPath);
+            if (folderId == null) {
+                return Collections.emptyList();
+            }
+        }
         return compositionsDao.getAllAsExternalCompositions(folderId);
     }
 
@@ -533,13 +546,13 @@ public class CompositionsDaoWrapper {
         return id;
     }
 
-    public CompositionPath getCompositionNameAndPath(long id) {
+    public FileKey getCompositionNameAndPath(long id) {
         String fileName = compositionsDao.getCompositionFileName(id);
         if (fileName == null) {
             throw new CompositionNotFoundException("composition not found");
         }
         String parentPath = compositionsDao.getCompositionParentPath(id);
-        return new CompositionPath(fileName, parentPath);
+        return new FileKey(fileName, parentPath);
     }
 
     public long getCompositionSize(long id) {
@@ -591,14 +604,27 @@ public class CompositionsDaoWrapper {
         });
     }
 
+    public List<FileKey> getCompositionsInFolder(String relativePath) {
+        Long folderId = findFolderId(relativePath);
+        if (folderId == null) {
+            return Collections.emptyList();
+        }
+        return getCompositionsInFolder(folderId);
+    }
+
+    public List<FileKey> getCompositionsInFolder(Long folderId) {
+        var compositions = getAllCompositionsInFolder(folderId);
+        return ListUtils.mapList(compositions, c -> new FileKey(c.getFileName(), c.getParentPath()));
+    }
+
     @Nullable
-    private Long findFolderId(String filePath) {
+    public Long findFolderId(@Nullable String filePath) {
         return findFolderId(filePath, null);
     }
 
     @Nullable
-    private Long findFolderId(String filePath, @Nullable Long parentId) {
-        if (filePath.isEmpty()) {
+    private Long findFolderId(@Nullable String filePath, @Nullable Long parentId) {
+        if (TextUtils.isEmpty(filePath)) {
             return parentId;
         }
 

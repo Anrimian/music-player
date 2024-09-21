@@ -347,15 +347,16 @@ class LibraryFoldersPresenter(
     }
 
     fun onRemoveIgnoredFolderClicked() {
-        interactor.deleteIgnoredFolder(recentlyAddedIgnoredFolder)
-            .justSubscribe(this::onDefaultError)
+        recentlyAddedIgnoredFolder?.let { folder ->
+            interactor.deleteIgnoredFolder(folder).justSubscribe(this::onDefaultError)
+        }
     }
 
     fun onRetryFailedEditActionClicked() {
         if (lastEditAction != null) {
             RxUtils.dispose(fileActionDisposable, presenterDisposable)
             fileActionDisposable = lastEditAction!!
-                .doFinally { lastEditAction = null }
+                .doOnComplete { lastEditAction = null }
                 .subscribe(viewState::updateMoveFilesList, this::onDefaultError, presenterDisposable)
         }
     }
@@ -369,7 +370,7 @@ class LibraryFoldersPresenter(
     }
 
     fun onChangeRandomModePressed() {
-        playerInteractor.setRandomPlayingEnabled(!playerInteractor.isRandomPlayingEnabled())
+        playerInteractor.changeRandomMode()
     }
 
     fun getSelectedMoveFiles(): LinkedHashSet<FileSource> = interactor.getFilesToMove()
@@ -527,7 +528,7 @@ class LibraryFoldersPresenter(
 
     private fun subscribeOnCurrentComposition() {
         playerInteractor.getCurrentCompositionObservable()
-            .subscribeOnUi(this::onCurrentCompositionReceived, errorParser::logError)
+            .runOnUi(this::onCurrentCompositionReceived, viewState::showErrorMessage)
     }
 
     private fun onCurrentCompositionReceived(currentComposition: CurrentComposition) {

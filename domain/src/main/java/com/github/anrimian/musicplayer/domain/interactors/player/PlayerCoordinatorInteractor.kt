@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.source.Composit
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.models.player.events.PlayerEvent
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -15,12 +16,10 @@ class PlayerCoordinatorInteractor(
 
     private val preparedSourcesMap = HashMap<PlayerType, SourceInfo>()
 
-    private var activePlayerType = PlayerType.LIBRARY
-    private val activePlayerTypeSubject = BehaviorSubject.createDefault(activePlayerType)
-
-    init {
-        initializePlayerType(activePlayerType)
-    }
+    private var activePlayerType: PlayerType? = null
+    private val activePlayerTypeSubject = BehaviorSubject.createDefault<Optional<PlayerType>>(
+        Optional()
+    )
 
     fun play(playerType: PlayerType, delay: Long = 0L) {
         applyPlayerType(playerType)
@@ -96,6 +95,8 @@ class PlayerCoordinatorInteractor(
         preparedSourcesMap[playerType] = SourceInfo(compositionSource, startPosition)
         if (playerType == activePlayerType) {
             playerInteractor.prepareToPlay(compositionSource, startPosition)
+        } else if (activePlayerType == null) {
+            applyPlayerType(playerType)
         }
     }
 
@@ -110,14 +111,6 @@ class PlayerCoordinatorInteractor(
             playerInteractor.onSeekFinished(position)
         } else {
             preparedSourcesMap[playerType]?.trackPosition = position
-        }
-    }
-
-    fun getActualTrackPosition(playerType: PlayerType): Single<Long> {
-        return if (isPlayerTypeActive(playerType)) {
-            playerInteractor.getTrackPosition()
-        } else {
-            Single.just(preparedSourcesMap[playerType]?.trackPosition ?: -1L)
         }
     }
 
@@ -137,9 +130,14 @@ class PlayerCoordinatorInteractor(
             .filter { isPlayerTypeActive(playerType) }
     }
 
+    fun getTrackPositionChangeObservable(playerType: PlayerType): Observable<Long> {
+        return playerInteractor.getTrackPositionChangeObservable()
+            .filter { isPlayerTypeActive(playerType) }
+    }
+
     fun getPlayerStateObservable(playerType: PlayerType): Observable<PlayerState> {
         return playerInteractor.getPlayerStateObservable()
-            .map { state -> if (isPlayerTypeActive(playerType)) state else PlayerState.PAUSE }
+            .map { state -> if (isPlayerTypeActive(playerType)) state else PlayerState.IDLE }
     }
 
     fun getIsPlayingStateObservable(playerType: PlayerType): Observable<Boolean> {
@@ -151,31 +149,45 @@ class PlayerCoordinatorInteractor(
         return activePlayerType == playerType
     }
 
-    fun getPlayerState(playerType: PlayerType): PlayerState {
-        return if (isPlayerTypeActive(playerType)) playerInteractor.getPlayerState() else PlayerState.PAUSE
-    }
-
     fun getSpeedChangeAvailableObservable() = playerInteractor.getSpeedChangeAvailableObservable()
 
-    fun getActivePlayerTypeObservable(): Observable<PlayerType> = activePlayerTypeSubject
+    fun getActivePlayerTypeObservable(): Observable<PlayerType> {
+        return activePlayerTypeSubject.flatMap { opt ->
+            val value = opt.value
+            return@flatMap if (value != null) {
+                Observable.just(value)
+            } else {
+                Observable.never()
+            }
+        }
+    }
 
+    fun getActualTrackPosition(playerType: PlayerType): Single<Long> {
+        return if (isPlayerTypeActive(playerType)) {
+            playerInteractor.getTrackPosition()
+        } else {
+            Single.just(preparedSourcesMap[playerType]?.trackPosition ?: -1L)
+        }
+    }
+
+    @Suppress("CheckResult")
     private fun applyPlayerType(playerType: PlayerType) {
         if (activePlayerType != playerType) {
             playerInteractor.pause()
-            val sourceInfo = preparedSourcesMap[playerType]
-            if (sourceInfo != null) {
-                playerInteractor.prepareToPlay(sourceInfo.source, sourceInfo.trackPosition)
-            }
             val oldSource = preparedSourcesMap[activePlayerType]
             if (oldSource != null) {
                 playerInteractor.getTrackPosition()
                     .subscribe { position -> oldSource.trackPosition = position }
             }
 
-            //not only here
             initializePlayerType(playerType)
             activePlayerType = playerType
-            activePlayerTypeSubject.onNext(activePlayerType)
+            activePlayerTypeSubject.onNext(Optional(activePlayerType))
+
+            val sourceInfo = preparedSourcesMap[playerType]
+            if (sourceInfo != null) {
+                playerInteractor.prepareToPlay(sourceInfo.source, sourceInfo.trackPosition)
+            }
         }
     }
 

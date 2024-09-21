@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.infrastructure.service;
 
-import static com.github.anrimian.musicplayer.domain.Constants.TRIGGER;
-
 import android.app.ForegroundServiceStartNotAllowedException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,6 +11,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.github.anrimian.musicplayer.Constants;
@@ -32,9 +31,8 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     private final Context context;
     private final SettingsRepository settingsRepository;
 
-    private final PublishSubject<Object> stopForegroundSubject = PublishSubject.create();
+    private final PublishSubject<Boolean> stopForegroundSubject = PublishSubject.create();
 
-    private static final Handler handler = new Handler(Looper.getMainLooper());
     private static final Handler stopHandler = new Handler(Looper.getMainLooper());
 
     public static void startPlayForegroundService(Context context) {
@@ -60,24 +58,23 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     @Override
     public void startMusicService() {
         stopHandler.removeCallbacksAndMessages(null);
-        handler.post(() -> {
-            Intent intent = new Intent(context, MusicService.class);
-            checkPermissionsAndStartServiceSafe(context, intent);
-        });
+        Intent intent = new Intent(context, MusicService.class);
+        checkPermissionsAndStartServiceSafe(context, intent);
     }
 
     @Override
-    public void stopMusicService(boolean forceStop) {
+    public void stopMusicService(boolean forceStop, boolean hideUi) {
         long stopDelayMillis = settingsRepository.getKeepNotificationTime();
         if (forceStop || stopDelayMillis == 0L) {
-            stopForegroundService();
+            stopForegroundService(hideUi);
             return;
         }
-        stopHandler.postDelayed(this::stopForegroundService, stopDelayMillis);
+        stopHandler.postDelayed(() -> stopForegroundService(hideUi), stopDelayMillis);
     }
 
+    @NonNull
     @Override
-    public Observable<Object> getStopForegroundSignal() {
+    public Observable<Boolean> getStopForegroundSignal() {
         return stopForegroundSubject;
     }
 
@@ -102,41 +99,43 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     }
 
     private static void startServiceSafe(Context context, Intent intent) {
-        handler.post(() -> {
-            try {
-                ServiceConnection connection = new ForegroundServiceStarterConnection(context, intent);
-                context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-            } catch (RuntimeException ignored) {
-                // Workaround for background calls
-                startServiceFromBg(context, intent);
-            }
-        });
+        try {
+            ServiceConnection connection = new ForegroundServiceStarterConnection(context, intent);
+            context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        } catch (RuntimeException ignored) {
+            // Workaround for background calls
+            startServiceFromBg(context, intent);
+        }
     }
 
     private static void startServiceFromBg(Context context, Intent intent) {
         Intent bgIntent = new Intent(intent);
         intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, true);
-        //let's see how try-catch will work
         try {
             ContextCompat.startForegroundService(context, bgIntent);
         } catch (Exception e) {
-            int sdkVersion = Build.VERSION.SDK_INT;
-            if (sdkVersion >= Build.VERSION_CODES.S && sdkVersion < Build.VERSION_CODES.TIRAMISU
-                    && e instanceof ForegroundServiceStartNotAllowedException) {
-                AppComponent appComponent = Components.getAppComponent();
-                appComponent.analytics().processNonFatalError(e);
-                appComponent.notificationsDisplayer().showErrorNotification(R.string.app_has_no_system_permission_to_start);
-                //check toast on this api version(S)
-                Toast.makeText(context, R.string.app_has_no_system_permission_to_start, Toast.LENGTH_LONG).show();
+            if (processServiceStartError(context, e)) {
                 return;
             }
             throw e;
         }
     }
 
-    private void stopForegroundService() {
-        handler.removeCallbacksAndMessages(null);
-        stopForegroundSubject.onNext(TRIGGER);
+    private static boolean processServiceStartError(Context context, Exception e) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && e instanceof ForegroundServiceStartNotAllowedException) {
+            AppComponent appComponent = Components.getAppComponent();
+            appComponent.analytics().processNonFatalError(e);
+            appComponent.notificationsDisplayer().showErrorNotification(R.string.app_has_no_system_permission_to_start);
+            //check toast on this api version(S)
+            Toast.makeText(context, R.string.app_has_no_system_permission_to_start, Toast.LENGTH_LONG).show();
+            return true;
+        }
+        return false;
+    }
+
+    private void stopForegroundService(boolean hideUi) {
+        stopForegroundSubject.onNext(hideUi);
     }
 
     private static class ForegroundServiceStarterConnection implements ServiceConnection {
@@ -153,7 +152,15 @@ public class SystemServiceControllerImpl implements SystemServiceController {
         public void onServiceConnected(ComponentName name, IBinder iBinder) {
             MusicService.LocalBinder binder = (MusicService.LocalBinder) iBinder;
             MusicService service = binder.getService();
-            ContextCompat.startForegroundService(context, intent);
+            try {
+                ContextCompat.startForegroundService(context, intent);
+            } catch (Exception e) {
+                if (processServiceStartError(context, e)) {
+                    context.unbindService(this);
+                    return;
+                }
+                throw e;
+            }
             service.startForeground();
             context.unbindService(this);
         }

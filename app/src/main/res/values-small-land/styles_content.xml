@@ -14,4 +14,8 @@
         <item name="android:layout_height">32dp</item>
     </style>
 
+    <!--play queue-->
+    <dimen name="file_sync_state_queue_icon_size">14dp</dimen>
+    <dimen name="file_sync_state_queue_icon_margin">-2dp</dimen>
+
 </resources>

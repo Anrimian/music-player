@@ -267,7 +267,7 @@ class CompositionEditorPresenter(
         if (lastEditAction != null) {
             RxUtils.dispose(changeDisposable, presenterDisposable)
             changeDisposable = lastEditAction!!
-                .doFinally { lastEditAction = null }
+                .doOnComplete { lastEditAction = null }
                 .subscribe({}, this::onDefaultError, presenterDisposable)
         }
     }

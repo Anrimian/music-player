@@ -16,10 +16,6 @@ public interface UiStateRepository {
 
     int getCurrentItemLastPosition();
 
-    void setTrackPosition(long position);
-
-    long getTrackPosition();
-
     void setPlayerPanelOpen(boolean open);
 
     boolean isPlayerPanelOpen();
@@ -94,6 +90,10 @@ public interface UiStateRepository {
     void saveArtistListPosition(@Nullable Long id, ListPosition listPosition);
 
     ListPosition getSavedArtistListPosition(@Nullable Long id);
+
+    void saveGenreListPosition(@Nullable Long id, ListPosition listPosition);
+
+    ListPosition getSavedGenreListPosition(@Nullable Long id);
 
     void savePlaylistsListPosition(@Nullable Long id, ListPosition listPosition);
 

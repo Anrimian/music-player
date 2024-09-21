@@ -1,293 +1,284 @@
-package com.github.anrimian.musicplayer.data.repositories.play_queue;
+package com.github.anrimian.musicplayer.data.repositories.play_queue
 
-import static com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl.NO_ITEM;
+import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper
+import com.github.anrimian.musicplayer.data.models.exceptions.NoCompositionsToInsertException
+import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayQueueItemsException
+import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl
+import com.github.anrimian.musicplayer.domain.Constants
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
+import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
+import com.github.anrimian.musicplayer.domain.utils.functions.Optional
+import com.github.anrimian.musicplayer.domain.utils.rx.CacheFlowable
+import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 
-import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayQueueItemsException;
-import com.github.anrimian.musicplayer.domain.Constants;
-import com.github.anrimian.musicplayer.data.models.exceptions.NoCompositionsToInsertException;
-import com.github.anrimian.musicplayer.domain.Constants;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-import com.github.anrimian.musicplayer.domain.repositories.PlayQueueRepository;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
-import com.github.anrimian.musicplayer.domain.utils.functions.Optional;
-import com.github.anrimian.musicplayer.domain.utils.rx.CacheFlowable;
+class PlayQueueRepositoryImpl(
+    private val playQueueDao: PlayQueueDaoWrapper,
+    private val settingsPreferences: SettingsRepository,
+    private val uiStatePreferences: UiStateRepository,
+    private val scheduler: Scheduler
+) : PlayQueueRepository {
 
-import java.util.ArrayList;
-import java.util.List;
+    private val playQueueCreateTimeSubject = BehaviorSubject.createDefault(0L)
 
-import javax.annotation.Nullable;
+    private val playQueueObservable = CacheFlowable(
+        settingsPreferences.randomPlayingObservable
+            .switchMap(
+                { isRandom ->
+                    settingsPreferences.displayFileNameObservable
+                        .switchMap { useFileName ->
+                            playQueueDao.getPlayQueueObservable(isRandom, useFileName)
+                        }
+                }
+            ).toFlowable(BackpressureStrategy.LATEST),
+        ArrayList()
+    )
 
-import io.reactivex.rxjava3.core.BackpressureStrategy;
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Scheduler;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.subjects.BehaviorSubject;
+    private val currentItemObservable = uiStatePreferences.currentItemIdObservable
+        .switchMap(this::getPlayQueueEvent)
+        .subscribeOn(scheduler)
+        .replay(1)
+        .refCount()
 
-public class PlayQueueRepositoryImpl implements PlayQueueRepository {
+    private var consumeDeletedItemEvent = false
 
-    private final PlayQueueDaoWrapper playQueueDao;
-    private final SettingsRepository settingsPreferences;
-    private final UiStateRepository uiStatePreferences;
-    private final Scheduler scheduler;
-
-    private final BehaviorSubject<Long> playQueueCreateTimeSubject = BehaviorSubject.createDefault(0L);
-
-    private final CacheFlowable<List<PlayQueueItem>> playQueueObservable;
-    private final Observable<PlayQueueEvent> currentItemObservable;
-
-    private boolean firstItemEmitted;
-    private boolean consumeDeletedItemEvent = false;
-
-    public PlayQueueRepositoryImpl(PlayQueueDaoWrapper playQueueDao,
-                                   SettingsRepository settingsPreferences,
-                                   UiStateRepository uiStatePreferences,
-                                   Scheduler scheduler) {
-        this.playQueueDao = playQueueDao;
-        this.settingsPreferences = settingsPreferences;
-        this.uiStatePreferences = uiStatePreferences;
-        this.scheduler = scheduler;
-
-        playQueueObservable = new CacheFlowable<>(
-                settingsPreferences.getRandomPlayingObservable()
-                        .switchMap(isRandom -> settingsPreferences.getDisplayFileNameObservable()
-                                .switchMap(useFileName -> playQueueDao.getPlayQueueObservable(isRandom, useFileName))
-                        ).toFlowable(BackpressureStrategy.LATEST),
-                new ArrayList<>()
-        );
-
-        currentItemObservable = uiStatePreferences.getCurrentItemIdObservable()
-                .switchMap(this::getPlayQueueEvent)
-                .subscribeOn(scheduler)
-                .replay(1)
-                .refCount();
+    override fun setPlayQueue(compositionIds: List<Long>, startPosition: Int): Completable {
+        return Completable.fromAction { insertNewQueue(compositionIds, startPosition) }
+            .subscribeOn(scheduler)
     }
 
-    @Override
-    public Completable setPlayQueue(List<Long> compositionIds, int startPosition) {
-        return Completable.fromAction(() -> insertNewQueue(compositionIds, startPosition))
-                .subscribeOn(scheduler);
-    }
-
-    @Override
-    public Flowable<Integer> getCurrentItemPositionObservable() {
-        return Observable.combineLatest(uiStatePreferences.getCurrentItemIdObservable(),
-                        settingsPreferences.getRandomPlayingObservable(),
-                        playQueueDao::getIndexPositionObservable)
-                .switchMap(observable -> observable)
-                .toFlowable(BackpressureStrategy.LATEST);
-    }
-
-    @Override
-    public Observable<PlayQueueEvent> getCurrentQueueItemObservable() {
-        return currentItemObservable;
-    }
-
-    @Override
-    public Flowable<List<PlayQueueItem>> getPlayQueueObservable() {
-        return playQueueObservable.getFlowable();
-    }
-
-    @Override
-    public void setRandomPlayingEnabled(boolean enabled) {
-        Completable.fromAction(() -> {
-            playQueueObservable.clearCache();
-            if (enabled) {
-                long itemId = uiStatePreferences.getCurrentQueueItemId();
-                playQueueDao.reshuffleQueue(itemId);
-            }
-            settingsPreferences.setRandomPlayingEnabled(enabled);
-        }).subscribeOn(scheduler)
-                .subscribe();
-    }
-
-    @Override
-    public Single<Integer> skipToNext() {
-        return Single.fromCallable(() -> {
-            long currentItemId = uiStatePreferences.getCurrentQueueItemId();
-            boolean isShuffled = settingsPreferences.isRandomPlayingEnabled();
-            long nextQueueItemId = playQueueDao.getNextQueueItemId(currentItemId, isShuffled);
-            setCurrentItem(nextQueueItemId);
-
-            return playQueueDao.getPosition(nextQueueItemId, isShuffled);
-        }).subscribeOn(scheduler);
-    }
-
-    @Override
-    public void skipToPrevious() {
-        Completable.fromAction(() -> {
-                    long currentItemId = uiStatePreferences.getCurrentQueueItemId();
-                    boolean isShuffled = settingsPreferences.isRandomPlayingEnabled();
-                    long nextQueueItemId = playQueueDao.getPreviousQueueItemId(currentItemId, isShuffled);
-                    setCurrentItem(nextQueueItemId);
-                }).subscribeOn(scheduler)
-                .subscribe();
-    }
-
-    @Override
-    public void skipToItem(long itemId) {
-        setCurrentItem(itemId);
-    }
-
-    @Override
-    public Completable removeQueueItem(PlayQueueItem item) {
-        return Completable.fromAction(() -> playQueueDao.deleteItem(item.getId()))
-                .subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable restoreDeletedItem() {
-        return Completable.fromAction(() -> {
-            Long restoredId = playQueueDao.restoreDeletedItem();
-            if (uiStatePreferences.getCurrentQueueItemId() == NO_ITEM && restoredId != null) {
-                setCurrentItem(restoredId);
-            }
-        }).subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable swapItems(PlayQueueItem firstItem,
-                                 PlayQueueItem secondItem) {
-        return Completable.fromRunnable(() -> playQueueDao.swapItems(firstItem,
-                secondItem,
-                settingsPreferences.isRandomPlayingEnabled())
-        ).subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable addCompositionsToPlayNext(List<Composition> compositions) {
-        return Completable.fromRunnable(() -> {
-            checkPlayQueueItemsCount(compositions.size());
-            long id = uiStatePreferences.getCurrentQueueItemId();
-            long firstId = playQueueDao.addCompositionsToQueue(compositions, id);
-            if (id == NO_ITEM) {
-                setCurrentItem(firstId);
-            }
-        }).subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable addCompositionsToEnd(List<Composition> compositions) {
-        return Completable.fromRunnable(() -> {
-            checkPlayQueueItemsCount(compositions.size());
-            long id = uiStatePreferences.getCurrentQueueItemId();
-            long firstId = playQueueDao.addCompositionsToEndQueue(compositions);
-            if (id == NO_ITEM) {
-                setCurrentItem(firstId);
-            }
-        }).subscribeOn(scheduler);
-    }
-
-    @Override
-    public Single<Boolean> isCurrentCompositionAtEndOfQueue() {
-        return Single.fromCallable(() -> {
-            boolean isShuffled = settingsPreferences.isRandomPlayingEnabled();
-            int currentPosition = playQueueDao.getPosition(
-                    uiStatePreferences.getCurrentQueueItemId(),
-                    isShuffled
-            );
-            return currentPosition == playQueueDao.getLastPosition(isShuffled);
-        }).subscribeOn(scheduler);
-    }
-
-    @Override
-    public Completable clearPlayQueue() {
-        return Completable.fromAction(playQueueDao::deletePlayQueue)
-                .subscribeOn(scheduler);
-    }
-
-    @Override
-    public Observable<Integer> getPlayQueueSizeObservable() {
-        return playQueueDao.getPlayQueueSizeObservable();
-    }
-
-    @Override
-    public Observable<PlayQueueData> getPlayQueueDataObservable() {
+    override fun getCurrentItemPositionObservable(): Flowable<Int> {
         return Observable.combineLatest(
-                settingsPreferences.getRandomPlayingObservable(),
-                playQueueCreateTimeSubject,
-                PlayQueueData::new
-        );
+            uiStatePreferences.currentItemIdObservable,
+            settingsPreferences.randomPlayingObservable,
+            playQueueDao::getIndexPositionObservable
+        ).switchMap { observable -> observable }
+            .toFlowable(BackpressureStrategy.LATEST)
     }
 
-    private void checkPlayQueueItemsCount(int itemsCountToInsert) {
+    override fun getCurrentQueueItemObservable(): Observable<PlayQueueEvent> {
+        return currentItemObservable
+    }
+
+    override fun getNextQueueItemId(): Single<Long> {
+        return Single.fromCallable {
+            val currentItemId = uiStatePreferences.currentQueueItemId
+            val isShuffled = settingsPreferences.isRandomPlayingEnabled
+            playQueueDao.getNextQueueItemId(currentItemId, isShuffled)
+        }.subscribeOn(scheduler)
+    }
+
+    override fun getPlayQueueObservable(): Flowable<List<PlayQueueItem>> {
+        return playQueueObservable.getFlowable()
+    }
+
+    override fun setRandomPlayingEnabled(enabled: Boolean) {
+        Completable.fromAction {
+            playQueueObservable.clearCache()
+            if (enabled) {
+                val itemId = uiStatePreferences.currentQueueItemId
+                playQueueDao.reshuffleQueue(itemId)
+            }
+            settingsPreferences.isRandomPlayingEnabled = enabled
+        }.subscribeOn(scheduler)
+            .subscribe()
+    }
+
+    override fun skipToNext(): Single<Int> {
+        return Single.fromCallable {
+            val currentItemId = uiStatePreferences.currentQueueItemId
+            val isShuffled = settingsPreferences.isRandomPlayingEnabled
+            val nextQueueItemId = playQueueDao.getNextQueueItemId(currentItemId, isShuffled)
+            setCurrentItem(nextQueueItemId)
+            playQueueDao.getPosition(nextQueueItemId, isShuffled)
+        }.subscribeOn(scheduler)
+    }
+
+    override fun skipToPrevious() {
+        Completable.fromAction {
+            val currentItemId = uiStatePreferences.currentQueueItemId
+            val isShuffled = settingsPreferences.isRandomPlayingEnabled
+            val nextQueueItemId = playQueueDao.getPreviousQueueItemId(currentItemId, isShuffled)
+            setCurrentItem(nextQueueItemId)
+        }.subscribeOn(scheduler)
+            .subscribe()
+    }
+
+    override fun skipToItem(itemId: Long) {
+        setCurrentItem(itemId)
+    }
+
+    override fun removeQueueItem(item: PlayQueueItem): Completable {
+        return Completable.fromAction { playQueueDao.deleteItem(item.itemId) }
+            .subscribeOn(scheduler)
+    }
+
+    override fun restoreDeletedItem(): Completable {
+        return Completable.fromAction {
+            val restoredId = playQueueDao.restoreDeletedItem()
+            if (uiStatePreferences.currentQueueItemId == UiStateRepositoryImpl.NO_ITEM && restoredId != null) {
+                setCurrentItem(restoredId)
+            }
+        }.subscribeOn(scheduler)
+    }
+
+    override fun swapItems(
+        first: PlayQueueItem,
+        second: PlayQueueItem
+    ): Completable {
+        return Completable.fromRunnable {
+            playQueueDao.swapItems(first, second, settingsPreferences.isRandomPlayingEnabled)
+        }.subscribeOn(scheduler)
+    }
+
+    override fun addCompositionsToPlayNext(compositions: List<Composition>): Completable {
+        return Completable.fromRunnable {
+            checkPlayQueueItemsCount(compositions.size)
+            val id = uiStatePreferences.currentQueueItemId
+            val firstId = playQueueDao.addCompositionsToQueue(compositions, id)
+            if (id == UiStateRepositoryImpl.NO_ITEM) {
+                setCurrentItem(firstId)
+            }
+        }.subscribeOn(scheduler)
+    }
+
+    override fun addCompositionsToEnd(compositions: List<Composition>): Completable {
+        return Completable.fromRunnable {
+            checkPlayQueueItemsCount(compositions.size)
+            val id = uiStatePreferences.currentQueueItemId
+            val firstId = playQueueDao.addCompositionsToEndQueue(compositions)
+            if (id == UiStateRepositoryImpl.NO_ITEM) {
+                setCurrentItem(firstId)
+            }
+        }.subscribeOn(scheduler)
+    }
+
+    override fun isCurrentCompositionAtEndOfQueue(): Single<Boolean> {
+        return Single.fromCallable {
+            val isShuffled = settingsPreferences.isRandomPlayingEnabled
+            val currentPosition = playQueueDao.getPosition(
+                uiStatePreferences.currentQueueItemId,
+                isShuffled
+            )
+            currentPosition == playQueueDao.getLastPosition(isShuffled)
+        }.subscribeOn(scheduler)
+    }
+
+    override fun clearPlayQueue(): Completable {
+        return Completable.fromAction { playQueueDao.deletePlayQueue() }
+            .subscribeOn(scheduler)
+    }
+
+    override fun getPlayQueueSizeObservable(): Observable<Int> {
+        return playQueueDao.getPlayQueueSizeObservable()
+    }
+
+    override fun getPlayQueueDataObservable(): Observable<PlayQueueData> {
+        return Observable.combineLatest(
+            settingsPreferences.randomPlayingObservable,
+            playQueueCreateTimeSubject,
+            ::PlayQueueData
+        )
+    }
+
+    override fun setCurrentItemTrackPosition(trackPosition: Long): Completable {
+        return Completable.fromAction {
+            val itemId = uiStatePreferences.currentQueueItemId
+            playQueueDao.insertTrackPosition(itemId, trackPosition)
+        }.subscribeOn(scheduler)
+    }
+
+    override fun getCurrentItemTrackPosition(): Single<Long> {
+        return Single.fromCallable {
+            val itemId = uiStatePreferences.currentQueueItemId
+            playQueueDao.getTrackPosition(itemId)
+        }.subscribeOn(scheduler)
+    }
+
+    override fun setItemTrackPosition(itemId: Long, trackPosition: Long): Completable {
+        return Completable.fromAction {
+            playQueueDao.insertTrackPosition(itemId, trackPosition)
+        }.subscribeOn(scheduler)
+    }
+
+    override fun getItemTrackPosition(itemId: Long): Single<Long> {
+        return Single.fromCallable { playQueueDao.getTrackPosition(itemId) }
+            .subscribeOn(scheduler)
+    }
+
+    private fun checkPlayQueueItemsCount(itemsCountToInsert: Int) {
         if (itemsCountToInsert == 0) {
-            throw new NoCompositionsToInsertException();
+            throw NoCompositionsToInsertException()
         }
         if (playQueueDao.getPlayQueueSize() + itemsCountToInsert > Constants.PLAY_QUEUE_MAX_ITEMS_COUNT) {
-            throw new TooManyPlayQueueItemsException();
+            throw TooManyPlayQueueItemsException()
         }
     }
 
-    private void setCurrentItem(@Nullable Long itemId) {
-        if (itemId == null) {
-            itemId = NO_ITEM;
-        }
-        uiStatePreferences.setCurrentQueueItemId(itemId);
+    private fun setCurrentItem(itemId: Long?) {
+        uiStatePreferences.currentQueueItemId = itemId ?: UiStateRepositoryImpl.NO_ITEM
     }
 
-    private void insertNewQueue(List<Long> compositionIds, int startPosition) {
+    private fun insertNewQueue(compositionIds: List<Long>, startPosition: Int) {
         if (compositionIds.isEmpty()) {
-            return;
+            return
         }
-        if (compositionIds.size() > Constants.PLAY_QUEUE_MAX_ITEMS_COUNT) {
-            throw new TooManyPlayQueueItemsException();
+        if (compositionIds.size > Constants.PLAY_QUEUE_MAX_ITEMS_COUNT) {
+            throw TooManyPlayQueueItemsException()
         }
-        consumeDeletedItemEvent = true;
-        long itemId = playQueueDao.insertNewPlayQueue(compositionIds,
-                settingsPreferences.isRandomPlayingEnabled(),
-                startPosition);
-        setCurrentItem(itemId);
-        consumeDeletedItemEvent = false;
+        consumeDeletedItemEvent = true
+        val itemId = playQueueDao.insertNewPlayQueue(
+            compositionIds,
+            settingsPreferences.isRandomPlayingEnabled,
+            startPosition
+        )
+        setCurrentItem(itemId)
+        consumeDeletedItemEvent = false
     }
 
-    private Observable<PlayQueueEvent> getPlayQueueEvent(long id) {
-        if (id == NO_ITEM) {
-            return Observable.just(new PlayQueueEvent(null));
+    private fun getPlayQueueEvent(id: Long): Observable<PlayQueueEvent> {
+        if (id == UiStateRepositoryImpl.NO_ITEM) {
+            return Observable.just(PlayQueueEvent(null))
         }
-
-        return settingsPreferences.getDisplayFileNameObservable()
-                .switchMap(useFileName -> playQueueDao.getItemObservable(id, useFileName))
-                .flatMap(this::checkForExisting)
-                .map(this::mapToQueueEvent);
+        return settingsPreferences.displayFileNameObservable
+            .switchMap { useFileName -> playQueueDao.getItemObservable(id, useFileName) }
+            .flatMap(::checkForExisting)
+            .map(::PlayQueueEvent)
     }
 
-    private Observable<PlayQueueItem> checkForExisting(Optional<PlayQueueItem> itemOpt) {
-        return Observable.<PlayQueueItem>create(emitter -> {
-            PlayQueueItem item = itemOpt.getValue();
+    private fun checkForExisting(itemOpt: Optional<PlayQueueItem>): Observable<PlayQueueItem> {
+        return Observable.create { emitter ->
+            val item = itemOpt.value
             if (item == null) {
                 if (consumeDeletedItemEvent) {
-                    return;
+                    return@create
                 }
                 //handle deleted item
-                boolean isRandom = settingsPreferences.isRandomPlayingEnabled();
-                int lastPosition = uiStatePreferences.getCurrentItemLastPosition();
-                Long nextItemId = playQueueDao.getItemAtPosition(lastPosition, isRandom);
+                val isRandom = settingsPreferences.isRandomPlayingEnabled
+                val lastPosition = uiStatePreferences.currentItemLastPosition
+                var nextItemId = playQueueDao.getItemAtPosition(lastPosition, isRandom)
                 if (nextItemId == null) {
-                    nextItemId = playQueueDao.getItemAtPosition(0, isRandom);
+                    nextItemId = playQueueDao.getItemAtPosition(0, isRandom)
                 }
-                setCurrentItem(nextItemId);
-                return;
+                setCurrentItem(nextItemId)
+                return@create
             }
-            emitter.onNext(item);
-        }).flatMap(item -> settingsPreferences.getRandomPlayingObservable()
-                .switchMap(random -> playQueueDao.getPositionObservable(item.getId(), random))
-                .doOnNext(uiStatePreferences::setCurrentItemLastPosition)
-                .map(o -> item));
-    }
-
-    private PlayQueueEvent mapToQueueEvent(PlayQueueItem item) {
-        long trackPosition = 0;
-        if (!firstItemEmitted) {
-            firstItemEmitted = true;
-            trackPosition = uiStatePreferences.getTrackPosition();
+            emitter.onNext(item)
+        }.flatMap { item ->
+            settingsPreferences.randomPlayingObservable
+                .switchMap { random -> playQueueDao.getPositionObservable(item.itemId, random) }
+                .doOnNext { position -> uiStatePreferences.currentItemLastPosition = position }
+                .map { item }
         }
-        return new PlayQueueEvent(item, trackPosition);
     }
 }

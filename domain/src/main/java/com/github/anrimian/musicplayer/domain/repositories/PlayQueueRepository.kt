@@ -1,53 +1,61 @@
-package com.github.anrimian.musicplayer.domain.repositories;
+package com.github.anrimian.musicplayer.domain.repositories
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
-
-import java.util.List;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Single;
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
+import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 /**
  * Created on 16.04.2018.
  */
-public interface PlayQueueRepository {
+interface PlayQueueRepository {
 
-    Completable setPlayQueue(List<Long> compositionIds, int startPosition);
+    fun setPlayQueue(compositionIds: List<Long>, startPosition: Int): Completable
 
-    Flowable<Integer> getCurrentItemPositionObservable();
+    fun getCurrentItemPositionObservable(): Flowable<Int>
 
-    Observable<PlayQueueEvent> getCurrentQueueItemObservable();
+    fun getCurrentQueueItemObservable(): Observable<PlayQueueEvent>
 
-    Flowable<List<PlayQueueItem>> getPlayQueueObservable();
+    fun getNextQueueItemId(): Single<Long>
 
-    void setRandomPlayingEnabled(boolean enabled);
+    fun getPlayQueueObservable(): Flowable<List<PlayQueueItem>>
 
-    Single<Integer> skipToNext();
+    fun setRandomPlayingEnabled(enabled: Boolean)
 
-    void skipToPrevious();
+    fun skipToNext(): Single<Int>
 
-    void skipToItem(long itemId);
+    fun skipToPrevious()
 
-    Completable removeQueueItem(PlayQueueItem item);
+    fun skipToItem(itemId: Long)
 
-    Completable restoreDeletedItem();
+    fun removeQueueItem(item: PlayQueueItem): Completable
 
-    Completable swapItems(PlayQueueItem firstItem, PlayQueueItem secondItem);
+    fun restoreDeletedItem(): Completable
 
-    Completable addCompositionsToPlayNext(List<Composition> compositions);
+    fun swapItems(first: PlayQueueItem, second: PlayQueueItem): Completable
 
-    Completable addCompositionsToEnd(List<Composition> compositions);
+    fun addCompositionsToPlayNext(compositions: List<Composition>): Completable
 
-    Single<Boolean> isCurrentCompositionAtEndOfQueue();
+    fun addCompositionsToEnd(compositions: List<Composition>): Completable
 
-    Completable clearPlayQueue();
+    fun isCurrentCompositionAtEndOfQueue(): Single<Boolean>
 
-    Observable<Integer> getPlayQueueSizeObservable();
+    fun clearPlayQueue(): Completable
 
-    Observable<PlayQueueData> getPlayQueueDataObservable();
+    fun getPlayQueueSizeObservable(): Observable<Int>
+
+    fun getPlayQueueDataObservable(): Observable<PlayQueueData>
+
+    fun setCurrentItemTrackPosition(trackPosition: Long): Completable
+
+    fun getCurrentItemTrackPosition(): Single<Long>
+
+    fun setItemTrackPosition(itemId: Long, trackPosition: Long): Completable
+
+    fun getItemTrackPosition(itemId: Long): Single<Long>
+
 }

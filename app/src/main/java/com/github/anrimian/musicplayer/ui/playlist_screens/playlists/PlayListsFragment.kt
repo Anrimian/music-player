@@ -48,6 +48,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNav
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.getMenuItems
+import com.github.anrimian.musicplayer.ui.utils.safeLaunch
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback
 import moxy.ktx.moxyPresenter
@@ -331,7 +332,7 @@ class PlayListsFragment : BaseLibraryFragment(), PlayListsView, FragmentNavigati
     private fun onOptionsItemClicked(item: MenuItem) {
         when (item.itemId) {
             R.id.menu_search -> toolbar.setSearchModeEnabled(true)
-            R.id.menu_import_playlist -> pickPlaylistFileLauncher.launch(PLAYLIST_MIME_TYPE)
+            R.id.menu_import_playlist -> pickPlaylistFileLauncher.safeLaunch(requireContext(), PLAYLIST_MIME_TYPE)
             R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(childFragmentManager)
             R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(childFragmentManager)
         }

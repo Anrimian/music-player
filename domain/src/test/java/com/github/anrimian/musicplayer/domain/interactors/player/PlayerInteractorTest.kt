@@ -23,7 +23,13 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
 class PlayerInteractorTest {
@@ -34,6 +40,7 @@ class PlayerInteractorTest {
     private val settingsRepository: SettingsRepository = mock()
     private val systemMusicController: SystemMusicController = mock()
     private val systemServiceController: SystemServiceController = mock()
+    private val delayedEventsScheduler = TestScheduler()
     private val analytics: Analytics = mock()
 
     private val playerInteractor = PlayerInteractor(
@@ -43,6 +50,7 @@ class PlayerInteractorTest {
         systemMusicController,
         systemServiceController,
         settingsRepository,
+        delayedEventsScheduler,
         analytics,
         1
     )
@@ -119,6 +127,31 @@ class PlayerInteractorTest {
         playerStateSubscriber.assertValue(PlayerState.IDLE)
         isPlayingStateSubscriber.assertValue(false)
     }
+
+    @Test
+    fun `prepare, resume with delay, pause`() {
+        val startPosition = 0L
+        playerInteractor.prepareToPlay(testSource, startPosition)
+        playerInteractor.play(3000L)
+
+        delayedEventsScheduler.advanceTimeBy(1500, TimeUnit.MILLISECONDS)
+        playerInteractor.pause()
+        delayedEventsScheduler.advanceTimeBy(3000, TimeUnit.MILLISECONDS)
+
+
+        inOrder.verify(musicPlayerController, never()).resume()
+
+        playerStateSubscriber.assertValues(
+            PlayerState.IDLE,
+            PlayerState.LOADING,
+            PlayerState.PREPARING,
+            PlayerState.PAUSE,
+            PlayerState.PLAY,
+            PlayerState.PAUSE,
+        )
+        isPlayingStateSubscriber.assertValues(false, true, false)
+    }
+
 
     @Nested
     @DisplayName("in prepare process")
@@ -263,7 +296,7 @@ class PlayerInteractorTest {
 
             playerEventsSubscriber.assertNoValues()
             verify(musicPlayerController, never()).resume()
-            inOrder.verify(systemServiceController).stopMusicService(eq(true))
+            inOrder.verify(systemServiceController).stopMusicService(eq(true), eq(false))
             inOrder.verify(musicPlayerController).stop()
 
             isPlayingStateSubscriber.assertValue(false)
@@ -283,7 +316,7 @@ class PlayerInteractorTest {
 
             playerEventsSubscriber.assertNoValues()
             verify(playerErrorParser, never()).parseError(any())
-            inOrder.verify(systemServiceController).stopMusicService(eq(true))
+            inOrder.verify(systemServiceController).stopMusicService(eq(true), eq(false))
             inOrder.verify(musicPlayerController).stop()
 
             isPlayingStateSubscriber.assertValue(false)
@@ -310,6 +343,29 @@ class PlayerInteractorTest {
                 playerInteractor.play()
                 playerInteractor.prepareToPlay(testSource2, startPosition)
                 testScheduler.advanceTimeBy(500, TimeUnit.MILLISECONDS)
+            }
+
+            @Test
+            fun ` and call pause`() {
+                playerInteractor.pause()
+                testScheduler.advanceTimeBy(500, TimeUnit.MILLISECONDS)
+
+                inOrder.verify(musicPlayerController).seekTo(eq(startPosition))
+                inOrder.verify(musicPlayerController).pause()
+                currentSourceSubscriber.assertValues(Optional(testSource), Optional(testSource2))
+                positionSubscriber.assertValues(startPosition)
+
+                playerStateSubscriber.assertValues(
+                    PlayerState.IDLE,
+                    PlayerState.LOADING,
+                    PlayerState.PREPARING,
+                    PlayerState.PAUSE,
+                    PlayerState.PLAY,
+                    PlayerState.LOADING,
+                    PlayerState.PREPARING,
+                    PlayerState.PAUSE,
+                )
+                isPlayingStateSubscriber.assertValues(false, true, false)
             }
 
             @Test

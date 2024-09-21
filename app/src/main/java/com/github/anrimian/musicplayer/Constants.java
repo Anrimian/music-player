@@ -28,6 +28,7 @@ public interface Constants {
         String TITLE_ARG = "title_arg";
         String POSITIVE_BUTTON_ARG = "positive_button_arg";
         String NEGATIVE_BUTTON_ARG = "negative_button_arg";
+        String NEUTRAL_BUTTON_ARG = "neutral_button_arg";
         String EDIT_TEXT_HINT = "edit_text_hint";
         String EDIT_TEXT_VALUE = "edit_text_value";
         String CAN_BE_EMPTY_ARG = "can_be_empty_arg";
@@ -43,6 +44,9 @@ public interface Constants {
         String DIGITS_ARG = "digits_arg";
         String CLOSE_MULTISELECT_ARG = "close_multiselect_arg";
         String PLAYLIST_IMPORT_ARG = "playlist_import_arg";
+        String DESCRIPTION_ARG = "description_arg";
+        String MESSAGE_ARG = "message_arg";
+        String MESSAGE_RES_ARG = "message_res_arg";
     }
 
     interface Tags {
@@ -62,9 +66,7 @@ public interface Constants {
         String ADD_GENRE_TAG = "add_genre_tag";
         String EDIT_GENRE_TAG = "edit_genre_tag";
         String NEW_FOLDER_NAME_TAG = "new_folder_name_tag";
-        String MESSAGE_ARG = "message_arg";
-        String MESSAGE_RES_ARG = "message_res_arg";
-        String PROGRESS_DIALOG_TAG = "progress_dialog_arg";
+        String PROGRESS_DIALOG_TAG = "progress_dialog_tag";
         String EDIT_COVER_TAG = "edit_cover_tag";
         String ENABLED_MEDIA_PLAYERS = "enabled_media_players";
         String SPEED_SELECTOR_TAG = "speed_selector_tag";

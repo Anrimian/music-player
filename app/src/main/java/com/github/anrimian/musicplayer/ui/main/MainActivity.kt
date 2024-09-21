@@ -51,13 +51,18 @@ class MainActivity : BaseAppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        val loggerRepository = Components.getAppComponent().loggerRepository()
+        val wasCriticalFatalError = loggerRepository.wasCriticalFatalError()
+        if (Permissions.hasFilePermission(this) && !wasCriticalFatalError) {
+            Components.getAppComponent().musicServiceInteractor().prepare()
+        }
+
         if (savedInstanceState == null) {
-            val loggerRepository = Components.getAppComponent().loggerRepository()
             if (loggerRepository.wasFatalError() && loggerRepository.isReportDialogOnStartEnabled()
-                || loggerRepository.wasCriticalFatalError()
+                || wasCriticalFatalError
             ) {
                 ErrorReportDialogFragment().safeShow(supportFragmentManager, null)
-                if (loggerRepository.wasCriticalFatalError()) {
+                if (wasCriticalFatalError) {
                     return
                 }
             }
@@ -193,6 +198,7 @@ class MainActivity : BaseAppCompatActivity() {
                 if (Permissions.hasFilePermission(requireContext())) {
                     appComponent.widgetUpdater().start()
                     appComponent.mediaScannerRepository().runStorageObserver()
+                    appComponent.musicServiceInteractor().prepare()
                 }
             }
         }

@@ -71,8 +71,8 @@ public class RxUtils {
     public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Single<T> creator) {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
-                //noinspection ResultOfMethodCallIgnored
-                creator.subscribe(subject::onNext, emitter::onError);
+                Disposable d = creator.subscribe(subject::onNext, emitter::onError);
+                emitter.setDisposable(d);
             }
         }).mergeWith(subject);
     }
@@ -80,8 +80,8 @@ public class RxUtils {
     public static <T> Observable<T> withDefaultValue(BehaviorSubject<T> subject, Maybe<T> creator) {
         return Observable.<T>create(emitter -> {
             if (subject.getValue() == null) {
-                //noinspection ResultOfMethodCallIgnored
-                creator.subscribe(subject::onNext, emitter::onError);
+                Disposable d = creator.subscribe(subject::onNext, emitter::onError);
+                emitter.setDisposable(d);
             }
         }).mergeWith(subject);
     }

@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.ui.main.external_player
 
-import android.content.Context
 import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -18,6 +17,7 @@ import com.github.anrimian.musicplayer.databinding.ActivityExternalPlayerBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
+import com.github.anrimian.musicplayer.ui.common.activity.BaseMvpAppCompatActivity
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
 import com.github.anrimian.musicplayer.ui.common.dialogs.speed.SpeedSelectorDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
@@ -35,12 +35,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class ExternalPlayerActivity : MvpAppCompatActivity(), ExternalPlayerView {
+class ExternalPlayerActivity : BaseMvpAppCompatActivity(), ExternalPlayerView {
 
     private val presenter by moxyPresenter { 
         Components.getExternalPlayerComponent().externalPlayerPresenter() 
@@ -94,10 +93,6 @@ class ExternalPlayerActivity : MvpAppCompatActivity(), ExternalPlayerView {
         }
     }
 
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(Components.getAppComponent().localeController().dispatchAttachBaseContext(base))
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val uriToPlay = intent.data
@@ -114,7 +109,6 @@ class ExternalPlayerActivity : MvpAppCompatActivity(), ExternalPlayerView {
     override fun displayComposition(source: ExternalCompositionSource) {
         binding.tvComposition.text = CompositionHelper.formatCompositionName(source.title, source.displayName)
         binding.tvCompositionAuthor.text = FormatUtils.formatAuthor(source.artist, this)
-        seekBarViewWrapper.setMax(source.duration)
         binding.tvTotalTime.text = FormatUtils.formatMilliseconds(source.duration)
 
         Components.getAppComponent()
@@ -137,7 +131,7 @@ class ExternalPlayerActivity : MvpAppCompatActivity(), ExternalPlayerView {
     }
 
     override fun showTrackState(currentPosition: Long, duration: Long) {
-        seekBarViewWrapper.setProgress(currentPosition)
+        seekBarViewWrapper.setProgress(currentPosition, duration)
         val formattedTime = FormatUtils.formatMilliseconds(currentPosition)
         binding.sbTrackState.contentDescription = getString(R.string.position_template, formattedTime)
         binding.tvPlayedTime.text = formattedTime

@@ -73,7 +73,11 @@ public interface SettingsRepository {
 
     Observable<Order> getGenresOrderObservable();
 
-    int getSkipConstraintMillis();
+    long getSkipConstraintMillis();
+
+    long getSkipSaveStartMillis();
+
+    long getSkipSaveEndMillis();
 
     boolean isCoversEnabled();
 

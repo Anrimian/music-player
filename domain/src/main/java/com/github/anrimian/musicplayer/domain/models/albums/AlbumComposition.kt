@@ -6,12 +6,13 @@ import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
 import java.util.Date
 
 class AlbumComposition(
-    artist: String?,
+    id: Long,
     title: String,
+    artist: String?,
     album: String?,
     duration: Long,
     size: Long,
-    id: Long,
+    comment: String?,
     storageId: Long?,
     dateAdded: Date,
     dateModified: Date,
@@ -22,12 +23,13 @@ class AlbumComposition(
     val trackNumber: Long?,
     val discNumber: Long?
 ): Composition(
-    artist,
+    id,
     title,
+    artist,
     album,
     duration,
     size,
-    id,
+    comment,
     storageId,
     dateAdded,
     dateModified,

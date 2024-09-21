@@ -46,8 +46,11 @@
     <dimen name="dialog_button_margin_vertical">8dp</dimen>
     <dimen name="dialog_button_margin_horizontal">12dp</dimen>
 
+    <!--common-->
     <dimen name="icon_size">48dp</dimen>
-
+    <dimen name="popup_menu_item_icon_size">20dp</dimen>
+    <dimen name="file_sync_state_icon_size">18dp</dimen>
+    <dimen name="file_sync_state_icon_margin">-3dp</dimen>
 
     <dimen name="current_composition_collapse_text_size">13sp</dimen>
     <dimen name="current_composition_expand_text_size">15sp</dimen>
@@ -77,16 +80,16 @@
     <dimen name="panel_secondary_icon_size">12dp</dimen>
     <dimen name="panel_secondary_icon_padding">2dp</dimen>
     <dimen name="panel_title_margin_start">@dimen/content_internal_margin</dimen>
-
     <dimen name="bottom_sheet_content_margin">16dp</dimen>
     <dimen name="play_button_expand_margin">8dp</dimen>
     <dimen name="play_button_expand_size">56dp</dimen>
     <dimen name="button_expand_size">48dp</dimen>
-    <dimen name="popup_menu_item_icon_size">20dp</dimen>
-    <dimen name="file_sync_state_icon_size">16dp</dimen>
-    <dimen name="file_sync_state_icon_margin">-2dp</dimen>
     <dimen name="file_sync_state_panel_icon_size">18dp</dimen>
     <dimen name="file_sync_state_panel_icon_margin">-1dp</dimen>
+
+    <!--play queue-->
+    <dimen name="file_sync_state_queue_icon_size">@dimen/file_sync_state_icon_size</dimen>
+    <dimen name="file_sync_state_queue_icon_margin">@dimen/file_sync_state_icon_margin</dimen>
 
     <!--modal bottom sheet-->
     <dimen name="sheet_dialog_title_collapsed_size">14sp</dimen>
@@ -94,6 +97,7 @@
     <dimen name="bottom_sheet_width">-1px</dimen><!--match_parent-->
 
     <!--toolbar-->
+    <dimen name="toolbar_nav_icon_margin_start">4dp</dimen>
     <dimen name="toolbar_title_menu_button_size">24dp</dimen>
     <dimen name="toolbar_content_start">72dp</dimen>
     <!--split toolbar_content_start - toolbar_content_start_padding -->

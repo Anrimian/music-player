@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Optional
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -22,6 +23,10 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
+/**
+ * This class should not be called without PlayerCoordinatorInteractor wrapper.
+ *  Otherwise it can be called without source preparation.
+ */
 class PlayerInteractor(
     private val musicPlayerController: MusicPlayerController,
     private val compositionSourceInteractor: CompositionSourceInteractor,
@@ -29,6 +34,7 @@ class PlayerInteractor(
     private val systemMusicController: SystemMusicController,
     private val systemServiceController: SystemServiceController,
     private val settingsRepository: SettingsRepository,
+    private val delayedEventsScheduler: Scheduler,
     private val analytics: Analytics,
     private val maxRePrepareTries: Int = 2
 ) {
@@ -43,6 +49,7 @@ class PlayerInteractor(
 
     private var currentPosition = 0L
     private val trackPositionSubject = BehaviorSubject.create<Long>()
+    private val trackPositionChangeSubject = PublishSubject.create<Long>()
 
     private var playAfterPrepare = false
     private var preparationDisposable: Disposable? = null
@@ -54,6 +61,7 @@ class PlayerInteractor(
     private val eventsDisposable = CompositeDisposable()
     private var trackPositionDisposable: Disposable? = null
     private var playerEventsDisposable: Disposable? = null
+    private var delayedResumeDisposable: Disposable? = null
 
     private var resumeDelay = 0L
 
@@ -78,7 +86,7 @@ class PlayerInteractor(
     fun reset() {
         stopTracingTrackPosition()
         eventsDisposable.clear()
-        preparationDisposable?.dispose()
+        RxUtils.dispose(preparationDisposable)
         currentSource = null
         currentSourceSubject.onNext(Optional(null))
         systemServiceController.stopMusicService(true)
@@ -118,8 +126,8 @@ class PlayerInteractor(
         if (resumeDelay == 0L) {
             resumeInternal()
         } else {
-            Completable.complete()
-                .delay(resumeDelay, TimeUnit.MILLISECONDS)
+            delayedResumeDisposable = Completable.complete()
+                .delay(resumeDelay, TimeUnit.MILLISECONDS, delayedEventsScheduler)
                 .subscribe {
                     resumeDelay = 0L
                     resumeInternal()
@@ -154,12 +162,17 @@ class PlayerInteractor(
         stopTracingTrackPosition()
         seekTo(0)
         eventsDisposable.clear()
+        delayedResumeDisposable?.dispose()
+        delayedResumeDisposable = null
+        RxUtils.dispose(preparationDisposable)
     }
 
     fun pause() {
         isPlayingSubject.onNext(false)
         systemServiceController.stopMusicService()
         eventsDisposable.clear()
+        delayedResumeDisposable?.dispose()
+        delayedResumeDisposable = null
         if (isPreparing) {
             playAfterPrepare = false
             return
@@ -195,6 +208,7 @@ class PlayerInteractor(
             musicPlayerController.seekTo(position)
         }
         updateCurrentPosition(position)
+        trackPositionChangeSubject.onNext(position)
     }
 
     fun fastSeekForward(): Single<Long> {
@@ -209,16 +223,16 @@ class PlayerInteractor(
         return trackPositionSubject.distinctUntilChanged()
     }
 
+    fun getTrackPositionChangeObservable(): Observable<Long> {
+        return trackPositionChangeSubject
+    }
+
     fun getPlayerStateObservable(): Observable<PlayerState> {
         return playerStateSubject
     }
 
     fun getIsPlayingStateObservable(): Observable<Boolean> {
         return isPlayingSubject.distinctUntilChanged()
-    }
-
-    fun getPlayerState(): PlayerState {
-        return playerStateSubject.value!!
     }
 
     fun isPlaying() = isPlayingSubject.value == true
@@ -289,10 +303,10 @@ class PlayerInteractor(
             play()
         } else {
             if (isPlayingSubject.value == true) {
-                musicPlayerController.resume()
-                startTracingTrackPosition()
+                resumeInternal()
                 playerStateSubject.onNext(PlayerState.PLAY)
             } else {
+                musicPlayerController.pause()
                 playerStateSubject.onNext(PlayerState.PAUSE)
             }
         }
@@ -408,11 +422,10 @@ class PlayerInteractor(
         if (formattedException is RelaunchSourceException) {
             if (launchRePrepare()) {
                 return null
-            } else {
-                val cause = formattedException.cause
-                analytics.processNonFatalError(cause)
-                return cause
             }
+            val cause = formattedException.cause
+            analytics.processNonFatalError(cause)
+            return cause
         }
         return formattedException
     }
@@ -438,11 +451,15 @@ class PlayerInteractor(
 
     private fun seekBy(millis: Long): Single<Long> {
         return Single.zip(getTrackPosition(), getDuration()) { position, duration ->
+//            if (position == -1L) {
+//                return@zip -1
+//            }
             val targetPosition = (position + millis).coerceAtLeast(0)
             if (targetPosition > duration && duration != -1L) {
                 return@zip position
             }
             seekTo(targetPosition)
+            trackPositionChangeSubject.onNext(targetPosition)
             return@zip targetPosition
         }
     }

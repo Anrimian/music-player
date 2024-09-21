@@ -10,8 +10,6 @@ import com.github.anrimian.musicplayer.data.storage.providers.playlists.StorageP
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListItem;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent;
-import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,12 +80,14 @@ public class TestDataProvider {
     }
 
     public static Composition fakeComposition(long id) {
-        return new Composition(null,
+        return new Composition(
+                id,
                 "fileName",
+                null,
                 null,
                 0,
                 0,
-                id,
+                null,
                 ++id,
                 new Date(0),
                 new Date(0),
@@ -108,14 +108,6 @@ public class TestDataProvider {
             compositions.put(i, composition);
         }
         return compositions;
-    }
-
-    public static PlayQueueEvent currentItem(int pos) {
-        return new PlayQueueEvent(new PlayQueueItem(pos, fakeComposition(pos)), 0L);
-    }
-
-    public static PlayQueueEvent currentItem(int itemId, int compositionId) {
-        return new PlayQueueEvent(new PlayQueueItem(itemId, fakeComposition(compositionId)), 0L);
     }
 
     public static StoragePlayList storagePlayList(long i) {

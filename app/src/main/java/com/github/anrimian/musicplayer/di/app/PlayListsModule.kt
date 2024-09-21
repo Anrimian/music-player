@@ -1,102 +1,95 @@
-package com.github.anrimian.musicplayer.di.app;
+package com.github.anrimian.musicplayer.di.app
 
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.SLOW_BG_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
-
-import android.content.Context;
-
-import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.PlaylistFilesStorage;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter;
-import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter;
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter;
-
-import javax.annotation.Nonnull;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import dagger.Module;
-import dagger.Provides;
-import io.reactivex.rxjava3.core.Scheduler;
+import android.content.Context
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper
+import com.github.anrimian.musicplayer.data.repositories.playlists.PlayListsRepositoryImpl
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.PlaylistFilesStorage
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
+import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListPresenter
+import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListPresenter
+import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsPresenter
+import dagger.Module
+import dagger.Provides
+import io.reactivex.rxjava3.core.Scheduler
+import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
-public class PlayListsModule {
+class PlayListsModule {
+    
+    @Provides
+    fun playListsPresenter(
+        playListsInteractor: PlayListsInteractor,
+        playerInteractor: LibraryPlayerInteractor,
+        @Named(SchedulerModule.UI_SCHEDULER) uiSchedule: Scheduler,
+        errorParser: ErrorParser
+    ) = PlayListsPresenter(
+        playListsInteractor,
+        playerInteractor,
+        uiSchedule,
+        errorParser
+    )
 
     @Provides
-    @Nonnull
-    PlayListsPresenter playListsPresenter(PlayListsInteractor playListsInteractor,
-                                          LibraryPlayerInteractor playerInteractor,
-                                          @Named(UI_SCHEDULER) Scheduler uiSchedule,
-                                          ErrorParser errorParser) {
-        return new PlayListsPresenter(playListsInteractor, playerInteractor, uiSchedule, errorParser);
-    }
+    fun choosePlayListPresenter(
+        playListsInteractor: PlayListsInteractor,
+        @Named(SchedulerModule.UI_SCHEDULER) uiSchedule: Scheduler,
+        errorParser: ErrorParser
+    ) = ChoosePlayListPresenter(playListsInteractor, uiSchedule, errorParser)
 
     @Provides
-    @Nonnull
-    ChoosePlayListPresenter choosePlayListPresenter(PlayListsInteractor playListsInteractor,
-                                                    @Named(UI_SCHEDULER) Scheduler uiSchedule,
-                                                    ErrorParser errorParser) {
-        return new ChoosePlayListPresenter(playListsInteractor, uiSchedule, errorParser);
-    }
+    fun createPlayListPresenter(
+        playListsInteractor: PlayListsInteractor,
+        @Named(SchedulerModule.UI_SCHEDULER) uiSchedule: Scheduler,
+        errorParser: ErrorParser
+    ) = CreatePlayListPresenter(playListsInteractor, uiSchedule, errorParser)
 
     @Provides
-    @Nonnull
-    CreatePlayListPresenter createPlayListPresenter(PlayListsInteractor playListsInteractor,
-                                                    @Named(UI_SCHEDULER) Scheduler uiSchedule,
-                                                    ErrorParser errorParser) {
-        return new CreatePlayListPresenter(playListsInteractor, uiSchedule, errorParser);
-    }
+    fun playListsInteractor(
+        playerInteractor: LibraryPlayerInteractor,
+        playListsRepository: PlayListsRepository,
+        settingsRepository: SettingsRepository,
+        uiStateRepository: UiStateRepository,
+        analytics: Analytics
+    ) = PlayListsInteractor(
+        playerInteractor,
+        playListsRepository,
+        settingsRepository,
+        uiStateRepository,
+        analytics
+    )
 
     @Provides
-    @Nonnull
-    PlayListsInteractor playListsInteractor(LibraryPlayerInteractor playerInteractor,
-                                            PlayListsRepository playListsRepository,
-                                            SettingsRepository settingsRepository,
-                                            UiStateRepository uiStateRepository,
-                                            Analytics analytics) {
-        return new PlayListsInteractor(playerInteractor,
-                playListsRepository,
-                settingsRepository,
-                uiStateRepository,
-                analytics);
-    }
-
-    @Provides
-    @Nonnull
     @Singleton
-    PlayListsRepository storagePlayListDataSource(Context context,
-                                                  SettingsRepository settingsRepository,
-                                                  StoragePlayListsProvider playListsProvider,
-                                                  CompositionsDaoWrapper compositionsDaoWrapper,
-                                                  PlayListsDaoWrapper playListsDaoWrapper,
-                                                  PlaylistFilesStorage playlistFilesStorage,
-                                                  @Named(DB_SCHEDULER) Scheduler dbScheduler,
-                                                  @Named(SLOW_BG_SCHEDULER) Scheduler slowBgScheduler) {
-        return new PlayListsRepositoryImpl(context,
-                settingsRepository,
-                playListsProvider,
-                compositionsDaoWrapper,
-                playListsDaoWrapper,
-                playlistFilesStorage,
-                dbScheduler,
-                slowBgScheduler);
-    }
+    fun storagePlayListDataSource(
+        context: Context,
+        settingsRepository: SettingsRepository,
+        playListsProvider: StoragePlayListsProvider,
+        compositionsDaoWrapper: CompositionsDaoWrapper,
+        playListsDaoWrapper: PlayListsDaoWrapper,
+        playlistFilesStorage: PlaylistFilesStorage,
+        @Named(SchedulerModule.DB_SCHEDULER) dbScheduler: Scheduler,
+        @Named(SchedulerModule.SLOW_BG_SCHEDULER) slowBgScheduler: Scheduler
+    ): PlayListsRepository = PlayListsRepositoryImpl(
+        context,
+        settingsRepository,
+        playListsProvider,
+        compositionsDaoWrapper,
+        playListsDaoWrapper,
+        playlistFilesStorage,
+        dbScheduler,
+        slowBgScheduler
+    )
 
     @Provides
-    @Nonnull
-    StoragePlayListsProvider storagePlayListsProvider(Context context) {
-        return new StoragePlayListsProvider(context);
-    }
+    fun storagePlayListsProvider(context: Context) = StoragePlayListsProvider(context)
 
 }

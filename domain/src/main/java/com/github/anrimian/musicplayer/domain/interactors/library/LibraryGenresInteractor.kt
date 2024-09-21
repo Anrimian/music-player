@@ -47,6 +47,14 @@ class LibraryGenresInteractor(
         uiStateRepository.saveGenresListPosition(listPosition)
     }
 
+    fun getSavedItemsListPosition(genreId: Long): ListPosition? {
+        return uiStateRepository.getSavedGenreListPosition(genreId)
+    }
+
+    fun saveItemsListPosition(genreId: Long, listPosition: ListPosition?) {
+        uiStateRepository.saveGenreListPosition(genreId, listPosition)
+    }
+
     fun startPlaying(genres: List<Genre>): Completable {
         return libraryRepository.getCompositionIdsInGenres(genres)
             .flatMapCompletable(playerInteractor::setQueueAndPlay)
