@@ -45,6 +45,7 @@ class MusicService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        Components.checkInitialization(applicationContext)
         Components.getAppComponent().mediaSessionHandler().dispatchServiceCreated()
     }
 

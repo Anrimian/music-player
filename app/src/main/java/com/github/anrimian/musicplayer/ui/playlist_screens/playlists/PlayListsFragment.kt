@@ -133,6 +133,8 @@ class PlayListsFragment : BaseLibraryFragment(), PlayListsView, FragmentNavigati
         binding.rvPlayLists.adapter = adapter
         binding.fab.setOnClickListener { onCreatePlayListButtonClicked() }
 
+        binding.progressStateView.onTryAgainClick { presenter.onTryAgainButtonClicked() }
+
         choosePlayListDialogRunner = DialogFragmentRunner(
             childFragmentManager,
             Constants.Tags.SELECT_PLAYLIST_TAG
@@ -199,6 +201,10 @@ class PlayListsFragment : BaseLibraryFragment(), PlayListsView, FragmentNavigati
         binding.progressStateView.showProgress()
     }
 
+    override fun showErrorState(errorCommand: ErrorCommand) {
+        binding.progressStateView.showMessage(errorCommand.message, true)
+    }
+
     override fun updateList(lists: List<PlayList>) {
         adapter.submitList(lists)
     }
@@ -226,7 +232,7 @@ class PlayListsFragment : BaseLibraryFragment(), PlayListsView, FragmentNavigati
     }
 
     override fun launchPickFolderScreen() {
-        pickFolderLauncher.launch(null)
+        pickFolderLauncher.safeLaunch(requireContext(),null)
     }
 
     override fun showPlaylistExportSuccess(playlists: List<PlayList>) {

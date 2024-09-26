@@ -4,6 +4,7 @@ import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao
 import com.github.anrimian.musicplayer.data.models.exceptions.NoCompositionsToInsertException
 import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayQueueItemsException
 import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl
+import com.github.anrimian.musicplayer.data.utils.rx.retryWithDelay
 import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData
@@ -21,6 +22,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import java.util.concurrent.TimeUnit
 
 class PlayQueueRepositoryImpl(
     private val playQueueDao: PlayQueueDaoWrapper,
@@ -254,6 +256,7 @@ class PlayQueueRepositoryImpl(
             .switchMap { useFileName -> playQueueDao.getItemObservable(id, useFileName) }
             .flatMap(::checkForExisting)
             .map(::PlayQueueEvent)
+            .retryWithDelay(10, 5, TimeUnit.SECONDS)
     }
 
     private fun checkForExisting(itemOpt: Optional<PlayQueueItem>): Observable<PlayQueueItem> {

@@ -44,6 +44,10 @@ class PlayListsPresenter(
         subscribeOnPlayLists()
     }
 
+    fun onTryAgainButtonClicked() {
+        subscribeOnPlayLists()
+    }
+
     fun onStop(listPosition: ListPosition?) {
         playListsInteractor.saveListPosition(listPosition)
     }
@@ -267,7 +271,10 @@ class PlayListsPresenter(
         RxUtils.dispose(playlistsDisposable, presenterDisposable)
         playlistsDisposable = playListsInteractor.getPlayListsObservable(searchText)
             .observeOn(uiScheduler)
-            .subscribe(this::onPlayListsReceived)
+            .subscribe(
+                this::onPlayListsReceived,
+                { t -> viewState.showErrorState(errorParser.parseError(t)) }
+            )
         presenterDisposable.add(playlistsDisposable!!)
     }
 

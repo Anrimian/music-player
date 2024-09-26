@@ -227,8 +227,8 @@ class AlbumsListFragment : BaseLibraryFragment(), AlbumsListView, FragmentNaviga
         when (item.itemId) {
             R.id.menu_order -> presenter.onOrderMenuItemClicked()
             R.id.menu_search -> toolbar.setSearchModeEnabled(true)
-            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(childFragmentManager)
-            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(childFragmentManager)
+            R.id.menu_sleep_timer -> SleepTimerDialogFragment().safeShow(this)
+            R.id.menu_equalizer -> EqualizerDialogFragment().safeShow(this)
         }
     }
 

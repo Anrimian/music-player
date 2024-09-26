@@ -287,7 +287,7 @@ public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback{
                 float start = currentAnimationValue == -1? (draggedFromSwipeEdge? 0 : maxEndValue) : currentAnimationValue;
                 float end = draggedFromSwipeEdge? maxEndValue : 0;
                 swipeEffectAnimator = ValueAnimator.ofFloat(start, end);
-                swipeEffectAnimator.setDuration(currentAnimationPlayTime == 0? SWIPE_EFFECT_ANIMATION_TIME : currentAnimationPlayTime);
+                swipeEffectAnimator.setDuration(currentAnimationPlayTime <= 0? SWIPE_EFFECT_ANIMATION_TIME : currentAnimationPlayTime);
                 swipeEffectAnimator.addUpdateListener(valueAnimator -> recyclerView.invalidate());
                 swipeEffectAnimator.addListener(new AnimatorListenerAdapter() {
                     @Override

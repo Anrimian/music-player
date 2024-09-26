@@ -65,13 +65,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.concurrent.TimeUnit
 
-private const val REPEAT_ACTION_ID = "repeat_action_id"
-private const val SHUFFLE_ACTION_ID = "shuffle_action_id"
-private const val FAST_FORWARD_ACTION_ID = "fast_forward_action_id"
-private const val REWIND_ACTION_ID = "rewind_action_id"
-
-private const val PLAY_EVENT_LOCK_WINDOW_MILLIS = 15L
-
 class MediaSessionHandler(
     private val context: Context,
     private val playerInteractor: PlayerInteractor,
@@ -464,17 +457,20 @@ class MediaSessionHandler(
                 PAUSE_ACTION_ID -> libraryPlayerInteractor.pause()
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     actionDisposable = musicServiceInteractor.shuffleAllAndPlay()
+                        .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 COMPOSITIONS_ACTION_ID -> {
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromCompositions(position)
+                        .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 SEARCH_ITEMS_ACTION_ID -> {
                     val position = extras.getInt(POSITION_ARG)
                     val searchQuery = extras.getString(SEARCH_QUERY_ARG)
                     actionDisposable = musicServiceInteractor.playFromSearch(searchQuery, position)
+                        .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 FOLDERS_ACTION_ID -> {
@@ -484,30 +480,35 @@ class MediaSessionHandler(
                     }
                     val compositionId = extras.getLong(COMPOSITION_ID_ARG)
                     actionDisposable = musicServiceInteractor.play(folderId, compositionId)
+                        .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 ARTIST_ITEMS_ACTION_ID -> {
                     val artistId = extras.getLong(ARTIST_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromArtistCompositions(artistId, position)
+                        .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 ALBUM_ITEMS_ACTION_ID -> {
                     val albumId = extras.getLong(ALBUM_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromAlbumCompositions(albumId, position)
+                        .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 GENRE_ITEMS_ACTION_ID -> {
                     val genreId = extras.getLong(GENRE_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromGenreCompositions(genreId, position)
+                        .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 PLAYLIST_ITEMS_ACTION_ID -> {
                     val playlistId = extras.getLong(PLAYLIST_ID_ARG)
                     val position = extras.getInt(POSITION_ARG)
                     actionDisposable = musicServiceInteractor.startPlayingFromPlaylistItems(playlistId, position)
+                        .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
             }
@@ -529,6 +530,7 @@ class MediaSessionHandler(
         override fun onPlayFromSearch(query: String, extras: Bundle) {
             val formattedQuery = query.ifEmpty { null }
             actionDisposable = musicServiceInteractor.playFromSearch(formattedQuery)
+                .observeOn(uiScheduler)
                 .subscribe({}, this::processError)
         }
 
@@ -599,6 +601,15 @@ class MediaSessionHandler(
             val errorCommand = errorParser.parseError(throwable)
             Toast.makeText(context, errorCommand.message, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private companion object {
+        const val REPEAT_ACTION_ID = "repeat_action_id"
+        const val SHUFFLE_ACTION_ID = "shuffle_action_id"
+        const val FAST_FORWARD_ACTION_ID = "fast_forward_action_id"
+        const val REWIND_ACTION_ID = "rewind_action_id"
+
+        const val PLAY_EVENT_LOCK_WINDOW_MILLIS = 15L
     }
 
 }

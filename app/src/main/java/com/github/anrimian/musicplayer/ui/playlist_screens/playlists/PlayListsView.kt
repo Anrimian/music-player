@@ -25,6 +25,9 @@ interface PlayListsView : BaseLibraryView {
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showLoading()
 
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
+    fun showErrorState(errorCommand: ErrorCommand)
+
     @AddToEndSingle
     fun updateList(lists: List<PlayList>)
 

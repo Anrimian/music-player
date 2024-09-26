@@ -5,6 +5,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.forma
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.MediaMetadata;
 import android.os.Build;
 import android.support.v4.media.MediaMetadataCompat;
@@ -70,7 +71,7 @@ public class CompositionSourceModelHelper {
                 Components.getAppComponent()
                         .imageLoader()
                         .loadMediaSessionImage(composition, bitmap -> {
-                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
+                            putBitmapToMetadata(metadataBuilder, bitmap);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -81,7 +82,7 @@ public class CompositionSourceModelHelper {
                 Components.getAppComponent()
                         .imageLoader()
                         .loadImage(composition, bitmap -> {
-                            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
+                            putBitmapToMetadata(metadataBuilder, bitmap);
                             mediaSession.setMetadata(metadataBuilder.build());
                         });
             }
@@ -91,7 +92,7 @@ public class CompositionSourceModelHelper {
                     .imageLoader()
                     .loadImage((ExternalCompositionSource) source, bitmap -> {
                         metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, null);
-                        metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
+                        putBitmapToMetadata(metadataBuilder, bitmap);
                         mediaSession.setMetadata(metadataBuilder.build());
                     });
         }
@@ -128,6 +129,15 @@ public class CompositionSourceModelHelper {
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, null)
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0);
         mediaSession.setMetadata(builder.build());
+    }
+
+    private static void putBitmapToMetadata(MediaMetadataCompat. Builder metadataBuilder,
+                                            @Nullable Bitmap bitmap) {
+        if (bitmap != null && bitmap.getWidth() > 0 && bitmap.getHeight() > 0) {
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
+        } else {
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
+        }
     }
 
 }

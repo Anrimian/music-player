@@ -469,6 +469,9 @@ public class CompositionsDaoWrapper {
             if (duration == 0L && tagDuration != 0) {
                 long tagDurationMillis = tagDuration * 1000L;
                 compositionsDao.updateDuration(id, tagDurationMillis);
+                if (compositionsDao.selectCorruptionType(id) == CorruptionType.UNKNOWN) {
+                    compositionsDao.setCorruptionType(null, id);
+                }
                 wasChanges = true;
             }
 

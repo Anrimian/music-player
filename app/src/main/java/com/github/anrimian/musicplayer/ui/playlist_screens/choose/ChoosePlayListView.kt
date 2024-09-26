@@ -21,6 +21,9 @@ interface ChoosePlayListView : MvpView {
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
     fun showLoading()
 
+    @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LIST_STATE)
+    fun showErrorState(errorCommand: ErrorCommand)
+
     @AddToEndSingle
     fun updateList(list: List<PlayList>)
 

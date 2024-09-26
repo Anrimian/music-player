@@ -541,7 +541,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public int[] getEnabledMediaPlayers() {
         return preferences.getIntArray(
                 ENABLED_MEDIA_PLAYERS,
-                new int[] { MediaPlayers.EXO_MEDIA_PLAYER }
+                new int[] { MediaPlayers.EXO_MEDIA_PLAYER, MediaPlayers.ANDROID_MEDIA_PLAYER }
         );
     }
 

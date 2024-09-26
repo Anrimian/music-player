@@ -11,6 +11,7 @@ import android.view.View.MeasureSpec;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.github.anrimian.musicplayer.R;
@@ -162,10 +163,10 @@ public class AppPopupWindow {
 
         View.OnAttachStateChangeListener listener = new View.OnAttachStateChangeListener() {
             @Override
-            public void onViewAttachedToWindow(View view) {}
+            public void onViewAttachedToWindow(@NonNull View view) {}
 
             @Override
-            public void onViewDetachedFromWindow(View view) {
+            public void onViewDetachedFromWindow(@NonNull View view) {
                 popupWindow.dismiss();
             }
         };
@@ -174,7 +175,11 @@ public class AppPopupWindow {
                 anchorView.removeOnAttachStateChangeListener(listener)
         );
 
-        popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, showX, showY);
+        try {
+            popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, showX, showY);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
 
         return popupWindow;
     }

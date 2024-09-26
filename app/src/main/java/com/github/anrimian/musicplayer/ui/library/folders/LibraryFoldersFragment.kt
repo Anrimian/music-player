@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.folders
 
 import android.animation.ValueAnimator
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -65,6 +66,7 @@ import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
+import com.github.anrimian.musicplayer.ui.utils.getDimensionPixelSize
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.touch_helper.short_swipe.ShortSwipeCallback
@@ -229,7 +231,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView, BackBu
         progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG)
 
         val isSearchLaunched = requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)
-        showSubToolbar(isSearchLaunched, animate = false)
+        showSubToolbar(requireContext(), isSearchLaunched, animate = false)
         binding.btnPaste.isEnabled = !isSearchLaunched
         binding.btnPasteInNewFolder.isEnabled = !isSearchLaunched
         if (isSearchLaunched) {
@@ -624,16 +626,16 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView, BackBu
         binding.btnPaste.isEnabled = !isActive
         binding.btnPasteInNewFolder.isEnabled = !isActive
         if (getFolderId() != null) {
-            showSubToolbar(isActive, true)
+            showSubToolbar(binding.btnPaste.context, isActive, true)
         }
     }
 
-    private fun showSubToolbar(isSearchActive: Boolean, animate: Boolean) {
+    private fun showSubToolbar(context: Context, isSearchActive: Boolean, animate: Boolean) {
         val show = getFolderId() != null && !isSearchActive
 
         val visibility = if (show) View.VISIBLE else View.GONE
 
-        val expandedY = resources.getDimensionPixelSize(R.dimen.sub_toolbar_height)
+        val expandedY = context.getDimensionPixelSize(R.dimen.sub_toolbar_height)
         val collapsedY = 0
         val currentTranslationY = getSubtitleY()
         val targetTranslationY = if (show) expandedY else collapsedY

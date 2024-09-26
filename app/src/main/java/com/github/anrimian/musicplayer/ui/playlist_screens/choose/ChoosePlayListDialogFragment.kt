@@ -25,7 +25,14 @@ import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
 import com.github.anrimian.musicplayer.ui.utils.views.bottom_sheet.SimpleBottomSheetCallback
-import com.github.anrimian.musicplayer.ui.utils.views.delegate.*
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.BoundValuesDelegate
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.DelegateManager
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.MotionLayoutDelegate
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.StatusBarColorDelegate
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextColorDelegate
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.TextSizeDelegate
+import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.RecyclerViewUtils
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -101,6 +108,8 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
         viewBinding.ivClose.visibility = View.INVISIBLE //start state
         viewBinding.ivCreatePlaylist.setOnClickListener { onCreatePlayListButtonClicked() }
 
+        viewBinding.progressStateView.onTryAgainClick { presenter.onTryAgainButtonClicked() }
+
         AndroidUtils.setDialogNavigationBarColorAttr(dialog, R.attr.dialogBackground)
     }
 
@@ -134,6 +143,10 @@ class ChoosePlayListDialogFragment : MvpBottomSheetDialogFragment(), ChoosePlayL
 
     override fun showLoading() {
         viewBinding.progressStateView.showProgress()
+    }
+
+    override fun showErrorState(errorCommand: ErrorCommand) {
+        viewBinding.progressStateView.showMessage(errorCommand.message, true)
     }
 
     override fun updateList(list: List<PlayList>) {

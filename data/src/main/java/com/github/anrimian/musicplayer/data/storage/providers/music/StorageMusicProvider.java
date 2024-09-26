@@ -814,12 +814,6 @@ public class StorageMusicProvider {
     private List<Uri> getStorageUris() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Set<String> volumes = MediaStore.getExternalVolumeNames(context);
-            //if duplicate issue remains, switch to VOLUME_EXTERNAL_PRIMARY
-            String primaryVolume = MediaStore.VOLUME_EXTERNAL;
-            if (volumes.contains(primaryVolume)) {
-                //due to unreproducible duplication issues return only primary volume if it exists
-                return asList(MediaStore.Audio.Media.getContentUri(primaryVolume));
-            }
             List<Uri> uris = new ArrayList<>();
             volumes.forEach(volume -> uris.add(MediaStore.Audio.Media.getContentUri(volume)));
             return uris;

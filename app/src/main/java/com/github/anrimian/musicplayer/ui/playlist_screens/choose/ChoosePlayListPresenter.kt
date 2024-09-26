@@ -20,9 +20,8 @@ class ChoosePlayListPresenter(
         subscribeOnPlayLists()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenterDisposable.dispose()
+    fun onTryAgainButtonClicked() {
+        subscribeOnPlayLists()
     }
 
     fun onBottomSheetSlided(slideOffset: Float) {
@@ -54,7 +53,8 @@ class ChoosePlayListPresenter(
 
     private fun subscribeOnPlayLists() {
         viewState.showLoading()
-        playListsInteractor.getPlayListsObservable().unsafeSubscribeOnUi(this::onPlayListsReceived)
+        playListsInteractor.getPlayListsObservable()
+            .runOnUi(this::onPlayListsReceived, viewState::showErrorState)
     }
 
     private fun onPlayListsReceived(list: List<PlayList>) {

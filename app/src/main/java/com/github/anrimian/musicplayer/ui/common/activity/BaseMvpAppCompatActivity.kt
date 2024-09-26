@@ -7,6 +7,7 @@ import moxy.MvpAppCompatActivity
 open class BaseMvpAppCompatActivity : MvpAppCompatActivity() {
 
     override fun attachBaseContext(base: Context) {
+        Components.checkInitialization(base.applicationContext)
         super.attachBaseContext(
             Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
         )
