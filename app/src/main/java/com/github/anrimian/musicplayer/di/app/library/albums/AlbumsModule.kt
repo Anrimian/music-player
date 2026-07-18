@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.di.app.library.albums
 import com.github.anrimian.musicplayer.di.app.SchedulerModule
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlaylistsInteractor
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.library.albums.list.AlbumsListPresenter
 import dagger.Module
@@ -18,7 +18,7 @@ class AlbumsModule {
     fun artistsListPresenter(
         interactor: LibraryAlbumsInteractor,
         playerInteractor: LibraryPlayerInteractor,
-        playListsInteractor: PlayListsInteractor,
+        playListsInteractor: PlaylistsInteractor,
         errorParser: ErrorParser,
         @Named(SchedulerModule.UI_SCHEDULER) uiScheduler: Scheduler
     ) = AlbumsListPresenter(

@@ -2,7 +2,6 @@ package com.github.anrimian.musicplayer.ui.player_screen.view.slide
 
 import android.animation.ArgbEvaluator
 import android.view.View
-import androidx.core.view.ViewCompat
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.utils.attrColor
@@ -16,7 +15,7 @@ class ToolbarVisibilityDelegate(private val toolbar: AdvancedToolbar) : SlideDel
     private val actionMenuView by lazy { toolbar.getActionMenuView() }
 
     override fun onSlide(slideOffset: Float) {
-        if (ViewCompat.isLaidOut(actionMenuView)) {
+        if (actionMenuView.isLaidOut) {
             makeVisible(slideOffset)
         } else {
             actionMenuView.post { makeVisible(slideOffset) }

@@ -18,11 +18,12 @@ import com.github.anrimian.musicplayer.databinding.PartialDeleteDialogBinding
 import com.github.anrimian.musicplayer.databinding.PartialNumberPickerDialogBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
 import com.github.anrimian.musicplayer.ui.common.dialogs.share.ShareCompositionsDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
@@ -33,9 +34,9 @@ private const val MAX_DISPLAY_DUPLICATE_FILES_COUNT = 5
 
 fun showPlaylistDuplicateEntryDialog(
     context: Context,
-    compositions: Collection<Composition>,
+    compositions: Collection<CompositionModel>,
     hasNonDuplicates: Boolean,
-    playList: PlayList,
+    playList: Playlist,
     isDuplicateCheckEnabled: Boolean,
     onAddEntriesConfirmed: (ignoreDuplicates: Boolean) -> Unit,
     onDuplicateChecked: (isChecked: Boolean) -> Unit
@@ -133,7 +134,7 @@ fun shareCompositions(fragment: Fragment, compositions: Collection<Composition>)
         fragment.requireContext(),
         fragment.childFragmentManager,
         compositions.map(Composition::id),
-        compositions.find { composition -> !composition.isFileExists } != null
+        compositions.any { composition -> !composition.isFileExists }
     )
 }
 
@@ -207,9 +208,9 @@ fun showConfirmDeleteDialog(
     val message = Components.getAppComponent()
         .messageTextFormatter()
         .getConfirmDeleteCompositionsText(context, compositions)
-    val hasExistingFiles = compositions.find { composition ->
+    val hasExistingFiles = compositions.any { composition ->
         composition.isFileExists && composition.initialSource == InitialSource.LOCAL
-    } != null
+    }
     showConfirmDeleteFileDialog(context, message, deleteCallback, hasExistingFiles)
 }
 
@@ -226,12 +227,12 @@ fun showConfirmDeleteDialog(
 
 fun showConfirmDeleteDialog(
     context: Context,
-    playLists: Collection<PlayList>,
+    playlists: Collection<Playlist>,
     deleteCallback: () -> Unit,
 ) {
-    val count = playLists.size
+    val count = playlists.size
     if (count == 1) {
-        showConfirmDeleteDialog(context, playLists.first(), deleteCallback)
+        showConfirmDeleteDialog(context, playlists.first(), deleteCallback)
     } else {
         val message = context.resources.getQuantityString(
             R.plurals.delete_playlists_template,
@@ -244,7 +245,7 @@ fun showConfirmDeleteDialog(
 
 fun showConfirmDeleteDialog(
     context: Context,
-    playList: PlayList,
+    playList: Playlist,
     deleteCallback: () -> Unit,
 ) {
     val message = context.getString(R.string.delete_playlist_template, playList.name)
@@ -268,7 +269,7 @@ fun showConfirmDeleteFileDialog(
             return
         }
         val binding = PartialDeleteDialogBinding.inflate(LayoutInflater.from(context))
-        ViewUtils.setChecked(binding.cbDoNotShowDeleteDialog, !isConfirmDialogEnabled)
+        ViewUtils.setChecked(binding.cbDoNotShowDeleteDialog, false)
         ViewUtils.onCheckChanged(binding.cbDoNotShowDeleteDialog) { enabled ->
             interactor.setAppConfirmDeleteDialogEnabled(!enabled)
         }

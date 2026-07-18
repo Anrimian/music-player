@@ -1,131 +1,144 @@
-package com.github.anrimian.musicplayer.data.database.dao.albums;
+package com.github.anrimian.musicplayer.data.database.dao.albums
 
-import androidx.room.Dao;
-import androidx.room.Query;
-import androidx.room.RawQuery;
-import androidx.sqlite.db.SimpleSQLiteQuery;
-import androidx.sqlite.db.SupportSQLiteQuery;
-
-import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
-import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity;
-import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity;
-import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity;
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Single;
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao
+import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
+import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity
+import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity
+import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 @Dao
-public interface AlbumsDao {
+interface AlbumsDao {
 
     @Query("INSERT OR REPLACE INTO albums (artistId, name) VALUES (:artistId, :name)")
-    long insertAlbum(@Nullable Long artistId, String name);
+    fun insertAlbum(artistId: Long?, name: String): Long
 
-    @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
-    Observable<List<Album>> getAllObservable(SupportSQLiteQuery query);
+    @RawQuery(observedEntities = [ ArtistEntity::class, CompositionEntity::class, AlbumEntity::class ])
+    fun getAllObservable(query: SupportSQLiteQuery): Observable<List<Album>>
 
-    @RawQuery(observedEntities = { ArtistEntity.class, CompositionEntity.class, AlbumEntity.class })
-    Observable<List<AlbumComposition>> getCompositionsInAlbumObservable(SimpleSQLiteQuery query);
+    @RawQuery(observedEntities = [ ArtistEntity::class, CompositionEntity::class, AlbumEntity::class ])
+    fun getCompositionsInAlbumObservable(query: SimpleSQLiteQuery): Observable<List<AlbumComposition>>
 
     @RawQuery
-    List<Composition> getCompositionsInAlbum(SimpleSQLiteQuery query);
+    fun getCompositionsInAlbum(query: SimpleSQLiteQuery): List<Composition>
 
-    @Query("SELECT id FROM compositions WHERE albumId = :albumId " +
-            "ORDER BY discNumber, trackNumber, fileName")
-    Single<List<Long>> getCompositionIdsInAlbum(long albumId);
+    @Query("""
+        SELECT id FROM compositions WHERE albumId = :albumId
+        ORDER BY discNumber, trackNumber, fileName
+    """)
+    fun getCompositionIdsInAlbum(albumId: Long): Single<List<Long>>
 
-    @Query("SELECT id as id," +
-            "name as name, " +
-            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
-            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
-            "FROM albums " +
-            "WHERE albums.artistId = :artistId")
-    Observable<List<Album>> getAllAlbumsForArtistObservable(long artistId);
+    @Query("""
+        SELECT id AS id,
+            name AS name, 
+            (SELECT name FROM artists WHERE artists.id = albums.artistId) AS artist, 
+            (SELECT count() FROM compositions WHERE albumId = albums.id) AS compositionsCount 
+        FROM albums 
+        WHERE albums.artistId = :artistId
+    """)
+    fun getAllAlbumsForArtistObservable(artistId: Long): Observable<List<Album>>
 
-    @Query("SELECT id as id," +
-            "name as name, " +
-            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
-            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
-            "FROM albums " +
-            "WHERE id = :albumId LIMIT 1")
-    Observable<List<Album>> getAlbumObservable(long albumId);
+    @Query("""
+        SELECT id AS id,
+            name AS name, 
+            (SELECT name FROM artists WHERE artists.id = albums.artistId) AS artist, 
+            (SELECT count() FROM compositions WHERE albumId = albums.id) AS compositionsCount 
+        FROM albums 
+        WHERE id = :albumId 
+        LIMIT 1
+    """)
+    fun getAlbumObservable(albumId: Long): Observable<List<Album>>
 
-    @Query("SELECT id as id," +
-            "name as name, " +
-            "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
-            "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
-            "FROM albums " +
-            "WHERE id = :albumId LIMIT 1")
-    Album getAlbum(long albumId);
+    @Query("""
+        SELECT id AS id,
+            name AS name, 
+            (SELECT name FROM artists WHERE artists.id = albums.artistId) AS artist, 
+            (SELECT count() FROM compositions WHERE albumId = albums.id) AS compositionsCount 
+        FROM albums 
+        WHERE id = :albumId 
+        LIMIT 1
+    """)
+    fun getAlbum(albumId: Long): Album?
 
-    @Query("SELECT name as name FROM albums WHERE id = :albumId LIMIT 1")
-    String getAlbumName(long albumId);
+    @Query("SELECT name AS name FROM albums WHERE id = :albumId LIMIT 1")
+    fun getAlbumName(albumId: Long): String
 
-    @Query("SELECT id FROM albums " +
-            "WHERE (artistId = :artistId OR (artistId IS NULL AND :artistId IS NULL)) " +
-            "AND name = :name")
-    Long findAlbum(Long artistId, String name);
+    @Query("""
+        SELECT id FROM albums 
+        WHERE (artistId = :artistId OR (artistId IS NULL AND :artistId IS NULL)) 
+        AND name = :name
+    """)
+    fun findAlbum(artistId: Long?, name: String): Long?
 
     @Query("UPDATE albums SET artistId = :artistId WHERE id = :albumId")
-    void setAuthorId(long albumId, Long artistId);
+    fun setAuthorId(albumId: Long, artistId: Long?)
 
     @Query("SELECT * FROM albums WHERE id = :id")
-    AlbumEntity getAlbumEntity(long id);
+    fun getAlbumEntity(id: Long): AlbumEntity
 
-    @Query("DELETE FROM albums " +
-            "WHERE id = :id AND (SELECT count() FROM compositions WHERE albumId = albums.id) = 0")
-    void deleteEmptyAlbum(long id);
+    @Query("""
+        DELETE FROM albums 
+        WHERE id = :id AND (SELECT count() FROM compositions WHERE albumId = albums.id) = 0
+    """)
+    fun deleteEmptyAlbum(id: Long)
 
-    @Query("DELETE FROM albums " +
-            "WHERE (SELECT count() FROM compositions WHERE albumId = albums.id) = 0")
-    void deleteEmptyAlbums();
+    @Query("DELETE FROM albums WHERE (SELECT count() FROM compositions WHERE albumId = albums.id) = 0")
+    fun deleteEmptyAlbums()
 
     @Query("SELECT name FROM albums")
-    String[] getAlbumNames();
+    fun getAlbumNames(): Array<String>
 
     @Query("UPDATE albums SET name = :name WHERE id = :id")
-    void updateAlbumName(String name, long id);
+    fun updateAlbumName(name: String, id: Long)
 
     @Query("SELECT artistId FROM albums WHERE id = :albumId")
-    Long getArtistId(long albumId);
+    fun getArtistId(albumId: Long): Long?
 
-    @Query("UPDATE compositions SET albumId = :newAlbumId WHERE id IN (" +
-            "SELECT id FROM compositions WHERE albumId = :oldAlbumId" +
-            ")")
-    void changeCompositionsAlbum(long oldAlbumId, long newAlbumId);
+    @Query("""
+        UPDATE compositions SET albumId = :newAlbumId WHERE id IN (
+            SELECT id FROM compositions WHERE albumId = :oldAlbumId
+        )
+    """)
+    fun changeCompositionsAlbum(oldAlbumId: Long, newAlbumId: Long)
 
-    @Query("UPDATE compositions SET dateModified = :dateModified WHERE id IN (" +
-            "SELECT id FROM compositions WHERE albumId = :albumId" +
-            ")")
-    void updateAlbumCompositionsModifyTime(long albumId, Date dateModified);
+    @Query("""
+        UPDATE compositions SET modifiedTime = :modifiedTime WHERE id IN (
+            SELECT id FROM compositions WHERE albumId = :albumId
+        )
+    """)
+    fun updateAlbumCompositionsModifyTime(albumId: Long, modifiedTime: Long)
 
-    static String getAlbumCompositionsQuery(boolean useFileName) {
-        return "SELECT " +
-                CompositionsDao.getCompositionSelectionQuery(useFileName) +
-                ", trackNumber AS trackNumber, " +
-                "discNumber AS discNumber " +
-                "FROM compositions " +
-                "WHERE albumId = ? " +
-                getAlbumItemsOrder();
-    }
+    companion object {
 
-    static String getCompositionsQuery(boolean useFileName) {
-        return "SELECT " +
-                CompositionsDao.getCompositionSelectionQuery(useFileName) +
-                "FROM compositions " +
-                "WHERE albumId = ? " +
-                getAlbumItemsOrder();
-    }
+        private const val ALBUM_ITEMS_ORDER = "ORDER BY discNumber, trackNumber, fileName"
 
-    private static String getAlbumItemsOrder() {
-        return "ORDER BY discNumber, trackNumber, fileName";
+        fun getAlbumCompositionsQuery(useFileName: Boolean): String {
+            return """
+                SELECT ${CompositionsDao.getCompositionSelectionQuery(useFileName)}, 
+                        trackNumber AS trackNumber, 
+                        discNumber AS discNumber 
+                    FROM compositions 
+                    WHERE albumId = ? 
+                    $ALBUM_ITEMS_ORDER
+            """
+        }
+
+        fun getCompositionsQuery(useFileName: Boolean): String {
+            return """
+                SELECT ${CompositionsDao.getCompositionSelectionQuery(useFileName)} 
+                    FROM compositions 
+                    WHERE albumId = ? 
+                    $ALBUM_ITEMS_ORDER
+            """
+        }
     }
 
 }

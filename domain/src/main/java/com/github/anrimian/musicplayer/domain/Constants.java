@@ -1,5 +1,9 @@
 package com.github.anrimian.musicplayer.domain;
 
+import java.util.Set;
+
+import kotlin.collections.SetsKt;
+
 public interface Constants {
 
     Object TRIGGER = new Object();
@@ -11,4 +15,25 @@ public interface Constants {
 
     char GENRE_DIVIDER_CHAR = ',';
     String GENRE_DIVIDER = GENRE_DIVIDER_CHAR + " ";
+
+    Set<String> DEFAULT_REMOTE_EXTENSIONS = SetsKt.setOf(
+            "mp4a",
+            "fmp4",
+            "webm",
+            "matroska",
+            "mp3",
+            "m4a",
+            "ogg",
+            "wav",
+            "wma",
+            "aac",
+            "flac",
+            "opus",
+            "vorbis",
+            "mkv",
+            "mp4",
+            "ts",
+            "3gp"
+    );
+
 }

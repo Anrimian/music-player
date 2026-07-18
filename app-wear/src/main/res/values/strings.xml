@@ -1,0 +1,8 @@
+<resources>
+    <string name="host_app_not_found">No device with installed host app was found</string>
+    <string name="update_host_app">Update main app is required</string>
+    <string name="update_wear_app">Update wear app is required</string>
+    <string name="locate_app">Locate app in Google Play</string>
+    <string name="check_your_device">Check your device</string>
+    <string name="state_error_template">Error: ev: %s, et: %s, t: %s</string>
+</resources>

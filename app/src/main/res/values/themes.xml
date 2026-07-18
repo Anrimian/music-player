@@ -122,6 +122,16 @@
         <item name="dialogButtonColor">@color/color_orange_accent</item>
     </style>
 
+    <style name="PrimaryPinkTheme" parent="PrimaryLightTheme">
+        <item name="colorPrimary">@color/colorPinkPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPinkPrimaryDark</item>
+        <item name="colorAccent">@color/colorPinkAccent</item>
+        <item name="colorAccentContrast">@color/colorPinkAccentContrast</item>
+
+        <!--text-->
+        <item name="dialogButtonColor">@color/colorPinkPrimary</item>
+    </style>
+
     <style name="DarkOrangeTheme" parent="@style/PrimaryDarkTheme">
         <item name="colorAccent">@color/color_orange_dark_accent</item>
         <item name="colorPrimaryVariant">@color/colorGreenDarkAccent</item>
@@ -184,6 +194,55 @@
         <item name="dialogBackground">@color/dark_background_level_0</item>
         <item name="subToolbarBackground">@android:color/black</item>
         <item name="horizontalNavBarBackground">@android:color/black</item>
+    </style>
+
+    <style name="CompletelyBlackRedTheme" parent="CompletelyBlackTheme">
+        <item name="colorAccent">@color/colorRedDarkAccent</item>
+        <item name="colorPrimaryVariant">@color/colorRedDarkAccent</item>
+        <item name="dialogButtonColor">@color/colorRedDarkAccent</item>
+    </style>
+
+    <style name="MatteDarkTheme" parent="PrimaryDarkTheme">
+        <!--primary colors-->
+        <item name="colorPrimary">@color/matte_dark_background_level_1</item>
+        <item name="colorPrimaryDark">@color/matte_dark_background_level_0</item>
+        <item name="colorPrimaryDarkSecondary">@color/matte_dark_background_level_2</item>
+
+        <!--background-->
+        <item name="android:colorBackground">@color/matte_dark_background_level_0</item>
+        <item name="listBackground">@color/matte_dark_background_level_0</item>
+        <item name="listItemBackground">@color/matte_dark_background_level_0</item>
+        <item name="listItemBottomBackground">@color/matte_dark_background_level_1</item>
+        <item name="popupMenuBackgroundColor">@color/matte_dark_background_level_1</item>
+        <item name="dialogBackground">@color/matte_dark_background_level_1</item>
+        <item name="playerPanelBackground">?attr/colorPrimary</item>
+        <item name="subToolbarBackground">@color/matte_dark_background_level_0_5</item>
+        <item name="horizontalNavBarBackground">@color/matte_dark_background_level_1</item>
+    </style>
+
+    <style name="MatteDarkBlueTheme" parent="MatteDarkTheme">
+        <item name="colorAccent">@color/colorAccentDark</item>
+        <item name="colorPrimaryVariant">@color/colorAccentDark</item>
+        <item name="dialogButtonColor">@color/colorAccentDark</item>
+    </style>
+
+    <style name="MatteDarkOrangeTheme" parent="MatteDarkTheme">
+        <item name="colorAccent">@color/color_orange_dark_accent</item>
+        <item name="colorPrimaryVariant">@color/color_orange_dark_accent</item>
+        <item name="colorAttention">@color/color_orange_dark_accent</item>
+        <item name="dialogButtonColor">@color/color_orange_dark_accent</item>
+    </style>
+
+    <style name="MatteDarkGreenTheme" parent="MatteDarkTheme">
+        <item name="colorAccent">@color/colorGreenDarkAccent</item>
+        <item name="colorPrimaryVariant">@color/colorGreenDarkAccent</item>
+        <item name="dialogButtonColor">@color/colorGreenDarkAccent</item>
+    </style>
+
+    <style name="MatteDarkPinkTheme" parent="MatteDarkTheme">
+        <item name="colorAccent">@color/colorPinkAccent</item>
+        <item name="colorPrimaryVariant">@color/colorPinkAccent</item>
+        <item name="dialogButtonColor">@color/colorPinkAccent</item>
     </style>
 
     <style name="WidgetTheme">

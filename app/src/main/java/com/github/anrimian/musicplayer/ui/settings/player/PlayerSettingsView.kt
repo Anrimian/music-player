@@ -17,6 +17,12 @@ interface PlayerSettingsView : MvpView {
     fun showPauseOnZeroVolumeLevelEnabled(enabled: Boolean)
 
     @AddToEndSingle
+    fun showPauseOnAudioDeviceRemoveEnabled(enabled: Boolean)
+
+    @AddToEndSingle
+    fun showSkipSilenceEnabled(enabled: Boolean)
+
+    @AddToEndSingle
     fun showSoundBalance(soundBalance: SoundBalance)
 
     @AddToEndSingle

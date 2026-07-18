@@ -1,72 +1,51 @@
 package com.github.anrimian.musicplayer.ui.settings.library
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
 import com.github.anrimian.musicplayer.R
-import com.github.anrimian.musicplayer.databinding.FragmentLibrarySettingsBinding
-import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.ui.common.dialogs.showNumberPickerDialog
+import com.github.anrimian.musicplayer.di.utils.viewModel
+import com.github.anrimian.musicplayer.ui.common.compose.AppTheme
+import com.github.anrimian.musicplayer.ui.common.effects.CommonEffect
+import com.github.anrimian.musicplayer.ui.common.navigation.Screen
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment
-import com.github.anrimian.musicplayer.ui.utils.ViewUtils
-import com.github.anrimian.musicplayer.ui.utils.ViewUtils.onCheckChanged
-import com.github.anrimian.musicplayer.ui.utils.applyBottomInsets
+import com.github.anrimian.musicplayer.ui.utils.compose.components.swipe.SwipeToCloseReporter
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
-import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
-import moxy.MvpAppCompatFragment
-import moxy.ktx.moxyPresenter
 
 /**
  * Created on 19.10.2017.
  */
-class LibrarySettingsFragment : MvpAppCompatFragment(),
-    FragmentNavigationListener, LibrarySettingsView {
+class LibrarySettingsFragment : Fragment(), FragmentNavigationListener {
 
-    private val presenter by moxyPresenter { Components.getSettingsComponent().librarySettingsPresenter() }
-
-    private lateinit var binding: FragmentLibrarySettingsBinding
-
-    private lateinit var navigation: FragmentNavigation
+    private val viewModel by viewModel<LibrarySettingsViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentLibrarySettingsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        val fn = FragmentNavigation.from(parentFragmentManager)
         val toolbar: AdvancedToolbar = requireActivity().findViewById(R.id.toolbar)
 
-        binding.nsvContainer.applyBottomInsets()
-
-        navigation = FragmentNavigation.from(parentFragmentManager)
-
-        binding.tvExcludedFolders.setOnClickListener {
-            navigation.addNewFragment(ExcludedFoldersFragment())
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppTheme {
+                    LibrarySettingsScreen(
+                        viewModel = viewModel,
+                        navigationCallback = ::handleNavigationEffect,
+                        actionsCallback = {},
+                        swipeToCloseReporter = SwipeToCloseReporter(fn, toolbar)
+                    )
+                }
+            }
         }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            binding.cbDoNotShowDeleteDialog.visibility = View.GONE
-        }
-
-        onCheckChanged(binding.cbDoNotShowDeleteDialog, presenter::doNotAppConfirmDialogChecked)
-        onCheckChanged(binding.cbShowAllAudioFiles, presenter::onShowAllAudioFilesChecked)
-        onCheckChanged(binding.cbPlaylistInsertStart, presenter::onPlaylistInsertStartChecked)
-        onCheckChanged(binding.cbPlaylistDuplicateCheck, presenter::onPlaylistDuplicateCheckChecked)
-
-        binding.flAudioMinDurationClickableArea.setOnClickListener {
-            presenter.onSelectMinDurationClicked()
-        }
-
-        SlidrPanel.simpleSwipeBack(binding.nsvContainer, this, toolbar::setNavigationButtonProgress)
     }
 
     override fun onFragmentResumed() {
@@ -76,37 +55,13 @@ class LibrarySettingsFragment : MvpAppCompatFragment(),
         toolbar.setTitleClickListener(null)
     }
 
-    override fun showAppConfirmDeleteDialogEnabled(enabled: Boolean) {
-        ViewUtils.setChecked(binding.cbDoNotShowDeleteDialog, !enabled)
-    }
-
-    override fun showAllAudioFilesEnabled(enabled: Boolean) {
-        ViewUtils.setChecked(binding.cbShowAllAudioFiles, enabled)
-    }
-
-    override fun showAudioFileMinDurationMillis(millis: Long) {
-        val seconds = (millis/1000L).toInt()
-        binding.tvAudioMinDurationValue.text = getString(
-            R.string.with_duration_less_than,
-            resources.getQuantityString(R.plurals.seconds_template, seconds, seconds)
-        )
-    }
-
-    override fun showPlaylistInsertStartEnabled(enabled: Boolean) {
-        ViewUtils.setChecked(binding.cbPlaylistInsertStart, enabled)
-    }
-
-    override fun showPlaylistDuplicateCheckEnabled(enabled: Boolean) {
-        ViewUtils.setChecked(binding.cbPlaylistDuplicateCheck, enabled)
-    }
-
-    override fun showSelectMinAudioDurationDialog(currentValue: Long) {
-        showNumberPickerDialog(
-            requireContext(),
-            0,
-            120,
-            currentValue / 1000L
-        ) { value -> presenter.onAudioFileMinDurationMillisPicked(value * 1000L) }
+    private fun handleNavigationEffect(effect: CommonEffect.NavigationEffect) {
+        val fn = FragmentNavigation.from(parentFragmentManager)
+        when(effect.screen) {
+            is Screen.ExcludedFolders -> {
+                fn.addNewFragment(ExcludedFoldersFragment())
+            }
+        }
     }
 
 }

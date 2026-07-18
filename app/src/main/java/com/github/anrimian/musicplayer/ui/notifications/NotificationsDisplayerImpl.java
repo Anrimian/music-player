@@ -1,6 +1,7 @@
 package com.github.anrimian.musicplayer.ui.notifications;
 
 import static androidx.core.content.ContextCompat.getColor;
+import static com.github.anrimian.musicplayer.ui.notifications.NotificationUtils.startMediaPlaybackForeground;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -16,7 +17,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
+import com.github.anrimian.utils.AndroidUtilsKt;
 
 public class NotificationsDisplayerImpl implements NotificationsDisplayer {
 
@@ -48,7 +49,7 @@ public class NotificationsDisplayerImpl implements NotificationsDisplayer {
     public void startForegroundErrorNotification(Service service,
                                                  @StringRes int errorMessageId) {
         Notification notification = getErrorNotification(errorMessageId);
-        service.startForeground(ERROR_NOTIFICATION_ID, notification);
+        startMediaPlaybackForeground(service, ERROR_NOTIFICATION_ID, notification);
     }
 
     @Override

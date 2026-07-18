@@ -5,30 +5,35 @@ import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
+import com.github.anrimian.musicplayer.domain.models.folders.AbstractDirectory
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FilesChangeResult
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
+import com.github.anrimian.musicplayer.domain.models.folders.Volume
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.toChangedKeys
 import com.github.anrimian.musicplayer.domain.models.utils.toFileKeys
-import com.github.anrimian.musicplayer.domain.repositories.EditorRepository
+import com.github.anrimian.musicplayer.domain.repositories.LibraryFilesRepository
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.rx3.asFlow
+import kotlinx.coroutines.rx3.await
 
 /**
  * Created on 24.10.2017.
  */
 class LibraryFoldersInteractor(
     private val libraryRepository: LibraryRepository,
-    private val editorRepository: EditorRepository,
+    private val libraryFilesRepository: LibraryFilesRepository,
     private val musicPlayerInteractor: LibraryPlayerInteractor,
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     private val settingsRepository: SettingsRepository,
@@ -44,6 +49,10 @@ class LibraryFoldersInteractor(
 
     fun getFolderObservable(folderId: Long): Observable<FolderInfo> {
         return libraryRepository.getFolderObservable(folderId)
+    }
+
+    fun getVolumesObservable(): Observable<List<Volume>> {
+        return libraryRepository.getVolumes()
     }
 
     fun playAllMusicInFolder(folderId: Long?): Completable {
@@ -111,7 +120,7 @@ class LibraryFoldersInteractor(
     }
 
     fun renameFolder(folderId: Long, newName: String): Completable {
-        return editorRepository.changeFolderName(folderId, newName)
+        return libraryFilesRepository.changeFolderName(folderId, newName)
             .flatMapCompletable(this::onFileKeyChanged)
     }
 
@@ -120,7 +129,7 @@ class LibraryFoldersInteractor(
         fromFolderId: Long?,
         toFolderId: Long?,
     ): Completable {
-        return editorRepository.moveFiles(files, fromFolderId, toFolderId)
+        return libraryFilesRepository.moveFiles(files, fromFolderId, toFolderId)
             .flatMapCompletable(this::onFileKeyChanged)
     }
 
@@ -128,9 +137,9 @@ class LibraryFoldersInteractor(
         files: Collection<FileSource>,
         fromFolderId: Long?,
         targetParentFolderId: Long?,
-        directoryName: String?,
+        directoryName: String,
     ): Completable {
-        return editorRepository.moveFilesToNewDirectory(
+        return libraryFilesRepository.moveFilesToNewDirectory(
             files,
             fromFolderId,
             targetParentFolderId,
@@ -138,25 +147,25 @@ class LibraryFoldersInteractor(
         ).flatMapCompletable(this::onFileKeyChanged)
     }
 
-    fun addFolderToIgnore(folder: IgnoredFolder): Completable {
-        return libraryRepository.addFolderToIgnore(folder)
-            .flatMapCompletable(syncInteractor::onLocalFilesDeleted)
+    suspend fun addFolderToIgnore(folder: IgnoredFolder) {
+        val deletedFiles = libraryRepository.addFolderToIgnore(folder).await()
+        syncInteractor.onLocalFilesDeleted(deletedFiles).await()
     }
 
-    fun addFolderToIgnore(folder: FolderFileSource): Single<IgnoredFolder> {
+    fun addFolderToIgnore(folder: AbstractDirectory): Single<IgnoredFolder> {
         return libraryRepository.addFolderToIgnore(folder)
             .flatMap { pair ->
                 syncInteractor.onLocalFilesDeleted(pair.second).toSingleDefault(pair.first)
             }
     }
 
-    fun getIgnoredFoldersObservable(): Observable<List<IgnoredFolder>> {
-        return libraryRepository.getIgnoredFoldersObservable()
+    fun getIgnoredFoldersFlow(): Flow<List<IgnoredFolder>> {
+        return libraryRepository.getIgnoredFoldersObservable().asFlow()
     }
 
-    fun deleteIgnoredFolder(folder: IgnoredFolder): Completable {
-        return libraryRepository.deleteIgnoredFolder(folder)
-            .flatMapCompletable(syncInteractor::onLocalFilesRestored)
+    suspend fun deleteIgnoredFolder(folder: IgnoredFolder) {
+        val restoredFiles = libraryRepository.deleteIgnoredFolder(folder.path).await()
+        syncInteractor.onLocalFilesRestored(restoredFiles).await()
     }
 
     private fun play(fileSources: List<FileSource>, composition: Composition?): Completable {

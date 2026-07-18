@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.common.snackbars;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.ui.utils.views.progress_bar.ProgressBarCountDownTimer;
@@ -62,6 +64,28 @@ public class AppSnackbar extends BaseTransientBottomBar<AppSnackbar>  {
         progressBar.setVisibility(View.GONE);
 
         setDurationMillis(DURATION_SHORT_MILLIS);
+    }
+
+    @NonNull
+    @Override
+    public Behavior getBehavior() {
+        return new Behavior() {
+            @Override
+            public boolean onTouchEvent(
+                    @NonNull CoordinatorLayout parent,
+                    @NonNull View child,
+                    @NonNull MotionEvent event
+            ) {
+                try {
+                    return super.onTouchEvent(parent, child, event);
+                } catch (IllegalArgumentException e) {
+                    // ViewDragHelper.captureChildView throws when the snackbar view
+                    // is detached from CoordinatorLayout during active touch processing.
+                    // This is a known framework race condition — suppress gracefully.
+                    return false;
+                }
+            }
+        };
     }
 
     public AppSnackbar setText(CharSequence text) {

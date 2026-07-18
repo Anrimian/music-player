@@ -11,7 +11,7 @@ class ListDragFilter {
         eventsToSkip++.coerceAtMost(MAX_EVENTS_TO_SKIP)
     }
 
-    fun filterListEmitting(list: List<Any>): Boolean {
+    fun isEmitAllowed(list: List<Any>): Boolean {
         if (currentSize != list.size) {
             currentSize = list.size
             return true

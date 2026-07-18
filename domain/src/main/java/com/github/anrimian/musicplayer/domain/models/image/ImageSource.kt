@@ -1,5 +1,3 @@
-package com.github.anrimian.musicplayer.domain.models.image;
+package com.github.anrimian.musicplayer.domain.models.image
 
-public interface ImageSource {
-
-}
+interface ImageSource 

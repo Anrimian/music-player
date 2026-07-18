@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.content.Relaunc
 import com.github.anrimian.musicplayer.domain.models.composition.content.TooLargeSourceException
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnknownPlayerException
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
+import com.github.anrimian.musicplayer.domain.models.exceptions.NotAllowedPathException
 import java.io.FileNotFoundException
 
 open class PlayerErrorParserImpl(
@@ -53,10 +54,14 @@ open class PlayerErrorParserImpl(
                 if (cause is ParserException) {
                     return CorruptedMediaFileException()
                 }
+                if (isTransientCodecError(throwable)) {
+                    return RelaunchSourceException(throwable)
+                }
             }
             is UnsupportedSourceException -> return throwable
             is NoReadPermissionException -> return throwable
             is UnavailableMediaStoreException -> return AcceptablePlayerException(throwable)
+            is NotAllowedPathException -> return throwable
             is UnknownPlayerException,
             is SecurityException,
                 -> {
@@ -66,5 +71,16 @@ open class PlayerErrorParserImpl(
         }
         analytics.processNonFatalError(throwable)
         return throwable
+    }
+
+    private fun isTransientCodecError(throwable: Throwable): Boolean {
+        var cause: Throwable? = throwable
+        while (cause != null) {
+            if (cause is android.media.MediaCodec.CodecException) {
+                return true
+            }
+            cause = cause.cause
+        }
+        return false
     }
 }

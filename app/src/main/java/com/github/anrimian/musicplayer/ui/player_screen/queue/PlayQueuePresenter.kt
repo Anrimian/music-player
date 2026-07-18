@@ -4,13 +4,13 @@ import com.github.anrimian.fsync.SyncInteractor
 import com.github.anrimian.musicplayer.data.utils.rx.retryWithDelay
 import com.github.anrimian.musicplayer.domain.Constants.NO_POSITION
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.PlayerScreenInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlaylistsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
@@ -28,7 +28,7 @@ class PlayQueuePresenter(
     private val playerInteractor: LibraryPlayerInteractor,
     private val playerScreenInteractor: PlayerScreenInteractor,
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
-    playListsInteractor: PlayListsInteractor,
+    playListsInteractor: PlaylistsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ): BaseLibraryPresenter<PlayQueueView>(
@@ -95,7 +95,7 @@ class PlayQueuePresenter(
         viewState.showSelectPlayListDialog()
     }
 
-    fun onPlayListForAddingSelected(playList: PlayList) {
+    fun onPlayListForAddingSelected(playList: Playlist) {
         addPreparedCompositionsToPlayList(playList)
     }
 
@@ -147,7 +147,7 @@ class PlayQueuePresenter(
         playerInteractor.restoreDeletedItem().justSubscribe(this::onDefaultError)
     }
 
-    fun onPlayListForAddingCreated(playList: PlayList) {
+    fun onPlayListForAddingCreated(playList: Playlist) {
         val compositionsToAdd = ArrayList(playQueue)
         performAddToPlaylist(compositionsToAdd, playList) {}
     }
@@ -191,12 +191,12 @@ class PlayQueuePresenter(
         playerInteractor.removeQueueItem(item).unsafeSubscribeOnUi(viewState::showDeletedItemMessage)
     }
 
-    private fun addPreparedCompositionsToPlayList(playList: PlayList) {
+    private fun addPreparedCompositionsToPlayList(playList: Playlist) {
         performAddToPlaylist(compositionsForPlayList, playList) { compositionsForPlayList.clear() }
     }
 
     private fun subscribeOnUiSettings() {
-        playerScreenInteractor.coversEnabledObservable
+        playerScreenInteractor.getCoversEnabledObservable()
             .subscribeOnUi(this::onUiSettingsReceived, errorParser::logError)
     }
 
@@ -211,7 +211,7 @@ class PlayQueuePresenter(
     }
 
     private fun launchPlayQueueSubscription() {
-        playerScreenInteractor.playQueueDataObservable
+        playerScreenInteractor.getPlayQueueDataObservable()
             .unsafeSubscribeOnUi(this::onQueueDataReceived)
     }
 
@@ -231,7 +231,7 @@ class PlayQueuePresenter(
         RxUtils.dispose(playQueueDisposable, presenterDisposable)
         playQueueDisposable = playerInteractor.getPlayQueueObservable()
             .observeOn(uiScheduler)
-            .filter(listDragFilter::filterListEmitting)
+            .filter(listDragFilter::isEmitAllowed)
             .subscribe(this::onPlayQueueReceived, this::onPlayQueueReceivingError)
         presenterDisposable.add(playQueueDisposable!!)
     }

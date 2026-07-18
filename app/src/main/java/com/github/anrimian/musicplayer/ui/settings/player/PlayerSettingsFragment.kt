@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
-import com.github.anrimian.musicplayer.Constants.Tags.ENABLED_MEDIA_PLAYERS
+import com.github.anrimian.musicplayer.AppConstants.Tags.ENABLED_MEDIA_PLAYERS
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType
 import com.github.anrimian.musicplayer.databinding.FragmentSettingsPlayerBinding
@@ -23,6 +23,8 @@ import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.applyBottomInsets
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.safeShow
+import com.github.anrimian.musicplayer.ui.utils.onCheckChanged
+import com.github.anrimian.musicplayer.ui.utils.setCheckedImmediately
 import com.github.anrimian.musicplayer.ui.utils.slidr.SlidrPanel
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
@@ -54,9 +56,14 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
         toolbar.setSubtitle(R.string.playing)
         toolbar.setTitleClickListener(null)
 
+        val silenceDurationSeconds = 2_000_000L / 1_000_000f
+        binding.tvSkipSilenceSummary.text = getString(R.string.skip_silence_summary, silenceDurationSeconds)
+
         ViewUtils.onCheckChanged(binding.cbDecreaseVolume, presenter::onDecreaseVolumeOnAudioFocusLossChecked)
         ViewUtils.onCheckChanged(binding.cbPauseOnAudioFocusLoss, presenter::onPauseOnAudioFocusLossChecked)
         ViewUtils.onCheckChanged(binding.cbPauseOnZeroVolumeLevel, presenter::onPauseOnZeroVolumeLevelChecked)
+        binding.cbPauseOnAudioDeviceRemove.onCheckChanged(presenter::onPauseOnAudioDeviceRemoveChecked)
+        binding.cbSkipSilence.onCheckChanged(presenter::onSkipSilenceChecked)
 
         binding.flEqualizerClickableArea.setOnClickListener { showEqualizerDialog() }
         binding.flMediaPlayersClickableArea.setOnClickListener { showMediaPlayersSettingScreen() }
@@ -81,6 +88,14 @@ class PlayerSettingsFragment : MvpAppCompatFragment(), PlayerSettingsView {
 
     override fun showPauseOnZeroVolumeLevelEnabled(enabled: Boolean) {
         ViewUtils.setChecked(binding.cbPauseOnZeroVolumeLevel, enabled)
+    }
+
+    override fun showPauseOnAudioDeviceRemoveEnabled(enabled: Boolean) {
+        binding.cbPauseOnAudioDeviceRemove.setCheckedImmediately(enabled)
+    }
+
+    override fun showSkipSilenceEnabled(enabled: Boolean) {
+        binding.cbSkipSilence.setCheckedImmediately(enabled)
     }
 
     override fun showSoundBalance(soundBalance: SoundBalance) {

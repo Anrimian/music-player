@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--do not change folder and array name-->
+    <string-array name="android_wear_capabilities">
+        <item>@string/wear_capability</item>
+    </string-array>
+</resources>

@@ -11,7 +11,7 @@ private const val LOADING_STATE = "loading_state"
 interface FolderRootView : MvpView {
 
     @OneExecution
-    fun showFolderScreens(ids: List<Long?>)
+    fun showFolderScreens(ids: List<Long>)
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = LOADING_STATE)
     fun showProgress()

@@ -4,7 +4,7 @@ import android.content.Context
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.M3UEditor
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListFile
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
-import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlayListFileNameValidator
+import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlaylistFileNameValidator
 import java.io.File
 
 class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
@@ -18,7 +18,7 @@ class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
         return files.mapNotNull { file ->
             try {
                 return@mapNotNull file.inputStream().use { stream ->
-                    m3uEditor.read(PlayListFileNameValidator.getPlaylistName(file.name), stream)
+                    m3uEditor.read(PlaylistFileNameValidator.getPlaylistName(file.name), stream)
                 }
             } catch (e: Exception) {
                 analytics.processNonFatalError(e, "playlist file '${file.name}' (length: ${file.length()}) read error")
@@ -30,8 +30,8 @@ class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
     }
 
     fun getPlaylistFile(name: String): File {
-        val formattedName = name.trim().ifEmpty { "0" }//fix for broken migration(15). Move fix to next migration and remove it
-        return File(getPlaylistFilesDir(), PlayListFileNameValidator.getPlaylistFileName(formattedName))
+        val formattedName = PlaylistFileNameValidator.normalizePlayListName(name).ifEmpty { "0" }
+        return File(getPlaylistFilesDir(), PlaylistFileNameValidator.getPlaylistFileName(formattedName))
     }
 
     fun insertPlaylist(playList: PlayListFile) {
@@ -39,7 +39,7 @@ class PlaylistFilesStorage(context: Context, private val analytics: Analytics) {
         try {
             file.outputStream().use { stream -> m3uEditor.write(playList, stream) }
         } catch (e: Exception) {
-            analytics.logMessage("playlist file (${file.absolutePath}) insert error")
+            analytics.processNonFatalError(e, "playlist file (${file.absolutePath}) insert error")
         }
     }
 

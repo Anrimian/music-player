@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.data.controllers.music.equalizer.Equalize
 import com.github.anrimian.musicplayer.data.controllers.music.players.utils.MediaPlayerDataSourceBuilder
 import com.github.anrimian.musicplayer.data.models.composition.source.UriContentSource
 import com.github.anrimian.musicplayer.data.utils.hasPersistedReadPermission
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
 import com.github.anrimian.musicplayer.domain.models.composition.content.NoReadPermissionException
 import com.github.anrimian.musicplayer.domain.models.composition.content.RelaunchSourceException
@@ -19,25 +20,24 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 class AndroidMediaPlayer(
     private val context: Context,
     private val ioScheduler: Scheduler,
     private val equalizerController: EqualizerController,
     private val sourceBuilder: MediaPlayerDataSourceBuilder,
+    private val analytics: Analytics
 ) : AppMediaPlayer {
 
     private val playerEventsSubject = PublishSubject.create<MediaPlayerEvent>()
 
     private val mediaPlayer = MediaPlayer().apply {
-        //problem with error case(file not found), multiple error events
-        setOnCompletionListener {
-            isSourcePrepared = false
-            playerEventsSubject.onNext(MediaPlayerEvent.Finished)
-        }
+        setOnCompletionListener { onPlaybackFinished() }
         setOnErrorListener { _, what, extra ->
             val ex = createExceptionFromPlayerError(what, extra)
             playerEventsSubject.onNext(MediaPlayerEvent.Error(ex))
@@ -57,10 +57,15 @@ class AndroidMediaPlayer(
     private var leftVolume = 1f
     private var rightVolume = 1f
 
+    private var trackEndMonitorDisposable: Disposable? = null
+    private val isFinished = AtomicBoolean(false)
+
     override fun prepareToPlay(
         source: CompositionContentSource,
         previousException: Exception?,
     ): Completable {
+        stopTrackEndMonitor()
+        isFinished.set(false)
         currentSource = source
         postponedPosition = null
         this.previousException = previousException
@@ -78,6 +83,7 @@ class AndroidMediaPlayer(
         if (!isPlaying) {
             return
         }
+        stopTrackEndMonitor()
         if (isSourcePrepared) {
             seekTo(0)
         }
@@ -100,6 +106,7 @@ class AndroidMediaPlayer(
         if (!isPlaying) {
             return
         }
+        stopTrackEndMonitor()
         pausePlayer()
         isPlaying = false
     }
@@ -129,7 +136,7 @@ class AndroidMediaPlayer(
     }
 
     override fun getTrackPositionObservable(): Observable<Long> {
-        return Observable.interval(0, 1, TimeUnit.SECONDS)
+        return Observable.interval(0, 50, TimeUnit.MILLISECONDS)
             .observeOn(ioScheduler)
             .flatMapSingle { getTrackPosition() }
     }
@@ -143,7 +150,7 @@ class AndroidMediaPlayer(
                 synchronized(mediaPlayer) {
                     return@fromCallable mediaPlayer.currentPosition.toLong()
                 }
-            } catch (e: IllegalStateException) {
+            } catch (_: IllegalStateException) {
                 return@fromCallable 0L
             }
         }
@@ -158,7 +165,7 @@ class AndroidMediaPlayer(
                 synchronized(mediaPlayer) {
                     return@fromCallable mediaPlayer.duration.toLong()
                 }
-            } catch (e: IllegalStateException) {
+            } catch (_: IllegalStateException) {
                 return@fromCallable 0L
             }
         }
@@ -174,13 +181,18 @@ class AndroidMediaPlayer(
                         mediaPlayer.pause()
                     }
                 }
-            } catch (ignored: IllegalStateException) {
+            } catch (_: IllegalStateException) {
             } //IllegalArgumentException - handle unsupported case
         }
     }
 
+    override fun setSkipSilenceEnabled(enabled: Boolean) {
+        //not supported
+    }
+
     override fun release() {
         synchronized(mediaPlayer) {
+            stopTrackEndMonitor()
             isSourcePrepared = false
             currentSource = null
             equalizerController.detachEqualizer()
@@ -209,7 +221,7 @@ class AndroidMediaPlayer(
             synchronized(mediaPlayer) {
                 mediaPlayer.setVolume(leftOutput, rightOutput)
             }
-        } catch (ignored: IllegalStateException) {}
+        } catch (_: IllegalStateException) {}
     }
 
     private fun createExceptionFromPlayerError(what: Int, playerError: Int): Exception {
@@ -229,10 +241,11 @@ class AndroidMediaPlayer(
             if (source is UriContentSource && !source.uri.hasPersistedReadPermission(context)) {
                 return NoReadPermissionException(throwable)
             }
-            if (previousException is UnsupportedSourceException) {
-                previousException = null
-                return UnsupportedSourceException()
-            }
+        }
+        
+        if (previousException is UnsupportedSourceException) {
+            previousException = null
+            return UnsupportedSourceException()
         }
 
         return throwable
@@ -246,6 +259,7 @@ class AndroidMediaPlayer(
                     mediaPlayer.setAudioAttributes(
                         AudioAttributes.Builder()
                             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
                             .build()
                     )
                     sourceBuilder.setMediaSource(mediaPlayer, source)
@@ -281,17 +295,59 @@ class AndroidMediaPlayer(
                     equalizerController.detachEqualizer()
                 }
             }
-        } catch (ignored: Exception) {}
+        } catch (_: Exception) {}
     }
 
     private fun start() {
         synchronized(mediaPlayer) {
             try {
                 mediaPlayer.start()
+                startTrackEndMonitor()
                 equalizerController.attachEqualizer(mediaPlayer.audioSessionId)
-            } catch (ignored: IllegalStateException) {}
-            isPlaying = true
+                isPlaying = true
+            } catch (_: IllegalStateException) {}
         }
+    }
+
+    private fun onPlaybackFinished() {
+        if (isFinished.compareAndSet(false, true)) {
+            stopTrackEndMonitor()
+            playerEventsSubject.onNext(MediaPlayerEvent.Finished)
+        }
+    }
+
+    private fun startTrackEndMonitor() {
+        stopTrackEndMonitor()
+        trackEndMonitorDisposable = getDuration()
+            .flatMapObservable { duration ->
+                if (duration <= 0) {
+                    return@flatMapObservable Observable.empty()
+                }
+                Observable.interval(0, 500, TimeUnit.MILLISECONDS, ioScheduler)
+                    .flatMapSingle { getTrackPosition() }
+                    .doOnNext { position ->
+                        if (position >= duration - PLAYBACK_END_TOLERANCE_WINDOW_MS) {
+                            onPlaybackFinished()
+                        }
+                    }
+            }
+            .doOnError { t -> analytics.processNonFatalError(t, "Track end monitor") }
+            .onErrorComplete()
+            .subscribe()
+    }
+
+    private fun stopTrackEndMonitor() {
+        trackEndMonitorDisposable?.dispose()
+        trackEndMonitorDisposable = null
+    }
+
+
+    private companion object {
+        /**
+         * A tolerance window in milliseconds to account for inaccuracies in MediaPlayer's
+         * position reporting near the end of a track.
+         */
+        private const val PLAYBACK_END_TOLERANCE_WINDOW_MS = 200L
     }
 
 }

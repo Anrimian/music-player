@@ -10,8 +10,7 @@ import androidx.core.content.ContextCompat;
 public class Permissions {
 
     public static boolean hasFilePermission(Context context) {
-        return ContextCompat.checkSelfPermission(context, getFilePermissionName())
-                == PackageManager.PERMISSION_GRANTED;
+        return hasPermission(context, getFilePermissionName());
     }
 
     public static String getFilePermissionName() {
@@ -22,5 +21,10 @@ public class Permissions {
         } else {
             return Manifest.permission.WRITE_EXTERNAL_STORAGE;
         }
+    }
+
+    public static boolean hasPermission(Context context, String permissionName) {
+        return ContextCompat.checkSelfPermission(context, permissionName)
+                == PackageManager.PERMISSION_GRANTED;
     }
 }

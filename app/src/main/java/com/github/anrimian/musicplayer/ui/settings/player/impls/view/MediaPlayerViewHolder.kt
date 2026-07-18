@@ -1,9 +1,11 @@
 package com.github.anrimian.musicplayer.ui.settings.player.impls.view
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ItemMediaPlayerBinding
+import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
 import com.github.anrimian.musicplayer.ui.common.format.getMediaPlayerName
 import com.github.anrimian.musicplayer.ui.utils.onMotionDown
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.BaseViewHolder
@@ -23,6 +25,13 @@ class MediaPlayerViewHolder(
         binding.tvMediaPlayerName.setText(getMediaPlayerName(id))
         binding.swMediaPlayer.setOnCheckedChangeListener { _, isChecked -> onPlayerEnabled(id, isChecked) }
         binding.ivDrag.onMotionDown { onDragButtonClick(this) }
+
+        if (id == MediaPlayers.ANDROID_MEDIA_PLAYER) {
+            binding.tvMediaPlayerSubtitle.visibility = View.VISIBLE
+            binding.tvMediaPlayerSubtitle.setText(R.string.android_media_player_skip_silence_note)
+        } else {
+            binding.tvMediaPlayerSubtitle.visibility = View.GONE
+        }
     }
 
     fun setEnabled(enabledItems: Set<Int>) {

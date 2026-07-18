@@ -12,20 +12,20 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.anrimian.fsync.models.state.file.FileSyncState
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentPlayQueueBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
-import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
+import com.github.anrimian.musicplayer.ui.common.menu.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity
@@ -34,8 +34,8 @@ import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFrag
 import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 import com.github.anrimian.musicplayer.ui.player_screen.queue.adapter.PlayQueueAdapter
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
-import com.github.anrimian.musicplayer.ui.playlist_screens.create.CreatePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlists.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlists.create.CreatePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.applyBottomInsets
@@ -160,12 +160,12 @@ class PlayQueueFragment: BaseLibraryFragment(), PlayQueueView {
 
         createPlayListFragmentRunner = DialogFragmentRunner(
             childFragmentManager,
-            Constants.Tags.CREATE_PLAYLIST_TAG
+            AppConstants.Tags.CREATE_PLAYLIST_TAG
         ) { fragment -> fragment.setOnCompleteListener(presenter::onPlayListForAddingCreated) }
 
         choosePlayListFragmentRunner = DialogFragmentRunner(
             childFragmentManager,
-            Constants.Tags.SELECT_PLAYLIST_TAG
+            AppConstants.Tags.SELECT_PLAYLIST_TAG
         ) { fragment -> fragment.setOnCompleteListener(presenter::onPlayListForAddingSelected) }
     }
 
@@ -296,7 +296,7 @@ class PlayQueueFragment: BaseLibraryFragment(), PlayQueueView {
             when (item.itemId) {
                 R.id.menu_add_to_playlist -> presenter.onAddQueueItemToPlayListButtonClicked(queueItem)
                 R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(requireContext(), queueItem.id))
-                R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), queueItem)
+                R.id.menu_show_in_folders -> MainActivity.showInFolders(requireActivity(), queueItem.id)
                 R.id.menu_share -> shareComposition(this, queueItem)
                 R.id.menu_delete_from_queue -> presenter.onDeleteQueueItemClicked(queueItem)
                 R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(queueItem)

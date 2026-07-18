@@ -1,26 +1,14 @@
-package com.github.anrimian.musicplayer.data.database.converters;
+package com.github.anrimian.musicplayer.data.database.converters
 
-import androidx.room.TypeConverter;
+import androidx.room.TypeConverter
+import java.util.Date
 
-import java.util.Date;
-
-public class DateConverter {
-
-    @TypeConverter
-    public Long toMillis(Date date) {
-        if (date == null) {
-            return null;
-        } else {
-            return date.getTime();
-        }
-    }
+class DateConverter {
 
     @TypeConverter
-    public Date toDate(Long millis) {
-        if (millis == null) {
-            return null;
-        } else {
-            return new Date(millis);
-        }
-    }
+    fun toMillis(date: Date?): Long? = date?.time
+
+    @TypeConverter
+    fun toDate(millis: Long?): Date? = if (millis == null) { null } else { Date(millis) }
+
 }

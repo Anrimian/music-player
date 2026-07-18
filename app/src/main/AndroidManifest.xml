@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <!--not used in app, but for other OEM's compatibility-->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <!--for bluetooth connection receiver-->
@@ -133,7 +135,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="@string/file_provider_authorities"
+            android:authorities="${applicationId}.share_file_provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -143,7 +145,7 @@
 
         <provider
             android:name=".infrastructure.providers.CoversFileProvider"
-            android:authorities="@string/covers_file_provider_authorities"
+            android:authorities="${applicationId}.covers_file_provider"
             android:grantUriPermissions="true"
             android:exported="true"
             tools:ignore="ExportedContentProvider">
@@ -204,9 +206,18 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED" />
+                <action android:name="android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
 
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
+        </intent>
+    </queries>
 
 </manifest>

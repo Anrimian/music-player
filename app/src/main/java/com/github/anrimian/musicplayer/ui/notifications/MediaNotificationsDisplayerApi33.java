@@ -1,12 +1,12 @@
 package com.github.anrimian.musicplayer.ui.notifications;
 
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
-import static com.github.anrimian.musicplayer.Constants.Arguments.LAUNCH_PREPARE_ARG;
-import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAYER_PANEL_ARG;
+import static com.github.anrimian.musicplayer.AppConstants.Actions.CHANGE_REPEAT_MODE;
+import static com.github.anrimian.musicplayer.AppConstants.Actions.PAUSE;
+import static com.github.anrimian.musicplayer.AppConstants.Actions.PLAY;
+import static com.github.anrimian.musicplayer.AppConstants.Actions.SKIP_TO_NEXT;
+import static com.github.anrimian.musicplayer.AppConstants.Actions.SKIP_TO_PREVIOUS;
+import static com.github.anrimian.musicplayer.AppConstants.Arguments.LAUNCH_PREPARE_ARG;
+import static com.github.anrimian.musicplayer.AppConstants.Arguments.OPEN_PLAYER_PANEL_ARG;
 import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
 import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
@@ -15,6 +15,7 @@ import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRe
 import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
 import static com.github.anrimian.musicplayer.ui.notifications.NotificationUtils.isNotificationVisible;
 import static com.github.anrimian.musicplayer.ui.notifications.NotificationUtils.safeNotify;
+import static com.github.anrimian.musicplayer.ui.notifications.NotificationUtils.startMediaPlaybackForeground;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -30,7 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 
-import com.github.anrimian.musicplayer.Constants;
+import com.github.anrimian.musicplayer.AppConstants;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
@@ -42,7 +43,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtilsKt;
 import com.github.anrimian.musicplayer.ui.main.MainActivity;
 import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerActivity;
 import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
+import com.github.anrimian.utils.AndroidUtilsKt;
 
 import javax.annotation.Nonnull;
 
@@ -64,7 +65,7 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
-                    context.getString(R.string.foreground_channel_description),
+                    context.getString(R.string.foreground_channel_name),
                     NotificationManager.IMPORTANCE_LOW);
             notificationManager.createNotificationChannel(channel);
         }
@@ -72,21 +73,34 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
 
     @Override
     public void startStubForegroundNotification(Service service, MediaSessionCompat mediaSession) {
-        service.startForeground(FOREGROUND_NOTIFICATION_ID, getStubNotification(mediaSession));
+        startMediaPlaybackForeground(service, FOREGROUND_NOTIFICATION_ID, getStubNotification(mediaSession));
     }
 
     @Override
     public Notification getStubNotification(MediaSessionCompat mediaSession) {
         androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle();
         style.setMediaSession(mediaSession.getSessionToken());
+        
+        Intent intentPlayPause = new Intent(context, MusicService.class);
+        intentPlayPause.putExtra(REQUEST_CODE, PLAY);
+        PendingIntent pIntentPlayPause = PendingIntent.getService(context,
+                PLAY,
+                intentPlayPause,
+                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+        NotificationCompat.Action playPauseAction = new NotificationCompat.Action(
+                FormatUtilsKt.getRemoteViewPlayerStateIcon(AppConstants.RemoteViewPlayerState.PAUSE),
+                getString(R.string.play),
+                pIntentPlayPause);
+
         return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
-                .setContentTitle("")
+                .setContentTitle(context.getString(R.string.app_name))
                 .setContentText("")
                 .setSmallIcon(R.drawable.ic_notification_icon)
                 .setShowWhen(false)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setCategory(Notification.CATEGORY_SERVICE)
+                .addAction(playPauseAction)
                 .setStyle(style)
                 .build();
     }
@@ -106,7 +120,7 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
                 repeatMode,
                 notificationSetting)
                 .build();
-        service.startForeground(FOREGROUND_NOTIFICATION_ID, notification);
+        startMediaPlaybackForeground(service, FOREGROUND_NOTIFICATION_ID, notification);
     }
 
     @Override
@@ -169,6 +183,21 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
         if (source != null) {
             formatCompositionSource(source, builder);
             setActionsToNotification(isPlayingState, source, mediaSession, repeatMode, builder);
+        } else {
+            builder.setContentTitle(context.getString(R.string.app_name));
+            
+            Intent intentPlayPause = new Intent(context, MusicService.class);
+            intentPlayPause.putExtra(REQUEST_CODE, PLAY);
+            PendingIntent pIntentPlayPause = PendingIntent.getService(context,
+                    PLAY,
+                    intentPlayPause,
+                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+            NotificationCompat.Action playPauseAction = new NotificationCompat.Action(
+                    FormatUtilsKt.getRemoteViewPlayerStateIcon(AppConstants.RemoteViewPlayerState.PAUSE),
+                    getString(R.string.play),
+                    pIntentPlayPause);
+                    
+            builder.addAction(playPauseAction);
         }
 
         return builder;
@@ -179,7 +208,7 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
                                           MediaSessionCompat mediaSession,
                                           int repeatMode,
                                           NotificationCompat.Builder builder) {
-        int requestCode = isPlayingState == Constants.RemoteViewPlayerState.PAUSE? PLAY: PAUSE;
+        int requestCode = isPlayingState == AppConstants.RemoteViewPlayerState.PAUSE? PLAY: PAUSE;
         Intent intentPlayPause = new Intent(context, MusicService.class);
         intentPlayPause.putExtra(REQUEST_CODE, requestCode);
         PendingIntent pIntentPlayPause = PendingIntent.getService(context,
@@ -189,7 +218,7 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
 
         NotificationCompat.Action playPauseAction = new NotificationCompat.Action(
                 FormatUtilsKt.getRemoteViewPlayerStateIcon(isPlayingState),
-                getString(isPlayingState == Constants.RemoteViewPlayerState.PAUSE? R.string.play: R.string.pause),
+                getString(isPlayingState == AppConstants.RemoteViewPlayerState.PAUSE? R.string.play: R.string.pause),
                 pIntentPlayPause);
 
         androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle();

@@ -70,6 +70,11 @@
     <color name="dark_background_level_1">#1D1D1D</color>
     <color name="dark_background_level_0">#121212</color>
 
+    <color name="matte_dark_background_level_0">#131315</color>
+    <color name="matte_dark_background_level_0_5">#19181C</color>
+    <color name="matte_dark_background_level_1">#1F1E23</color>
+    <color name="matte_dark_background_level_2">#2A292E</color>
+
     <color name="text_color_primary_dark">#F3F3F3</color>
     <color name="text_color_secondary_dark">#B1B1B1</color>
     <color name="text_color_disabled_dark">#61FFFFFF</color>
@@ -84,7 +89,7 @@
     <color name="actionModeStatusBarColorDark">#5C5B5B</color>
     <color name="actionModeBackgroundColorDark">#3D3D3D</color>
 
-    <color name="color_error_dark">#CF6679</color>
+    <color name="color_error_dark">#FF8989</color>
 
     <color name="snackbar_color_dark">#ffff</color>
 
@@ -108,14 +113,18 @@
     <color name="colorPinkAccentContrast">#FF80AB</color>
 
     <!--light theme(red)-->
-    <color name="colorRedPrimary">#d50000</color>
-    <color name="colorRedPrimaryDark">#9b0000</color>
+    <color name="colorRedPrimary">#D32F2F</color>
+    <color name="colorRedPrimaryDark">#B71C1C</color>
     <color name="colorRedAccentContrast">#FF5252</color>
 
+    <!--link theme(pink)-->
+    <color name="colorPinkPrimary">#E91E63</color>
+    <color name="colorPinkPrimaryDark">#C2185B</color>
+
     <!--light theme(orange)-->
-    <color name="colorOrangePrimary">#FB8C00</color>
-    <color name="colorOrangePrimaryDark">#EF6C00</color>
-    <color name="colorOrangeAccentContrast">#FFA726</color>
+    <color name="colorOrangePrimary">#E65100</color>
+    <color name="colorOrangePrimaryDark">#AC3900</color>
+    <color name="colorOrangeAccentContrast">#FF9800</color>
 
     <!--light theme(blue_orange)-->
     <color name="color_blue_primary">#039BE5</color>
@@ -131,6 +140,9 @@
 
     <!--dark theme(orange)-->
     <color name="color_orange_dark_accent">#e65100</color>
+
+    <!--completely dark theme(red)-->
+    <color name="colorRedDarkAccent">#FF5252</color>
 
     <!--dark theme(green)-->
     <color name="colorGreenDarkAccent">#00c853</color>

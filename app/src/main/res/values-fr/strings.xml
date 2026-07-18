@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="open_drawer">Ouvrir le menu</string>
     <string name="try_again">Essayer encore</string>
     <string name="can_not_work_without_file_permission">L\'application ne peut pas fonctionner sans l\'autorisation sur fichier</string>
@@ -12,7 +11,7 @@
     <string name="file_not_found">Fichier non trouvé</string>
     <string name="compositions_on_device_not_found">Aucune chanson trouvée sur l\'appareil</string>
     <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
-    <string name="foreground_channel_description">Notification du lecteur au premier plan</string>
+    <string name="foreground_channel_name">Notification du lecteur au premier plan</string>
     <string name="previous_track">Piste précédante</string>
     <string name="next_track">Piste suivante</string>
     <string name="folder">Dossier</string>
@@ -42,7 +41,7 @@
     <string name="select_play_list">Selectionner la playlist</string>
     <string name="add_to_playlist_error_template">Impossible d\'ajouter une chanson à la playlist: %1$s</string>
     <string name="delete_composition_error_template">Impossible de supprimer le morceau %1$s</string>
-    <string name="add_to_playlist_success_template">Le morceau "%1$s\" a été ajouté à la playlist "%2$s\".</string>
+    <string name="add_to_playlist_success_template">Le morceau \"%1$s\" a été ajouté à la playlist \"%2$s\".</string>
     <string name="save_as_play_list">Enregistrer comme playlist</string>
     <string name="cancel">Annuler</string>
     <string name="deleting">Suppression</string>
@@ -68,16 +67,9 @@
     <string name="now_playing_template">En cours de lecture: %1$s. Ouvrir la liste de lecture.</string>
     <string name="play_all_in_folder">Lire toutes les morceaux dans le dossier</string>
     <string name="delete_playlist">Supprimer la playlist</string>
-    <string name="storage_timeout_error_message">
-        Le péripherique de stockage média ne répond pas.
-        C\'est un problème vraiment étrange et rare.
-        Essayez de redémarrer l\'appareil, cela résoudra peut-être le problème.
-    </string>
+    <string name="storage_timeout_error_message">Le péripherique de stockage média ne répond pas.\nC\'est un problème vraiment étrange et rare.\nEssayez de redémarrer l\'appareil, cela résoudra peut-être le problème.</string>
     <string name="select_all">Selectionner tout</string>
-    <string name="file_uri_extract_error">
-        Impossible d\'obtenir le chemin du système pour la chanson\"%s\" à envoyer.
-        Il est possible qu\'elle soit dans un dossier système privé.
-    </string>
+    <string name="file_uri_extract_error">Impossible d\'obtenir le chemin du système pour la chanson\"%s\" à envoyer.\nIl est possible qu\'elle soit dans un dossier système privé.</string>
     <string name="loading_progress">En cours de chargement…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
     <string name="add_date_order_desc_title">Les plus anciens d\'abord</string>
@@ -161,7 +153,7 @@
     <string name="move_progress">Déplacement…</string>
     <string name="delete_progress">Suppression…</string>
     <string name="play_next_message_single">La composition \"%s\" sera jouée la fois suivante.</string>
-    <string name="added_to_queue_message_single">Composition "%s\" ajoutée à la file d\'attente de fin de lecture</string>
+    <string name="added_to_queue_message_single">Composition \"%s\" ajoutée à la file d\'attente de fin de lecture</string>
     <string name="queue_item_removed">Élément de la file d\'attente supprimé</string>
     <string name="by_size">Par taille</string>
     <string name="largest_first">Les plus volumineux d\'abord</string>
@@ -182,15 +174,13 @@
     <string name="open">Ouvrir</string>
     <string name="cover">Cover</string>
     <string name="change_cover">Changer la cover</string>
-    <string name="pick_from_gallery">Choisir à partir de la gallerie</string>
+    <string name="pick_from_gallery">Choisir à partir de la galerie</string>
     <string name="remove_cover">Supprimer la cover</string>
     <string name="editor_timeout_error">L\'éditeur de tags s\'est arrêté. Le format du fichier n\'est peut-être pas pris en charge</string>
     <string name="lyrics">Lyrics</string>
     <string name="check_tags_error">Échec de la vérification des informations: %s</string>
     <string name="changing_file_progress">Changement de fichier…</string>
-    <string name="android_r_edit_file_permission_denied">
-        À partir d\'Android 11, l\'édition et la suppression de fichiers nécessitent une autorisation explicite du système.
-    </string>
+    <string name="android_r_edit_file_permission_denied">À partir d\'Android 11, l\'édition et la suppression de fichiers nécessitent une autorisation explicite du système.</string>
     <string name="error_report">Rapport d\'erreurs</string>
     <string name="critical_error_report_message">Une erreur s\'est produite et l\'application ne peut pas démarrer. L\'apparition de cette erreur est nettement indésirable.  L\'application n\'envoie pas d\'informations automatiquement, mais vous pouvez envoyer le fichier avec le journal des erreurs manuellement par e-mail. Cela aidera à corriger cette erreur.</string>
     <string name="error_report_message">Une erreur s\'est produite. L\'application n\'envoie pas d\'informations automatiquement, mais vous pouvez envoyer le fichier avec le journal des erreurs manuellement par e-mail. Cela aidera à corriger cette erreur.</string>
@@ -241,22 +231,17 @@
     <string name="no_lyrics_for_current_composition">Pas de lyrics pour cette composition</string>
     <string name="edit_lyrics">Modifier les lyrics</string>
     <string name="show_in_folders">Afficher dans l\'explorateur des fichiers</string>
-    <string name="file_source_not_found">Fichier distant non trouvé</string>
     <string name="file_is_too_large">Le fichier est volumineux</string>
     <string name="preparing_files">Préparation des fichiers</string>
     <string name="downloading">Téléchargement: %1$d/%2$d</string>
     <string name="downloading_progress">En cours de téléchargement(%d%%)</string>
     <string name="rename_progress_count">Restant(%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? Cette action est irréversible.</string>
+    <string name="undone_action_template">Cette action est irréversible.</string>
     <string name="delete_composition_template">Supprimer le titre \"%1$s\"</string>
     <string name="delete_empty_folder">Supprimer le dossier \"%s\"</string>
     <string name="delete_folder_template">%2$s à partir du dossier \"%1$s\"</string>
-    <string name="android_r_editor_restriction_error">
-    A partir de Android 11 copier/déplacer/renommer des fichiers sont authorises seulement dans les dossiers: \"%s\".
-        Placer les fichiers audio dans ces dossiers et l\'operation fonctionnera correctement
-    </string>
+    <string name="android_r_editor_restriction_error">A partir de Android 11 copier/déplacer/renommer des fichiers sont authorises seulement dans les dossiers: \"%s\".\nPlacer les fichiers audio dans ces dossiers et l\'operation fonctionnera correctement</string>
     <string name="folder_already_excluded_from_scanning">The dossier est déjà exclus de la liste des dossiers à analyser</string>
-    <!--not verified-->
     <string name="no_file_modify_permission">Aucune autorisation de modifier le fichier</string>
     <string name="interface_settings">Interface</string>
     <string name="enable_player_screens_swipe">Activer le geste de balayage pour basculer entre la file d\'attente de lecture et l\'écran des paroles</string>
@@ -283,8 +268,6 @@
     <string name="overwrite_playlist">La liste de lecture portant ce nom existe déjà. \nEcraser?</string>
     <string name="playlist_has_no_records">La liste de lecture n\'a aucun enregistrement</string>
     <string name="export_playlists_success">Le fichier \"%1$s.m3u\" a été enregistré dans le stockage interne</string>
-    <!---->
-    <!--not verified-->
     <string name="name_is_too_long">le nom est trop long</string>
     <string name="play_queue_items_limit_error">Le nombre d\'éléments de la file d\'attente de lecture ne peut pas être supérieur à %d</string>
     <string name="play_list_items_limit_error">Le nombre d\'éléments de la playlist ne peut pas dépasser %d</string>
@@ -299,99 +282,101 @@
     <string name="check_for_duplicates">Vérifiez la liste de lecture pour les doublons avant d\'ajouter de nouvelles compositions</string>
     <string name="more_template">…%d plus</string>
     <string name="add_without_duplicates">Ajouter sans doublons</string>
+    <string name="process_unsupported_actions">Traiter tout événement multimédia non reconnu comme commande lecture/pause</string>
+    <string name="process_unsupported_actions_description">Peut provoquer une lecture/pause inattendue</string>
+    <string name="ignore_play_after_connection">Ignorer les commandes de \'Lecture\' pendant 3 s après connexion Bluetooth</string>
+    <string name="ignore_play_after_connection_description">Peut éviter une lecture inattendue à la connexion</string>
+    <string name="pause_on_audio_device_remove">Mettre en pause lors de la déconnexion d\'un périphérique audio</string>
+    <string name="missing_files_detected">Fichiers audio manquants détectés</string>
+    <!-- !Not verified by native speaker! -->
+    <string name="missing_files_description">Le système Android signale que ces fichiers ne sont plus disponibles à leur emplacement d\'origine.\nIls ont peut-être été déplacés, supprimés par une autre application ou se trouvent sur une carte SD déconnectée.\nVous pouvez supprimer ces entrées non valides de votre bibliothèque.\nChansons indisponibles (%d) :</string>
     <!---->
-
+    <string name="see_more">Voir plus (%d)</string>
+    <string name="remove">Supprimer</string>
+    <string name="delete_missing_compositions_title">Supprimer les compositions ?</string>
+    <string name="file_not_found_in_all_storages">Fichier introuvable en local ou dans le cloud</string>
+    <string name="question_template">%1$s ? %2$s</string>
+    <string name="allowed_file_extensions">Extensions de fichiers autorisées</string>
+    <string name="allowed_extensions_state">Seuls les fichiers avec ces extensions seront inclus dans la bibliothèque : \n%s</string>
+    <string name="allowed_file_extensions_description">Les extensions sont séparées par \',\'</string>
+    <string name="restore_default">Restaurer par défaut</string>
+    <string name="not_allowed_path">Chemin non autorisé pour écrire le fichier</string>
+    <string name="configure_menu">Configurer le menu</string>
+    <string name="configure_menu_items">Configurer les éléments du menu</string>
+    <string name="save">Enregistrer</string>
+    <string name="menu_group_primary">Principal</string>
+    <string name="menu_group_secondary">Supplémentaire</string>
+    <string name="menu_group_hidden">Masqué</string>
+    <string name="undo">Annuler</string>
+    <string name="playlist_sorted">Liste de lecture triée</string>
+    <string name="artist_order">Par artiste</string>
+    <string name="skip_silence">Passer les silences</string>
+    <string name="skip_silence_summary">Ignorer automatiquement les silences de plus de %.1fs</string>
+    <string name="android_media_player_skip_silence_note">Ne prend pas en charge la suppression des silences</string>
+    <string name="system_interaction">Interaction du système</string>
+    <string name="sound_processing">Traitement du son</string>
     <plurals name="compositions_count">
         <item quantity="one">%1$s morceau</item>
-        <item quantity="many">%1$s morceaux</item>
         <item quantity="other">%1$s morceaux</item>
     </plurals>
-
     <plurals name="files_count">
         <item quantity="one">%1$s fichier</item>
-        <item quantity="many">%1$s fichiers</item>
         <item quantity="other">%1$s fichiers</item>
     </plurals>
-
     <plurals name="albums_count">
         <item quantity="one">%1$s album</item>
-        <item quantity="many">%1$s albums</item>
         <item quantity="other">%1$s albums</item>
     </plurals>
-
     <plurals name="play_next_message">
         <item quantity="one">%s morceau sera joué à la suite</item>
-        <item quantity="many">%s morceaux seront joués à la suite</item>
         <item quantity="other">%s morceaux seront joués à la suite</item>
     </plurals>
-
     <plurals name="added_to_queue_message">
         <item quantity="one">%s morceau ajouté à la fin de la liste de lecture</item>
-        <item quantity="many">%s morceaux ajoutés à la fin de la liste de lecture</item>
         <item quantity="other">%s morceaux ajoutés à la fin de la liste de lecture</item>
     </plurals>
-
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d morceau ajouté à la playlist \"%2$s\"</item>
-        <item quantity="many">%1$d morceaux ajoutés à la playlist \"%2$s\"</item>
         <item quantity="other">%1$d morceaux ajoutés à la playlist \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d morceaux supprimés de la playlist \"%2$s\"</item>
-        <item quantity="many">%1$d morceaux supprimés de la playlist \"%2$s\"</item>
         <item quantity="other">%1$d morceaux supprimés de la playlist \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d morceau supprimé</item>
-        <item quantity="many">%1$d morceaux supprimés</item>
         <item quantity="other">%1$d morceaux supprimés</item>
     </plurals>
-
     <plurals name="seconds_template">
         <item quantity="one">%1$d seconde</item>
-        <item quantity="many">%1$d secondes</item>
         <item quantity="other">%1$d secondes</item>
     </plurals>
-
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="one">Supprimer %d titre</item>
-        <item quantity="many">Supprimer %d titres</item>
         <item quantity="other">Supprimer %d titres</item>
     </plurals>
-
-    <!--not verified-->
     <plurals name="for_at_least_minutes">
         <item quantity="one">Pendant au moins % dminute</item>
-        <item quantity="many">Pendant au moins %d minutes</item>
         <item quantity="other">Pendant au moins %d minutes</item>
     </plurals>
-
     <plurals name="export_playlists_success">
         <item quantity="one">%d liste de lecture a été enregistrée dans la mémoire de stockage interne</item>
-        <item quantity="many">%d listes de lecture ont été enregistrées dans la mémoire de stockage interne</item>
         <item quantity="other">%d listes de lecture ont été enregistrées dans la mémoire de stockage interne</item>
     </plurals>
-
     <plurals name="playlist_import_partial_success">
         <item quantity="one">La liste de lecture a été importée avec succès, mais %d fichier n\'a pas été trouvé dans la bibliothèque</item>
-        <item quantity="many">La liste de lecture a été importée avec succès, mais %d fichiers n\'ont pas été trouvés dans la bibliothèque</item>
         <item quantity="other">La liste de lecture a été importée avec succès, mais %d fichiers n\'ont pas été trouvés dans la bibliothèque</item>
     </plurals>
-    <!---->
-    <!--not verified-->
     <plurals name="delete_playlists_template">
-        <item quantity="one">Supprimer %d playlist</item>
-        <item quantity="many">Supprimer %d listes de lecture</item>
-        <item quantity="other">Supprimer %d listes de lecture</item>
+        <item quantity="one">Supprimer %d playlist?</item>
+        <item quantity="other">Supprimer %d listes de lecture?</item>
     </plurals>
-
     <plurals name="delete_playlists_success">
         <item quantity="one">%d playlist supprimée</item>
-        <item quantity="many">%d listes de lecture supprimées</item>
         <item quantity="other">%d listes de lecture supprimées</item>
     </plurals>
-    <!---->
-    
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="one">Supprimer %1$d composition de la bibliothèque ? %2$s</item>
+        <item quantity="other">Supprimer %1$d compositions de la bibliothèque ? %2$s</item>
+    </plurals>
 </resources>

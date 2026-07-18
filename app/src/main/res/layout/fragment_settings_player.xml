@@ -16,18 +16,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <TextView
+                style="@style/TextStyle.ContentTitle"
+                android:id="@+id/tvSystemInteraction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/system_interaction"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
             <CheckBox
                 style="@style/CheckboxStyle"
                 android:id="@+id/cbDecreaseVolume"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/decrease_volume_on_notification"
-                android:layout_marginTop="@dimen/content_spacing_margin"
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@id/tvSystemInteraction" />
 
             <CheckBox
                 style="@style/CheckboxStyle"
@@ -53,12 +65,76 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cbPauseOnAudioFocusLoss" />
 
-            <View style="@style/Divider.Horizontal.Constraint"
-                android:id="@+id/dividerDecreaseVolume"
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbPauseOnAudioDeviceRemove"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/pause_on_audio_device_remove"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cbPauseOnZeroVolumeLevel" />
+
+            <TextView
+                style="@style/TextStyle.ContentTitle"
+                android:id="@+id/tvSoundProcessing"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/sound_processing"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cbPauseOnAudioDeviceRemove"/>
+
+            <CheckBox
+                style="@style/CheckboxStyle"
+                android:id="@+id/cbSkipSilence"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="@dimen/content_horizontal_margin"
+                app:layout_constraintTop_toTopOf="@id/tvSkipSilenceTitle"
+                app:layout_constraintBottom_toBottomOf="@id/tvSkipSilenceSummary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                style="@style/TextStyle.Medium"
+                android:id="@+id/tvSkipSilenceTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/content_horizontal_margin"
+                android:paddingStart="@dimen/checkbox_description_padding"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_vertical_margin"
+                android:text="@string/skip_silence"
+                app:layout_constraintTop_toBottomOf="@id/tvSoundProcessing"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                style="@style/TextStyle.Subtitle"
+                android:id="@+id/tvSkipSilenceSummary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/content_horizontal_margin"
+                android:paddingStart="@dimen/checkbox_description_padding"
+                android:paddingEnd="@dimen/content_horizontal_margin"
+                android:paddingTop="@dimen/content_spacing_vertical_margin"
+                android:paddingBottom="@dimen/content_vertical_margin"
+                android:text="@string/skip_silence_summary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSkipSilenceTitle" />
+            <View style="@style/Divider.Horizontal.Constraint"
+                android:id="@+id/dividerSkipSilence"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSkipSilenceSummary" />
 
             <TextView
                 style="@style/TextStyle.Medium"
@@ -69,7 +145,7 @@
                 android:paddingEnd="@dimen/content_horizontal_margin"
                 android:paddingTop="@dimen/content_vertical_margin"
                 android:text="@string/sound_balance"
-                app:layout_constraintTop_toBottomOf="@id/dividerDecreaseVolume"
+                app:layout_constraintTop_toBottomOf="@id/dividerSkipSilence"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -97,7 +173,6 @@
                 app:layout_constraintBottom_toBottomOf="@id/tvSoundBalanceState"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
-
 
             <View style="@style/Divider.Horizontal.Constraint"
                 android:id="@+id/dividerSoundBalance"

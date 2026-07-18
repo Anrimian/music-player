@@ -98,8 +98,8 @@ class WidgetUpdater(
             compositionName = CompositionHelper.formatCompositionName(item)
             compositionAuthor = FormatUtils.formatCompositionAuthor(item, context).toString()
             compositionId = item.id
-            compositionUpdateTime = item.dateModified.time
-            coverModifyTime = item.coverModifyTime.time
+            compositionUpdateTime = item.modifiedTime
+            coverModifyTime = item.coverModifyTime
             compositionSize = item.size
             isFileExists = item.isFileExists
         }

@@ -18,89 +18,113 @@ class PlayerCoordinatorInteractor(
     private val preparedSourcesMap = HashMap<PlayerType, SourceInfo>()
     private val cleanupCallbacksMap = HashMap<PlayerType, () -> Unit>()
 
+    @Volatile
     private var activePlayerType: PlayerType? = null
     private val activePlayerTypeSubject = BehaviorSubject.createDefault<Opt<PlayerType>>(Opt())
     private val playerActivationHistory = LinkedList<PlayerType>()
+    private val stateLock = Any()
 
     fun play(playerType: PlayerType, delay: Long = 0L) {
-        applyPlayerType(playerType)
-        playerInteractor.play(delay)
+        synchronized(stateLock) {
+            applyPlayerType(playerType)
+            playerInteractor.play(delay)
+        }
     }
 
     fun playAfterPrepare(playerType: PlayerType) {
-        applyPlayerType(playerType)
-        playerInteractor.playAfterPrepare()
+        synchronized(stateLock) {
+            applyPlayerType(playerType)
+            playerInteractor.playAfterPrepare()
+        }
     }
 
     fun updateSource(source: CompositionSource, playerType: PlayerType) {
-        val currentSourceInfo = preparedSourcesMap[playerType]
-        if (currentSourceInfo?.source == source) {
-            currentSourceInfo.source = source
-        }
-        if (playerType == activePlayerType) {
-            playerInteractor.updateSource(source)
+        synchronized(stateLock) {
+            val currentSourceInfo = preparedSourcesMap[playerType]
+            if (currentSourceInfo?.source == source) {
+                currentSourceInfo.source = source
+            }
+            if (playerType == activePlayerType) {
+                playerInteractor.updateSource(source)
+            }
         }
     }
 
     fun playOrPause(playerType: PlayerType) {
-        applyPlayerType(playerType)
-        playerInteractor.playOrPause()
+        synchronized(stateLock) {
+            applyPlayerType(playerType)
+            playerInteractor.playOrPause()
+        }
     }
 
     fun stop(playerType: PlayerType) {
-        if (playerType == activePlayerType) {
-            playerInteractor.stop()
+        synchronized(stateLock) {
+            if (playerType == activePlayerType) {
+                playerInteractor.stop()
+            }
         }
     }
 
     fun pause(playerType: PlayerType) {
-        if (playerType == activePlayerType) {
-            playerInteractor.pause()
+        synchronized(stateLock) {
+            if (playerType == activePlayerType) {
+                playerInteractor.pause()
+            }
         }
     }
 
     fun error(playerType: PlayerType, throwable: Throwable) {
-        if (playerType == activePlayerType) {
-            playerInteractor.error(throwable)
+        synchronized(stateLock) {
+            if (playerType == activePlayerType) {
+                playerInteractor.error(throwable)
+            }
         }
     }
 
     fun reset(playerType: PlayerType, fallbackToPrevious: Boolean = false) {
-        if (activePlayerType == null) {
-            playerInteractor.reset()
-            return
-        }
-        preparedSourcesMap.remove(playerType)
-        if (activePlayerType == playerType) {
-            playerActivationHistory.removeLast()
-
-            cleanupCallbacksMap[playerType]?.invoke()
-
-            val prevPlayerType = playerActivationHistory.lastOrNull()
-            if (prevPlayerType == null || !fallbackToPrevious) {
-                activePlayerType = null
-                activePlayerTypeSubject.onNext(Opt())
+        synchronized(stateLock) {
+            if (activePlayerType == null) {
                 playerInteractor.reset()
-            } else {
-                applyPlayerType(prevPlayerType)
+                return
+            }
+            preparedSourcesMap.remove(playerType)
+            if (activePlayerType == playerType) {
+                if (playerActivationHistory.isNotEmpty()) {
+                    playerActivationHistory.removeLast()
+                }
+
+                cleanupCallbacksMap[playerType]?.invoke()
+
+                val prevPlayerType = playerActivationHistory.lastOrNull()
+                if (prevPlayerType == null || !fallbackToPrevious) {
+                    activePlayerType = null
+                    activePlayerTypeSubject.onNext(Opt())
+                    playerInteractor.reset()
+                } else {
+                    applyPlayerType(prevPlayerType)
+                }
             }
         }
     }
 
     fun fastSeekForward(playerType: PlayerType): Single<Long> {
-        if (playerType == activePlayerType) {
-            return playerInteractor.fastSeekForward()
+        synchronized(stateLock) {
+            if (playerType == activePlayerType) {
+                return playerInteractor.fastSeekForward()
+            }
+            //do not update position if player is not active
+            return getActualTrackPosition(playerType)
         }
-        //do not update position if player is not active
-        return getActualTrackPosition(playerType)
     }
 
     fun fastSeekBackward(playerType: PlayerType): Single<Long> {
-        if (playerType == activePlayerType) {
-            return playerInteractor.fastSeekBackward()
+        synchronized(stateLock) {
+            if (playerType == activePlayerType) {
+                return playerInteractor.fastSeekBackward()
+            }
+            //do not update position if player is not active
+            return getActualTrackPosition(playerType)
         }
-        //do not update position if player is not active
-        return getActualTrackPosition(playerType)
     }
 
     fun prepareToPlay(
@@ -108,36 +132,46 @@ class PlayerCoordinatorInteractor(
         playerType: PlayerType,
         startPosition: Long
     ) {
-        preparedSourcesMap[playerType] = SourceInfo(compositionSource, startPosition)
-        if (playerType == activePlayerType) {
-            playerInteractor.prepareToPlay(compositionSource, startPosition)
-        } else if (activePlayerType == null) {
-            applyPlayerType(playerType)
+        synchronized(stateLock) {
+            preparedSourcesMap[playerType] = SourceInfo(compositionSource, startPosition)
+            if (playerType == activePlayerType) {
+                playerInteractor.prepareToPlay(compositionSource, startPosition)
+            } else if (activePlayerType == null) {
+                applyPlayerType(playerType)
+            }
         }
     }
 
     fun onSeekStarted(playerType: PlayerType) {
-        if (activePlayerType == playerType) {
-            playerInteractor.onSeekStarted()
+        synchronized(stateLock) {
+            if (activePlayerType == playerType) {
+                playerInteractor.onSeekStarted()
+            }
         }
     }
 
     fun onSeekFinished(position: Long, playerType: PlayerType) {
-        if (activePlayerType == playerType) {
-            playerInteractor.onSeekFinished(position)
-        } else {
-            preparedSourcesMap[playerType]?.trackPosition = position
+        synchronized(stateLock) {
+            if (activePlayerType == playerType) {
+                playerInteractor.onSeekFinished(position)
+            } else {
+                preparedSourcesMap[playerType]?.trackPosition = position
+            }
         }
     }
 
     fun setPlaybackSpeed(speed: Float, playerType: PlayerType) {
-        if (activePlayerType == playerType) {
-            playerInteractor.setPlaybackSpeed(speed)
+        synchronized(stateLock) {
+            if (activePlayerType == playerType) {
+                playerInteractor.setPlaybackSpeed(speed)
+            }
         }
     }
 
     fun registerCleanupCallback(playerType: PlayerType, callback: () -> Unit) {
-        cleanupCallbacksMap[playerType] = callback
+        synchronized(stateLock) {
+            cleanupCallbacksMap[playerType] = callback
+        }
     }
 
     fun getPlayerEventsObservable(playerType: PlayerType): Observable<PlayerEvent> {
@@ -183,10 +217,12 @@ class PlayerCoordinatorInteractor(
     }
 
     fun getActualTrackPosition(playerType: PlayerType): Single<Long> {
-        return if (isPlayerTypeActive(playerType)) {
-            playerInteractor.getTrackPosition()
-        } else {
-            Single.just(preparedSourcesMap[playerType]?.trackPosition ?: -1L)
+        synchronized(stateLock) {
+            return if (isPlayerTypeActive(playerType)) {
+                playerInteractor.getTrackPosition()
+            } else {
+                Single.just(preparedSourcesMap[playerType]?.trackPosition ?: -1L)
+            }
         }
     }
 

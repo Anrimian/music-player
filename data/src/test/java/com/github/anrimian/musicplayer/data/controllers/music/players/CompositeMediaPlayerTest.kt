@@ -52,7 +52,8 @@ class CompositeMediaPlayerTest {
         compositeMediaPlayer = CompositeMediaPlayer(
             arrayListOf({ player1 }, { player2 }), 
             1f,
-            SoundBalance(1f, 1f)
+            SoundBalance(1f, 1f),
+            false
         )
         textEventObserver = compositeMediaPlayer.getPlayerEventsObservable().test()
     }

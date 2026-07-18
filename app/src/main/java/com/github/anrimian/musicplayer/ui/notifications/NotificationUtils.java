@@ -2,9 +2,14 @@ package com.github.anrimian.musicplayer.ui.notifications;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.Service;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
-import android.os.DeadSystemException;
 import android.service.notification.StatusBarNotification;
+
+import androidx.core.app.ServiceCompat;
+
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
 
 public class NotificationUtils {
 
@@ -31,12 +36,19 @@ public class NotificationUtils {
         try {
             notificationManager.notify(id, notification);
         } catch (RuntimeException e) {
-            Throwable cause = e.getCause();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && cause instanceof DeadSystemException) {
+            if (AndroidUtils.isDeadSystemException(e)) {
                 return;
             }
             throw e;
         }
+    }
+
+    public static void startMediaPlaybackForeground(Service service, int id, Notification notification) {
+        int foregroundServiceType = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            foregroundServiceType = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK;
+        }
+        ServiceCompat.startForeground(service, id, notification, foregroundServiceType);
     }
 
 }

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import com.github.anrimian.fsync.models.ProgressInfo
-import com.github.anrimian.musicplayer.Constants.Arguments.IDS_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.IDS_ARG
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogProgressHorizontalBinding
 import com.github.anrimian.musicplayer.di.Components

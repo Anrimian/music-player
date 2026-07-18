@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--main screen-->
+    <item name="title_width_percent" type="dimen" format="float">0.80</item>
+    <item name="artist_width_percent" type="dimen" format="float">0.90</item>
+    <item name="seekbar_width_percent" type="dimen" format="float">1</item>
+
+</resources>

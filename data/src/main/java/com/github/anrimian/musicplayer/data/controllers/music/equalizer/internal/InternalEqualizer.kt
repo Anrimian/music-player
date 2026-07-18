@@ -92,7 +92,7 @@ class InternalEqualizer(
         if (equalizerState == null) {
             equalizerState = EqualizerState(EqualizerStateRepository.NO_PRESET, HashMap())
         }
-        equalizerState.bendLevels[bandNumber] = level
+        equalizerState.bandLevels[bandNumber] = level
         equalizerState.currentPreset = EqualizerStateRepository.NO_PRESET
         currentStateSubject.onNext(equalizerState)
     }
@@ -120,7 +120,7 @@ class InternalEqualizer(
     }
 
     private fun applyEqualizerState(equalizer: Equalizer, equalizerState: EqualizerState) {
-        for ((key, value) in equalizerState.bendLevels) {
+        for ((key, value) in equalizerState.bandLevels) {
             EqualizerObjectHolder.setBandLevel(equalizer, key, value)
         }
     }

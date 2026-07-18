@@ -27,11 +27,21 @@ class CompositionSourceInteractor(
         compositions: Iterable<Long>,
         currentFileIdSubject: BehaviorSubject<Long>? = null
     ): Single<ArrayList<CompositionContentSource>> {
-        return Observable.fromIterable(compositions)
-            .concatMapSingle { id -> getLibraryCompositionSource(id)
-                .doOnSubscribe { currentFileIdSubject?.onNext(id) }
+        val compositionsList = compositions.toList()
+        return storageSourceRepository.getStorageSources(compositionsList)
+            .flatMap { localSourcesMap ->
+                Observable.fromIterable(compositionsList)
+                    .concatMapSingle { id ->
+                        val localSource = localSourcesMap[id]
+                        val sourceSingle = if (localSource != null) {
+                            Single.just(localSource)
+                        } else {
+                            syncInteractor.requestFileSource(id).map(::RemoteCompositionSource)
+                        }
+                        sourceSingle.doOnSubscribe { currentFileIdSubject?.onNext(id) }
+                    }
+                    .collect(::ArrayList, ArrayList<CompositionContentSource>::add)
             }
-            .collect(::ArrayList, ArrayList<CompositionContentSource>::add)
     }
 
     fun getLibraryCompositionSource(compositionId: Long): Single<CompositionContentSource> {

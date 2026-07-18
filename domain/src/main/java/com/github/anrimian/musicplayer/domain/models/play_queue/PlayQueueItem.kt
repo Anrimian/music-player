@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.domain.models.play_queue
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
-import java.util.Date
+import com.github.anrimian.musicplayer.domain.models.composition.LocalFileStatus
 
 class PlayQueueItem(
     val itemId: Long,
@@ -15,9 +15,10 @@ class PlayQueueItem(
     size: Long,
     comment: String?,
     storageId: Long?,
-    dateAdded: Date,
-    dateModified: Date,
-    coverModifyTime: Date,
+    addedTime: Long,
+    modifiedTime: Long,
+    coverModifyTime: Long,
+    fileStatus: LocalFileStatus,
     corruptionType: CorruptionType?,
     isFileExists: Boolean,
     initialSource: InitialSource,
@@ -30,9 +31,10 @@ class PlayQueueItem(
     size,
     comment,
     storageId,
-    dateAdded,
-    dateModified,
+    addedTime,
+    modifiedTime,
     coverModifyTime,
+    fileStatus,
     corruptionType,
     isFileExists,
     initialSource

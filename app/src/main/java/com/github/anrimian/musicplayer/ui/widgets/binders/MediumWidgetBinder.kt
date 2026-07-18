@@ -6,15 +6,15 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
-import com.github.anrimian.musicplayer.ui.utils.broadcastPendingIntentFlag
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver
 import com.github.anrimian.musicplayer.ui.widgets.models.WidgetColors
 import com.github.anrimian.musicplayer.ui.widgets.models.WidgetData
 import com.github.anrimian.musicplayer.ui.widgets.providers.WidgetProviderMedium
+import com.github.anrimian.utils.broadcastPendingIntentFlag
 
 open class MediumWidgetBinder: SmallExtWidgetBinder() {
 
@@ -67,20 +67,20 @@ open class MediumWidgetBinder: SmallExtWidgetBinder() {
         }
 
         val intentRewind = Intent(context, WidgetActionsReceiver::class.java)
-        intentRewind.putExtra(MusicService.REQUEST_CODE, Constants.Actions.REWIND)
+        intentRewind.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.REWIND)
         val pIntentRewind = PendingIntent.getBroadcast(
             context,
-            Constants.Actions.REWIND,
+            AppConstants.Actions.REWIND,
             intentRewind,
             broadcastPendingIntentFlag()
         )
         widgetView.setOnClickPendingIntent(R.id.ivRewind, pIntentRewind)
 
         val intentFastForward = Intent(context, WidgetActionsReceiver::class.java)
-        intentFastForward.putExtra(MusicService.REQUEST_CODE, Constants.Actions.FAST_FORWARD)
+        intentFastForward.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.FAST_FORWARD)
         val pIntentFastForward = PendingIntent.getBroadcast(
             context,
-            Constants.Actions.FAST_FORWARD,
+            AppConstants.Actions.FAST_FORWARD,
             intentFastForward,
             broadcastPendingIntentFlag()
         )

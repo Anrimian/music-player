@@ -27,7 +27,23 @@ fun showLocaleChooserDialog(context: Context, onCompleteListener: (Locale?) -> U
     menuBuilder.add(FOLLOW_SYSTEM_LANGUAGE_ID, context.getString(R.string.follow_system_language))
     val locales = getAppLanguages(context, R.string.close, Locale.ENGLISH)
     locales.forEachIndexed { index, locale ->
-        val title = locale.displayLanguage + '/' + locale.getDisplayLanguage(locale)
+        var title = locale.displayLanguage.replaceFirstChar { c -> c.uppercase() }
+
+        val nativeName = locale.getDisplayLanguage(locale).replaceFirstChar { c -> c.uppercase() }
+        if (!title.equals(nativeName, ignoreCase = true)) {
+            title += "/$nativeName"
+        }
+
+        if (locale.language == "zh") {
+            if (locale.country == "TW" || locale.country == "HK" || locale.script == "Hant") {
+                title = "繁體中文 (Traditional)"
+            } else {
+                title = "简体中文 (Simplified)"
+            }
+        } else if (locale.country.isNotEmpty()) {
+            title += " (${locale.displayCountry})"
+        }
+
         menuBuilder.add(index, title)
     }
 
@@ -60,29 +76,64 @@ private fun getAppLanguages(
     defaultLocale: Locale
 ): List<Locale> {
     val listAppLocales = ArrayList<Locale>()
+    val addedLanguageTags = HashSet<String>()
 
     val metrics = DisplayMetrics()
     val res = context.resources
     val conf = res.configuration
-    val locales = res.assets.locales
-    for (locale in locales) {
-        val currentLocale = Locale(locale)
-        conf.locale = currentLocale
+    val localesStr = res.assets.locales
+
+    for (localeStr in localesStr) {
+        val tempLocale = parseLocaleString(localeStr)
+
+        val normalizedLocale = when (tempLocale.language) {
+            "zh" -> {
+                val country = tempLocale.country
+                if (country == "TW" || country == "HK" || country == "MO") {
+                    Locale.TAIWAN
+                } else {
+                    Locale.CHINESE
+                }
+            }
+            else -> {
+                if (tempLocale.country.isNotEmpty()) {
+                    Locale(tempLocale.language)
+                } else {
+                    tempLocale
+                }
+            }
+        }
+
+        val tag = normalizedLocale.toLanguageTag()
+        if (addedLanguageTags.contains(tag)) {
+            continue
+        }
+
+        conf.locale = normalizedLocale
         val res1 = Resources(context.assets, metrics, conf)
         val s1 = res1.getString(anyStringResId)
 
-        conf.locale = Locale("")
+        conf.locale = Locale("") // default
         val res2 = Resources(context.assets, metrics, conf)
         val defaultString = res2.getString(anyStringResId)
 
-        if (s1 != defaultString || currentLocale == defaultLocale) {
-            if (currentLocale == Locale.CHINESE) {
-                listAppLocales.add(Locale.forLanguageTag("zh-Hans"))
-                listAppLocales.add(Locale.forLanguageTag("zh-Hant-TW"))
-            } else {
-                listAppLocales.add(currentLocale)
-            }
+        if (s1 != defaultString || normalizedLocale == defaultLocale) {
+            listAppLocales.add(normalizedLocale)
+            addedLanguageTags.add(tag)
         }
     }
     return listAppLocales
+}
+
+@Suppress("DEPRECATION")
+private fun parseLocaleString(localeStr: String): Locale {
+    return if (localeStr.contains("_")) {
+        val parts = localeStr.split("_")
+        if (parts.size > 1) Locale(parts[0], parts[1]) else Locale(parts[0])
+    } else if (localeStr.contains("-")) {
+        val parts = localeStr.split("-")
+        if (parts.size > 1) Locale(parts[0], parts[1]) else Locale(parts[0])
+    } else {
+        Locale(localeStr)
+    }
 }

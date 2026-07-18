@@ -1,39 +1,21 @@
-package com.github.anrimian.musicplayer.ui.editor.common;
+package com.github.anrimian.musicplayer.ui.editor.common
 
-import android.annotation.TargetApi;
-import android.app.RecoverableSecurityException;
-import android.content.IntentSender;
-import android.os.Build;
+import android.annotation.SuppressLint
+import android.annotation.TargetApi
+import android.app.RecoverableSecurityException
+import android.content.IntentSender
+import android.os.Build
+import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt
+import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 
-import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
-import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand;
-
-import javax.annotation.Nonnull;
-
+@SuppressLint("UseRequiresApi")
 @TargetApi(Build.VERSION_CODES.R)
-public class EditorErrorCommand extends ErrorCommand {
+class EditorErrorCommand(message: String, throwable: Throwable) : ErrorCommand(message) {
 
-    @Nonnull
-    private final IntentSender intentSender;
-
-    public EditorErrorCommand(String message, Throwable throwable) {
-        super(message);
-
-        if (throwable instanceof RecoverableSecurityException) {
-            RecoverableSecurityException recoverableSecurityException = (RecoverableSecurityException) throwable;
-            intentSender = recoverableSecurityException.getUserAction().getActionIntent().getIntentSender();
-            return;
-        }
-        if (throwable instanceof RecoverableSecurityExceptionExt) {
-            RecoverableSecurityExceptionExt exception = (RecoverableSecurityExceptionExt) throwable;
-            intentSender = exception.getPIntent().getIntentSender();
-            return;
-        }
-        throw new IllegalStateException("unknown throwable type: " + throwable);
+    val intentSender: IntentSender = when (throwable) {
+        is RecoverableSecurityException -> throwable.userAction.actionIntent.intentSender
+        is RecoverableSecurityExceptionExt -> throwable.pIntent.intentSender
+        else -> throw IllegalStateException("Unknown throwable type: $throwable")
     }
 
-    @Nonnull
-    public IntentSender getIntentSender() {
-        return intentSender;
-    }
 }

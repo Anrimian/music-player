@@ -6,17 +6,17 @@ import android.content.Intent
 import android.widget.RemoteViews
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
 import com.github.anrimian.musicplayer.ui.common.format.getRemoteViewPlayerStateIcon
 import com.github.anrimian.musicplayer.ui.main.MainActivity
-import com.github.anrimian.musicplayer.ui.utils.broadcastPendingIntentFlag
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver
 import com.github.anrimian.musicplayer.ui.widgets.menu.WidgetMenuActivity
 import com.github.anrimian.musicplayer.ui.widgets.models.WidgetColors
 import com.github.anrimian.musicplayer.ui.widgets.models.WidgetData
+import com.github.anrimian.utils.broadcastPendingIntentFlag
 
 abstract class WidgetBinder {
 
@@ -80,7 +80,7 @@ abstract class WidgetBinder {
             getRemoteViewPlayerStateIcon(widgetData.playerState)
         )
 
-        val requestCode = if (widgetData.playerState == Constants.RemoteViewPlayerState.PAUSE) Constants.Actions.PLAY else Constants.Actions.PAUSE
+        val requestCode = if (widgetData.playerState == AppConstants.RemoteViewPlayerState.PAUSE) AppConstants.Actions.PLAY else AppConstants.Actions.PAUSE
         val intentPlayPause = Intent(context, WidgetActionsReceiver::class.java)
         intentPlayPause.putExtra(MusicService.REQUEST_CODE, requestCode)
         val pIntentPlayPause = AppAndroidUtils.broadcastPendingIntent(
@@ -91,25 +91,25 @@ abstract class WidgetBinder {
         widgetView.setOnClickPendingIntent(R.id.ivPlayPause, pIntentPlayPause)
 
         val intentSkipToPrevious = Intent(context, WidgetActionsReceiver::class.java)
-        intentSkipToPrevious.putExtra(MusicService.REQUEST_CODE, Constants.Actions.SKIP_TO_PREVIOUS)
+        intentSkipToPrevious.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.SKIP_TO_PREVIOUS)
         val pIntentSkipToPrevious = AppAndroidUtils.broadcastPendingIntent(
             context,
-            Constants.Actions.SKIP_TO_PREVIOUS,
+            AppConstants.Actions.SKIP_TO_PREVIOUS,
             intentSkipToPrevious
         )
         widgetView.setOnClickPendingIntent(R.id.ivSkipToPrevious, pIntentSkipToPrevious)
 
         val intentSkipToNext = Intent(context, WidgetActionsReceiver::class.java)
-        intentSkipToNext.putExtra(MusicService.REQUEST_CODE, Constants.Actions.SKIP_TO_NEXT)
+        intentSkipToNext.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.SKIP_TO_NEXT)
         val pIntentSkipToNext = AppAndroidUtils.broadcastPendingIntent(
             context,
-            Constants.Actions.SKIP_TO_NEXT,
+            AppConstants.Actions.SKIP_TO_NEXT,
             intentSkipToNext,
         )
         widgetView.setOnClickPendingIntent(R.id.ivSkipToNext, pIntentSkipToNext)
 
         val intent = Intent(context, MainActivity::class.java)
-        intent.putExtra(Constants.Arguments.OPEN_PLAYER_PANEL_ARG, widgetData.isEnabled())
+        intent.putExtra(AppConstants.Arguments.OPEN_PLAYER_PANEL_ARG, widgetData.isEnabled())
         val pIntent = PendingIntent.getActivity(
             context,
             0,
@@ -119,7 +119,7 @@ abstract class WidgetBinder {
         widgetView.setOnClickPendingIntent(android.R.id.background, pIntent)
 
         val menuIntent = Intent(context, WidgetMenuActivity::class.java)
-        menuIntent.putExtra(Constants.Arguments.ID_ARG, widgetData.compositionId)
+        menuIntent.putExtra(AppConstants.Arguments.ID_ARG, widgetData.compositionId)
         val pMenuIntent = PendingIntent.getActivity(
             context,
             0,

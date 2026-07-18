@@ -13,9 +13,9 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     protected void attachBaseContext(Context base) {
         // should be always initialized here, but bug is somewhere in Android sdk
         // so initialize manually in this case
-        Components.checkInitialization(base.getApplicationContext());
+        Components.INSTANCE.checkInitialization(base.getApplicationContext());
         super.attachBaseContext(
-                Components.getAppComponent().localeController().dispatchAttachBaseContext(base)
+                Components.INSTANCE.getAppComponent().localeController().dispatchAttachBaseContext(base)
         );
     }
 

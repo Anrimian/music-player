@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.WindowCompat
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ActivityLyricsEditBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -30,13 +30,13 @@ class LyricsEditorActivity : BaseMvpAppCompatActivity(), LyricsEditorView {
     companion object {
         fun newIntent(context: Context, compositionId: Long): Intent {
             val intent = Intent(context, LyricsEditorActivity::class.java)
-            intent.putExtra(Constants.Arguments.COMPOSITION_ID_ARG, compositionId)
+            intent.putExtra(AppConstants.Arguments.COMPOSITION_ID_ARG, compositionId)
             return intent
         }
     }
 
     private val presenter by moxyPresenter {
-        val compositionId = intent.getLongExtra(Constants.Arguments.COMPOSITION_ID_ARG, 0)
+        val compositionId = intent.getLongExtra(AppConstants.Arguments.COMPOSITION_ID_ARG, 0)
         Components.getLyricsEditorComponent(compositionId).lyricsEditorPresenter()
     }
 
@@ -76,8 +76,8 @@ class LyricsEditorActivity : BaseMvpAppCompatActivity(), LyricsEditorView {
 
         progressDialogRunner = DialogFragmentDelayRunner(
             supportFragmentManager,
-            Constants.Tags.PROGRESS_DIALOG_TAG,
-            delayMillis = Constants.EDIT_DIALOG_DELAY_MILLIS,
+            AppConstants.Tags.PROGRESS_DIALOG_TAG,
+            delayMillis = AppConstants.EDIT_DIALOG_DELAY_MILLIS,
         )
 
         Slidr.attach(this)

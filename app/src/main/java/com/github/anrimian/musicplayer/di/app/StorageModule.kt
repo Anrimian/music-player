@@ -1,287 +1,313 @@
-package com.github.anrimian.musicplayer.di.app;
+package com.github.anrimian.musicplayer.di.app
 
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.DB_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.IO_SCHEDULER;
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.SLOW_BG_SCHEDULER;
-
-import android.content.Context;
-import android.os.Build;
-import android.os.Environment;
-
-import com.github.anrimian.fsync.SyncInteractor;
-import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
-import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
-import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
-import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
-import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter;
-import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
-import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
-import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.player.ExternalAudioFileCache;
-import com.github.anrimian.musicplayer.data.repositories.player.ExternalMediaSourceRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.scanner.MediaScannerRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.scanner.StorageCompositionAnalyzer;
-import com.github.anrimian.musicplayer.data.repositories.scanner.files.FileScanner;
-import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.PlaylistFilesStorage;
-import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.StoragePlaylistsAnalyzer;
-import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource;
-import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceApi30;
-import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceImpl;
-import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider;
-import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor;
-import com.github.anrimian.musicplayer.data.storage.source.ContentSourceHelper;
-import com.github.anrimian.musicplayer.data.storage.source.FileSourceProvider;
-import com.github.anrimian.musicplayer.data.storage.source.StorageSourceRepositoryImpl;
-import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics;
-import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.player.CompositionSourceInteractor;
-import com.github.anrimian.musicplayer.domain.models.sync.FileKey;
-import com.github.anrimian.musicplayer.domain.repositories.EditorRepository;
-import com.github.anrimian.musicplayer.domain.repositories.ExternalMediaSourceRepository;
-import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository;
-import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository;
-import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
-import com.github.anrimian.musicplayer.domain.repositories.PlayListsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
-import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository;
-
-import javax.annotation.Nonnull;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import dagger.Module;
-import dagger.Provides;
-import io.reactivex.rxjava3.core.Scheduler;
+import android.content.Context
+import android.os.Build
+import com.github.anrimian.fsync.SyncInteractor
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.compositions.StorageCompositionsInserter
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao
+import com.github.anrimian.musicplayer.data.database.dao.playlist.PlaylistsDaoWrapper
+import com.github.anrimian.musicplayer.data.repositories.library.LibraryFilesRepositoryImpl
+import com.github.anrimian.musicplayer.data.repositories.library.edit.EditorRepositoryImpl
+import com.github.anrimian.musicplayer.data.repositories.player.ExternalAudioFileCache
+import com.github.anrimian.musicplayer.data.repositories.player.ExternalMediaSourceRepositoryImpl
+import com.github.anrimian.musicplayer.data.repositories.scanner.FileFilter
+import com.github.anrimian.musicplayer.data.repositories.scanner.StorageAudioFileAnalyzer
+import com.github.anrimian.musicplayer.data.repositories.scanner.StorageScannerRepositoryImpl
+import com.github.anrimian.musicplayer.data.repositories.scanner.files.FileScanner
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.PlaylistFilesStorage
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.StoragePlaylistsAnalyzer
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSource
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceApi30
+import com.github.anrimian.musicplayer.data.storage.files.StorageFilesDataSourceImpl
+import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider
+import com.github.anrimian.musicplayer.data.storage.providers.genres.StorageGenresProvider
+import com.github.anrimian.musicplayer.data.storage.providers.music.SystemAudioCatalogProvider
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlaylistsProvider
+import com.github.anrimian.musicplayer.data.storage.providers.volumes.VolumeProvider
+import com.github.anrimian.musicplayer.data.storage.providers.volumes.VolumeProviderImpl
+import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor
+import com.github.anrimian.musicplayer.data.storage.source.ContentSourceHelper
+import com.github.anrimian.musicplayer.data.storage.source.FileSourceProvider
+import com.github.anrimian.musicplayer.data.storage.source.StorageSourceRepositoryImpl
+import com.github.anrimian.musicplayer.di.config.AppSetupConfig
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
+import com.github.anrimian.musicplayer.domain.interactors.editor.EditorInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.CompositionSourceInteractor
+import com.github.anrimian.musicplayer.domain.interactors.storage.StorageScannerInteractor
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
+import com.github.anrimian.musicplayer.domain.repositories.EditorRepository
+import com.github.anrimian.musicplayer.domain.repositories.ExternalMediaSourceRepository
+import com.github.anrimian.musicplayer.domain.repositories.LibraryFilesRepository
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
+import com.github.anrimian.musicplayer.domain.repositories.LoggerRepository
+import com.github.anrimian.musicplayer.domain.repositories.PlaylistsRepository
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository
+import com.github.anrimian.musicplayer.domain.repositories.StorageScannerRepository
+import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository
+import dagger.Module
+import dagger.Provides
+import io.reactivex.rxjava3.core.Scheduler
+import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
-public class StorageModule {
+class StorageModule {
 
     @Provides
-    @Nonnull
     @Singleton
-    StorageMusicProvider storageMusicProvider(Context context, StorageAlbumsProvider albumsProvider) {
-        return new StorageMusicProvider(context, albumsProvider);
-    }
+    fun storageMusicProvider(
+        context: Context,
+        analytics: Analytics,
+    ) = SystemAudioCatalogProvider(
+        context,
+        analytics,
+    )
 
     @Provides
-    @Nonnull
     @Singleton
-    StorageGenresProvider storageGenresProvider(Context context) {
-        return new StorageGenresProvider(context);
-    }
+    fun storageGenresProvider(context: Context) = StorageGenresProvider(context)
 
     @Provides
-    @Nonnull
     @Singleton
-    StorageAlbumsProvider storageAlbumsProvider(Context context) {
-        return new StorageAlbumsProvider(context);
-    }
+    fun storageAlbumsProvider(context: Context) = StorageAlbumsProvider(context)
 
     @Provides
-    @Nonnull
     @Singleton
-    FileSourceProvider fileSourceProvider(Context context) {
-        return new FileSourceProvider(context);
-    }
+    fun fileSourceProvider(context: Context) = FileSourceProvider(context)
 
     @Provides
-    @Nonnull
     @Singleton
-    CompositionSourceEditor compositionSourceEditor(StorageMusicProvider musicProvider,
-                                                    FileSourceProvider fileSourceProvider,
-                                                    ContentSourceHelper contentSourceHelper) {
-        return new CompositionSourceEditor(musicProvider, fileSourceProvider, contentSourceHelper);
-    }
+    fun compositionSourceEditor(
+        musicProvider: SystemAudioCatalogProvider,
+        fileSourceProvider: FileSourceProvider,
+        contentSourceHelper: ContentSourceHelper
+    ) = CompositionSourceEditor(musicProvider, fileSourceProvider, contentSourceHelper)
 
     @Provides
-    @Nonnull
     @Singleton
-    EditorRepository compositionEditorRepository(CompositionSourceEditor sourceEditor,
-                                                 StorageFilesDataSource filesDataSource,
-                                                 LibraryDatabase libraryDatabase,
-                                                 CompositionsDaoWrapper compositionsDao,
-                                                 AlbumsDaoWrapper albumsDao,
-                                                 ArtistsDaoWrapper artistsDao,
-                                                 GenresDaoWrapper genresDao,
-                                                 FoldersDaoWrapper foldersDao,
-                                                 PlayListsDaoWrapper playListsDao,
-                                                 StorageMusicProvider storageMusicProvider,
-                                                 PlayListsRepository playListsRepository,
-                                                 LibraryRepository libraryRepository,
-                                                 @Named(DB_SCHEDULER) Scheduler scheduler) {
-        return new EditorRepositoryImpl(
-                sourceEditor,
-                filesDataSource,
-                libraryDatabase,
-                compositionsDao,
-                albumsDao,
-                artistsDao,
-                genresDao,
-                foldersDao,
-                playListsDao,
-                storageMusicProvider,
-                playListsRepository,
-                libraryRepository,
-                scheduler);
-    }
+    fun compositionEditorRepository(
+        sourceEditor: CompositionSourceEditor,
+        compositionsDao: CompositionsDaoWrapper,
+        albumsDao: AlbumsDaoWrapper,
+        artistsDao: ArtistsDaoWrapper,
+        genresDao: GenresDaoWrapper,
+        storageMusicProvider: SystemAudioCatalogProvider,
+        @Named(AppSchedulerModule.DB_SCHEDULER) scheduler: Scheduler
+    ): EditorRepository = EditorRepositoryImpl(
+        sourceEditor,
+        compositionsDao,
+        albumsDao,
+        artistsDao,
+        genresDao,
+        storageMusicProvider,
+        scheduler
+    )
 
     @Provides
-    @Nonnull
     @Singleton
-    StorageFilesDataSource storageFilesDataSource(StorageMusicProvider musicProvider) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return new StorageFilesDataSourceApi30(musicProvider);
+    fun libraryFilesRepository(
+        filesDataSource: StorageFilesDataSource,
+        libraryDatabase: LibraryDatabase,
+        compositionsDao: CompositionsDaoWrapper,
+        foldersDao: FoldersDaoWrapper,
+        playListsDao: PlaylistsDaoWrapper,
+        storageMusicProvider: SystemAudioCatalogProvider,
+        playListsRepository: PlaylistsRepository,
+        libraryRepository: LibraryRepository,
+        @Named(SchedulerModule.IO_SCHEDULER) ioScheduler: Scheduler,
+        appSetupConfig: AppSetupConfig
+    ): LibraryFilesRepository = LibraryFilesRepositoryImpl(
+        filesDataSource,
+        libraryDatabase,
+        compositionsDao,
+        foldersDao,
+        playListsDao,
+        storageMusicProvider,
+        playListsRepository,
+        libraryRepository,
+        ioScheduler,
+        appSetupConfig.isPathChangeForNonExistentFilesAllowed
+    )
+
+    @Provides
+    @Singleton
+    fun storageFilesDataSource(musicProvider: SystemAudioCatalogProvider): StorageFilesDataSource {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            StorageFilesDataSourceApi30(musicProvider)
+        } else {
+            StorageFilesDataSourceImpl(musicProvider)
         }
-        return new StorageFilesDataSourceImpl(musicProvider);
     }
 
     @Provides
-    @Nonnull
-    EditorInteractor compositionEditorInteractor(CompositionSourceInteractor sourceInteractor,
-                                                 SyncInteractor<FileKey, ?, Long> syncInteractor,
-                                                 EditorRepository editorRepository,
-                                                 LibraryRepository musicProviderRepository,
-                                                 StorageSourceRepository storageSourceRepository) {
-        return new EditorInteractor(
-                sourceInteractor,
-                syncInteractor,
-                editorRepository,
-                musicProviderRepository,
-                storageSourceRepository);
-    }
+    fun compositionEditorInteractor(
+        sourceInteractor: CompositionSourceInteractor,
+        syncInteractor: SyncInteractor<FileKey, *, Long>,
+        editorRepository: EditorRepository,
+        libraryRepository: LibraryRepository,
+        libraryFilesRepository: LibraryFilesRepository,
+        storageSourceRepository: StorageSourceRepository
+    ) = EditorInteractor(
+        sourceInteractor,
+        syncInteractor,
+        editorRepository,
+        libraryRepository,
+        libraryFilesRepository,
+        storageSourceRepository
+    )
 
     @Provides
-    @Nonnull
     @Singleton
-    FileScanner fileScanner(CompositionsDaoWrapper compositionsDao,
-                            CompositionSourceEditor compositionSourceEditor,
-                            StateRepository stateRepository,
-                            StorageSourceRepository storageSourceRepository,
-                            Analytics analytics,
-                            @Named(SLOW_BG_SCHEDULER) Scheduler scheduler) {
-        return new FileScanner(compositionsDao,
-                compositionSourceEditor,
-                stateRepository,
-                storageSourceRepository,
-                analytics,
-                scheduler);
-    }
+    fun fileScanner(
+        compositionsDao: CompositionsDaoWrapper,
+        compositionSourceEditor: CompositionSourceEditor,
+        stateRepository: StateRepository,
+        storageSourceRepository: StorageSourceRepository,
+        analytics: Analytics,
+        @Named(AppSchedulerModule.SLOW_BG_SCHEDULER) scheduler: Scheduler
+    ) = FileScanner(
+        compositionsDao,
+        compositionSourceEditor,
+        stateRepository,
+        storageSourceRepository,
+        analytics,
+        scheduler
+    )
 
     @Provides
-    @Nonnull
     @Singleton
-    MediaScannerRepository mediaScannerRepository(StorageMusicProvider musicProvider,
-                                                  StoragePlayListsProvider playListsProvider,
-                                                  CompositionsDaoWrapper compositionsDao,
-                                                  StateRepository stateRepository,
-                                                  SettingsRepository settingsRepository,
-                                                  StorageCompositionAnalyzer compositionAnalyzer,
-                                                  StoragePlaylistsAnalyzer storagePlaylistAnalyzer,
-                                                  FileScanner fileScanner,
-                                                  LoggerRepository loggerRepository,
-                                                  Analytics analytics,
-                                                  @Named(IO_SCHEDULER) Scheduler scheduler) {
-        return new MediaScannerRepositoryImpl(musicProvider,
-                playListsProvider,
-                compositionsDao,
-                stateRepository,
-                settingsRepository,
-                compositionAnalyzer,
-                storagePlaylistAnalyzer,
-                fileScanner,
-                loggerRepository,
-                analytics,
-                scheduler);
-    }
+    fun storageScannerRepository(
+        musicProvider: SystemAudioCatalogProvider,
+        playListsProvider: StoragePlaylistsProvider,
+        compositionsDao: CompositionsDaoWrapper,
+        stateRepository: StateRepository,
+        settingsRepository: SettingsRepository,
+        compositionAnalyzer: StorageAudioFileAnalyzer,
+        storagePlaylistAnalyzer: StoragePlaylistsAnalyzer,
+        fileScanner: FileScanner,
+        loggerRepository: LoggerRepository,
+        analytics: Analytics,
+        @Named(SchedulerModule.IO_SCHEDULER) scheduler: Scheduler
+    ): StorageScannerRepository = StorageScannerRepositoryImpl(
+        musicProvider,
+        playListsProvider,
+        compositionsDao,
+        stateRepository,
+        settingsRepository,
+        compositionAnalyzer,
+        storagePlaylistAnalyzer,
+        fileScanner,
+        loggerRepository,
+        analytics,
+        scheduler
+    )
 
     @Provides
-    @Nonnull
-    StorageCompositionAnalyzer compositionAnalyzer(CompositionsDaoWrapper compositionsDao,
-                                                   IgnoredFoldersDao ignoredFoldersDao,
-                                                   StateRepository stateRepository,
-                                                   StorageCompositionsInserter compositionsInserter) {
-        return new StorageCompositionAnalyzer(
-                compositionsDao,
-                ignoredFoldersDao,
-                stateRepository,
-                compositionsInserter,
-                Environment.getExternalStorageDirectory().getAbsolutePath()
-        );
-    }
-
-    @Provides
-    @Nonnull
-    StoragePlaylistsAnalyzer storagePlaylistsAnalyzer2(CompositionsDaoWrapper compositionsDao,
-                                                        PlayListsDaoWrapper playListsDao,
-                                                        StoragePlayListsProvider playListsProvider,
-                                                        PlaylistFilesStorage playlistFilesStorage) {
-        return new StoragePlaylistsAnalyzer(compositionsDao, playListsDao, playListsProvider, playlistFilesStorage);
-    }
-
-    @Provides
-    @Nonnull
-    PlaylistFilesStorage playlistFilesStorage(Context context, Analytics analytics) {
-        return new PlaylistFilesStorage(context, analytics);
-    }
-
-    @Provides
-    @Nonnull
-    StorageCompositionsInserter compositionsInserter(LibraryDatabase libraryDatabase,
-                                                     CompositionsDao compositionsDao,
-                                                     CompositionsDaoWrapper compositionsDaoWrapper,
-                                                     FoldersDaoWrapper foldersDao,
-                                                     ArtistsDao artistsDao,
-                                                     ArtistsDaoWrapper artistsDaoWrapper,
-                                                     AlbumsDao albumsDao,
-                                                     AlbumsDaoWrapper albumsDaoWrapper,
-                                                     GenreDao genreDao) {
-        return new StorageCompositionsInserter(libraryDatabase,
-                compositionsDao,
-                compositionsDaoWrapper,
-                foldersDao,
-                artistsDao,
-                artistsDaoWrapper,
-                albumsDao,
-                albumsDaoWrapper,
-                genreDao);
-    }
-
-    @Provides
-    @Nonnull
     @Singleton
-    StorageSourceRepository storageSourceRepository(CompositionsDaoWrapper compositionsDao,
-                                                    StorageMusicProvider storageMusicProvider,
-                                                    CompositionSourceEditor compositionSourceEditor,
-                                                    @Named(IO_SCHEDULER) Scheduler ioScheduler) {
-        return new StorageSourceRepositoryImpl(compositionsDao, storageMusicProvider, compositionSourceEditor, ioScheduler);
-    }
+    fun storageScannerInteractor(
+        storageScannerRepository: StorageScannerRepository,
+        syncInteractor: SyncInteractor<FileKey, *, Long>
+    ) = StorageScannerInteractor(storageScannerRepository, syncInteractor)
 
     @Provides
-    @Nonnull
     @Singleton
-    ExternalAudioFileCache externalAudioFileCache(Context context,
-                                                  Analytics analytics,
-                                                  @Named(IO_SCHEDULER) Scheduler ioScheduler) {
-        return new ExternalAudioFileCache(context, analytics, ioScheduler);
-    }
+    fun fileFilter(settingsRepository: SettingsRepository) = FileFilter(settingsRepository)
 
     @Provides
-    @Nonnull
-    @Singleton
-    ExternalMediaSourceRepository externalMediaSourceRepository(Context context,
-                                                                @Named(IO_SCHEDULER) Scheduler ioScheduler,
-                                                                ExternalAudioFileCache cache) {
-        return new ExternalMediaSourceRepositoryImpl(context, ioScheduler, cache);
-    }
+    fun storageAudioFileAnalyzer(
+        compositionsDao: CompositionsDaoWrapper,
+        ignoredFoldersDao: IgnoredFoldersDao,
+        settingsRepository: SettingsRepository,
+        compositionsInserter: StorageCompositionsInserter,
+        fileFilter: FileFilter
+    ) = StorageAudioFileAnalyzer(
+        compositionsDao,
+        ignoredFoldersDao,
+        settingsRepository,
+        compositionsInserter,
+        fileFilter
+    )
 
+    @Provides
+    fun storagePlaylistsAnalyzer(
+        compositionsDao: CompositionsDaoWrapper,
+        playListsDao: PlaylistsDaoWrapper,
+        playListsProvider: StoragePlaylistsProvider,
+        playlistFilesStorage: PlaylistFilesStorage
+    ) = StoragePlaylistsAnalyzer(
+        compositionsDao,
+        playListsDao,
+        playListsProvider,
+        playlistFilesStorage
+    )
+
+    @Provides
+    fun playlistFilesStorage(context: Context, analytics: Analytics) =
+        PlaylistFilesStorage(context, analytics)
+
+    @Provides
+    fun compositionsInserter(
+        libraryDatabase: LibraryDatabase,
+        compositionsDao: CompositionsDao,
+        compositionsDaoWrapper: CompositionsDaoWrapper,
+        foldersDao: FoldersDaoWrapper,
+        artistsDao: ArtistsDao,
+        artistsDaoWrapper: ArtistsDaoWrapper,
+        albumsDao: AlbumsDao,
+        genreDao: GenreDao
+    ) = StorageCompositionsInserter(
+        libraryDatabase,
+        compositionsDao,
+        compositionsDaoWrapper,
+        foldersDao,
+        artistsDao,
+        artistsDaoWrapper,
+        albumsDao,
+        genreDao
+    )
+
+    @Provides
+    @Singleton
+    fun storageSourceRepository(
+        compositionsDao: CompositionsDaoWrapper,
+        storageMusicProvider: SystemAudioCatalogProvider,
+        compositionSourceEditor: CompositionSourceEditor,
+        @Named(SchedulerModule.IO_SCHEDULER) ioScheduler: Scheduler
+    ): StorageSourceRepository = StorageSourceRepositoryImpl(
+        compositionsDao,
+        storageMusicProvider,
+        compositionSourceEditor,
+        ioScheduler
+    )
+
+    @Provides
+    @Singleton
+    fun externalAudioFileCache(
+        context: Context,
+        analytics: Analytics,
+        @Named(SchedulerModule.IO_SCHEDULER) ioScheduler: Scheduler
+    ) = ExternalAudioFileCache(context, analytics, ioScheduler)
+
+    @Provides
+    @Singleton
+    fun externalMediaSourceRepository(
+        context: Context,
+        @Named(SchedulerModule.IO_SCHEDULER) ioScheduler: Scheduler,
+        cache: ExternalAudioFileCache
+    ): ExternalMediaSourceRepository = ExternalMediaSourceRepositoryImpl(context, ioScheduler, cache)
+
+    @Provides
+    @Singleton
+    fun volumeProvider(context: Context): VolumeProvider = VolumeProviderImpl(context)
 }

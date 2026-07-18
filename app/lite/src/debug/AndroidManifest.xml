@@ -4,7 +4,7 @@
 
     <application tools:ignore="MissingApplicationIcon">
 
-        <!--fixes adb idea activity restart-->
+        <!--fixes adb idea plugin activity restart-->
         <activity-alias
             android:name="com.github.anrimian.musicplayer.lite.ui.main.MainActivity"
             android:targetActivity="com.github.anrimian.musicplayer.ui.main.MainActivity"

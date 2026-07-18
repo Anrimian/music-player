@@ -10,13 +10,13 @@ import static com.github.anrimian.musicplayer.domain.Payloads.DURATION;
 import static com.github.anrimian.musicplayer.domain.Payloads.FILE_EXISTS;
 import static com.github.anrimian.musicplayer.domain.Payloads.SIZE;
 import static com.github.anrimian.musicplayer.domain.Payloads.TITLE;
-import static com.github.anrimian.musicplayer.domain.utils.FileUtils.formatFileName;
 import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
 
 import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel;
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
+import com.github.anrimian.musicplayer.domain.utils.FileUtils;
 import com.github.anrimian.musicplayer.domain.utils.Objects;
 
 import java.util.LinkedList;
@@ -26,24 +26,31 @@ import javax.annotation.Nonnull;
 
 public class CompositionHelper {
 
-    public static boolean areSourcesTheSame(@Nonnull Composition first, @Nonnull Composition second) {
+    public static boolean areItemsTheSame(@Nonnull CompositionModel first, @Nonnull CompositionModel second) {
+        return first.getId() == second.getId();
+    }
+
+    public static boolean areSourcesTheSame(@Nonnull CompositionModel first, @Nonnull CompositionModel second) {
         return Objects.equals(first.getAlbum(), second.getAlbum())
                 && Objects.equals(first.getArtist(), second.getArtist())
-                && Objects.equals(first.getDateAdded(), second.getDateAdded())
-                && Objects.equals(first.getDateModified(), second.getDateModified())
+                && Objects.equals(first.getAddedTime(), second.getAddedTime())
+                && Objects.equals(first.getModifiedTime(), second.getModifiedTime())
                 && Objects.equals(first.getCoverModifyTime(), second.getCoverModifyTime())
                 && first.getDuration() == second.getDuration()
                 && first.getSize() == second.getSize()
                 && Objects.equals(first.getTitle(), second.getTitle())
+                && first.getFileStatus() == second.getFileStatus()
                 && first.getCorruptionType() == second.getCorruptionType()
                 && first.isFileExists() == second.isFileExists();
     }
 
     public static boolean hasSourceChanges(@Nonnull Composition first, @Nonnull Composition second) {
-        return first.getDuration() != second.getDuration() || first.getSize() != second.getSize();
+        return first.getDuration() != second.getDuration()
+                || first.getSize() != second.getSize()
+                || first.getModifiedTime() != second.getModifiedTime();
     }
 
-    public static List<Object> getChangePayload(Composition first, Composition second) {
+    public static List<Object> getChangePayload(CompositionModel first, CompositionModel second) {
         List<Object> payloads = new LinkedList<>();
         if (!Objects.equals(first.getAlbum(), second.getAlbum())) {
             payloads.add(ALBUM);
@@ -51,10 +58,10 @@ public class CompositionHelper {
         if (!Objects.equals(first.getArtist(), second.getArtist())) {
             payloads.add(ARTIST);
         }
-        if (!Objects.equals(first.getDateAdded(), second.getDateAdded())) {
+        if (!Objects.equals(first.getAddedTime(), second.getAddedTime())) {
             payloads.add(DATE_ADDED);
         }
-        if (!Objects.equals(first.getDateModified(), second.getDateModified())) {
+        if (!Objects.equals(first.getModifiedTime(), second.getModifiedTime())) {
             payloads.add(DATE_MODIFIED);
         }
         if (!Objects.equals(first.getCoverModifyTime(), second.getCoverModifyTime())) {
@@ -72,13 +79,13 @@ public class CompositionHelper {
         if (first.getCorruptionType() != second.getCorruptionType()) {
             payloads.add(CORRUPTED);
         }
-        if (first.isFileExists() != second.isFileExists()) {
+        if (first.isFileExists() != second.isFileExists() || first.getFileStatus() != second.getFileStatus()) {
             payloads.add(FILE_EXISTS);
         }
         return payloads;
     }
 
-    public static String formatCompositionName(Composition composition) {
+    public static String formatCompositionName(CompositionModel composition) {
         return composition.getTitle();
     }
 
@@ -88,13 +95,13 @@ public class CompositionHelper {
 
     public static String formatCompositionName(String title, String fileName) {
         if (isEmpty(title)) {
-            return formatFileName(fileName);
+            return FileUtils.formatFileName(fileName);
         }
         return title;
     }
 
-    public static boolean isCompositionFileRemote(Composition composition) {
-        return !composition.isFileExists() && composition.getInitialSource() == InitialSource.REMOTE;
+    public static boolean isCompositionFileRemote(CompositionModel composition) {
+        return CompositionHelperKt.isFileRemote(composition);
     }
 
     public static String[] splitGenres(String genres) {

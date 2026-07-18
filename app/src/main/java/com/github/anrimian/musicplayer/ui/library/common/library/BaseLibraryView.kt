@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.common.library
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import moxy.MvpView
 import moxy.viewstate.strategy.alias.OneExecution
@@ -9,19 +9,19 @@ import moxy.viewstate.strategy.alias.OneExecution
 interface BaseLibraryView : MvpView {
 
     @OneExecution
-    fun onCompositionsAddedToPlayNext(compositions: List<Composition>)
+    fun onCompositionsAddedToPlayNext(compositions: List<CompositionModel>)
 
     @OneExecution
-    fun onCompositionsAddedToQueue(compositions: List<Composition>)
+    fun onCompositionsAddedToQueue(compositions: List<CompositionModel>)
 
     @OneExecution
-    fun showAddingToPlayListComplete(playList: PlayList, compositions: List<Composition>)
+    fun showAddingToPlaylistComplete(playList: Playlist, compositions: List<CompositionModel>)
 
     @OneExecution
     fun showPlaylistDuplicateEntryDialog(
-        compositions: Collection<Composition>,
+        compositions: Collection<CompositionModel>,
         hasNonDuplicates: Boolean,
-        playList: PlayList,
+        playList: Playlist,
         isDuplicateCheckEnabled: Boolean
     )
 

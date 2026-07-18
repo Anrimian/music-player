@@ -1,159 +1,169 @@
-package com.github.anrimian.musicplayer.infrastructure.service.music;
+package com.github.anrimian.musicplayer.infrastructure.service.music
 
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaSessionCompat
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
+import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
+import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.Build;
-import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaSessionCompat;
+object CompositionSourceModelHelper {
 
-import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource;
-import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
-import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
-import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
-
-import javax.annotation.Nullable;
-
-public class CompositionSourceModelHelper {
-
-    public static boolean areSourcesTheSame(@Nullable CompositionSource first, @Nullable CompositionSource second) {
+    fun areSourcesTheSame(first: CompositionSource?, second: CompositionSource?): Boolean {
         if (first == null || second == null) {
-            return false;
+            return false
         }
 
-        if (first.getClass().equals(second.getClass())) {
-            if (first instanceof LibraryCompositionSource) {
+        if (first.javaClass == second.javaClass) {
+            if (first is LibraryCompositionSource) {
                 return CompositionHelper.areSourcesTheSame(
-                        ((LibraryCompositionSource) first).getComposition(),
-                        ((LibraryCompositionSource) second).getComposition());
+                    first.composition,
+                    (second as LibraryCompositionSource).composition
+                )
             }
-            if (first instanceof ExternalCompositionSource) {
-                return true;
+            if (first is ExternalCompositionSource) {
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public static void updateMediaSessionAlbumArt(@Nullable CompositionSource source,
-                                                  MediaMetadataCompat.Builder metadataBuilder,
-                                                  MediaSessionCompat mediaSession,
-                                                  MusicNotificationSetting setting) {
-        boolean useAlbumArt = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                && setting.isShowCovers()) || setting.isCoversOnLockScreen();
+    fun updateMediaSessionAlbumArt(
+        source: CompositionSource?,
+        metadataBuilder: MediaMetadataCompat.Builder,
+        mediaSession: MediaSessionCompat,
+        setting: MusicNotificationSetting
+    ): Runnable? {
+        val useAlbumArt = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && setting.isShowCovers) || setting.isCoversOnLockScreen
         if (!useAlbumArt || source == null) {
-            mediaSession.setMetadata(null);
-            return;
+            return null
         }
 
-        if (source instanceof LibraryCompositionSource) {
-            Composition composition = ((LibraryCompositionSource) source).getComposition();
-            Components.getAppComponent()
-                    .imageLoader()
-                    .loadImageUri(composition, uri -> {
-                        String uriStr = null;
-                        if (uri != null) {
-                            uriStr = uri.toString();
-                        }
-                        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr);
-                        mediaSession.setMetadata(metadataBuilder.build());
-                    });
+        val imageLoader = Components.getAppComponent().imageLoader()
+        val cancellations = mutableListOf<Runnable>()
+
+        if (source is LibraryCompositionSource) {
+            val composition = source.composition
+            cancellations.add(imageLoader.loadImageUri(composition) { uri: Uri? ->
+                var uriStr: String? = null
+                if (uri != null) {
+                    uriStr = uri.toString()
+                }
+                metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr)
+                mediaSession.setMetadata(metadataBuilder.build())
+            })
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Components.getAppComponent()
-                        .imageLoader()
-                        .loadMediaSessionImage(composition, bitmap -> {
-                            putBitmapToMetadata(metadataBuilder, bitmap);
-                            mediaSession.setMetadata(metadataBuilder.build());
-                        });
+                cancellations.add(imageLoader.loadMediaSessionImage(composition) { bitmap: Bitmap? ->
+                    putBitmapToMetadata(metadataBuilder, bitmap)
+                    mediaSession.setMetadata(metadataBuilder.build())
+                })
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
-                mediaSession.setMetadata(metadataBuilder.build());
+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null)
+                mediaSession.setMetadata(metadataBuilder.build())
             } else {
                 //uri doesn't work for lock screen background, so put it here
-                Components.getAppComponent()
-                        .imageLoader()
-                        .loadImage(composition, bitmap -> {
-                            putBitmapToMetadata(metadataBuilder, bitmap);
-                            mediaSession.setMetadata(metadataBuilder.build());
-                        });
+                cancellations.add(imageLoader.loadImage(composition) { bitmap: Bitmap? ->
+                    putBitmapToMetadata(metadataBuilder, bitmap)
+                    mediaSession.setMetadata(metadataBuilder.build())
+                })
             }
         }
-        if (source instanceof ExternalCompositionSource) {
-            ExternalCompositionSource composition = (ExternalCompositionSource) source;
-            Components.getAppComponent()
-                    .imageLoader()
-                    .loadImageUri(composition, uri -> {
-                        String uriStr = null;
-                        if (uri != null) {
-                            uriStr = uri.toString();
-                        }
-                        metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr);
-                        mediaSession.setMetadata(metadataBuilder.build());
-                    });
+        if (source is ExternalCompositionSource) {
+            cancellations.add(imageLoader.loadImageUri(source) { uri: Uri? ->
+                var uriStr: String? = null
+                if (uri != null) {
+                    uriStr = uri.toString()
+                }
+                metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr)
+                mediaSession.setMetadata(metadataBuilder.build())
+            })
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Components.getAppComponent()
-                        .imageLoader()
-                        .loadMediaSessionImage(composition, bitmap -> {
-                            putBitmapToMetadata(metadataBuilder, bitmap);
-                            mediaSession.setMetadata(metadataBuilder.build());
-                        });
+                cancellations.add(imageLoader.loadMediaSessionImage(source) { bitmap: Bitmap? ->
+                    putBitmapToMetadata(metadataBuilder, bitmap)
+                    mediaSession.setMetadata(metadataBuilder.build())
+                })
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
-                mediaSession.setMetadata(metadataBuilder.build());
+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null)
+                mediaSession.setMetadata(metadataBuilder.build())
             } else {
                 //uri doesn't work for lock screen background, so put it here
-                Components.getAppComponent()
-                        .imageLoader()
-                        .loadImage((ExternalCompositionSource) source, bitmap -> {
-                            putBitmapToMetadata(metadataBuilder, bitmap);
-                            mediaSession.setMetadata(metadataBuilder.build());
-                        });
+                cancellations.add(imageLoader.loadImage(source) { bitmap: Bitmap? ->
+                    putBitmapToMetadata(metadataBuilder, bitmap)
+                    mediaSession.setMetadata(metadataBuilder.build())
+                })
             }
         }
+
+        if (cancellations.isEmpty()) {
+            return null
+        }
+        return Runnable { cancellations.forEach { runnable -> runnable.run() } }
     }
 
-    public static void updateMediaSessionMetadata(@Nullable CompositionSource source,
-                                                  MediaMetadataCompat.Builder metadataBuilder,
-                                                  MediaSessionCompat mediaSession,
-                                                  Context context) {
-        if (source instanceof LibraryCompositionSource) {
-            Composition composition = ((LibraryCompositionSource) source).getComposition();
-            MediaMetadataCompat.Builder builder = metadataBuilder
-                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, formatCompositionName(composition))
-                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, composition.getAlbum())
-                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatCompositionAuthor(composition, context).toString())
-                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.getDuration());
-            mediaSession.setMetadata(builder.build());
-            return;
+    fun updateMediaSessionMetadata(
+        source: CompositionSource?,
+        metadataBuilder: MediaMetadataCompat.Builder,
+        mediaSession: MediaSessionCompat,
+        context: Context,
+        trackNumber: Long,
+        totalTracks: Long
+    ) {
+        if (source is LibraryCompositionSource) {
+            val composition = source.composition
+            val builder = metadataBuilder
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, composition.id.toString())
+                .putString(
+                    MediaMetadataCompat.METADATA_KEY_TITLE,
+                    CompositionHelper.formatCompositionName(composition)
+                )
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, composition.album)
+                .putString(
+                    MediaMetadataCompat.METADATA_KEY_ARTIST,
+                    FormatUtils.formatCompositionAuthor(composition, context).toString()
+                )
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.duration)
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNumber)
+                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, totalTracks)
+            mediaSession.setMetadata(builder.build())
+            return
         }
-        if (source instanceof ExternalCompositionSource) {
-            ExternalCompositionSource uriSource = (ExternalCompositionSource) source;
-
-            MediaMetadataCompat.Builder builder = metadataBuilder
-                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, formatCompositionName(uriSource.getTitle(), uriSource.getDisplayName()))
-                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, uriSource.getAlbum())
-                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, formatAuthor(uriSource.getArtist(), context).toString())
-                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, uriSource.getDuration());
-            mediaSession.setMetadata(builder.build());
-            return;
+        if (source is ExternalCompositionSource) {
+            val builder = metadataBuilder
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, source.uri.toString())
+                .putString(
+                    MediaMetadataCompat.METADATA_KEY_TITLE,
+                    CompositionHelper.formatCompositionName(source.title, source.displayName)
+                )
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, source.album)
+                .putString(
+                    MediaMetadataCompat.METADATA_KEY_ARTIST,
+                    FormatUtils.formatAuthor(source.artist, context).toString()
+                )
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, source.duration)
+            mediaSession.setMetadata(builder.build())
+            return
         }
-        mediaSession.setMetadata(null);
+        mediaSession.setMetadata(null)
     }
 
-    private static void putBitmapToMetadata(MediaMetadataCompat. Builder metadataBuilder,
-                                            @Nullable Bitmap bitmap) {
+    private fun putBitmapToMetadata(
+        metadataBuilder: MediaMetadataCompat.Builder,
+        bitmap: Bitmap?
+    ) {
         if (bitmap != null && bitmap.getWidth() > 0 && bitmap.getHeight() > 0) {
-            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap)
         } else {
-            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null);
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null)
         }
     }
-
 }

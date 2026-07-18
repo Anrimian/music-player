@@ -7,7 +7,6 @@ import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatDialog
 import androidx.constraintlayout.motion.widget.MotionLayout
@@ -130,11 +129,11 @@ fun View.applyCoordinatorBottomMarginInsets() {
     requestApplyInsetsWhenAttached()
 }
 
-fun View.applyFrameBottomMarginInsets() {
-    val marginBottom = (layoutParams as FrameLayout.LayoutParams).bottomMargin
+fun View.applyBottomMarginInsets() {
+    val marginBottom = (layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
         val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-        view.updateLayoutParams<FrameLayout.LayoutParams> {
+        view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             bottomMargin = marginBottom + insets.bottom
         }
         windowInsets

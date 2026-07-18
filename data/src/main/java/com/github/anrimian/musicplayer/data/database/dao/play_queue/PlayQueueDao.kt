@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.RawQuery
-import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
@@ -17,8 +16,8 @@ import io.reactivex.rxjava3.core.Observable
 @Dao
 interface PlayQueueDao {
 
-    @Query("SELECT * FROM play_queue ORDER BY position")
-    fun getPlayQueue(): MutableList<PlayQueueEntity>
+    @Query("SELECT id FROM play_queue ORDER BY position")
+    fun getPlayQueueIds(): MutableList<Long>
 
     @RawQuery(observedEntities = [
         PlayQueueEntity::class,
@@ -118,32 +117,17 @@ interface PlayQueueDao {
     @Query("SELECT MAX(shuffledPosition) FROM play_queue")
     fun getLastShuffledPosition(): Int
 
-    @Query("SELECT id FROM play_queue WHERE position = (SELECT MAX(position) FROM play_queue)")
+    @Query("SELECT id FROM play_queue ORDER BY position DESC LIMIT 1")
     fun getLastItem(): Long
 
-    @Query("""
-        SELECT id 
-        FROM play_queue 
-        WHERE shuffledPosition = (SELECT MAX(shuffledPosition) FROM play_queue)
-    """)
+    @Query("SELECT id FROM play_queue ORDER BY shuffledPosition DESC LIMIT 1")
     fun getLastShuffledItem(): Long
 
-    @Query("""
-        SELECT id 
-        FROM play_queue 
-        WHERE position = (SELECT MIN(position) FROM play_queue)
-    """)
+    @Query("SELECT id FROM play_queue ORDER BY position ASC LIMIT 1")
     fun getFirstItem(): Long
 
-    @Query("""
-        SELECT id 
-        FROM play_queue 
-        WHERE shuffledPosition = (SELECT MIN(shuffledPosition) FROM play_queue)
-    """)
+    @Query("SELECT id FROM play_queue ORDER BY shuffledPosition ASC LIMIT 1")
     fun getFirstShuffledItem(): Long
-
-    @Update
-    fun update(list: List<PlayQueueEntity>)
 
     @Query("""
         SELECT id 
@@ -221,6 +205,7 @@ interface PlayQueueDao {
     fun getTrackPosition(itemId: Long): Long
 
     companion object {
+
         fun getCompositionQuery(useFileName: Boolean): String {
             return """
                 SELECT play_queue.id AS itemId,
@@ -228,5 +213,22 @@ interface PlayQueueDao {
                 FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id 
                 """
         }
+
+        fun getWindowCompositionQuery(
+            useFileName: Boolean,
+            isRandom: Boolean,
+            itemsCount: Int
+        ): String {
+            val pos = if (isRandom) "shuffledPosition" else "position"
+            return """
+                SELECT play_queue.id AS itemId,
+                ${CompositionsDao.getCompositionSelectionQuery(useFileName)}
+                FROM play_queue INNER JOIN compositions ON play_queue.audioId = compositions.id 
+                WHERE $pos >= ?
+                ORDER BY $pos
+                LIMIT $itemsCount
+            """
+        }
+
     }
 }

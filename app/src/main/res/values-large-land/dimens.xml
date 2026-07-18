@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--list margins-->
+    <dimen name="list_library_bottom_padding">0dp</dimen>
+
     <!--toolbar-->
     <dimen name="toolbar_player_content_start_padding">24dp</dimen>
 

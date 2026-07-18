@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.anrimian.musicplayer.Constants.Arguments
-import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.AppConstants.Arguments
+import com.github.anrimian.musicplayer.AppConstants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLibraryArtistsBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -32,7 +32,7 @@ import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFrag
 import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.library.common.setupLibraryTitle
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlists.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.applyBottomInsets
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner

@@ -212,7 +212,7 @@ class EqualizerDialogFragment : MvpBottomSheetDialogFragment(), EqualizerView {
         for (pair in bandsViewList) {
             val binding = pair.first
             val band = pair.second
-            val currentRange = equalizerState.bendLevels[band.bandNumber] ?: return
+            val currentRange = equalizerState.bandLevels[band.bandNumber] ?: return
             binding.tvLevel.text = FormatUtils.formatDecibels(currentRange)
             val lowestRange = config.lowestBandRange
             binding.sbLevel.progress = currentRange + abs(lowestRange.toInt())

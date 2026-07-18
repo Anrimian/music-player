@@ -19,6 +19,8 @@ class PlayerSettingsPresenter(
         )
         viewState.showPauseOnAudioFocusLossEnabled(interactor.isPauseOnAudioFocusLossEnabled())
         viewState.showPauseOnZeroVolumeLevelEnabled(interactor.isPauseOnZeroVolumeLevelEnabled())
+        viewState.showPauseOnAudioDeviceRemoveEnabled(interactor.isPauseOnAudioDeviceRemoveEnabled())
+        viewState.showSkipSilenceEnabled(interactor.isSkipSilenceEnabled())
         viewState.showSoundBalance(interactor.getSoundBalance())
         viewState.showKeepNotificationTime(interactor.getKeepNotificationTime())
         viewState.showEnabledMediaPlayers(interactor.getEnabledMediaPlayers())
@@ -38,6 +40,16 @@ class PlayerSettingsPresenter(
     fun onPauseOnZeroVolumeLevelChecked(checked: Boolean) {
         viewState.showPauseOnZeroVolumeLevelEnabled(checked)
         interactor.setPauseOnZeroVolumeLevelEnabled(checked)
+    }
+
+    fun onPauseOnAudioDeviceRemoveChecked(checked: Boolean) {
+        viewState.showPauseOnAudioDeviceRemoveEnabled(checked)
+        interactor.setPauseOnAudioDeviceRemoveEnabled(checked)
+    }
+
+    fun onSkipSilenceChecked(checked: Boolean) {
+        viewState.showSkipSilenceEnabled(checked)
+        interactor.setSkipSilenceEnabled(checked)
     }
 
     fun onSelectKeepNotificationTimeClicked() {

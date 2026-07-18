@@ -1,40 +1,22 @@
-package com.github.anrimian.musicplayer.domain.models.equalizer;
+package com.github.anrimian.musicplayer.domain.models.equalizer
 
-public class Preset {
+class Preset(val number: Short, val presetName: String) {
 
-    private final short number;
-    private final String presetName;
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Preset) return false
 
-    public Preset(short number, String presetName) {
-        this.number = number;
-        this.presetName = presetName;
+        if (number != other.number) return false
+
+        return true
     }
 
-    public short getNumber() {
-        return number;
+    override fun hashCode(): Int {
+        return number.toInt()
     }
 
-    public String getPresetName() {
-        return presetName;
+    override fun toString(): String {
+        return presetName
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Preset preset = (Preset) o;
-
-        return number == preset.number;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) number;
-    }
-
-    @Override
-    public String toString() {
-        return presetName;
-    }
 }

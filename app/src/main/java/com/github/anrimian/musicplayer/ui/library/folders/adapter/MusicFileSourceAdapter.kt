@@ -18,9 +18,6 @@ import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.mvp.MvpDiffA
 /**
  * Created on 31.10.2017.
  */
-private const val TYPE_MUSIC = 1
-private const val TYPE_FILE = 2
-
 class MusicFileSourceAdapter(
     lifecycleOwner: LifecycleOwner,
     recyclerView: RecyclerView,
@@ -176,4 +173,10 @@ class MusicFileSourceAdapter(
             }
         }
     }
+
+    private companion object {
+        const val TYPE_MUSIC = 1
+        const val TYPE_FILE = 2
+    }
+
 }

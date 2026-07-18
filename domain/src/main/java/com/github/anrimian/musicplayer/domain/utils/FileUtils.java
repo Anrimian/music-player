@@ -44,7 +44,7 @@ public class FileUtils {
     }
 
     public static String replaceFileName(String fullPath, String newFileName) {
-        String fileName = FileUtils.formatFileName(fullPath);
+        String fileName = FileUtils.formatFileName(fullPath, true);
         if (fileName.equals(newFileName)) {
             return fullPath;
         }
@@ -135,6 +135,15 @@ public class FileUtils {
         if (!renamed) {
             throw new RuntimeException("file wasn't renamed");
         }
+    }
+
+    public static String getExtension(String fileName) {
+        String fileExtension = "";
+        int lastDot = fileName.lastIndexOf('.');
+        if (lastDot >= 0 && lastDot < fileName.length() - 1) {
+            fileExtension = fileName.substring(lastDot + 1).toLowerCase();
+        }
+        return fileExtension;
     }
 
 }

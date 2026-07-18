@@ -2,62 +2,65 @@ package com.github.anrimian.musicplayer.data.database.dao.compositions
 
 import android.annotation.SuppressLint
 import androidx.room.Dao
+import androidx.room.MapColumn
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.util.appendPlaceholders
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.github.anrimian.musicplayer.data.database.common.FileKeyDto
 import com.github.anrimian.musicplayer.data.database.entities.albums.AlbumEntity
 import com.github.anrimian.musicplayer.data.database.entities.artist.ArtistEntity
 import com.github.anrimian.musicplayer.data.database.entities.composition.CompositionEntity
+import com.github.anrimian.musicplayer.data.database.entities.folder.FolderEntity
 import com.github.anrimian.musicplayer.data.models.composition.ExternalComposition
-import com.github.anrimian.musicplayer.data.repositories.library.edit.models.CompositionMoveData
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition
+import com.github.anrimian.musicplayer.data.storage.providers.music.DBComposition
 import com.github.anrimian.musicplayer.domain.Constants
+import com.github.anrimian.musicplayer.domain.models.composition.AudioFileInfo
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
+import com.github.anrimian.musicplayer.domain.models.composition.LocalFileStatus
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
-import java.util.Date
 
 @Dao
 interface CompositionsDao {
-    
+
     @Query("""
-        SELECT 
-        (SELECT name FROM artists WHERE id = artistId) AS artist, 
-        title AS title, 
-        (SELECT name FROM albums WHERE id = albumId) AS album, 
-        (SELECT name 
-            FROM artists 
+        SELECT
+        (SELECT name FROM artists WHERE id = artistId) AS artist,
+        title AS title,
+        (SELECT name FROM albums WHERE id = albumId) AS album,
+        (SELECT name
+            FROM artists
             WHERE id = (SELECT artistId FROM albums WHERE id = albumId)
-        ) AS albumArtist, 
-        (SELECT group_concat(name, '${Constants.GENRE_DIVIDER}') FROM (    
-            SELECT name   
-            FROM genres    
-            JOIN genre_entries AS entries ON entries.compositionId = compositions.id   
-            WHERE id = entries.genreId    
+        ) AS albumArtist,
+        (SELECT group_concat(name, '${Constants.GENRE_DIVIDER}') FROM (
+            SELECT name
+            FROM genres
+            JOIN genre_entries AS entries ON entries.compositionId = compositions.id
+            WHERE id = entries.genreId
             ORDER BY entries.position)
-        ) AS genres, 
-        trackNumber AS trackNumber, 
-        discNumber AS discNumber, 
-        comment AS comment, 
-        lyrics AS lyrics, 
-        fileName AS fileName, 
-        duration AS duration, 
-        size AS size, 
-        id AS id, 
-        storageId AS storageId, 
-        dateAdded AS dateAdded,     
-        dateModified AS dateModified, 
-        coverModifyTime AS coverModifyTime, 
-        corruptionType AS corruptionType, 
-        initialSource AS initialSource 
-        FROM compositions 
-        WHERE id = :id 
+        ) AS genres,
+        trackNumber AS trackNumber,
+        discNumber AS discNumber,
+        comment AS comment,
+        lyrics AS lyrics,
+        fileName AS fileName,
+        duration AS duration,
+        size AS size,
+        id AS id,
+        storageId AS storageId,
+        addedTime AS addedTime,
+        modifiedTime AS modifiedTime,
+        coverModifyTime AS coverModifyTime,
+        localFileStatus AS fileStatus,
+        corruptionType AS corruptionType
+        FROM compositions
+        WHERE id = :id
         LIMIT 1
     """)
     fun getFullCompositionObservable(id: Long): Observable<List<FullComposition>>
@@ -66,112 +69,180 @@ interface CompositionsDao {
     fun getLyricsObservable(compositionId: Long): Observable<String>
 
     @Query("""
-        SELECT 
-        (SELECT name FROM artists WHERE id = artistId) AS artist, 
-        title AS title, 
-        (SELECT name FROM albums WHERE id = albumId) AS album, 
-        (SELECT name 
-            FROM artists 
+        SELECT
+        (SELECT name FROM artists WHERE id = artistId) AS artist,
+        title AS title,
+        (SELECT name FROM albums WHERE id = albumId) AS album,
+        (SELECT name
+            FROM artists
             WHERE id = (SELECT artistId FROM albums WHERE id = albumId)
-        ) AS albumArtist, 
-        (SELECT group_concat(name, '${Constants.GENRE_DIVIDER}') FROM (    
-            SELECT name   
-            FROM genres    
-            JOIN genre_entries AS entries ON entries.compositionId = compositions.id   
-            WHERE id = entries.genreId    
+        ) AS albumArtist,
+        (SELECT group_concat(name, '${Constants.GENRE_DIVIDER}') FROM (
+            SELECT name
+            FROM genres
+            JOIN genre_entries AS entries ON entries.compositionId = compositions.id
+            WHERE id = entries.genreId
             ORDER BY entries.position)
-        ) AS genres, 
-        trackNumber AS trackNumber, 
-        discNumber AS discNumber, 
-        comment AS comment, 
-        lyrics AS lyrics, 
-        fileName AS fileName, 
-        duration AS duration, 
-        size AS size, 
-        id AS id, 
-        storageId AS storageId, 
-        dateAdded AS dateAdded,     
-        dateModified AS dateModified, 
-        coverModifyTime AS coverModifyTime, 
-        corruptionType AS corruptionType, 
-        initialSource AS initialSource 
-        FROM compositions 
-        WHERE id = :id 
+        ) AS genres,
+        trackNumber AS trackNumber,
+        discNumber AS discNumber,
+        comment AS comment,
+        lyrics AS lyrics,
+        fileName AS fileName,
+        duration AS duration,
+        size AS size,
+        id AS id,
+        storageId AS storageId,
+        addedTime AS addedTime,
+        modifiedTime AS modifiedTime,
+        coverModifyTime AS coverModifyTime,
+        localFileStatus AS fileStatus,
+        corruptionType AS corruptionType
+        FROM compositions
+        WHERE id = :id
         LIMIT 1
     """)
     fun getFullComposition(id: Long): FullComposition
 
     @Query("""
-        SELECT (
-            WITH RECURSIVE path(level, name, parentId) AS (                
-                SELECT 0, name, parentId                 
-                FROM folders                 
-                WHERE id = compositions.folderId                 
-                UNION ALL                 
-                SELECT path.level + 1, folders.name, folders.parentId                 
-                FROM folders                 
-                JOIN path ON folders.id = path.parentId             
-            ),             
-            path_from_root AS (SELECT name FROM path ORDER BY level DESC)             
-            SELECT IFNULL(group_concat(name, '/'), '') FROM path_from_root
-        ) AS parentPath, 
-        compositions.id AS id, 
-        compositions.storageId AS storageId, 
-        compositions.fileName AS fileName,
-        compositions.pathModifyTime AS pathModifyTime
-        FROM compositions 
+        WITH RECURSIVE path(level, name, parentId, id) AS (
+            SELECT 0, name, parentId, id
+            FROM folders
+            WHERE id = (SELECT folderId FROM compositions WHERE id = :id)
+            UNION ALL
+            SELECT path.level + 1, folders.name, folders.parentId, folders.id
+            FROM folders
+            JOIN path ON folders.id = path.parentId
+        ),
+        path_from_root AS (
+            SELECT name
+            FROM path
+            WHERE parentId IS NOT NULL
+            ORDER BY level DESC
+        ),
+        volume_path AS (
+            SELECT v.path
+            FROM volumes AS v
+            JOIN folders AS f ON v.id = f.volumeId
+            JOIN path ON f.id = path.id AND path.parentId IS NULL
+            LIMIT 1
+        )
+        SELECT
+            IFNULL((SELECT path FROM volume_path) || (SELECT IFNULL(group_concat('/' || name, ''), '') FROM path_from_root), '') AS parentPath,
+            compositions.id AS id,
+            compositions.storageId AS storageId,
+            compositions.fileName AS fileName,
+            compositions.pathModifyTime AS pathModifyTime
+        FROM compositions
         WHERE id = :id
     """)
-    fun getCompositionMoveData(id: Long): CompositionMoveData
+    fun getAudioFileInfo(id: Long): AudioFileInfo
 
-    @RawQuery(observedEntities = [CompositionEntity::class, ArtistEntity::class, AlbumEntity::class])
+    @RawQuery(observedEntities = [ CompositionEntity::class, ArtistEntity::class, AlbumEntity::class ])
     fun getCompositionsObservable(query: SupportSQLiteQuery): Observable<List<Composition>>
 
-    @RawQuery(observedEntities = [CompositionEntity::class, ArtistEntity::class, AlbumEntity::class])
+    @RawQuery(observedEntities = [ CompositionEntity::class, ArtistEntity::class, AlbumEntity::class ])
     fun getCompositionsInFolderObservable(query: SupportSQLiteQuery): Observable<List<Composition>>
 
     @RawQuery
     fun executeQuery(sqlQuery: SimpleSQLiteQuery): List<Composition>
 
     @RawQuery
-    fun executeQueryForMove(sqlQuery: SimpleSQLiteQuery): List<CompositionMoveData>
+    fun getAudioFilesInfo(sqlQuery: SimpleSQLiteQuery): List<AudioFileInfo>
+
+    @RawQuery(observedEntities = [ CompositionEntity::class, FolderEntity::class ])
+    fun getAudioFilesInfoObservable(sqlQuery: SimpleSQLiteQuery): Observable<List<AudioFileInfo>>
 
     @Query("""
-        SELECT (
-            WITH RECURSIVE path(level, name, parentId) AS (                
-                SELECT 0, name, parentId                 
-                FROM folders                 
-                WHERE id = compositions.folderId                 
-                UNION ALL                 
-                SELECT path.level + 1, folders.name, folders.parentId                 
-                FROM folders                 
-                JOIN path ON folders.id = path.parentId             
-            ),             
-            path_from_root AS (SELECT name FROM path ORDER BY level DESC)             
-            SELECT IFNULL(group_concat(name, '/'), '') FROM path_from_root
-        ) AS parentPath, 
-        (SELECT name FROM artists WHERE id = artistId) AS artist, 
-        title AS title, 
-        (SELECT name FROM albums WHERE id = albumId) AS album, 
-        (SELECT name FROM artists WHERE id = (
-            SELECT artistId FROM albums WHERE id = albumId
-        )) AS albumArtist, 
-        compositions.fileName AS fileName, 
-        compositions.duration AS duration, 
-        compositions.size AS size, 
-        compositions.id AS id, 
-        compositions.initialSource AS initialSource, 
-        compositions.storageId AS storageId, 
-        compositions.folderId AS folderId, 
-        compositions.dateAdded AS dateAdded, 
-        compositions.dateModified AS dateModified, 
-        compositions.lastScanDate AS lastScanDate 
-        FROM compositions 
-        WHERE storageId NOTNULL 
-        LIMIT :pageSize 
+        SELECT
+            (
+                WITH RECURSIVE path(level, name, parentId, id) AS (
+                    SELECT 0, name, parentId, id
+                    FROM folders
+                    WHERE id = compositions.folderId
+                    UNION ALL
+                    SELECT path.level + 1, folders.name, folders.parentId, folders.id
+                    FROM folders
+                    JOIN path ON folders.id = path.parentId
+                ),
+                path_from_root AS (
+                    SELECT name
+                    FROM path
+                    WHERE parentId IS NOT NULL
+                    ORDER BY level DESC
+                ),
+                volume_path AS (
+                    SELECT v.path
+                    FROM volumes AS v
+                    JOIN folders AS f ON v.id = f.volumeId
+                    JOIN path ON f.id = path.id AND path.parentId IS NULL
+                    LIMIT 1
+                )
+                SELECT IFNULL((SELECT path FROM volume_path) || (SELECT IFNULL(group_concat('/' || name, ''), '') FROM path_from_root), '')
+            ) AS parentPath,
+            compositions.fileName AS name
+        FROM compositions
+        WHERE (:minDuration IS NULL OR duration >= :minDuration)
+          AND (:maxDuration IS NULL OR duration < :maxDuration)
+          AND (:fileExtensionsSize = 0 OR SUBSTR(LOWER(fileName), INSTR(fileName, '.') + 1) IN (:fileExtensions))
+    """)
+    fun getCompositionKeys(
+        minDuration: Long?,
+        maxDuration: Long?,
+        fileExtensionsSize: Int,
+        fileExtensions: Set<String>?
+    ): List<FileKeyDto>
+
+    @Query("""
+        SELECT
+            (
+                WITH RECURSIVE path(level, name, parentId, id) AS (
+                    SELECT 0, name, parentId, id
+                    FROM folders
+                    WHERE id = compositions.folderId
+                    UNION ALL
+                    SELECT path.level + 1, folders.name, folders.parentId, folders.id
+                    FROM folders
+                    JOIN path ON folders.id = path.parentId
+                ),
+                path_from_root AS (
+                    SELECT name
+                    FROM path
+                    WHERE parentId IS NOT NULL
+                    ORDER BY level DESC
+                ),
+                volume_path AS (
+                    SELECT v.path
+                    FROM volumes AS v
+                    JOIN folders AS f ON v.id = f.volumeId
+                    JOIN path ON f.id = path.id AND path.parentId IS NULL
+                    LIMIT 1
+                )
+                SELECT IFNULL((SELECT path FROM volume_path) || (SELECT IFNULL(group_concat('/' || name, ''), '') FROM path_from_root), '')
+            ) AS parentPath,
+            (SELECT name FROM artists WHERE id = artistId) AS artist,
+            title AS title,
+            (SELECT name FROM albums WHERE id = albumId) AS album,
+            (SELECT name FROM artists WHERE id = (
+                SELECT artistId FROM albums WHERE id = albumId
+            )) AS albumArtist,
+            compositions.fileName AS fileName,
+            compositions.duration AS duration,
+            compositions.size AS size,
+            compositions.id AS id,
+            compositions.storageId AS storageId,
+            compositions.folderId AS folderId,
+            compositions.storageModifyTime AS storageModifyTime,
+            compositions.lastScanTime AS lastScanTime,
+            compositions.missingTime AS missingTime,
+            compositions.pathModifyTime AS pathModifyTime,
+            compositions.localFileStatus AS localFileStatus,
+            compositions.initialSource AS initialSource
+        FROM compositions
+        LIMIT :pageSize
         OFFSET :pageIndex * :pageSize
     """)
-    fun selectAllAsStorageCompositions(pageSize: Int, pageIndex: Int): List<StorageComposition>
+    fun selectAsDbCompositions(pageSize: Int, pageIndex: Int): List<DBComposition>
 
     @Query("""
         INSERT INTO compositions (
@@ -187,10 +258,14 @@ interface CompositionsDao {
             duration,
             size,
             storageId,
-            dateAdded,
-            dateModified,
-            lastScanDate,
+            addedTime,
+            modifiedTime,
+            storageModifyTime,
+            pathModifyTime,
+            lastScanTime,
+            missingTime,
             coverModifyTime,
+            localFileStatus,
             corruptionType,
             initialSource
         ) VALUES (
@@ -202,14 +277,18 @@ interface CompositionsDao {
             :discNumber,
             :comment,
             :lyrics,
-            :fileName,  
+            :fileName,
             :duration,
             :size,
             :storageId,
-            :dateAdded,
-            :dateModified,
-            :lastScanDate,
+            :addedTime,
+            :modifiedTime,
+            :storageModifyTime,
+            :pathModifyTime,
+            :lastScanTime,
+            0,
             :coverModifyTime,
+            :localFileStatus,
             :corruptionType,
             :initialSource
         )
@@ -227,42 +306,41 @@ interface CompositionsDao {
         duration: Long,
         size: Long,
         storageId: Long?,
-        dateAdded: Date,
-        dateModified: Date,
-        lastScanDate: Date?,
-        coverModifyTime: Date?,
+        addedTime: Long,
+        modifiedTime: Long,
+        storageModifyTime: Long,
+        pathModifyTime: Long?,
+        lastScanTime: Long,
+        coverModifyTime: Long,
+        localFileStatus: LocalFileStatus,
         corruptionType: CorruptionType?,
         initialSource: InitialSource
     ): Long
 
     @Query("""
-        UPDATE compositions SET 
-            title = :title, 
-            fileName = :fileName, 
-            duration = :duration, 
-            size = :size, 
-            dateModified = :dateModified 
+        UPDATE compositions SET
+            fileName = :fileName,
+            duration = :duration,
+            storageModifyTime = :storageModifyTime
         WHERE storageId = :storageId
     """)
     fun update(
-        title: String?,
         fileName: String,
         duration: Long,
-        size: Long,
-        dateModified: Date,
+        storageModifyTime: Long,
         storageId: Long
     )
 
     @Query("""
-        UPDATE compositions SET 
-            title = :title, 
-            trackNumber = :trackNumber, 
-            discNumber = :discNumber, 
-            comment = :comment, 
-            lyrics = :lyrics, 
-            duration = :duration, 
-            size = :size, 
-            dateModified = :dateModified 
+        UPDATE compositions SET
+            title = :title,
+            trackNumber = :trackNumber,
+            discNumber = :discNumber,
+            comment = :comment,
+            lyrics = :lyrics,
+            duration = :duration,
+            size = :size,
+            modifiedTime = :modifiedTime
         WHERE id = :id
     """)
     fun update(
@@ -274,7 +352,7 @@ interface CompositionsDao {
         lyrics: String?,
         duration: Long,
         size: Long,
-        dateModified: Long
+        modifiedTime: Long
     )
 
     @Query("DELETE FROM compositions WHERE id = :id")
@@ -283,8 +361,8 @@ interface CompositionsDao {
     @Query("DELETE FROM compositions WHERE id in (:ids)")
     fun delete(ids: Array<Long>)
 
-    @Query("DELETE FROM compositions WHERE storageId IS NULL")
-    fun deleteCompositionsWithoutStorageId()
+    @Query("DELETE FROM compositions WHERE localFileStatus IN (:statuses)")
+    fun deleteCompositionsWithLocalFileStatus(vararg statuses: LocalFileStatus)
 
     @Query("UPDATE compositions SET pathModifyTime = NULL")
     fun clearAllPathModifyTime()
@@ -338,16 +416,24 @@ interface CompositionsDao {
     fun selectIdByStorageId(storageId: Long): Long
 
     @Query("SELECT storageId FROM compositions WHERE id = :id")
-    fun selectStorageId(id: Long): Long
+    fun selectStorageId(id: Long): Long?
 
     @Query("SELECT storageId FROM compositions WHERE id = :id")
     fun getStorageId(id: Long): Long?
 
+    @Query("SELECT id, storageId FROM compositions WHERE id IN (:ids) AND storageId IS NOT NULL")
+    fun selectStorageIds(
+        ids: List<Long>
+    ): Map<@MapColumn("id") Long, @MapColumn("storageId") Long>
+
     @Query("SELECT corruptionType FROM compositions WHERE id = :id")
     fun selectCorruptionType(id: Long): CorruptionType?
 
-    @Query("UPDATE compositions SET corruptionType = :corruptionType WHERE id = :id")
-    fun setCorruptionType(corruptionType: CorruptionType?, id: Long)
+    @Query("UPDATE compositions SET corruptionType = :corruptionType WHERE id = :compositionId")
+    fun setCorruptionType(compositionId: Long, corruptionType: CorruptionType?)
+
+    @Query("UPDATE compositions SET localFileStatus = :status WHERE id = :compositionId")
+    fun setLocalFileStatus(compositionId: Long, status: LocalFileStatus)
 
     @Query("SELECT albumId FROM compositions WHERE id = :compositionId")
     fun getAlbumId(compositionId: Long): Long?
@@ -358,20 +444,31 @@ interface CompositionsDao {
     @Query("SELECT artistId FROM compositions WHERE id = :id")
     fun getArtistId(id: Long): Long?
 
-    @Query("UPDATE compositions SET dateModified = :date WHERE id = :id")
-    fun setUpdateTime(id: Long, date: Date)
+    @Query("UPDATE compositions SET modifiedTime = :time WHERE id = :id")
+    fun setModifyTime(id: Long, time: Long)
 
     @Query("UPDATE compositions SET pathModifyTime = :time WHERE id = :id")
     fun setPathModifyTime(id: Long, time: Long?)
 
-    @Query("""
-        UPDATE compositions SET 
-            coverModifyTime = :date, 
-            dateModified = :date, 
-            size = :size 
+    @Query("UPDATE compositions SET missingTime = :time WHERE id = :id")
+    fun setCompositionMissedTime(id: Long, time: Long)
+
+    @Query("SELECT count() FROM compositions WHERE missingTime > 0")
+    fun getMissingCompositionsCountObservable(): Observable<Int>
+
+    @Query("DELETE FROM compositions WHERE missingTime > 0")
+    fun deleteMissingCompositions()
+
+    @Query(
+        """
+        UPDATE compositions SET
+            coverModifyTime = :time,
+            modifiedTime = :time,
+            size = :size
         WHERE id = :id
-    """)
-    fun setCoverModifyTimeAndSize(id: Long, size: Long, date: Date)
+    """
+    )
+    fun setCoverModifyTimeAndSize(id: Long, size: Long, time: Long)
 
     @Query("UPDATE compositions SET coverModifyTime = :time WHERE id = :id")
     fun setCoverModifyTime(id: Long, time: Long)
@@ -380,38 +477,38 @@ interface CompositionsDao {
     fun getCompositionsCount(): Long
 
     @Query("""
-        SELECT 
-            (SELECT name FROM artists WHERE id = artistId) AS artist, 
-            title AS title, 
-            (SELECT name FROM albums WHERE id = albumId) AS album, 
+        SELECT
+            (SELECT name FROM artists WHERE id = artistId) AS artist,
+            title AS title,
+            (SELECT name FROM albums WHERE id = albumId) AS album,
             (SELECT name FROM artists WHERE id = (
                 SELECT artistId FROM albums WHERE id = albumId
-            )) AS albumArtist, 
-            (SELECT group_concat(name, '${Constants.GENRE_DIVIDER}') FROM (    
-                SELECT name   
-                FROM genres    
-                JOIN genre_entries AS entries ON entries.compositionId = compositions.id   
-                WHERE id = entries.genreId    
+            )) AS albumArtist,
+            (SELECT group_concat(name, '${Constants.GENRE_DIVIDER}') FROM (
+                SELECT name
+                FROM genres
+                JOIN genre_entries AS entries ON entries.compositionId = compositions.id
+                WHERE id = entries.genreId
                 ORDER BY entries.position
-            )) AS genres, 
-            trackNumber AS trackNumber, 
-            discNumber AS discNumber, 
-            comment AS comment, 
-            lyrics AS lyrics, 
-            fileName AS fileName, 
-            duration AS duration, 
-            size AS size, 
-            id AS id, 
-            storageId AS storageId, 
-            dateAdded AS dateAdded, 
-            dateModified AS dateModified, 
-            coverModifyTime AS coverModifyTime, 
-            corruptionType AS corruptionType, 
-            initialSource AS initialSource 
-        FROM compositions 
-        WHERE (lastScanDate < dateModified OR lastScanDate < :lastCompleteScanTime) 
-            AND storageId IS NOT NULL 
-        ORDER BY dateModified DESC 
+            )) AS genres,
+            trackNumber AS trackNumber,
+            discNumber AS discNumber,
+            comment AS comment,
+            lyrics AS lyrics,
+            fileName AS fileName,
+            duration AS duration,
+            size AS size,
+            id AS id,
+            storageId AS storageId,
+            addedTime AS addedTime,
+            modifiedTime AS modifiedTime,
+            coverModifyTime AS coverModifyTime,
+            localFileStatus AS fileStatus,
+            corruptionType AS corruptionType
+        FROM compositions
+        WHERE (lastScanTime < storageModifyTime OR lastScanTime < :lastCompleteScanTime)
+            AND storageId IS NOT NULL
+        ORDER BY storageModifyTime DESC
         LIMIT :filesCount
     """)
     fun selectNextCompositionsToScan(
@@ -419,10 +516,16 @@ interface CompositionsDao {
         filesCount: Int
     ): Single<List<FullComposition>>
 
-    @Query("UPDATE compositions SET lastScanDate = :time WHERE id = :id")
-    fun setCompositionLastFileScanTime(id: Long, time: Date)
+    @Query("SELECT storageModifyTime FROM compositions WHERE id = :id")
+    fun getCompositionStorageModifyTime(id: Long): Long
 
-    @Query("UPDATE compositions SET lastScanDate = 0")
+    @Query("UPDATE compositions SET lastScanTime = :time WHERE id = :id")
+    fun setCompositionLastFileScanTime(id: Long, time: Long)
+
+    @Query("SELECT lastScanTime FROM compositions WHERE id = :id")
+    fun getCompositionLastFileScanTime(id: Long): Long
+
+    @Query("UPDATE compositions SET lastScanTime = 0")
     fun cleanLastFileScanTime()
 
     @Query("SELECT folderId FROM compositions WHERE id = :compositionId")
@@ -430,55 +533,56 @@ interface CompositionsDao {
 
     @Query("""
         WITH RECURSIVE allChildFolders(cfId, cfPId, name) AS (
-            SELECT folders.id AS cfId, folders.parentId AS cfPId, folders.name AS name    
-            FROM folders    
+            SELECT folders.id AS cfId, folders.parentId AS cfPId, folders.name AS name
+            FROM folders
             WHERE parentId = :parentFolderId OR (parentId IS NULL AND :parentFolderId IS NULL)
-            UNION 
-            SELECT folders.id AS cfId, folders.parentId AS cfPId, folders.name AS name    
-            FROM folders    
+            UNION
+            SELECT folders.id AS cfId, folders.parentId AS cfPId, folders.name AS name
+            FROM folders
             INNER JOIN allChildFolders ON parentId = allChildFolders.cfId
-        ), 
-        entries(genreId, position) AS (SELECT genreId, position FROM genre_entries) 
-        SELECT (
-            WITH RECURSIVE path(level, name, parentId) AS (   
-                SELECT 0, name, cfPId    
-                FROM allChildFolders    
-                WHERE cfId = compositions.folderId    
-                UNION ALL    
-                SELECT path.level + 1, allChildFolders.name, allChildFolders.cfPId    
-                FROM allChildFolders    
-                JOIN path ON allChildFolders.cfId = path.parentId 
-            ), 
-            path_from_root AS (SELECT name FROM path ORDER BY level DESC)    
-            SELECT IFNULL(group_concat(name, '/'), '') FROM path_from_root
-        ) AS parentPath, 
-        fileName AS fileName, 
-        title AS title, 
-        (SELECT name FROM artists WHERE id = artistId) AS artist, 
-        (SELECT name FROM albums WHERE id = albumId) AS album, 
-        (SELECT name FROM artists WHERE id = (
-            SELECT artistId FROM albums WHERE id = albumId
-        )) AS albumArtist, 
-        (SELECT group_concat(name, '${Constants.GENRE_DIVIDER}') FROM (    
-            SELECT name  
-            FROM genres    
-            JOIN genre_entries AS entries ON entries.compositionId = compositions.id   
-            WHERE id = entries.genreId    
-            ORDER BY entries.position
-        )) AS genres, 
-        trackNumber AS trackNumber, 
-        discNumber AS discNumber, 
-        comment AS comment, 
-        lyrics AS lyrics, 
-        duration AS duration, 
-        size AS size, 
-        dateAdded AS dateAdded, 
-        dateModified AS dateModified, 
-        pathModifyTime AS pathModifyTime, 
-        coverModifyTime AS coverModifyTime, 
-        storageId IS NOT NULL AS isFileExists 
-        FROM compositions 
-        WHERE folderId IN (SELECT cfId FROM allChildFolders)   
+        )
+        SELECT
+            (
+                WITH RECURSIVE path(level, name, parentId) AS (
+                    SELECT 0, name, cfPId
+                    FROM allChildFolders
+                    WHERE cfId = compositions.folderId
+                    UNION ALL
+                    SELECT path.level + 1, allChildFolders.name, allChildFolders.cfPId
+                    FROM allChildFolders
+                    JOIN path ON allChildFolders.cfId = path.parentId
+                ),
+                path_from_root AS (SELECT name FROM path ORDER BY level DESC)
+                SELECT IFNULL(group_concat(name, '/'), '') FROM path_from_root
+            ) AS parentPath,
+            fileName AS fileName,
+            title AS title,
+            (SELECT name FROM artists WHERE id = artistId) AS artist,
+            (SELECT name FROM albums WHERE id = albumId) AS album,
+            (SELECT name FROM artists WHERE id = (
+                SELECT artistId FROM albums WHERE id = albumId
+            )) AS albumArtist,
+            (SELECT group_concat(name, '${Constants.GENRE_DIVIDER}') FROM (
+                SELECT name
+                FROM genres
+                JOIN genre_entries AS entries ON entries.compositionId = compositions.id
+                WHERE id = entries.genreId
+                ORDER BY entries.position
+            )) AS genres,
+            trackNumber AS trackNumber,
+            discNumber AS discNumber,
+            comment AS comment,
+            lyrics AS lyrics,
+            duration AS duration,
+            size AS size,
+            addedTime AS addedTime,
+            modifiedTime AS modifiedTime,
+            pathModifyTime AS pathModifyTime,
+            missingTime AS missingTime,
+            coverModifyTime AS coverModifyTime,
+            storageId IS NOT NULL AS isFileExists
+        FROM compositions
+        WHERE folderId IN (SELECT cfId FROM allChildFolders)
             OR (folderId = :parentFolderId OR (folderId IS NULL AND :parentFolderId IS NULL))
     """)
     fun getAllAsExternalCompositions(parentFolderId: Long?): List<ExternalComposition>
@@ -487,30 +591,37 @@ interface CompositionsDao {
     fun findCompositionsByFileName(fileName: String): List<Long>
 
     @Query("""
-        SELECT id 
-        FROM compositions 
-        WHERE fileName = :fileName 
+        SELECT id
+        FROM compositions
+        WHERE fileName = :fileName
             AND (folderId = :folderId OR (folderId IS NULL AND :folderId IS NULL))
     """)
     fun findCompositionByFileName(fileName: String, folderId: Long?): Long?
 
     @Query("""
-        WITH RECURSIVE path(level, name, parentId) AS (    
-            SELECT 0, name, parentId    
-            FROM folders    
-            WHERE id = (SELECT folderId FROM compositions WHERE id = :id)   
-            UNION ALL    
-            SELECT path.level + 1, folders.name, folders.parentId    
-            FROM folders    
+        WITH RECURSIVE path(level, name, parentId, id) AS (
+            SELECT 0, name, parentId, id
+            FROM folders
+            WHERE id = (SELECT folderId FROM compositions WHERE id = :id)
+            UNION ALL
+            SELECT path.level + 1, folders.name, folders.parentId, folders.id
+            FROM folders
             JOIN path ON folders.id = path.parentId
-        ), 
-        path_from_root AS (    
-            SELECT name    
-            FROM path    
+        ),
+        path_from_root AS (
+            SELECT name
+            FROM path
+            WHERE parentId IS NOT NULL
             ORDER BY level DESC
-        ) 
-        SELECT IFNULL(group_concat(name, '/'), '') 
-        FROM path_from_root
+        ),
+        volume_path AS (
+            SELECT v.path
+            FROM volumes AS v
+            JOIN folders AS f ON v.id = f.volumeId
+            JOIN path ON f.id = path.id AND path.parentId IS NULL
+            LIMIT 1
+        )
+        SELECT IFNULL((SELECT path FROM volume_path) || (SELECT IFNULL(group_concat('/' || name, ''), '') FROM path_from_root), '')
     """)
     fun getCompositionParentPath(id: Long): String
 
@@ -521,8 +632,8 @@ interface CompositionsDao {
     fun getCompositionSize(id: Long): Long
 
     @Query("""
-        UPDATE compositions 
-        SET initialSource = :initialSource 
+        UPDATE compositions
+        SET initialSource = :initialSource
         WHERE id = :compositionId AND initialSource = :updateFrom
     """)
     fun updateCompositionInitialSource(
@@ -530,6 +641,8 @@ interface CompositionsDao {
         initialSource: InitialSource,
         updateFrom: InitialSource
     )
+
+
 
     @RawQuery
     fun selectDeletedComposition(query: SupportSQLiteQuery): List<DeletedComposition>
@@ -547,23 +660,36 @@ interface CompositionsDao {
             }
         }
 
-        fun getMoveCompositionQuery(): StringBuilder {
+        fun getAudioFileInfoQuery(): StringBuilder {
             return StringBuilder("""
-                SELECT (
-                    WITH RECURSIVE path(level, name, parentId) AS (                
-                        SELECT 0, name, parentId                 
-                        FROM folders                 
-                        WHERE id = compositions.folderId                 
-                        UNION ALL                 
-                        SELECT path.level + 1, folders.name, folders.parentId                 
-                        FROM folders                 
-                        JOIN path ON folders.id = path.parentId             
-                    ),             
-                    path_from_root AS (SELECT name FROM path ORDER BY level DESC)             
-                    SELECT IFNULL(group_concat(name, '/'), '') FROM path_from_root
-                ) AS parentPath, 
-                compositions.id AS id, 
-                compositions.storageId AS storageId, 
+                SELECT
+                (
+                    WITH RECURSIVE path(level, name, parentId, id) AS (
+                        SELECT 0, name, parentId, id
+                        FROM folders
+                        WHERE id = compositions.folderId
+                        UNION ALL
+                        SELECT path.level + 1, folders.name, folders.parentId, folders.id
+                        FROM folders
+                        JOIN path ON folders.id = path.parentId
+                    ),
+                    path_from_root AS (
+                        SELECT name
+                        FROM path
+                        WHERE parentId IS NOT NULL
+                        ORDER BY level DESC
+                    ),
+                    volume_path AS (
+                        SELECT v.path
+                        FROM volumes AS v
+                        JOIN folders AS f ON v.id = f.volumeId
+                        JOIN path ON f.id = path.id AND path.parentId IS NULL
+                        LIMIT 1
+                    )
+                    SELECT IFNULL((SELECT path FROM volume_path) || (SELECT IFNULL(group_concat('/' || name, ''), '') FROM path_from_root), '')
+                ) AS parentPath,
+                compositions.id AS id,
+                compositions.storageId AS storageId,
                 compositions.fileName AS fileName,
                 compositions.pathModifyTime AS pathModifyTime
                 FROM compositions
@@ -573,20 +699,21 @@ interface CompositionsDao {
         @JvmStatic
         fun getCompositionSelectionQuery(useFileName: Boolean): String {
             return """
-                compositions.id AS id, 
-                compositions.storageId AS storageId, 
-                (SELECT name FROM artists WHERE id = artistId) AS artist, 
-                (SELECT name FROM albums WHERE id = albumId) AS album, 
-                (${if (useFileName) "fileName" else "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END"}) AS title, 
-                compositions.duration AS duration, 
-                compositions.size AS size, 
-                compositions.comment AS comment, 
-                compositions.dateAdded AS dateAdded, 
-                compositions.dateModified AS dateModified, 
-                compositions.coverModifyTime AS coverModifyTime, 
-                storageId IS NOT NULL AS isFileExists, 
-                initialSource AS initialSource, 
-                compositions.corruptionType AS corruptionType 
+                compositions.id AS id,
+                compositions.storageId AS storageId,
+                (SELECT name FROM artists WHERE id = artistId) AS artist,
+                (SELECT name FROM albums WHERE id = albumId) AS album,
+                (${if (useFileName) "fileName" else "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END"}) AS title,
+                compositions.duration AS duration,
+                compositions.size AS size,
+                compositions.comment AS comment,
+                compositions.addedTime AS addedTime,
+                compositions.modifiedTime AS modifiedTime,
+                compositions.coverModifyTime AS coverModifyTime,
+                storageId IS NOT NULL AS isFileExists,
+                initialSource AS initialSource,
+                compositions.localFileStatus AS fileStatus,
+                compositions.corruptionType AS corruptionType
             """
         }
 
@@ -620,21 +747,34 @@ interface CompositionsDao {
             compositionsCount: Int
         ): StringBuilder {
             return StringBuilder("""
-                SELECT (
-                    WITH RECURSIVE path(level, name, parentId) AS (                
-                        SELECT 0, name, parentId                 
-                        FROM folders                 
-                        WHERE id = compositions.folderId                 
-                        UNION ALL                 
-                        SELECT path.level + 1, folders.name, folders.parentId                 
-                        FROM folders                 
-                        JOIN path ON folders.id = path.parentId             
-                    ),             
-                    path_from_root AS (SELECT name FROM path ORDER BY level DESC)             
-                    SELECT IFNULL(group_concat(name, '/'), '') FROM path_from_root
-                ) AS parentPath, 
-                fileName AS fileName, 
-                compositions.storageId AS storageId, 
+                SELECT
+                (
+                    WITH RECURSIVE path(level, name, parentId, id) AS (
+                        SELECT 0, name, parentId, id
+                        FROM folders
+                        WHERE id = compositions.folderId
+                        UNION ALL
+                        SELECT path.level + 1, folders.name, folders.parentId, folders.id
+                        FROM folders
+                        JOIN path ON folders.id = path.parentId
+                    ),
+                    path_from_root AS (
+                        SELECT name
+                        FROM path
+                        WHERE parentId IS NOT NULL
+                        ORDER BY level DESC
+                    ),
+                    volume_path AS (
+                        SELECT v.path
+                        FROM volumes AS v
+                        JOIN folders AS f ON v.id = f.volumeId
+                        JOIN path ON f.id = path.id AND path.parentId IS NULL
+                        LIMIT 1
+                    )
+                    SELECT IFNULL((SELECT path FROM volume_path) || (SELECT IFNULL(group_concat('/' || name, ''), '') FROM path_from_root), '')
+                ) AS parentPath,
+                fileName AS fileName,
+                compositions.storageId AS storageId,
             """
             ).apply {
                 append("(")

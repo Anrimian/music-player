@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.text.InputType
-import android.text.TextUtils
 import android.text.method.DigitsKeyListener
 import android.view.LayoutInflater
 import android.view.View
@@ -14,26 +13,27 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
-import com.github.anrimian.musicplayer.Constants.Arguments.CAN_BE_EMPTY_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.COMPLETE_ON_ENTER_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.DESCRIPTION_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.DIGITS_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_HINT
-import com.github.anrimian.musicplayer.Constants.Arguments.EDIT_TEXT_VALUE
-import com.github.anrimian.musicplayer.Constants.Arguments.EXTRA_DATA_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.HINTS_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.INPUT_TYPE_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.NEGATIVE_BUTTON_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.NEUTRAL_BUTTON_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.POSITIVE_BUTTON_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.TITLE_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.CAN_BE_EMPTY_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.COMPLETE_ON_ENTER_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.DESCRIPTION_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.DIGITS_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.EDIT_TEXT_HINT
+import com.github.anrimian.musicplayer.AppConstants.Arguments.EDIT_TEXT_VALUE
+import com.github.anrimian.musicplayer.AppConstants.Arguments.EXTRA_DATA_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.HINTS_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.INPUT_TYPE_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.NEGATIVE_BUTTON_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.NEUTRAL_BUTTON_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.POSITIVE_BUTTON_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.TITLE_ARG
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogCommonInputSimpleBinding
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.args
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher
 
-class InputTextDialogFragment : DialogFragment() {
+open class InputTextDialogFragment : DialogFragment() {
 
     companion object {
         fun newInstance(
@@ -80,7 +80,6 @@ class InputTextDialogFragment : DialogFragment() {
             LayoutInflater.from(requireActivity())
         )
         editText = binding.editText
-        val args = requireArguments()
         val dialog = AlertDialog.Builder(activity)
             .setTitle(args.getInt(TITLE_ARG))
             .setView(binding.root)
@@ -171,15 +170,15 @@ class InputTextDialogFragment : DialogFragment() {
 
     private fun onCompleteButtonClicked() {
         val text = editText.text.toString().trim()
-        if (!TextUtils.equals(text, requireArguments().getString(EDIT_TEXT_VALUE))) {
+        if (text != args.getString(EDIT_TEXT_VALUE)) {
             onCompleteListener?.invoke(text)
-            complexCompleteListener?.invoke(text, requireArguments().getBundle(EXTRA_DATA_ARG)!!)
+            complexCompleteListener?.invoke(text, args.getBundle(EXTRA_DATA_ARG)!!)
         }
         dismissAllowingStateLoss()
     }
 
     private fun isEnterButtonEnabled(text: String?): Boolean {
-        return !TextUtils.isEmpty(text)
+        return !text.isNullOrEmpty()
     }
 
 }

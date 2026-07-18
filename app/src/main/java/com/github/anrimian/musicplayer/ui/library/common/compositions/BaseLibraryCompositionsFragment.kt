@@ -5,8 +5,8 @@ import android.view.View
 import androidx.annotation.MenuRes
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
-import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
+import com.github.anrimian.musicplayer.ui.common.menu.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.editor.composition.CompositionEditorActivity
 import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFragment
 import com.github.anrimian.musicplayer.ui.main.MainActivity
@@ -45,7 +45,7 @@ abstract class BaseLibraryCompositionsFragment : BaseLibraryFragment() {
             R.id.menu_add_to_queue -> getLibraryPresenter().onAddToQueueCompositionClicked(composition)
             R.id.menu_add_to_playlist -> getLibraryPresenter().onAddToPlayListButtonClicked(composition)
             R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(act, composition.id))
-            R.id.menu_show_in_folders -> MainActivity.showInFolders(act, composition)
+            R.id.menu_show_in_folders -> MainActivity.showInFolders(act, composition.id)
             R.id.menu_share -> shareComposition(this, composition)
             R.id.menu_delete -> getLibraryPresenter().onDeleteCompositionButtonClicked(composition)
         }

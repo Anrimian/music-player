@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEditor
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
-import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileTagInfo
 import com.github.anrimian.musicplayer.domain.models.scanner.Idle
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.repositories.StateRepository
@@ -15,7 +15,13 @@ import io.reactivex.rxjava3.schedulers.TestScheduler
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
 class FileScannerTest {
@@ -42,7 +48,7 @@ class FileScannerTest {
         on { id } doReturn 1
     }
 
-    private val fileInfo: AudioFileInfo = mock()
+    private val fileInfo: AudioFileTagInfo = mock()
 
     @BeforeEach
     fun setUp() {
@@ -67,7 +73,7 @@ class FileScannerTest {
         fileScanner.scheduleFileScanner()
         scheduler.triggerActions()
 
-        verify(compositionsDao).updateCompositionsByFileInfo(any(), any())
+        verify(compositionsDao).updateCompositionsByFileInfo(any(), any(), any())
         verify(stateRepository).lastFileScannerVersion = eq(1)
         verify(stateRepository).lastCompleteScanTime = any()
 
@@ -88,7 +94,11 @@ class FileScannerTest {
         fileScanner.scheduleFileScanner()
         scheduler.triggerActions()
 
-        verify(compositionsDao, never()).updateCompositionsByFileInfo(any(), any())
+        verify(compositionsDao, never()).updateCompositionsByFileInfo(
+            any(),
+            any(),
+            any()
+        )
         verify(stateRepository, never()).lastFileScannerVersion = any()
         verify(stateRepository, never()).lastCompleteScanTime = any()
         verify(analytics).processNonFatalError(exception)
@@ -109,12 +119,12 @@ class FileScannerTest {
             .doThrow(exception)
             .doThrow(exception)
             .doNothing()
-            .whenever(compositionsDao).updateCompositionsByFileInfo(any(), any())
+            .whenever(compositionsDao).updateCompositionsByFileInfo(any(), any(), any())
 
         fileScanner.scheduleFileScanner()
         scheduler.triggerActions()
 
-        verify(compositionsDao).updateCompositionsByFileInfo(any(), any())
+        verify(compositionsDao).updateCompositionsByFileInfo(any(), any(), any())
         verify(analytics).processNonFatalError(eq(exception))
         verify(stateRepository).lastFileScannerVersion = eq(1)
         verify(stateRepository).lastCompleteScanTime = any()
@@ -142,7 +152,7 @@ class FileScannerTest {
         scheduler.triggerActions()
 
         verify(compositionsDao).selectNextCompositionsToScan(eq(lastScanTime), any())
-        verify(compositionsDao).updateCompositionsByFileInfo(any(), any())
+        verify(compositionsDao).updateCompositionsByFileInfo(any(), any(), any())
         verify(stateRepository).lastFileScannerVersion = eq(2)
         verify(stateRepository).lastCompleteScanTime = any()
 
@@ -158,7 +168,7 @@ class FileScannerTest {
         val testStateObserver = fileScanner.getStateObservable().test()
 
         val composition: FullComposition = mock()
-        val fileInfo: AudioFileInfo = mock()
+        val fileInfo: AudioFileTagInfo = mock()
 
         whenever(compositionsDao.selectNextCompositionsToScan(any(), any()))
             .thenReturn(Single.just(listOf(composition)))
@@ -173,7 +183,7 @@ class FileScannerTest {
 
         verify(storageSourceRepository).getStorageSource(any())
         verify(compositionSourceEditor).getAudioFileInfo(any())
-        verify(compositionsDao).updateCompositionsByFileInfo(any(), any())
+        verify(compositionsDao).updateCompositionsByFileInfo(any(), any(), any())
         verify(stateRepository).lastFileScannerVersion = eq(1)
         verify(stateRepository).lastCompleteScanTime = any()
 

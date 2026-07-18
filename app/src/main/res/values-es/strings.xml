@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="open_drawer">Abrir cajón</string>
     <string name="try_again">Reintentar</string>
     <string name="can_not_work_without_file_permission">La aplicación no puede funcionar sin permisos de almacenamiento</string>
@@ -11,7 +11,7 @@
     <string name="file_not_found">Archivo no encontrado</string>
     <string name="compositions_on_device_not_found">No se encontraron canciones en el dispositivo</string>
     <string name="compositions_and_folders_for_search_not_found">No se han encontrado composiciones y carpetas que coincidan con los resultados de búsqueda</string>
-    <string name="foreground_channel_description">Notificación del reproductor en primer plano</string>
+    <string name="foreground_channel_name">Notificación del reproductor en primer plano</string>
     <string name="previous_track">Canción anterior</string>
     <string name="next_track">Proxima canción</string>
     <string name="folder">Carpeta</string>
@@ -67,16 +67,9 @@
     <string name="now_playing_template">Reproduciendo: %1$s. Abrir cola de reproducción.</string>
     <string name="play_all_in_folder">Reproducir todas las canciones de la carpeta</string>
     <string name="delete_playlist">Eliminar lista de reproducción</string>
-    <string name="storage_timeout_error_message">
-        El almacenamiento de medios del dispositivo no responde.
-        Este es un problema realmente extraño y poco común.
-        Intente reiniciar el dispositivo, tal vez resuelva el problema.
-    </string>
+    <string name="storage_timeout_error_message">El almacenamiento de medios del dispositivo no responde.\nEste es un problema realmente extraño y poco común.\nIntente reiniciar el dispositivo, tal vez resuelva el problema.</string>
     <string name="select_all">Seleccionar todo</string>
-    <string name="file_uri_extract_error">
-        No se puede obtener la ruta del sistema \"%s\" para enviar la composición.
-        Es posible que sea una carpeta privada del sistema.
-    </string>
+    <string name="file_uri_extract_error">No se puede obtener la ruta del sistema \"%s\" para enviar la composición.\nEs posible que sea una carpeta privada del sistema.</string>
     <string name="loading_progress">Cargando…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
     <string name="add_date_order_desc_title">Descendiente</string>
@@ -187,17 +180,13 @@
     <string name="lyrics">Letras</string>
     <string name="check_tags_error">No se pudo verificar las etiquetas de composición: %s</string>
     <string name="changing_file_progress">Modificando archivo…</string>
-    <string name="android_r_edit_file_permission_denied">
-        Desde Android 11 la edición y eliminación de archivos requiere un permiso explicito del sistema
-    </string>
+    <string name="android_r_edit_file_permission_denied">Desde Android 11 la edición y eliminación de archivos requiere un permiso explicito del sistema</string>
     <string name="error_report">Informe de errores</string>
     <string name="critical_error_report_message">Se produjo un error grave y debido a esto la aplicación no puede iniciarse. La aparición de estos errores es altamente indeseable. La aplicación no envía ningún dato automaticamente, pero se puede enviar el archivo de registro de errores manualmente por correo electrónico.</string>
     <string name="error_report_message">Se produjo un error grave. La app no envía ningún dato automaticamente, pero se puede enviar el archivo de registro de errores manualmente por correo electrónico. Eso ayudará a corregir este error.</string>
     <string name="show_error_report_dialog_on_start">Mostrar el diálogo de informe de errores al iniciar la aplicación una vez que la app se bloquee</string>
-    <!--not verified-->
     <string name="do_not_show_confirm_delete_dialog">No mostrar el cuadro de diálogo de confirmación de eliminación de la aplicación</string>
     <string name="app_equalizer">Ecualizador de aplicaciones</string>
-    <!---->
     <string name="presets">Preajustes</string>
     <string name="playback_speed">Velocidad de reproducción</string>
     <string name="reset">Reset</string>
@@ -207,12 +196,9 @@
     <string name="resume">Reiniciar</string>
     <string name="sleep_timer_message">Reproducción se detendrá en:</string>
     <string name="stop">Parar</string>
-    <!--not verified-->
     <string name="exclude_compositions_with_duration_less_than">Excluir composiciones del escaneo</string>
     <string name="with_duration_less_than">Con duración inferior a %s</string>
-    <!---->
     <string name="pause_on_audiofocus_loss">Dejar de reproducir en llamadas,  reproducción de música / video, etc.</string>
-    <!--not verified-->
     <string name="show_cover_stub_in_notification">Mostrar talón de portada en la notificación cuando no se encuentra la portada</string>
     <string name="write_to_this_is_not_allowed">Sin permiso para modificar este archivo. Pruebe a través del administrador de archivos.</string>
     <string name="shuffle_all_and_play">Mezclar todo y reproducir</string>
@@ -234,14 +220,10 @@
     <string name="enabled_media_players">Reproductores multimedia habilitados</string>
     <string name="advanced_settings">Ajustes avanzados</string>
     <string name="media_players_setting_description">La aplicación utiliza varios reproductores multimedia para reproducir música. Aquí se pueden desactivar o cambiar la prioridad de uso. Todos los cambios entrarán en vigor solo después de reiniciar la aplicación.</string>
-    <!---->
-    <!--not verified-->
     <string name="sound_balance">Balance de sonido</string>
     <string name="sound_balance_state">Izquierda: %1$d%%, Derecha: %2$d%%</string>
     <string name="language">Idioma</string>
     <string name="follow_system_language">Seguir el idioma del sistema</string>
-    <!---->
-    <!--not verified-->
     <string name="move">Mover</string>
     <string name="no_compositions_in_folder">Composiciones en carpeta no encontradas</string>
     <string name="follow_system_theme">Seguir el tema del sistema</string>
@@ -249,22 +231,17 @@
     <string name="no_lyrics_for_current_composition">No hay letras para la composición actual</string>
     <string name="edit_lyrics">Editar letras</string>
     <string name="show_in_folders">Mostrar en carpetas</string>
-    <string name="file_source_not_found">Archivo remoto no encontrado</string>
     <string name="file_is_too_large">El archivo es demasiado grande</string>
     <string name="preparing_files">Preparando archivos</string>
     <string name="downloading">Descargando: %1$d/%2$d</string>
     <string name="downloading_progress">Descargando(%d%%)</string>
     <string name="rename_progress_count">Renombrando(%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? Esta acción no se puede deshacer.</string>
+    <string name="undone_action_template">Esta acción no se puede deshacer.</string>
     <string name="delete_composition_template">Eliminar canción \"%1$s\"</string>
     <string name="delete_empty_folder">Eliminar carpeta \"%s\"</string>
     <string name="delete_folder_template">%2$s de la carpeta \"%1$s\"</string>
-    <string name="android_r_editor_restriction_error">Desde Android 11, solo se permite copiar/mover/renombrar archivos en las carpetas: \"%s\".
-        Coloque los archivos de audio en estas carpetas y la operación debería funcionar correctamente.
-    </string>
+    <string name="android_r_editor_restriction_error">Desde Android 11, solo se permite copiar/mover/renombrar archivos en las carpetas: \"%s\".\nColoque los archivos de audio en estas carpetas y la operación debería funcionar correctamente.</string>
     <string name="folder_already_excluded_from_scanning">Esta carpeta ya está excluida del escaneo</string>
-    <!---->
-    <!--not verified-->
     <string name="no_file_modify_permission">Sin permiso para modificar archivo</string>
     <string name="interface_settings">Interfaz</string>
     <string name="enable_player_screens_swipe">Habilite el gesto de deslizar para cambiar entre la cola de reproducción y la pantalla de letras</string>
@@ -291,8 +268,6 @@
     <string name="overwrite_playlist">Ya existe una lista de reproducción con este nombre. \n¿Sobrescribirlo?</string>
     <string name="playlist_has_no_records">La lista de reproducción no tiene registros</string>
     <string name="export_playlists_success">El archivo \"%1$s.m3u\" se guardó en el almacenamiento interno</string>
-    <!---->
-    <!--not verified-->
     <string name="name_is_too_long">el nombre es demasiado largo</string>
     <string name="play_queue_items_limit_error">El recuento de elementos de la cola de reproducción no puede ser superior a %d</string>
     <string name="play_list_items_limit_error">El recuento de elementos de la lista de reproducción no puede ser superior a %d</string>
@@ -307,89 +282,101 @@
     <string name="check_for_duplicates">Compruebe la lista de reproducción en busca de duplicados antes de agregar nuevas composiciones</string>
     <string name="more_template">…%d más</string>
     <string name="add_without_duplicates">Agregar sin duplicados</string>
+    <string name="process_unsupported_actions">Tratar cualquier evento multimedia no reconocido como comando de reproducción/pausa</string>
+    <string name="process_unsupported_actions_description">Puede causar reproducción/pausa inesperada</string>
+    <string name="ignore_play_after_connection">Ignorar comandos de \'Reproducir\' durante 3 segundos al conectar Bluetooth</string>
+    <string name="ignore_play_after_connection_description">Puede prevenir reproducción inesperada al conectar</string>
+    <string name="pause_on_audio_device_remove">Pausar al desconectar el dispositivo de salida de audio</string>
+    <string name="missing_files_detected">Se detectaron archivos de audio faltantes</string>
+    <!-- !Not verified by native speaker! -->
+    <string name="missing_files_description">El sistema Android informa que estos archivos ya no están disponibles en sus ubicaciones originales.\nEs posible que se hayan movido, que otra aplicación los haya eliminado o que estén en una tarjeta SD desconectada.\nPuedes eliminar estas entradas no válidas de tu biblioteca.\nCanciones no disponibles (%d):</string>
     <!---->
-
+    <string name="see_more">Ver más (%d)</string>
+    <string name="remove">Eliminar</string>
+    <string name="delete_missing_compositions_title">¿Eliminar composiciones?</string>
+    <string name="file_not_found_in_all_storages">Archivo no encontrado localmente ni en la nube</string>
+    <string name="question_template">%1$s? %2$s</string>
+    <string name="allowed_file_extensions">Extensiones de archivo permitidas</string>
+    <string name="allowed_extensions_state">Solo se incluirán en la biblioteca archivos con estas extensiones: \n%s</string>
+    <string name="allowed_file_extensions_description">Las extensiones están separadas por \',\'</string>
+    <string name="restore_default">Restaurar al valor predeterminado</string>
+    <string name="not_allowed_path">Ruta no permitida para escribir archivo</string>
+    <string name="configure_menu">Configurar menú</string>
+    <string name="configure_menu_items">Configurar elementos del menú</string>
+    <string name="save">Guardar</string>
+    <string name="menu_group_primary">Principal</string>
+    <string name="menu_group_secondary">Adicional</string>
+    <string name="menu_group_hidden">Oculto</string>
+    <string name="undo">Deshacer</string>
+    <string name="playlist_sorted">Lista de reproducción ordenada</string>
+    <string name="artist_order">Por artista</string>
+    <string name="skip_silence">Omitir silencios</string>
+    <string name="skip_silence_summary">Omitir automáticamente partes silenciosas de más de %.1fs</string>
+    <string name="android_media_player_skip_silence_note">No es compatible con omisión de silencios</string>
+    <string name="system_interaction">Interacción del sistema</string>
+    <string name="sound_processing">Procesamiento de sonido</string>
     <plurals name="compositions_count">
         <item quantity="one">%1$s canción</item>
         <item quantity="other">%1$s canciones</item>
     </plurals>
-
     <plurals name="files_count">
         <item quantity="one">%1$s archivo</item>
         <item quantity="other">%1$s archivos</item>
     </plurals>
-
     <plurals name="albums_count">
         <item quantity="one">%1$s álbum</item>
         <item quantity="other">%1$s albums</item>
     </plurals>
-
     <plurals name="play_next_message">
         <item quantity="one">%s canción se reproducirá acontinuación</item>
         <item quantity="other">%s canciones se reproducirán acontinuación</item>
     </plurals>
-
     <plurals name="added_to_queue_message">
         <item quantity="one">%s canción agregada al final de la cola de reproducción</item>
         <item quantity="other">%s canciones agregadas al final de la cola de reproducción</item>
     </plurals>
-
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d canción agregada a la lista de reproducción \"%2$s\"</item>
         <item quantity="other">%1$d canciones agregadas a la lista de reproducción \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d canción eliminada de la lista de reproducción \"%2$s\"</item>
         <item quantity="other">%1$d canciones eliminadas de la lista de reproducción \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d canción eliminada</item>
         <item quantity="other">%1$d canciones eliminadas</item>
     </plurals>
-
-    <!-- not verified-->
     <plurals name="seconds_template">
         <item quantity="one">%1$d segunda</item>
         <item quantity="other">%1$d segundos</item>
     </plurals>
-    <!---->
-
-    <!--not verified-->
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="one">Eliminar %d canción</item>
         <item quantity="other">Eliminar %d canciones</item>
     </plurals>
-    <!---->
-
-    <!--not verified-->
     <plurals name="for_at_least_minutes">
         <item quantity="one">Durante al menos %d minuto</item>
         <item quantity="other">Durante al menos %d minutos</item>
     </plurals>
-
     <plurals name="export_playlists_success">
         <item quantity="one">%d lista de reproducción se guardó en el almacenamiento interno</item>
         <item quantity="other">%d listas de reproducción se guardaron en el almacenamiento interno</item>
     </plurals>
-
     <plurals name="playlist_import_partial_success">
         <item quantity="one">La lista de reproducción se importó correctamente, pero el archivo %d no se encontró en la biblioteca</item>
         <item quantity="other">La lista de reproducción se importó con éxito, pero %d archivos no se encontraron en la biblioteca</item>
     </plurals>
-    <!---->
-
-    <!--not verified-->
     <plurals name="delete_playlists_template">
-        <item quantity="one">Eliminar %d lista de reproducción</item>
-        <item quantity="other">Eliminar %d listas de reproducción</item>
+        <item quantity="one">Eliminar %d lista de reproducción?</item>
+        <item quantity="other">Eliminar %d listas de reproducción?</item>
     </plurals>
-
     <plurals name="delete_playlists_success">
         <item quantity="one">%d lista de reproducción eliminada</item>
         <item quantity="other">%d listas de reproducción eliminadas</item>
     </plurals>
-    <!---->
-
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="one">¿Eliminar %1$d composición de tu biblioteca? %2$s</item>
+        <item quantity="other">¿Eliminar %1$d composiciones de tu biblioteca? %2$s</item>
+    </plurals>
 </resources>

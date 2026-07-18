@@ -35,3 +35,27 @@ output.json
 #NDK
 obj/
 .externalNativeBuild
+
+# AI agent scratch space (local-only)
+.agents/tasks/tmp/
+
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+
+# Kotlin/Gradle tooling noise
+.kotlin/
+
+# Editor settings (repo-specific settings are not committed)
+.vscode/
+
+# Proguard/R8 mapping output (explicitly written by rules)
+**/out.map
+
+# Release outputs (generated artifacts)
+**/release/*.aab
+**/release/output-metadata.json
+**/release/baselineProfiles/
+.hotswan/
+
+# Room WIP migration placeholder schema (version 999 — see architecture-guidelines.md)
+**/schemas/**/999.json

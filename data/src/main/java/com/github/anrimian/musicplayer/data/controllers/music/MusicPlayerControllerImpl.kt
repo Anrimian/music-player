@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.data.controllers.music.players.ExoMediaPl
 import com.github.anrimian.musicplayer.data.controllers.music.players.utils.ExoPlayerMediaItemBuilder
 import com.github.anrimian.musicplayer.data.controllers.music.players.utils.MediaPlayerDataSourceBuilder
 import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController
+import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance
@@ -27,7 +28,8 @@ class MusicPlayerControllerImpl(
     uiScheduler: Scheduler,
     equalizerController: EqualizerController,
     exoPlayerMediaItemBuilder: ExoPlayerMediaItemBuilder,
-    sourceBuilder: MediaPlayerDataSourceBuilder
+    sourceBuilder: MediaPlayerDataSourceBuilder,
+    analytics: Analytics
 ): MusicPlayerController {
 
     private val currentSpeedSubject = BehaviorSubject.createDefault(1f)
@@ -36,6 +38,7 @@ class MusicPlayerControllerImpl(
 
     init {
         val mediaPlayers = settingsRepository.enabledMediaPlayers
+        val hasAlternativePlayer = mediaPlayers.size > 1
         val mediaPlayerImpls = ArrayList<() -> AppMediaPlayer>(mediaPlayers.size)
         for (playerId in mediaPlayers) {
             when (playerId) {
@@ -45,13 +48,20 @@ class MusicPlayerControllerImpl(
                             context,
                             uiScheduler,
                             equalizerController,
-                            exoPlayerMediaItemBuilder
+                            exoPlayerMediaItemBuilder,
+                            hasAlternativePlayer
                         )
                     }
                 }
                 MediaPlayers.ANDROID_MEDIA_PLAYER -> {
                     mediaPlayerImpls.add {
-                        AndroidMediaPlayer(context, ioScheduler, equalizerController, sourceBuilder)
+                        AndroidMediaPlayer(
+                            context,
+                            ioScheduler,
+                            equalizerController,
+                            sourceBuilder,
+                            analytics
+                        )
                     }
                 }
             }
@@ -59,7 +69,8 @@ class MusicPlayerControllerImpl(
         mediaPlayer = CompositeMediaPlayer(
             mediaPlayerImpls,
             1f,
-            settingsRepository.soundBalance
+            settingsRepository.soundBalance,
+            settingsRepository.isSkipSilenceEnabled
         )
     }
 
@@ -102,6 +113,10 @@ class MusicPlayerControllerImpl(
     override fun setPlaybackSpeed(speed: Float) {
         mediaPlayer.setPlaybackSpeed(speed)
         currentSpeedSubject.onNext(speed)
+    }
+
+    override fun setSkipSilenceEnabled(enabled: Boolean) {
+        mediaPlayer.setSkipSilenceEnabled(enabled)
     }
 
     override fun getTrackPositionObservable(): Observable<Long> {

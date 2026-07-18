@@ -1,5 +1,12 @@
 package com.github.anrimian.musicplayer.data.repositories.equalizer;
 
+import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.BANDS;
+import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.BAND_LEVEL;
+import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.BAND_NUMBER;
+import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.EQUALIZER_STATE;
+import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.PREFERENCES_NAME;
+import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.SELECTED_PRESET;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -14,13 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-
-import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.BANDS;
-import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.BAND_LEVEL;
-import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.BAND_NUMBER;
-import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.EQUALIZER_STATE;
-import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.PREFERENCES_NAME;
-import static com.github.anrimian.musicplayer.data.repositories.equalizer.EqualizerStateRepository.Constants.SELECTED_PRESET;
 
 
 public class EqualizerStateRepository {
@@ -53,7 +53,7 @@ public class EqualizerStateRepository {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put(SELECTED_PRESET, state.getCurrentPreset());
             JSONArray bands = new JSONArray();
-            for (Map.Entry<Short, Short> band: state.getBendLevels().entrySet()) {
+            for (Map.Entry<Short, Short> band: state.getBandLevels().entrySet()) {
                 JSONObject obj = new JSONObject();
                 obj.put(BAND_NUMBER, band.getKey());
                 obj.put(BAND_LEVEL, band.getValue());

@@ -6,7 +6,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.anrimian.musicplayer.Constants.Arguments
+import com.github.anrimian.musicplayer.AppConstants.Arguments
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ActivityWidgetMenuBinding
 import com.github.anrimian.musicplayer.databinding.PartialWidgetMenuHeaderBinding
@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.TimeFormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
@@ -75,7 +76,7 @@ class WidgetMenuActivity: BaseMvpAppCompatActivity(), WidgetMenuView {
 
             val sb = DescriptionSpannableStringBuilder(this)
             sb.append(FormatUtils.formatAuthor(composition.artist, this))
-            sb.append(FormatUtils.formatMilliseconds(composition.duration))
+            sb.append(TimeFormatUtils.formatMilliseconds(composition.duration))
             sb.append(FormatUtils.formatSize(this, composition.size))
             binding.tvCompositionInfo.text = sb
         }

@@ -1,6 +1,6 @@
 package com.github.anrimian.fsync.models.task
 
-abstract class Task<K>(open val id: Long) {
+abstract class Task<K>(open val id: Long, open val storageId: Long) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

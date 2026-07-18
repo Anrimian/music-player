@@ -1,7 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.source
 
 import com.github.anrimian.musicplayer.data.storage.exceptions.GenreAlreadyPresentException
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider
+import com.github.anrimian.musicplayer.data.storage.providers.music.SystemAudioCatalogProvider
 import com.github.anrimian.musicplayer.data.utils.files.TestFileUtils
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,7 +21,7 @@ class CompositionSourceEditorTest {
     
     private var filePath: String? = null
 
-    private val musicProvider = mock<StorageMusicProvider>()
+    private val musicProvider = mock<SystemAudioCatalogProvider>()
     private val fileSourceProvider = mock<FileSourceProvider>()
     private val contentSourceHelper = mock<ContentSourceHelper>()
 

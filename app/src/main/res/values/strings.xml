@@ -10,13 +10,13 @@
     <string name="unexpected_error">Error: %s</string>
     <string name="file_not_found">File not found</string>
     <string name="compositions_on_device_not_found">No songs found on the device</string>
-    <string name="compositions_and_folders_for_search_not_found">Compositions and folders matching search results not found</string>
-    <string name="foreground_channel_description">Foreground player notification</string>
+    <string name="compositions_and_folders_for_search_not_found">Songs and folders matching search results not found</string>
+    <string name="foreground_channel_name">Foreground player notification</string>
     <string name="previous_track">Previous track</string>
     <string name="next_track">Next track</string>
     <string name="folder">Folder</string>
-    <string name="content_description_menu">Open current composition menu</string>
-    <string name="content_description_menu_template">Open composition menu: %s</string>
+    <string name="content_description_menu">Open current song menu</string>
+    <string name="content_description_menu_template">Open song menu: %s</string>
     <string name="share">Send</string>
     <string name="content_description_repeat_mode">Repeat mode menu</string>
     <string name="content_description_shuffle">Shuffle mode</string>
@@ -67,16 +67,9 @@
     <string name="now_playing_template">Now playing: %1$s. Open play queue.</string>
     <string name="play_all_in_folder">Play all in folder</string>
     <string name="delete_playlist">Delete playlist</string>
-    <string name="storage_timeout_error_message">
-        Device media storage is not responding.
-        This is a really strange and rare issue.
-        Try to reboot the device, perhaps it will solve this problem.
-    </string>
+    <string name="storage_timeout_error_message">Device media storage is not responding.\nThis is a really strange and rare issue.\nTry to reboot the device, perhaps it will solve this problem.</string>
     <string name="select_all">Select all</string>
-    <string name="file_uri_extract_error">
-        Can\'t get system path for composition \"%s\" to send.
-        Possible it is in private system folder.
-    </string>
+    <string name="file_uri_extract_error">Can\'t get system path for song \"%s\" to send.\nPossible it is in private system folder.</string>
     <string name="loading_progress">Loading…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
     <string name="add_date_order_desc_title">Later first</string>
@@ -85,7 +78,7 @@
     <string name="add_to_play_queue">Add to queue</string>
     <string name="edit_name">Rename</string>
     <string name="change">Change</string>
-    <string name="no_current_composition">No current composition</string>
+    <string name="no_current_composition">No current song</string>
     <string name="show_covers">Show covers</string>
     <string name="show_covers_in_notification">Show covers in notification</string>
     <string name="colored_notification">Color notification in cover colors</string>
@@ -127,18 +120,18 @@
     <string name="no_albums_in_library">No albums in library</string>
     <string name="genres">Genres</string>
     <string name="no_genres_in_library">No genres in library</string>
-    <string name="no_items_in_genre">No compositions in selected genre</string>
-    <string name="no_compositions">No compositions</string>
+    <string name="no_items_in_genre">No songs in selected genre</string>
+    <string name="no_compositions">No songs</string>
     <string name="change_album_name">Change album</string>
     <string name="album">Album</string>
     <string name="genre">Genre</string>
-    <string name="change_composition_genre">Change composition genre</string>
+    <string name="change_composition_genre">Change song genre</string>
     <string name="change_name">Change name</string>
     <string name="rename_progress">Renaming…</string>
     <string name="album_artist">Album artist</string>
     <string name="change_album_artist">Change album artist</string>
     <string name="edit_album_tags">Edit album tags</string>
-    <string name="by_composition_count">By composition count</string>
+    <string name="by_composition_count">By song count</string>
     <string name="by_duration">By duration</string>
     <string name="longest_first">Longest first</string>
     <string name="more_first">More first</string>
@@ -159,8 +152,8 @@
     <string name="folder_with_this_name_already_exists_in_dest_folder">Folder with this name already exists in target folder</string>
     <string name="move_progress">Moving…</string>
     <string name="delete_progress">Deleting…</string>
-    <string name="play_next_message_single">Composition \"%s\" will be played next</string>
-    <string name="added_to_queue_message_single">Composition \"%s\" added to end of play queue</string>
+    <string name="play_next_message_single">Song \"%s\" will be played next</string>
+    <string name="added_to_queue_message_single">Song \"%s\" added to end of play queue</string>
     <string name="queue_item_removed">Queue item removed</string>
     <string name="by_size">By size</string>
     <string name="largest_first">Largest first</string>
@@ -185,11 +178,9 @@
     <string name="remove_cover">Remove cover</string>
     <string name="editor_timeout_error">Tag editor timed out. Perhaps file format is unsupported</string>
     <string name="lyrics">Lyrics</string>
-    <string name="check_tags_error">Failed to check composition tags: %s</string>
+    <string name="check_tags_error">Failed to check song tags: %s</string>
     <string name="changing_file_progress">Changing file…</string>
-    <string name="android_r_edit_file_permission_denied">
-        From Android 11 editing and deleting files requires explicit system permission
-    </string>
+    <string name="android_r_edit_file_permission_denied">From Android 11 editing and deleting files requires explicit system permission</string>
     <string name="error_report">Error report</string>
     <string name="critical_error_report_message">Fatal error occurred and due to this app can\'t start. Appearing of this errors is highly unwanted. Application doesn\'t send any info  automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
     <string name="error_report_message">Fatal error occurred. Application doesn\'t send any info automatically, but you can send file with error log manually by email. This will help to fix this error.</string>
@@ -205,9 +196,9 @@
     <string name="resume">Resume</string>
     <string name="sleep_timer_message">Playing will be stopped in:</string>
     <string name="stop">Stop</string>
-    <string name="exclude_compositions_with_duration_less_than">Exclude compositions from scanning</string>
+    <string name="exclude_compositions_with_duration_less_than">Exclude songs from scanning</string>
     <string name="with_duration_less_than">With duration less than %s</string>
-    <string name="pause_on_audiofocus_loss">Stop playing on calling, music/video playing, etc.</string>
+    <string name="pause_on_audiofocus_loss">Pause on calling, music/video playing, etc.</string>
     <string name="show_cover_stub_in_notification">Show cover stub in notification when cover is not found</string>
     <string name="write_to_this_is_not_allowed">No permission to modify this file. Try through file manager.</string>
     <string name="shuffle_all_and_play">Shuffle all and play</string>
@@ -218,12 +209,12 @@
     <string name="restart">Restart</string>
     <string name="scan_storage_description">Usually all changes with files on the device will appear automatically. But on some devices or system builds it won\'t work. This button runs files scan manually.</string>
     <string name="scanning_completed">Scanning completed</string>
-    <string name="pause_on_zero_volume_level">Stop playing when volume level reaches zero</string>
+    <string name="pause_on_zero_volume_level">Pause when volume level reaches zero</string>
     <string name="covers">Covers</string>
-    <string name="display_composition_file_name">Display composition file name instead of title</string>
+    <string name="display_composition_file_name">Display song file name instead of title</string>
     <string name="name_order">By name</string>
     <string name="file_name_order">By file name</string>
-    <string name="play_list_is_empty">Playlist is empty. Compositions can be added to playlists on library screens.</string>
+    <string name="play_list_is_empty">Playlist is empty. Songs can be added to playlists on library screens.</string>
     <string name="file_scanner_state">Scanning file tags: %s</string>
     <string name="show_all_audio_files">Show all audio files</string>
     <string name="enabled_media_players">Enabled media players</string>
@@ -234,30 +225,27 @@
     <string name="language">Language</string>
     <string name="follow_system_language">Follow system language</string>
     <string name="move">Move</string>
-    <string name="no_compositions_in_folder">Compositions in folder not found</string>
+    <string name="no_compositions_in_folder">No songs found in this folder</string>
     <string name="follow_system_theme">Follow system theme</string>
     <string name="play_queue_is_empty">Play queue is empty</string>
-    <string name="no_lyrics_for_current_composition">No lyrics for current composition</string>
+    <string name="no_lyrics_for_current_composition">No lyrics for current song</string>
     <string name="edit_lyrics">Edit lyrics</string>
     <string name="show_in_folders">Show in folders</string>
-    <string name="file_source_not_found">Remote file not found</string>
     <string name="file_is_too_large">File is too large</string>
     <string name="preparing_files">Preparing files</string>
     <string name="downloading">Downloading: %1$d/%2$d</string>
     <string name="downloading_progress">Downloading(%d%%)</string>
     <string name="rename_progress_count">Renaming(%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? This action cannot be undone.</string>
+    <string name="undone_action_template">This action cannot be undone.</string>
     <string name="delete_composition_template">Delete song \"%1$s\"</string>
     <string name="delete_empty_folder">Delete folder \"%s\"</string>
     <string name="delete_folder_template">%2$s from folder \"%1$s\"</string>
-    <string name="android_r_editor_restriction_error">From Android 11 copying/moving/renaming files are allowed only in folders: \"%s\".
-        Place audio files into these folders and operation should perform correctly.
-    </string>
+    <string name="android_r_editor_restriction_error">From Android 11 copying/moving/renaming files are allowed only in folders: \"%s\".\nPlace audio files into these folders and operation should perform correctly.</string>
     <string name="folder_already_excluded_from_scanning">This folder is already excluded from scanning</string>
     <string name="no_file_modify_permission">No permission to modify file</string>
     <string name="interface_settings">Interface</string>
     <string name="enable_player_screens_swipe">Enable swipe gesture for switching between play queue and lyrics screen</string>
-    <string name="no_enough_data_to_play">Not enough data to play composition</string>
+    <string name="no_enough_data_to_play">Not enough data to play song</string>
     <string name="permission_required">Permission is required</string>
     <string name="open_app_settings">Open app settings</string>
     <string name="file_is_corrupted">File is corrupted</string>
@@ -274,7 +262,7 @@
     <string name="disc_short">Disc %d</string>
     <string name="track_short">Track %d</string>
     <string name="with_delay">With %.1fs delay</string>
-    <string name="insert_to_playlist_beginning">Insert new compositions at the beginning of the playlist</string>
+    <string name="insert_to_playlist_beginning">Insert new songs at the beginning of the playlist</string>
     <string name="export_playlist">Save as .m3u file</string>
     <string name="import_playlist">Import playlist</string>
     <string name="overwrite_playlist">Playlist with this name already exists. \nOverwrite it?</string>
@@ -290,10 +278,41 @@
     <string name="play_once">Play once</string>
     <string name="back">Back</string>
     <string name="duplicates_detected">Duplicates detected</string>
-    <string name="playlist_duplicates_description">Some compositions already are in the playlist \'%1$s\'. \nAdd them anyway?</string>
-    <string name="check_for_duplicates">Check playlist for duplicates before adding new compositions</string>
+    <string name="playlist_duplicates_description">Some songs already are in the playlist \'%1$s\'. \nAdd them anyway?</string>
+    <string name="check_for_duplicates">Check playlist for duplicates before adding new songs</string>
     <string name="more_template">…%d more</string>
     <string name="add_without_duplicates">Add without duplicates</string>
+    <string name="process_unsupported_actions">Treat any unrecognized media event as a play/pause command</string>
+    <string name="process_unsupported_actions_description">May cause unexpected play/pause</string>
+    <string name="ignore_play_after_connection">Ignore \'Play\' commands for 3 seconds after a Bluetooth device connects</string>
+    <string name="ignore_play_after_connection_description">May prevent unexpected playback when connecting</string>
+    <string name="pause_on_audio_device_remove">Pause on audio output device disconnect</string>
+    <string name="missing_files_detected">Missing audio files detected</string>
+    <string name="missing_files_description">The Android system reports that these files are no longer available at their original locations.\nThey might have been moved, deleted by another app, or are on a disconnected SD card.\nYou can remove these invalid entries from your library.\nUnavailable songs (%d):</string>
+    <string name="see_more">See more (%d)</string>
+    <string name="remove">Remove</string>
+    <string name="delete_missing_compositions_title">Delete missing songs?</string>
+    <string name="file_not_found_in_all_storages">File not found locally or in cloud storages</string>
+    <string name="question_template">%1$s? %2$s</string>
+    <string name="allowed_file_extensions">Allowed file extensions</string>
+    <string name="allowed_extensions_state">Only files with these extensions will be included in the library: \n%s</string>
+    <string name="allowed_file_extensions_description">Extensions are separated by the symbol \',\'</string>
+    <string name="restore_default">Restore default</string>
+    <string name="not_allowed_path">Not allowed path to write file</string>
+    <string name="configure_menu">Configure menu</string>
+    <string name="configure_menu_items">Configure menu items</string>
+    <string name="save">Save</string>
+    <string name="menu_group_primary">Main</string>
+    <string name="menu_group_secondary">Additional</string>
+    <string name="menu_group_hidden">Hidden</string>
+    <string name="undo">Undo</string>
+    <string name="playlist_sorted">Playlist sorted</string>
+    <string name="artist_order">By artist</string>
+    <string name="skip_silence">Skip silence</string>
+    <string name="skip_silence_summary">Automatically skip silent parts longer than %.1fs</string>
+    <string name="android_media_player_skip_silence_note">Does not support skipping silence</string>
+    <string name="system_interaction">System interaction</string>
+    <string name="sound_processing">Sound processing</string>
 
 
     <plurals name="compositions_count">
@@ -341,7 +360,7 @@
         <item quantity="other">%1$d seconds</item>
     </plurals>
 
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="one">Delete %d song</item>
         <item quantity="other">Delete %d songs</item>
     </plurals>
@@ -362,13 +381,18 @@
     </plurals>
 
     <plurals name="delete_playlists_template">
-        <item quantity="one">Delete %d playlist</item>
-        <item quantity="other">Delete %d playlists</item>
+        <item quantity="one">Delete %d playlist?</item>
+        <item quantity="other">Delete %d playlists?</item>
     </plurals>
 
     <plurals name="delete_playlists_success">
         <item quantity="one">%d playlist deleted</item>
         <item quantity="other">%d playlists deleted</item>
+    </plurals>
+
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="one">Delete %1$d song from your library? %2$s</item>
+        <item quantity="other">Delete %1$d songs from your library? %2$s</item>
     </plurals>
 
 </resources>

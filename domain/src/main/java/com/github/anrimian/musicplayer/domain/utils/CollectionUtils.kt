@@ -14,7 +14,7 @@ inline fun <I> Collection<I>.toLongArray(mapper: (I) -> Long): LongArray {
     return ids
 }
 
-fun <K, V1, V2> mergeMaps(
+inline fun <K, V1, V2> mergeMaps(
     firstMap: Map<K, V1>,
     secondMap: Map<K, V2>,
     onSecondEntryAdded: (V1) -> Unit,
@@ -24,7 +24,7 @@ fun <K, V1, V2> mergeMaps(
     onFirstEntryModified: (old: V1, new: V2) -> Unit,
     onSecondEntryModified: (old: V2, new: V1) -> Unit,
 ) {
-    for(firstEntry in firstMap) {
+    for (firstEntry in firstMap) {
         val firstValue = firstEntry.value
         val secondValue = secondMap[firstEntry.key]
         if (secondValue != null) {
@@ -40,7 +40,7 @@ fun <K, V1, V2> mergeMaps(
             onSecondEntryAdded(firstValue)
         }
     }
-    for(secondEntry in secondMap) {
+    for (secondEntry in secondMap) {
         if (!firstMap.containsKey(secondEntry.key)) {
             onFirstEntryAdded(secondEntry.value)
         }

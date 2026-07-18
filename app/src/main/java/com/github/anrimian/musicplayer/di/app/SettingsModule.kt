@@ -1,126 +1,158 @@
-package com.github.anrimian.musicplayer.di.app;
+package com.github.anrimian.musicplayer.di.app
 
-import static com.github.anrimian.musicplayer.di.app.SchedulerModule.UI_SCHEDULER;
+import android.content.Context
+import com.github.anrimian.fsync.SyncInteractor
+import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl
+import com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl
+import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl
+import com.github.anrimian.musicplayer.di.mvvm.ViewModelAssistedFactory
+import com.github.anrimian.musicplayer.di.utils.ViewModelKey
+import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController
+import com.github.anrimian.musicplayer.domain.interactors.library.MissingFilesInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.HeadsetSettingsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.MenuConfigInteractor
+import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.storage.StorageScannerInteractor
+import com.github.anrimian.musicplayer.domain.models.sync.FileKey
+import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
+import com.github.anrimian.musicplayer.domain.repositories.StateRepository
+import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
+import com.github.anrimian.musicplayer.ui.common.compose.components.dialogs.menu.MenuConfigViewModel
+import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
+import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsPresenter
+import com.github.anrimian.musicplayer.ui.settings.headset.HeadsetSettingsViewModel
+import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsViewModel
+import com.github.anrimian.musicplayer.ui.settings.main.SettingsViewModel
+import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsPresenter
+import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersPresenter
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoMap
+import io.reactivex.rxjava3.core.Scheduler
+import javax.inject.Named
+import javax.inject.Singleton
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
-import com.github.anrimian.musicplayer.data.repositories.settings.SettingsRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.state.StateRepositoryImpl;
-import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl;
-import com.github.anrimian.musicplayer.domain.controllers.MusicPlayerController;
-import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.HeadsetSettingsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.LibrarySettingsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.settings.PlayerSettingsInteractor;
-import com.github.anrimian.musicplayer.domain.repositories.MediaScannerRepository;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
-import com.github.anrimian.musicplayer.domain.repositories.StateRepository;
-import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository;
-import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser;
-import com.github.anrimian.musicplayer.ui.settings.display.DisplaySettingsPresenter;
-import com.github.anrimian.musicplayer.ui.settings.headset.HeadsetSettingsPresenter;
-import com.github.anrimian.musicplayer.ui.settings.library.LibrarySettingsPresenter;
-import com.github.anrimian.musicplayer.ui.settings.player.PlayerSettingsPresenter;
-import com.github.anrimian.musicplayer.ui.settings.player.impls.EnabledMediaPlayersPresenter;
-
-import javax.annotation.Nonnull;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import dagger.Module;
-import dagger.Provides;
-import io.reactivex.rxjava3.core.Scheduler;
-
-/**
- * Created on 21.04.2018.
- */
 @Module
-public class SettingsModule {
+class SettingsModule {
 
     @Provides
-    @Nonnull
     @Singleton
-    SettingsRepository provideSettingsRepository(Context context) {
-        return new SettingsRepositoryImpl(context);
-    }
+    fun provideSettingsRepository(
+        context: Context
+    ): SettingsRepository = SettingsRepositoryImpl(context)
 
     @Provides
-    @Nonnull
     @Singleton
-    UiStateRepository provideUiStateRepository(Context context) {
-        return new UiStateRepositoryImpl(context);
-    }
+    fun provideUiStateRepository(
+        context: Context
+    ): UiStateRepository = UiStateRepositoryImpl(context)
 
     @Provides
-    @Nonnull
     @Singleton
-    StateRepository uiStateRepository(Context context) {
-        return new StateRepositoryImpl(context);
+    fun uiStateRepository(
+        context: Context
+    ): StateRepository = StateRepositoryImpl(context)
+
+    @Provides
+    fun displaySettingsInteractor(
+        settingsRepository: SettingsRepository
+    ) = DisplaySettingsInteractor(settingsRepository)
+
+    @Provides
+    fun headsetSettingsInteractor(
+        settingsRepository: SettingsRepository
+    ) = HeadsetSettingsInteractor(settingsRepository)
+
+    @Provides
+    fun displaySettingsPresenter(
+        displaySettingsInteractor: DisplaySettingsInteractor,
+        @Named(SchedulerModule.UI_SCHEDULER) uiScheduler: Scheduler,
+        errorParser: ErrorParser
+    ) = DisplaySettingsPresenter(displaySettingsInteractor, uiScheduler, errorParser)
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(HeadsetSettingsViewModel::class)
+    fun headsetSettingsViewModel(
+        interactor: HeadsetSettingsInteractor,
+        errorParser: ErrorParser
+    ): ViewModelAssistedFactory<*> = ViewModelAssistedFactory { handle ->
+        HeadsetSettingsViewModel(interactor, handle, errorParser)
     }
 
     @Provides
-    @Nonnull
-    DisplaySettingsInteractor displaySettingsInteractor(SettingsRepository settingsRepository) {
-        return new DisplaySettingsInteractor(settingsRepository);
+    fun playerSettingsInteractor(
+        settingsRepository: SettingsRepository,
+        musicPlayerController: MusicPlayerController
+    ) = PlayerSettingsInteractor(settingsRepository, musicPlayerController)
+
+    @Provides
+    fun playerSettingsPresenter(
+        playerSettingsInteractor: PlayerSettingsInteractor,
+        @Named(SchedulerModule.UI_SCHEDULER) uiScheduler: Scheduler,
+        errorParser: ErrorParser
+    ) = PlayerSettingsPresenter(playerSettingsInteractor, uiScheduler, errorParser)
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(LibrarySettingsViewModel::class)
+    fun librarySettingsViewModel(
+        librarySettingsInteractor: LibrarySettingsInteractor,
+        errorParser: ErrorParser
+    ): ViewModelAssistedFactory<*> = ViewModelAssistedFactory { handle ->
+        LibrarySettingsViewModel(librarySettingsInteractor, handle, errorParser)
     }
 
     @Provides
-    @Nonnull
-    HeadsetSettingsInteractor headsetSettingsInteractor(SettingsRepository settingsRepository) {
-        return new HeadsetSettingsInteractor(settingsRepository);
+    fun librarySettingsInteractor(
+        settingsRepository: SettingsRepository,
+        libraryRepository: LibraryRepository,
+        storageScannerInteractor: StorageScannerInteractor,
+        syncInteractor: SyncInteractor<FileKey, *, Long>
+    ) = LibrarySettingsInteractor(
+        settingsRepository,
+        libraryRepository,
+        storageScannerInteractor,
+        syncInteractor
+    )
+
+    @Provides
+    fun enabledMediaPlayersPresenter(
+        playerSettingsInteractor: PlayerSettingsInteractor
+    ) = EnabledMediaPlayersPresenter(playerSettingsInteractor)
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(SettingsViewModel::class)
+    fun settingsViewModel(
+        missingFilesInteractor: MissingFilesInteractor,
+        storageScannerInteractor: StorageScannerInteractor,
+        errorParser: ErrorParser
+    ): ViewModelAssistedFactory<*> = ViewModelAssistedFactory { handle ->
+        SettingsViewModel(
+            missingFilesInteractor,
+            storageScannerInteractor,
+            handle,
+            errorParser
+        )
     }
 
     @Provides
-    @Nonnull
-    DisplaySettingsPresenter displaySettingsPresenter(DisplaySettingsInteractor displaySettingsInteractor,
-                                                      @Named(UI_SCHEDULER) Scheduler uiScheduler,
-                                                      ErrorParser errorParser) {
-        return new DisplaySettingsPresenter(displaySettingsInteractor, uiScheduler, errorParser);
-    }
+    fun menuConfigInteractor(
+        settingsRepository: SettingsRepository
+    ) = MenuConfigInteractor(settingsRepository)
 
     @Provides
-    @Nonnull
-    HeadsetSettingsPresenter headsetSettingsPresenter(HeadsetSettingsInteractor interactor) {
-        return new HeadsetSettingsPresenter(interactor);
-    }
-
-    @Provides
-    @Nonnull
-    PlayerSettingsInteractor playerSettingsInteractor(
-            SettingsRepository settingsRepository,
-            MusicPlayerController musicPlayerController
-    ) {
-        return new PlayerSettingsInteractor(settingsRepository, musicPlayerController);
-    }
-
-    @Provides
-    @Nonnull
-    PlayerSettingsPresenter playerSettingsPresenter(PlayerSettingsInteractor playerSettingsInteractor,
-                                                    @Named(UI_SCHEDULER) Scheduler uiScheduler,
-                                                    ErrorParser errorParser) {
-        return new PlayerSettingsPresenter(playerSettingsInteractor, uiScheduler, errorParser);
-    }
-
-    @Provides
-    @NonNull
-    LibrarySettingsPresenter librarySettingsPresenter(LibrarySettingsInteractor librarySettingsInteractor,
-                                                      @Named(UI_SCHEDULER) Scheduler uiScheduler,
-                                                      ErrorParser errorParser) {
-        return new LibrarySettingsPresenter(librarySettingsInteractor, uiScheduler, errorParser);
-    }
-
-    @Provides
-    @NonNull
-    LibrarySettingsInteractor librarySettingsInteractor(SettingsRepository settingsRepository,
-                                                        MediaScannerRepository mediaScannerRepository) {
-        return new LibrarySettingsInteractor(settingsRepository, mediaScannerRepository);
-    }
-
-    @Provides
-    @Nonnull
-    EnabledMediaPlayersPresenter enabledMediaPlayersPresenter(PlayerSettingsInteractor playerSettingsInteractor) {
-        return new EnabledMediaPlayersPresenter(playerSettingsInteractor);
+    @IntoMap
+    @ViewModelKey(MenuConfigViewModel::class)
+    fun menuConfigViewModel(
+        menuConfigInteractor: MenuConfigInteractor,
+        errorParser: ErrorParser
+    ): ViewModelAssistedFactory<*> = ViewModelAssistedFactory { handle ->
+        MenuConfigViewModel(menuConfigInteractor, handle, errorParser)
     }
 }
+

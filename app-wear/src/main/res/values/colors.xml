@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--tiles-->
+    <color name="icon_color">@android:color/white</color>
+    <color name="color_accent">#1E88E5</color>
+
+    <color name="disabled_color">#ACACAC</color>
+    <color name="color_control_highlight">#4DFFFFFF</color>
+
+</resources>

@@ -19,6 +19,7 @@ import java.util.Arrays;
     private boolean active;
     private int[] outputChannels;
     private ByteBuffer buffer;
+    private short[] tempBuffer;
     private ByteBuffer outputBuffer;
     private boolean inputEnded;
 
@@ -80,6 +81,7 @@ import java.util.Arrays;
         int position = inputBuffer.position();
         int limit = inputBuffer.limit();
         int size = limit - position;
+        int samplesCount = size / 2;
 
         if (buffer.capacity() < size) {
             buffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
@@ -88,14 +90,27 @@ import java.util.Arrays;
         }
 
         if (isActive()) {
-            int ch = 0;
-            for (int i = position; i < limit; i += 2) {
-                short sample = (short) (inputBuffer.getShort(i) * volume[ch++]);
-                buffer.putShort(sample);
-                ch %= channelCount;
+            if (tempBuffer == null || tempBuffer.length < samplesCount) {
+                tempBuffer = new short[samplesCount];
             }
+
+            inputBuffer.order(ByteOrder.nativeOrder());
+            inputBuffer.asShortBuffer().get(tempBuffer, 0, samplesCount);
+
+            float leftVol = volume[0];
+            float rightVol = volume[1];
+
+            for (int i = 0; i < samplesCount; i += 2) {
+                tempBuffer[i] = (short) (tempBuffer[i] * leftVol);
+                if (i + 1 < samplesCount) {
+                    tempBuffer[i+1] = (short) (tempBuffer[i+1] * rightVol);
+                }
+            }
+
+            buffer.asShortBuffer().put(tempBuffer, 0, samplesCount);
+            buffer.position(size);
         } else {
-            throw new IllegalStateException();
+            buffer.put(inputBuffer);
         }
 
         inputBuffer.position(limit);

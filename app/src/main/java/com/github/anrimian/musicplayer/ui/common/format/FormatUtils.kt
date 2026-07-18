@@ -1,6 +1,11 @@
 package com.github.anrimian.musicplayer.ui.common.format
 
 import android.content.Context
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.style.ClickableSpan
 import android.view.View
 import android.widget.ProgressBar
 import androidx.annotation.ColorInt
@@ -10,15 +15,21 @@ import androidx.core.graphics.ColorUtils
 import com.github.anrimian.fsync.models.ProgressInfo
 import com.github.anrimian.fsync.models.state.file.FileSyncState
 import com.github.anrimian.fsync.models.state.file.FileTaskType
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.domain.models.folders.Volume
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder
+import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionStringBuilder
 import com.github.anrimian.musicplayer.ui.common.progress.ProgressView
+import com.github.anrimian.musicplayer.ui.common.text.CenteredImageSpan
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
+import com.github.anrimian.musicplayer.ui.utils.attrColor
 import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
 import com.google.android.material.progressindicator.BaseProgressIndicator
 import com.google.android.material.progressindicator.BaseProgressIndicatorSpec
+import java.io.File
 
 @StringRes
 fun getMediaPlayerName(mediaPlayerId: Int) = when(mediaPlayerId) {
@@ -29,7 +40,7 @@ fun getMediaPlayerName(mediaPlayerId: Int) = when(mediaPlayerId) {
 fun ProgressView.showFileSyncState(
     fileSyncState: FileSyncState?,
     isFileRemote: Boolean,
-    animate: Boolean = true
+    animate: Boolean = true,
 ) {
     /*//debug view
     val time = 3000L
@@ -124,20 +135,20 @@ private fun ProgressView.setProgressInfo(progressInfo: ProgressInfo) {
 fun getRemoteViewPlayerState(isPlaying: Boolean, playerState: PlayerState): Int {
     return if (isPlaying) {
         if (playerState == PlayerState.LOADING) {
-            Constants.RemoteViewPlayerState.PLAY_LOADING
+            AppConstants.RemoteViewPlayerState.PLAY_LOADING
         } else {
-            Constants.RemoteViewPlayerState.PLAY
+            AppConstants.RemoteViewPlayerState.PLAY
         }
     } else {
-        Constants.RemoteViewPlayerState.PAUSE
+        AppConstants.RemoteViewPlayerState.PAUSE
     }
 }
 
 @DrawableRes
 fun getRemoteViewPlayerStateIcon(playerState: Int): Int {
     return when(playerState) {
-        Constants.RemoteViewPlayerState.PLAY_LOADING -> R.drawable.ic_pause_loading
-        Constants.RemoteViewPlayerState.PAUSE -> R.drawable.ic_play
+        AppConstants.RemoteViewPlayerState.PLAY_LOADING -> R.drawable.ic_pause_loading
+        AppConstants.RemoteViewPlayerState.PAUSE -> R.drawable.ic_play
         else -> R.drawable.ic_pause
     }
 }
@@ -150,4 +161,85 @@ fun Context.getHighlightColor(): Int {
 @DrawableRes
 fun getVolumeIcon(volume: Int): Int {
     return if (volume > 0) R.drawable.ic_volume_up else R.drawable.ic_volume_off
+}
+
+fun formatFilePath(parentPath: String, name: String): String {
+    return if (parentPath.isEmpty()) {
+        name
+    } else {
+        parentPath + File.separator + name
+    }
+}
+
+fun <T> formatExpandableTextList(
+    context: Context,
+    items: List<T>,
+    description: String,
+    isExpanded: Boolean,
+    itemFormatter: (T) -> CharSequence,
+    maxDisplayItemsCount: Int = 8,
+    collapsedItemsCount: Int = 5,
+    @DrawableRes itemPrefixDrawableRes: Int = R.drawable.ic_secondary_text_circle,
+    onExpandButtonClick: () -> Unit = {},
+): SpannableStringBuilder {
+    val sb = SpannableStringBuilder(description)
+
+    val collapseList = items.size > maxDisplayItemsCount && !isExpanded
+    val displayItem = if (collapseList) {
+        items.subList(0, collapsedItemsCount)
+    } else {
+        items
+    }
+    displayItem.forEach { item ->
+        sb.append("\n   ")
+        val imageSpan = CenteredImageSpan(context, itemPrefixDrawableRes)
+        sb.setSpan(imageSpan, sb.length - 2, sb.length - 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        sb.append(itemFormatter(item))
+        sb.append(';')
+    }
+    if (collapseList) {
+        sb.append("\n")
+        val moreText = context.getString(R.string.see_more, items.size - collapsedItemsCount)
+        sb.appendClickable(context, moreText, onExpandButtonClick)
+    }
+    return sb
+}
+
+fun SpannableStringBuilder.appendClickable(context: Context, text: String, onClick: () -> Unit) {
+    val startIndex = length
+    val endIndex = startIndex + text.length
+    append(text)
+    setSpan(object : ClickableSpan() {
+        override fun updateDrawState(ds: TextPaint) {
+            super.updateDrawState(ds)
+            ds.color = context.attrColor(R.attr.colorAccent)
+            ds.isUnderlineText = false
+        }
+        override fun onClick(widget: View) { onClick() }
+    }, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+}
+
+
+fun formatVolumeAdditionalInfo(
+    context: Context,
+    volume: Volume,
+    @DrawableRes dividerDrawableRes: Int = R.drawable.ic_secondary_text_circle,
+): SpannableStringBuilder {
+    val sb: SpannableStringBuilder = DescriptionSpannableStringBuilder(
+        context,
+        volume.path,
+        dividerDrawableRes
+    )
+    sb.append(FormatUtils.formatCompositionsCount(context, volume.compositionsCount))
+    return sb
+}
+
+fun formatVolumeAdditionalInfoForMediaBrowser(
+    context: Context,
+    volume: Volume,
+): String {
+    val sb: SpannableStringBuilder = DescriptionStringBuilder()
+    sb.append(volume.path)
+    sb.append(FormatUtils.formatCompositionsCount(context, volume.compositionsCount))
+    return sb.toString()
 }

@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.anrimian.musicplayer.Constants
-import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.AppConstants
+import com.github.anrimian.musicplayer.AppConstants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLibraryAlbumsBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -32,7 +32,7 @@ import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFrag
 import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.library.common.setupLibraryTitle
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlists.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.applyBottomInsets
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -109,8 +109,8 @@ class AlbumsListFragment : BaseLibraryFragment(), AlbumsListView, FragmentNaviga
             fragment.setComplexCompleteListener { playlist, extra ->
                 presenter.onPlayListToAddingSelected(
                     playlist,
-                    extra.getLongArray(Constants.Arguments.IDS_ARG)!!,
-                    extra.getBoolean(Constants.Arguments.CLOSE_MULTISELECT_ARG)
+                    extra.getLongArray(AppConstants.Arguments.IDS_ARG)!!,
+                    extra.getBoolean(AppConstants.Arguments.CLOSE_MULTISELECT_ARG)
                 )
             }
         }
@@ -166,6 +166,7 @@ class AlbumsListFragment : BaseLibraryFragment(), AlbumsListView, FragmentNaviga
         val fragment = SelectOrderDialogFragment.newInstance(
             order,
             OrderType.NAME,
+            OrderType.ARTIST,
             OrderType.COMPOSITION_COUNT
         )
         selectOrderDialogRunner.show(fragment)
@@ -198,8 +199,8 @@ class AlbumsListFragment : BaseLibraryFragment(), AlbumsListView, FragmentNaviga
 
     override fun showSelectPlayListDialog(albums: Collection<Album>, closeMultiselect: Boolean) {
         val args = Bundle().apply {
-            putLongArray(Constants.Arguments.IDS_ARG, albums.toLongArray(Album::id))
-            putBoolean(Constants.Arguments.CLOSE_MULTISELECT_ARG, closeMultiselect)
+            putLongArray(AppConstants.Arguments.IDS_ARG, albums.toLongArray(Album::id))
+            putBoolean(AppConstants.Arguments.CLOSE_MULTISELECT_ARG, closeMultiselect)
         }
         choosePlayListDialogRunner.show(ChoosePlayListDialogFragment.newInstance(args))
     }

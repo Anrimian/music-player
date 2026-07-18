@@ -27,7 +27,7 @@ class AlbumCompositionsAdapter(
     onLongClickListener,
     iconClickListener,
     menuClickListener,
-    SimpleDiffItemCallback(::areSourcesTheSame, ::getChangePayload)
+    SimpleDiffItemCallback(CompositionHelper::areItemsTheSame, ::areSourcesTheSame, ::getChangePayload)
 ) {
 
     override fun onCreateViewHolder(

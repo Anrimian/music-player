@@ -7,6 +7,12 @@
         android:title="@string/search"
         android:icon="@drawable/ic_magnify"
         app:showAsAction="ifRoom"/>
+    
+    <item
+        android:id="@+id/menu_sort"
+        android:title="@string/order"
+        android:icon="@drawable/ic_sort"
+        app:showAsAction="never"/>
 
     <item android:id="@+id/menu_change_play_list_name"
         android:title="@string/edit_name"

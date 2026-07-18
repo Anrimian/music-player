@@ -79,9 +79,9 @@ public interface UiStateRepository {
 
     void savePlaylistsPosition(ListPosition listPosition);
 
-    void saveFolderListPosition(@Nullable Long folderId, ListPosition listPosition);
+    void saveFolderListPosition(Long folderId, ListPosition listPosition);
 
-    ListPosition getSavedFolderListPosition(@Nullable Long folderId);
+    ListPosition getSavedFolderListPosition(Long folderId);
 
     void saveAlbumListPosition(@Nullable Long id, ListPosition listPosition);
 

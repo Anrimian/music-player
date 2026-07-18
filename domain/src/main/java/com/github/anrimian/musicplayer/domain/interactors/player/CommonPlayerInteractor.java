@@ -88,6 +88,16 @@ public class CommonPlayerInteractor {
         }
     }
 
+    public void seekTo(long position) {
+        if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
+            libraryPlayerInteractor.onSeekFinished(position);
+            return;
+        }
+        if (playerCoordinatorInteractor.isPlayerTypeActive(EXTERNAL)) {
+            externalPlayerInteractor.onSeekFinished(position);
+        }
+    }
+
     public void fastSeekBackward() {
         if (playerCoordinatorInteractor.isPlayerTypeActive(LIBRARY)) {
             libraryPlayerInteractor.fastSeekBackward();

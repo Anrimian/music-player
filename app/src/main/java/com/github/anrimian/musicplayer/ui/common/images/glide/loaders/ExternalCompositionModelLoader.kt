@@ -15,19 +15,19 @@ class ExternalCompositionModelLoader(
     private val context: Context,
 ) : AppModelLoader<UriCompositionImage, Bitmap>() {
 
-    override fun getModelKey(uriCompositionImage: UriCompositionImage): Any {
-        return uriCompositionImage
+    override fun getModelKey(model: UriCompositionImage): Any {
+        return model
     }
 
     override fun loadData(
-        uriCompositionImage: UriCompositionImage,
+        model: UriCompositionImage,
         priority: Priority,
         callback: DataFetcher.DataCallback<in Bitmap>,
     ) {
         var mmr: MediaMetadataRetriever? = null
         try {
             mmr = MediaMetadataRetriever()
-            mmr.setDataSource(context, uriCompositionImage.uri)
+            mmr.setDataSource(context, model.uri)
             val imageBytes = mmr.embeddedPicture
 
             var bitmap: Bitmap? = null
@@ -42,7 +42,7 @@ class ExternalCompositionModelLoader(
             if (mmr != null) {
                 try {
                     mmr.release()
-                } catch (ignored: IOException) {}
+                } catch (_: IOException) {}
             }
         }
     }

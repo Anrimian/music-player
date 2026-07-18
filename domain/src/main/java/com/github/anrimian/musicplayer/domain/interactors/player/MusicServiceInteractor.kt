@@ -1,283 +1,242 @@
-package com.github.anrimian.musicplayer.domain.interactors.player;
+package com.github.anrimian.musicplayer.domain.interactors.player
 
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor;
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor;
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
-import com.github.anrimian.musicplayer.domain.models.artist.Artist;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.folders.FileSource;
-import com.github.anrimian.musicplayer.domain.models.genres.Genre;
-import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
-import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryAlbumsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryArtistsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryFoldersInteractor
+import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlaylistsInteractor
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.folders.FileSource
+import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting
+import com.github.anrimian.musicplayer.domain.models.playlist.PlaylistEntry
+import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
-import java.util.List;
+class MusicServiceInteractor(
+    private val commonPlayerInteractor: CommonPlayerInteractor,
+    private val libraryPlayerInteractor: LibraryPlayerInteractor,
+    private val libraryCompositionsInteractor: LibraryCompositionsInteractor,
+    private val libraryFoldersInteractor: LibraryFoldersInteractor,
+    private val libraryArtistsInteractor: LibraryArtistsInteractor,
+    private val libraryAlbumsInteractor: LibraryAlbumsInteractor,
+    private val libraryGenresInteractor: LibraryGenresInteractor,
+    private val playListsInteractor: PlaylistsInteractor,
+    private val settingsRepository: SettingsRepository
+) {
 
-import javax.annotation.Nullable;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Single;
-
-public class MusicServiceInteractor {
-
-    private final CommonPlayerInteractor commonPlayerInteractor;
-    private final LibraryPlayerInteractor libraryPlayerInteractor;
-    private final LibraryCompositionsInteractor libraryCompositionsInteractor;
-    private final LibraryFoldersInteractor libraryFoldersInteractor;
-    private final LibraryArtistsInteractor libraryArtistsInteractor;
-    private final LibraryAlbumsInteractor libraryAlbumsInteractor;
-    private final LibraryGenresInteractor libraryGenresInteractor;
-    private final PlayListsInteractor playListsInteractor;
-    private final SettingsRepository settingsRepository;
-
-    public MusicServiceInteractor(CommonPlayerInteractor commonPlayerInteractor,
-                                  LibraryPlayerInteractor libraryPlayerInteractor,
-                                  LibraryCompositionsInteractor libraryCompositionsInteractor,
-                                  LibraryFoldersInteractor libraryFoldersInteractor,
-                                  LibraryArtistsInteractor libraryArtistsInteractor,
-                                  LibraryAlbumsInteractor libraryAlbumsInteractor,
-                                  LibraryGenresInteractor libraryGenresInteractor,
-                                  PlayListsInteractor playListsInteractor,
-                                  SettingsRepository settingsRepository) {
-        this.commonPlayerInteractor = commonPlayerInteractor;
-        this.libraryPlayerInteractor = libraryPlayerInteractor;
-        this.libraryCompositionsInteractor = libraryCompositionsInteractor;
-        this.libraryFoldersInteractor = libraryFoldersInteractor;
-        this.libraryArtistsInteractor = libraryArtistsInteractor;
-        this.libraryAlbumsInteractor = libraryAlbumsInteractor;
-        this.libraryGenresInteractor = libraryGenresInteractor;
-        this.playListsInteractor = playListsInteractor;
-        this.settingsRepository = settingsRepository;
+    fun prepare() {
+        commonPlayerInteractor.prepare()
     }
 
-    public void prepare() {
-        commonPlayerInteractor.prepare();
+    fun play(delay: Long, forcePlayerType: PlayerType?) {
+        commonPlayerInteractor.play(delay, forcePlayerType)
     }
 
-    public void play(long delay, @Nullable PlayerType forcePlayerType) {
-        commonPlayerInteractor.play(delay, forcePlayerType);
+    fun skipToNext() {
+        commonPlayerInteractor.skipToNext()
     }
 
-    public void skipToNext() {
-        commonPlayerInteractor.skipToNext();
+    fun skipToPrevious() {
+        commonPlayerInteractor.skipToPrevious()
     }
 
-    public void skipToPrevious() {
-        commonPlayerInteractor.skipToPrevious();
+    fun setRepeatMode(appRepeatMode: Int) {
+        commonPlayerInteractor.setRepeatMode(appRepeatMode)
     }
 
-    public void setRepeatMode(int appRepeatMode) {
-        commonPlayerInteractor.setRepeatMode(appRepeatMode);
+    fun changeRandomMode() {
+        commonPlayerInteractor.changeRandomMode()
     }
 
-    public void changeRandomMode() {
-        commonPlayerInteractor.changeRandomMode();
+    fun changeRepeatMode() {
+        commonPlayerInteractor.changeRepeatMode()
     }
 
-    public void changeRepeatMode() {
-        commonPlayerInteractor.changeRepeatMode();
+    fun setRandomPlayingEnabled(isEnabled: Boolean) {
+        commonPlayerInteractor.setRandomPlayingEnabled(isEnabled)
     }
 
-    public void setRandomPlayingEnabled(boolean isEnabled) {
-        commonPlayerInteractor.setRandomPlayingEnabled(isEnabled);
+    fun setPlaybackSpeed(speed: Float) {
+        commonPlayerInteractor.setPlaybackSpeed(speed)
     }
 
-    public void setPlaybackSpeed(float speed) {
-        commonPlayerInteractor.setPlaybackSpeed(speed);
+    fun fastSeekBackward() {
+        commonPlayerInteractor.fastSeekBackward()
     }
 
-    public void fastSeekBackward() {
-        commonPlayerInteractor.fastSeekBackward();
+    fun fastSeekForward() {
+        commonPlayerInteractor.fastSeekForward()
     }
 
-    public void fastSeekForward() {
-        commonPlayerInteractor.fastSeekForward();
+    fun reset() {
+        commonPlayerInteractor.reset()
     }
 
-    public void reset() {
-        commonPlayerInteractor.reset();
+    fun getTrackPositionChangeObservable(): Observable<Long> {
+        return commonPlayerInteractor.getTrackPositionChangeObservable()
     }
 
-    public Observable<Long> getTrackPositionChangeObservable() {
-        return commonPlayerInteractor.getTrackPositionChangeObservable();
-    }
+    fun getTrackPosition(): Single<Long> = commonPlayerInteractor.getTrackPosition()
 
-    public Single<Long> getTrackPosition() {
-        return commonPlayerInteractor.getTrackPosition();
-    }
-
-    public Completable shuffleAllAndPlay() {
+    fun shuffleAllAndPlay(): Completable {
         return libraryCompositionsInteractor.getCompositionsObservable(null)
-                .firstOrError()
-                .flatMapCompletable(compositions -> {
-                    libraryPlayerInteractor.setRandomPlayingEnabled(true);
-                    return libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions);
-                });
+            .firstOrError()
+            .flatMapCompletable { compositions ->
+                libraryPlayerInteractor.setRandomPlayingEnabled(true)
+                libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions)
+            }
     }
 
-    public Completable playFromSearch(@Nullable String searchQuery) {
-        return playFromSearch(searchQuery, 0);
-    }
-
-    public Completable playFromSearch(@Nullable String searchQuery, int position) {
+    fun playFromSearch(searchQuery: String?, position: Int = 0): Completable {
         return libraryCompositionsInteractor.getCompositionsObservable(searchQuery)
-                .firstOrError()
-                .flatMapCompletable(compositions ->
-                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
-                );
+            .firstOrError()
+            .flatMapCompletable { compositions ->
+                libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+            }
     }
 
-    public Observable<Float> getPlaybackSpeedObservable() {
-        return commonPlayerInteractor.getPlaybackSpeedObservable();
+    fun getPlaybackSpeedObservable() = commonPlayerInteractor.getPlaybackSpeedObservable()
+
+    fun getRepeatModeObservable() = commonPlayerInteractor.getRepeatModeObservable()
+
+    fun getRandomModeObservable() = commonPlayerInteractor.getRandomModeObservable()
+
+    fun getNotificationSettingObservable(): Observable<MusicNotificationSetting> {
+        return Observable.combineLatest(
+            getCoversInNotificationEnabledObservable(),
+            getColoredNotificationEnabledObservable(),
+            getNotificationCoverStubEnabledObservable(),
+            getCoversOnLockScreenEnabledObservable(),
+            ::MusicNotificationSetting
+        )
     }
 
-    public Observable<Integer> getRepeatModeObservable() {
-        return commonPlayerInteractor.getRepeatModeObservable();
+    fun getCompositionsObservable(searchText: String?): Observable<List<Composition>> {
+        return libraryCompositionsInteractor.getCompositionsObservable(searchText)
     }
 
-    public Observable<Boolean> getRandomModeObservable() {
-        return commonPlayerInteractor.getRandomModeObservable();
-    }
-
-    public Observable<MusicNotificationSetting> getNotificationSettingObservable() {
-        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
-                getColoredNotificationEnabledObservable(),
-                getNotificationCoverStubEnabledObservable(),
-                getCoversOnLockScreenEnabledObservable(),
-                MusicNotificationSetting::new);
-    }
-
-    public Observable<List<Composition>> getCompositionsObservable(String searchText) {
-        return libraryCompositionsInteractor.getCompositionsObservable(searchText);
-    }
-
-    public Completable startPlayingFromCompositions(int position) {
+    fun startPlayingFromCompositions(position: Int): Completable {
         return libraryCompositionsInteractor.getCompositionsObservable(null)
-                .firstOrError()
-                .flatMapCompletable(compositions ->
-                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
-                );
+            .firstOrError()
+            .flatMapCompletable { compositions ->
+                libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+            }
     }
 
-    public Observable<List<FileSource>> getFoldersObservable(@Nullable Long folderId) {
-        return libraryFoldersInteractor.getFoldersInFolder(folderId, null);
+    fun getVolumesObservable() = libraryFoldersInteractor.getVolumesObservable()
+
+    fun getFoldersObservable(folderId: Long?): Observable<List<FileSource>> {
+        return libraryFoldersInteractor.getFoldersInFolder(folderId, null)
     }
 
-    public Completable play(@Nullable Long folderId, long compositionId) {
-        return libraryFoldersInteractor.play(folderId, compositionId);
+    fun play(folderId: Long?, compositionId: Long): Completable {
+        return libraryFoldersInteractor.play(folderId, compositionId)
     }
 
-    public Observable<List<Artist>> getArtistsObservable() {
-        return libraryArtistsInteractor.getArtistsObservable(null);
+    fun getArtistsObservable() = libraryArtistsInteractor.getArtistsObservable(null)
+
+    fun getCompositionsByArtist(artistId: Long): Observable<List<Composition>> {
+        return libraryArtistsInteractor.getCompositionsByArtist(artistId)
     }
 
-    public Observable<List<Composition>> getCompositionsByArtist(long artistId) {
-        return libraryArtistsInteractor.getCompositionsByArtist(artistId);
-    }
-
-    public Completable startPlayingFromArtistCompositions(long artistId, int position) {
+    fun startPlayingFromArtistCompositions(artistId: Long, position: Int): Completable {
         return getCompositionsByArtist(artistId)
-                .firstOrError()
-                .flatMapCompletable(compositions ->
-                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
-                );
+            .firstOrError()
+            .flatMapCompletable { compositions ->
+                libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+            }
     }
 
-    public Observable<List<Album>> getAlbumsObservable() {
-        return libraryAlbumsInteractor.getAlbumsObservable(null);
+    fun getAlbumsObservable() = libraryAlbumsInteractor.getAlbumsObservable(null)
+
+    fun getAlbumItemsObservable(albumId: Long): Observable<List<AlbumComposition>> {
+        return libraryAlbumsInteractor.getAlbumItemsObservable(albumId)
     }
 
-    public Observable<List<AlbumComposition>> getAlbumItemsObservable(long albumId) {
-        return libraryAlbumsInteractor.getAlbumItemsObservable(albumId);
-    }
-
-    public Completable startPlayingFromAlbumCompositions(long albumId, int position) {
+    fun startPlayingFromAlbumCompositions(albumId: Long, position: Int): Completable {
         return getAlbumItemsObservable(albumId)
-                .firstOrError()
-                .flatMapCompletable(compositions ->
-                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
-                );
+            .firstOrError()
+            .flatMapCompletable { compositions ->
+                libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+            }
     }
 
-    public Observable<List<Genre>> getGenresObservable() {
-        return libraryGenresInteractor.getGenresObservable(null);
+    fun getGenresObservable() = libraryGenresInteractor.getGenresObservable(null)
+
+    fun getGenreItemsObservable(genreId: Long): Observable<List<Composition>> {
+        return libraryGenresInteractor.getGenreItemsObservable(genreId)
     }
 
-    public Observable<List<Composition>> getGenreItemsObservable(long genreId) {
-        return libraryGenresInteractor.getGenreItemsObservable(genreId);
-    }
-
-    public Completable startPlayingFromGenreCompositions(long genreId, int position) {
+    fun startPlayingFromGenreCompositions(genreId: Long, position: Int): Completable {
         return getGenreItemsObservable(genreId)
-                .firstOrError()
-                .flatMapCompletable(compositions ->
-                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
-                );
+            .firstOrError()
+            .flatMapCompletable { compositions ->
+                libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+            }
     }
 
-    public Observable<List<PlayList>> getPlayListsObservable() {
-        return playListsInteractor.getPlayListsObservable(null);
+    fun getPlaylistsObservable() = playListsInteractor.getPlaylistsObservable(null)
+
+    fun getPlaylistItemsObservable(playListId: Long): Observable<List<PlaylistEntry>> {
+        return playListsInteractor.getCompositionsObservable(playListId, null)
     }
 
-    public Observable<List<PlayListItem>> getPlaylistItemsObservable(long playListId) {
-        return playListsInteractor.getCompositionsObservable(playListId, null);
-    }
-
-    public Completable startPlayingFromPlaylistItems(long playListId, int position) {
+    fun startPlayingFromPlaylistItems(playListId: Long, position: Int): Completable {
         return getPlaylistItemsObservable(playListId)
-                .firstOrError()
-                .flatMapCompletable(compositions ->
-                        libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
-                );
+            .firstOrError()
+            .flatMapCompletable { compositions ->
+                libraryPlayerInteractor.setCompositionsQueueAndPlay(compositions, position)
+            }
     }
 
-    public MusicNotificationSetting getNotificationSettings() {
-        boolean coversInNotification = isCoversInNotificationEnabled();
-        boolean coloredNotification = settingsRepository.isColoredNotificationEnabled();
-        boolean showNotificationCoverStub = settingsRepository.isNotificationCoverStubEnabled();
-        boolean coversOnLockScreen = settingsRepository.isCoversOnLockScreenEnabled();
-        return new MusicNotificationSetting(
-                coversInNotification,
-                coversInNotification && coloredNotification,
-                coversInNotification && showNotificationCoverStub,
-                coversInNotification && coversOnLockScreen
-        );
+    fun getNotificationSettings(): MusicNotificationSetting {
+        val coversInNotification = isCoversInNotificationEnabled()
+        val coloredNotification = settingsRepository.isColoredNotificationEnabled()
+        val showNotificationCoverStub = settingsRepository.isNotificationCoverStubEnabled()
+        val coversOnLockScreen = settingsRepository.isCoversOnLockScreenEnabled()
+        return MusicNotificationSetting(
+            coversInNotification,
+            coversInNotification && coloredNotification,
+            coversInNotification && showNotificationCoverStub,
+            coversInNotification && coversOnLockScreen
+        )
     }
 
-    public boolean isCoversInNotificationEnabled() {
+    fun isCoversInNotificationEnabled(): Boolean {
         return settingsRepository.isCoversEnabled()
-                && settingsRepository.isCoversInNotificationEnabled();
+                && settingsRepository.isCoversInNotificationEnabled()
     }
 
-    private Observable<Boolean> getCoversInNotificationEnabledObservable() {
-        return Observable.combineLatest(settingsRepository.getCoversEnabledObservable(),
-                settingsRepository.getCoversInNotificationEnabledObservable(),
-                (coversEnabled, coversInNotification) -> coversEnabled && coversInNotification);
+    private fun getCoversInNotificationEnabledObservable(): Observable<Boolean> {
+        return Observable.combineLatest(
+            settingsRepository.getCoversEnabledObservable(),
+            settingsRepository.getCoversInNotificationEnabledObservable()
+        ) { coversEnabled, coversInNotification -> coversEnabled && coversInNotification }
     }
 
-    private Observable<Boolean> getColoredNotificationEnabledObservable() {
-        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
-                settingsRepository.getColoredNotificationEnabledObservable(),
-                (coversInNotification, coloredNotification) -> coversInNotification && coloredNotification);
+    private fun getColoredNotificationEnabledObservable(): Observable<Boolean> {
+        return Observable.combineLatest(
+            getCoversInNotificationEnabledObservable(),
+            settingsRepository.getColoredNotificationEnabledObservable()
+        ) { coversInNotification, coloredNotification -> coversInNotification && coloredNotification }
     }
 
-    private Observable<Boolean> getNotificationCoverStubEnabledObservable() {
-        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
-                settingsRepository.getNotificationCoverStubEnabledObservable(),
-                (coversInNotification, showNotificationCoverStub) -> coversInNotification && showNotificationCoverStub);
+    private fun getNotificationCoverStubEnabledObservable(): Observable<Boolean> {
+        return Observable.combineLatest(
+            getCoversInNotificationEnabledObservable(),
+            settingsRepository.getNotificationCoverStubEnabledObservable()
+        ) { coversInNotification, showNotificationCoverStub -> coversInNotification && showNotificationCoverStub }
     }
 
-    private Observable<Boolean> getCoversOnLockScreenEnabledObservable() {
-        return Observable.combineLatest(getCoversInNotificationEnabledObservable(),
-                settingsRepository.getCoversOnLockScreenEnabledObservable(),
-                (coversInNotification, coversOnLockScreen) -> coversInNotification && coversOnLockScreen);
+    private fun getCoversOnLockScreenEnabledObservable(): Observable<Boolean> {
+        return Observable.combineLatest(
+            getCoversInNotificationEnabledObservable(),
+            settingsRepository.getCoversOnLockScreenEnabledObservable()
+        ) { coversInNotification, coversOnLockScreen -> coversInNotification && coversOnLockScreen }
     }
 
 }

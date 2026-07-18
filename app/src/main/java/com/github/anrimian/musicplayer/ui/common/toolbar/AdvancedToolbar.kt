@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.ui.common.toolbar
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
@@ -19,13 +20,15 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import androidx.appcompat.widget.ActionMenuView
-import com.github.anrimian.musicplayer.Constants
+import androidx.fragment.app.FragmentActivity
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.PartialToolbarBinding
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow.showPopup
@@ -129,7 +132,7 @@ class AdvancedToolbar @JvmOverloads constructor(
 
         if (animate && isNavigationDrawableStateInitialized) {
             val animator = getControlButtonAnimatorToState(targetProgress = endProgress)
-            animator.duration = Constants.Animation.TOOLBAR_ARROW_ANIMATION_TIME
+            animator.duration = AppConstants.Animation.TOOLBAR_ARROW_ANIMATION_TIME
             animator.start()
         } else {
             setNavigationButtonProgressInternal(endProgress)
@@ -151,6 +154,29 @@ class AdvancedToolbar @JvmOverloads constructor(
             config.selectionMenuExitListener
         )
         return this
+    }
+
+    @SuppressLint("CheckResult")
+    fun attachBackPressedCallback(activity: FragmentActivity) {
+        val onBackPressedCallback = object : OnBackPressedCallback(isInSearchMode() || isInActiveSearchMode()) {
+            override fun handleOnBackPressed() {
+                if (isInActionMode()) {
+                    invokeActionModeExit()
+                    return
+                }
+                if (isInActiveSearchMode()) {
+                    invokeSearchModeExit()
+                    return
+                }
+            }
+        }
+        activity.onBackPressedDispatcher.addCallback(onBackPressedCallback)
+        Observable.combineLatest(
+            getActiveSearchModeObservable(),
+            getSelectionModeObservable()
+        ) { isSearchActive, isActionModeActive ->
+            isSearchActive || isActionModeActive
+        }.subscribe { isAnyModeActive -> onBackPressedCallback.isEnabled = isAnyModeActive }
     }
 
     fun setSearchModeEnabled(
@@ -433,6 +459,13 @@ class AdvancedToolbar @JvmOverloads constructor(
                 )
                 .with(
                     ViewUtils.getColorAnimator(
+                        startBackgroundColor,
+                        endBackgroundColor,
+                        binding.ivNavHint::setBackgroundColor
+                    )
+                )
+                .with(
+                    ViewUtils.getColorAnimator(
                         startStatusBarColor,
                         endStatusBarColor,
                         backgroundDrawable::setStatusBarColor
@@ -493,6 +526,7 @@ class AdvancedToolbar @JvmOverloads constructor(
             binding.clSelectionMode.visibility = modeElementsVisibility
             navigationDrawable.color = endControlButtonColor
             backgroundDrawable.setColor(endBackgroundColor)
+            binding.ivNavHint.setBackgroundColor(endBackgroundColor)
             backgroundDrawable.setStatusBarColor(endStatusBarColor)
         }
     }

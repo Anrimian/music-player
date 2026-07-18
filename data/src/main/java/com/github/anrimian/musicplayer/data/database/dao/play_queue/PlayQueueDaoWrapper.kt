@@ -6,25 +6,24 @@ import com.github.anrimian.musicplayer.data.database.LibraryDatabase
 import com.github.anrimian.musicplayer.data.database.entities.play_queue.PlayQueueEntity
 import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl
 import com.github.anrimian.musicplayer.domain.Constants
-import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.utils.functions.Opt
 import io.reactivex.rxjava3.core.Observable
-import java.util.Random
 
 /**
  * Created on 02.07.2018.
  */
 class PlayQueueDaoWrapper(
     private val libraryDatabase: LibraryDatabase,
-    private val playQueueDao: PlayQueueDao
+    private val playQueueDao: PlayQueueDao,
 ) {
 
     private var deletedItem: PlayQueueEntity? = null
 
     fun getPlayQueueObservable(
         isRandom: Boolean,
-        useFileName: Boolean
+        useFileName: Boolean,
     ): Observable<List<PlayQueueItem>> {
         var query = PlayQueueDao.getCompositionQuery(useFileName)
         query += if (isRandom) "ORDER BY shuffledPosition" else "ORDER BY position"
@@ -32,74 +31,80 @@ class PlayQueueDaoWrapper(
         return playQueueDao.getPlayQueueObservable(sqlQuery)
     }
 
+    fun getWindowPlayQueueObservable(
+        itemId: Long,
+        isRandom: Boolean,
+        useFileName: Boolean,
+        startOffset: Int,
+        endOffset: Int
+    ): Observable<List<PlayQueueItem>> {
+        val position = getPosition(itemId, isRandom) - startOffset//TODO-W handle negative value
+        val itemsCount = endOffset + startOffset
+        val query = PlayQueueDao.getWindowCompositionQuery(useFileName, isRandom, itemsCount)
+        val sqlQuery = SimpleSQLiteQuery(query, arrayOf(position))
+        return playQueueDao.getPlayQueueObservable(sqlQuery)
+    }
+
     fun reshuffleQueue(currentItemId: Long) {
         libraryDatabase.runInTransaction {
-            val list = playQueueDao.getPlayQueue()
-            if (list.isEmpty()) {
+            val ids = playQueueDao.getPlayQueueIds()
+            if (ids.isEmpty()) {
                 return@runInTransaction
             }
+            ids.shuffle()
 
-            list.shuffle()
+            val currentItemIndex = ids.indexOf(currentItemId)
 
-            val firstItemId = list[0].id
-            var currentItemPosition = -1
-            for (i in list.indices) {
-                val entity = list[i]
-
-                if (entity.id == currentItemId) {
-                    currentItemPosition = i
-                }
-                entity.shuffledPosition = i
-            }
-            if (currentItemPosition != -1 && firstItemId != currentItemId) {
-                list[currentItemPosition].shuffledPosition = 0
-                list[0].shuffledPosition = currentItemPosition
+            // If the current song is not already at the top (index 0),
+            //  swap it with whatever song is at the top.
+            if (currentItemIndex != -1 && currentItemIndex != 0) {
+                val itemAtTop = ids[0]
+                ids[0] = ids[currentItemIndex]
+                ids[currentItemIndex] = itemAtTop
             }
 
-            playQueueDao.deletePlayQueue()
-            playQueueDao.insertItems(list)
+            // prevent sqlite constraint error
+            ids.forEachIndexed { newPosition, songId ->
+                playQueueDao.updateShuffledPosition(songId, (newPosition + 1) * -1)
+            }
+
+            ids.forEachIndexed { newPosition, itemId ->
+                playQueueDao.updateShuffledPosition(itemId, newPosition)
+            }
         }
     }
 
     fun insertNewPlayQueue(
         compositionIds: List<Long>,
         randomPlayingEnabled: Boolean,
-        startPosition: Int
+        startPosition: Int,
     ): Long {
         return libraryDatabase.runInTransaction<Long> {
-            val shuffledList = ArrayList(compositionIds)
-            val randomSeed = System.nanoTime()
-            shuffledList.shuffle(Random(randomSeed))
 
-            val shuffledPositionList = ArrayList<Int>(compositionIds.size)
-            for (i in compositionIds.indices) {
-                shuffledPositionList.add(i)
-            }
-            shuffledPositionList.shuffle(Random(randomSeed))
+            val shuffledPositions = compositionIds.indices.toMutableList()
+            shuffledPositions.shuffle()
 
-            val entities = ArrayList<PlayQueueEntity>(compositionIds.size)
-            var shuffledStartPosition = 0
-            for (i in compositionIds.indices) {
-                val id = compositionIds[i]
-                val playQueueEntity = PlayQueueEntity()
-                playQueueEntity.audioId = id
-                playQueueEntity.position = i
-                val shuffledPosition = shuffledPositionList[i]
-                playQueueEntity.shuffledPosition = shuffledPosition
-
-                if (startPosition != Constants.NO_POSITION && i == startPosition) {
-                    shuffledStartPosition = shuffledPosition
-                }
-
-                entities.add(playQueueEntity)
+            val entities = compositionIds.mapIndexed { index, compositionId ->
+                PlayQueueEntity(0, compositionId, index, shuffledPositions[index])
             }
 
             playQueueDao.deletePlayQueue()
             playQueueDao.insertItems(entities)
+
             return@runInTransaction if (randomPlayingEnabled) {
-                playQueueDao.getItemIdAtShuffledPosition(shuffledStartPosition)!!
+                val targetShuffledPosition = if (startPosition == Constants.NO_POSITION) {
+                    0
+                } else {
+                    shuffledPositions[startPosition]
+                }
+                playQueueDao.getItemIdAtShuffledPosition(targetShuffledPosition)!!
             } else {
-                playQueueDao.getItemIdAtPosition(if (startPosition == Constants.NO_POSITION) 0 else startPosition)!!
+                val targetPosition = if (startPosition == Constants.NO_POSITION) {
+                    0
+                } else {
+                    startPosition
+                }
+                playQueueDao.getItemIdAtPosition(targetPosition)!!
             }
         }
     }
@@ -146,7 +151,7 @@ class PlayQueueDaoWrapper(
         }
     }
 
-    fun addCompositionsToEndQueue(compositions: List<Composition>): Long {
+    fun addCompositionsToEndQueue(compositions: List<CompositionModel>): Long {
         return libraryDatabase.runInTransaction<Long> {
             val positionToInsert = playQueueDao.getLastPosition() + 1
             val shuffledPositionToInsert = playQueueDao.getLastShuffledPosition() + 1
@@ -156,7 +161,7 @@ class PlayQueueDaoWrapper(
         }
     }
 
-    fun addCompositionsToQueue(compositions: List<Composition>, currentItemId: Long): Long {
+    fun addCompositionsToQueue(compositions: List<CompositionModel>, currentItemId: Long): Long {
         return libraryDatabase.runInTransaction<Long> {
             var positionToInsert = 0
             var shuffledPositionToInsert = 0
@@ -169,6 +174,7 @@ class PlayQueueDaoWrapper(
                 for (pos in lastPosition downTo currentPosition + 1) {
                     playQueueDao.increasePosition(increaseBy, pos)
                 }
+
                 val lastShuffledPosition = playQueueDao.getLastShuffledPosition()
                 for (pos in lastShuffledPosition downTo currentShuffledPosition + 1) {
                     playQueueDao.increaseShuffledPosition(increaseBy, pos)
@@ -272,23 +278,13 @@ class PlayQueueDaoWrapper(
     }
 
     private fun toEntityList(
-        compositions: List<Composition>,
+        compositions: List<CompositionModel>,
         position: Int,
-        shuffledPosition: Int
+        shuffledPosition: Int,
     ): List<PlayQueueEntity> {
-        var currentPosition = position
-        var currentShuffledPosition = shuffledPosition
-        val entityList = ArrayList<PlayQueueEntity>(compositions.size)
-
-        for (composition in compositions) {
-            val playQueueEntity = PlayQueueEntity()
-            playQueueEntity.audioId = composition.id
-            playQueueEntity.position = currentPosition++
-            playQueueEntity.shuffledPosition = currentShuffledPosition++
-
-            entityList.add(playQueueEntity)
+        return compositions.mapIndexed { index, composition ->
+            PlayQueueEntity(0, composition.id, position + index, shuffledPosition + index)
         }
-        return entityList
     }
 
     companion object {

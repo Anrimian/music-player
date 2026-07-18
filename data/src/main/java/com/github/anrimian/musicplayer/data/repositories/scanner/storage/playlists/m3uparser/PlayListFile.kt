@@ -1,10 +1,8 @@
 package com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser
 
-import java.util.*
-
 class PlayListFile(
     val name: String,
-    val createDate: Date,
-    val modifyDate: Date,
+    val createDate: Long,
+    val modifyDate: Long,
     val entries: List<PlayListEntry>
 )

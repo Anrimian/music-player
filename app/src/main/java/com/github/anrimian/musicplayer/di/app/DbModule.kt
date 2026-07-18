@@ -1,184 +1,164 @@
-package com.github.anrimian.musicplayer.di.app;
+package com.github.anrimian.musicplayer.di.app
 
-import android.content.Context;
-
-import com.github.anrimian.musicplayer.data.database.ConfigsDatabase;
-import com.github.anrimian.musicplayer.data.database.DatabaseManager;
-import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
-import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao;
-import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
-import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao;
-import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao;
-import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao;
-import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
-import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListDao;
-import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper;
-import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao;
-import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper;
-
-import javax.annotation.Nonnull;
-import javax.inject.Singleton;
-
-import dagger.Module;
-import dagger.Provides;
-
-/**
- * Created on 20.11.2017.
- */
+import android.content.Context
+import com.github.anrimian.musicplayer.data.database.ConfigsDatabase
+import com.github.anrimian.musicplayer.data.database.DatabaseManager
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao
+import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDao
+import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao
+import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao
+import com.github.anrimian.musicplayer.data.database.dao.genre.GenresDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao
+import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDao
+import com.github.anrimian.musicplayer.data.database.dao.play_queue.PlayQueueDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.playlist.PlaylistDao
+import com.github.anrimian.musicplayer.data.database.dao.playlist.PlaylistsDaoWrapper
+import com.github.anrimian.musicplayer.data.storage.providers.music.SystemAudioCatalogProvider
+import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
 @Module
-public class DbModule {
+class DbModule {
 
     @Provides
-    @Nonnull
     @Singleton
-    DatabaseManager provideDatabaseManager(Context context) {
-        return new DatabaseManager(context);
-    }
+    fun provideDatabaseManager(
+        context: Context,
+        systemAudioCatalogProvider: SystemAudioCatalogProvider,
+    ) = DatabaseManager(context, systemAudioCatalogProvider)
 
     @Provides
-    @Nonnull
     @Singleton
-    LibraryDatabase provideAppDatabase(DatabaseManager databaseManager) {
-        return databaseManager.getLibraryDatabase();
-    }
+    fun provideAppDatabase(
+        databaseManager: DatabaseManager
+    ): LibraryDatabase = databaseManager.getLibraryDatabase()
 
     @Provides
-    @Nonnull
     @Singleton
-    PlayQueueDao playQueueDao(LibraryDatabase libraryDatabase) {
-        return libraryDatabase.playQueueDao();
-    }
+    fun playQueueDao(
+        libraryDatabase: LibraryDatabase
+    ): PlayQueueDao = libraryDatabase.playQueueDao()
 
     @Provides
-    @Nonnull
     @Singleton
-    CompositionsDao compositionsDao(LibraryDatabase libraryDatabase) {
-        return libraryDatabase.compositionsDao();
-    }
+    fun compositionsDao(
+        libraryDatabase: LibraryDatabase
+    ): CompositionsDao = libraryDatabase.compositionsDao()
 
     @Provides
-    @Nonnull
     @Singleton
-    PlayQueueDaoWrapper playQueueDaoWrapper(LibraryDatabase libraryDatabase, PlayQueueDao playQueueDao) {
-        return new PlayQueueDaoWrapper(libraryDatabase, playQueueDao);
-    }
+    fun playQueueDaoWrapper(
+        libraryDatabase: LibraryDatabase,
+        playQueueDao: PlayQueueDao
+    ) = PlayQueueDaoWrapper(libraryDatabase, playQueueDao)
 
     @Provides
-    @Nonnull
     @Singleton
-    ArtistsDao artistsDao(LibraryDatabase libraryDatabase) {
-        return libraryDatabase.artistsDao();
-    }
+    fun artistsDao(
+        libraryDatabase: LibraryDatabase
+    ): ArtistsDao = libraryDatabase.artistsDao()
 
     @Provides
-    @Nonnull
     @Singleton
-    AlbumsDao albumsDao(LibraryDatabase libraryDatabase) {
-        return libraryDatabase.albumsDao();
-    }
+    fun albumsDao(
+        libraryDatabase: LibraryDatabase
+    ): AlbumsDao = libraryDatabase.albumsDao()
 
     @Provides
-    @Nonnull
     @Singleton
-    GenreDao genreDao(LibraryDatabase libraryDatabase) {
-        return libraryDatabase.genreDao();
-    }
+    fun genreDao(
+        libraryDatabase: LibraryDatabase
+    ): GenreDao = libraryDatabase.genreDao()
 
     @Provides
-    @Nonnull
     @Singleton
-    AlbumsDaoWrapper albumsDaoWrapper(LibraryDatabase libraryDatabase,
-                                      AlbumsDao albumsDao,
-                                      ArtistsDao artistsDao,
-                                      ArtistsDaoWrapper artistsDaoWrapper) {
-        return new AlbumsDaoWrapper(libraryDatabase, albumsDao, artistsDao, artistsDaoWrapper);
-    }
+    fun albumsDaoWrapper(
+        libraryDatabase: LibraryDatabase,
+        albumsDao: AlbumsDao,
+        artistsDao: ArtistsDao,
+        artistsDaoWrapper: ArtistsDaoWrapper
+    ) = AlbumsDaoWrapper(libraryDatabase, albumsDao, artistsDao, artistsDaoWrapper)
 
     @Provides
-    @Nonnull
     @Singleton
-    ArtistsDaoWrapper artistsDaoWrapper(LibraryDatabase libraryDatabase,
-                                        ArtistsDao artistsDao,
-                                        AlbumsDao albumsDao) {
-        return new ArtistsDaoWrapper(libraryDatabase, artistsDao, albumsDao);
-    }
+    fun artistsDaoWrapper(
+        libraryDatabase: LibraryDatabase,
+        artistsDao: ArtistsDao,
+        albumsDao: AlbumsDao
+    ) = ArtistsDaoWrapper(libraryDatabase, artistsDao, albumsDao)
 
     @Provides
-    @Nonnull
     @Singleton
-    GenresDaoWrapper genresDaoWrapper(LibraryDatabase libraryDatabase,
-                                      GenreDao genreDao,
-                                      CompositionsDao compositionsDao) {
-        return new GenresDaoWrapper(libraryDatabase, genreDao, compositionsDao);
-    }
+    fun genresDaoWrapper(
+        libraryDatabase: LibraryDatabase,
+        genreDao: GenreDao,
+        compositionsDao: CompositionsDao
+    ) = GenresDaoWrapper(libraryDatabase, genreDao, compositionsDao)
 
     @Provides
-    @Nonnull
     @Singleton
-    CompositionsDaoWrapper compositionsDaoWrapper(LibraryDatabase libraryDatabase,
-                                                  ArtistsDao artistsDao,
-                                                  CompositionsDao compositionsDao,
-                                                  AlbumsDao albumsDao,
-                                                  GenreDao genreDao,
-                                                  FoldersDao foldersDao) {
-        return new CompositionsDaoWrapper(libraryDatabase,
-                artistsDao,
-                compositionsDao,
-                albumsDao,
-                genreDao,
-                foldersDao);
-    }
+    fun compositionsDaoWrapper(
+        libraryDatabase: LibraryDatabase,
+        artistsDao: ArtistsDao,
+        artistsDaoWrapper: ArtistsDaoWrapper,
+        compositionsDao: CompositionsDao,
+        albumsDao: AlbumsDao,
+        genreDao: GenreDao,
+        foldersDao: FoldersDao
+    ) = CompositionsDaoWrapper(
+        libraryDatabase,
+        artistsDao,
+        artistsDaoWrapper,
+        compositionsDao,
+        albumsDao,
+        genreDao,
+        foldersDao
+    )
 
     @Provides
-    @Nonnull
     @Singleton
-    FoldersDao foldersDao(LibraryDatabase libraryDatabase) {
-        return libraryDatabase.foldersDao();
-    }
+    fun foldersDao(
+        libraryDatabase: LibraryDatabase
+    ): FoldersDao = libraryDatabase.foldersDao()
 
     @Provides
-    @Nonnull
     @Singleton
-    FoldersDaoWrapper foldersDaoWrapper(LibraryDatabase libraryDatabase,
-                                        FoldersDao foldersDao,
-                                        CompositionsDaoWrapper compositionsDao) {
-        return new FoldersDaoWrapper(libraryDatabase, foldersDao, compositionsDao);
-    }
+    fun foldersDaoWrapper(
+        libraryDatabase: LibraryDatabase,
+        foldersDao: FoldersDao,
+        compositionsDao: CompositionsDaoWrapper,
+    ) = FoldersDaoWrapper(libraryDatabase, foldersDao, compositionsDao)
 
     @Provides
-    @Nonnull
     @Singleton
-    PlayListDao playListDao(LibraryDatabase libraryDatabase) {
-        return libraryDatabase.playListDao();
-    }
+    fun playListDao(
+        libraryDatabase: LibraryDatabase
+    ): PlaylistDao = libraryDatabase.playListDao()
 
     @Provides
-    @Nonnull
     @Singleton
-    PlayListsDaoWrapper playListsDaoWrapper(PlayListDao playListDao,
-                                            CompositionsDao compositionsDao,
-                                            LibraryDatabase libraryDatabase) {
-        return new PlayListsDaoWrapper(playListDao, compositionsDao, libraryDatabase);
-    }
+    fun playListsDaoWrapper(
+        playListDao: PlaylistDao,
+        compositionsDao: CompositionsDao,
+        libraryDatabase: LibraryDatabase
+    ) = PlaylistsDaoWrapper(playListDao, compositionsDao, libraryDatabase)
 
     @Provides
-    @Nonnull
     @Singleton
-    ConfigsDatabase configsDatabase(DatabaseManager databaseManager) {
-        return databaseManager.getConfigsDatabase();
-    }
+    fun configsDatabase(
+        databaseManager: DatabaseManager
+    ): ConfigsDatabase = databaseManager.getConfigsDatabase()
 
     @Provides
-    @Nonnull
     @Singleton
-    IgnoredFoldersDao ignoredFoldersDao(ConfigsDatabase configsDatabase) {
-        return configsDatabase.ignoredFoldersDao();
-    }
-
+    fun ignoredFoldersDao(
+        configsDatabase: ConfigsDatabase
+    ): IgnoredFoldersDao = configsDatabase.ignoredFoldersDao()
 }

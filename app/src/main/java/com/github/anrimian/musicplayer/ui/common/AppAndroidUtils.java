@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.common;
 
+import static com.github.anrimian.utils.AndroidUtilsKt.broadcastPendingIntentFlag;
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -13,10 +15,10 @@ import androidx.core.content.FileProvider;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerInteractor;
 import com.github.anrimian.musicplayer.domain.interactors.player.PlayerType;
+import com.github.anrimian.musicplayer.infrastructure.providers.ProviderAuthorities;
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl;
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils;
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils;
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -28,7 +30,7 @@ public class AppAndroidUtils {
     public static Uri createUri(Context context, File file) {
         try {
             return FileProvider.getUriForFile(context,
-                    context.getString(R.string.file_provider_authorities),
+                    ProviderAuthorities.of(context, FileProvider.class),
                     file);
         } catch (Exception e) {
             Toast.makeText(context,
@@ -59,7 +61,7 @@ public class AppAndroidUtils {
                 context,
                 requestCode,
                 intent,
-                AndroidUtilsKt.broadcastPendingIntentFlag()
+                broadcastPendingIntentFlag()
         );
     }
 

@@ -1,28 +1,30 @@
 package com.github.anrimian.musicplayer.data.database.dao.compositions
 
-import androidx.collection.LongSparseArray
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.github.anrimian.musicplayer.data.database.LibraryDatabase
 import com.github.anrimian.musicplayer.data.database.dao.albums.AlbumsDao
 import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper
 import com.github.anrimian.musicplayer.data.database.dao.folders.FoldersDao
 import com.github.anrimian.musicplayer.data.database.dao.genre.GenreDao
 import com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils
 import com.github.anrimian.musicplayer.data.models.composition.ExternalComposition
 import com.github.anrimian.musicplayer.data.models.exceptions.CompositionNotFoundException
-import com.github.anrimian.musicplayer.data.repositories.library.edit.models.CompositionMoveData
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListEntry
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageComposition
-import com.github.anrimian.musicplayer.data.utils.collections.AndroidCollectionUtils
+import com.github.anrimian.musicplayer.data.storage.providers.music.AudioFileKey
+import com.github.anrimian.musicplayer.data.storage.providers.music.DBComposition
 import com.github.anrimian.musicplayer.domain.Constants
+import com.github.anrimian.musicplayer.domain.models.composition.AudioFileInfo
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
-import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo
+import com.github.anrimian.musicplayer.domain.models.composition.LocalFileStatus
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileTagInfo
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
+import com.github.anrimian.musicplayer.domain.models.search.CompositionLookup
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.utils.FileUtils
@@ -33,15 +35,15 @@ import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import java.util.Date
 
 class CompositionsDaoWrapper(
     private val libraryDatabase: LibraryDatabase,
     private val artistsDao: ArtistsDao,
+    private val artistsDaoWrapper: ArtistsDaoWrapper,
     private val compositionsDao: CompositionsDao,
     private val albumsDao: AlbumsDao,
     private val genreDao: GenreDao,
-    private val foldersDao: FoldersDao
+    private val foldersDao: FoldersDao,
 ) {
 
     private val updateSubject = BehaviorSubject.createDefault(Constants.TRIGGER)
@@ -70,18 +72,18 @@ class CompositionsDaoWrapper(
         return compositionsDao.getFullComposition(id)
     }
 
-    fun getCompositionMoveData(id: Long): CompositionMoveData {
-        return compositionsDao.getCompositionMoveData(id)
+    fun getAudioFileInfo(id: Long): AudioFileInfo {
+        return compositionsDao.getAudioFileInfo(id)
     }
 
-    fun getCompositionsMoveData(ids: List<Long>): List<CompositionMoveData> {
-        return ids.map(compositionsDao::getCompositionMoveData)
+    fun getAudioFilesInfo(ids: List<Long>): List<AudioFileInfo> {
+        return ids.map(compositionsDao::getAudioFileInfo)
     }
 
-    fun getAllObservable(
+    fun getCompositionsObservable(
         order: Order,
         useFileName: Boolean,
-        searchText: String?
+        searchText: String?,
     ): Observable<List<Composition>> {
         val query = CompositionsDao.getCompositionQuery(useFileName)
         query.append(CompositionsDao.getSearchWhereQuery(useFileName))
@@ -93,6 +95,15 @@ class CompositionsDaoWrapper(
         return updateSubject.switchMap { compositionsDao.getCompositionsObservable(sqlQuery) }
     }
 
+    fun getCompositionKeys(lookup: CompositionLookup): List<FileKey> {
+        return compositionsDao.getCompositionKeys(
+            lookup.minDuration,
+            lookup.maxDuration,
+            lookup.fileExtensions?.size ?: 0,
+            lookup.fileExtensions
+        ).map { key -> FileKey(key.name, key.parentPath) }
+    }
+
     fun launchManualUpdate() {
         updateSubject.onNext(Constants.TRIGGER)
     }
@@ -101,7 +112,7 @@ class CompositionsDaoWrapper(
         folderId: Long?,
         order: Order,
         useFileName: Boolean,
-        searchText: String?
+        searchText: String?,
     ): Observable<List<Composition>> {
         val query = CompositionsDao.getCompositionQuery(useFileName)
         query.append(CompositionsDao.getSearchWhereQuery(useFileName))
@@ -121,7 +132,7 @@ class CompositionsDaoWrapper(
 
     fun getAllCompositionsInFolder(
         parentFolderId: Long?,
-        useFileName: Boolean
+        useFileName: Boolean,
     ): List<Composition> {
         var query = FoldersDao.getRecursiveFolderQuery(parentFolderId)
         query += CompositionsDao.getCompositionQuery(useFileName)
@@ -132,20 +143,20 @@ class CompositionsDaoWrapper(
         return compositionsDao.executeQuery(sqlQuery)
     }
 
-    fun getAllCompositionsInFolder(parentFolderId: Long?): List<CompositionMoveData> {
+    fun getAllFilesInFolder(parentFolderId: Long?): List<AudioFileInfo> {
         var query = FoldersDao.getRecursiveFolderQuery(parentFolderId)
-        query += CompositionsDao.getMoveCompositionQuery()
+        query += CompositionsDao.getAudioFileInfoQuery()
         query += " WHERE folderId IN (SELECT childFolderId FROM allChildFolders) "
         query += "OR folderId = "
         query += parentFolderId
         val sqlQuery = SimpleSQLiteQuery(query)
-        return compositionsDao.executeQueryForMove(sqlQuery)
+        return compositionsDao.getAudioFilesInfo(sqlQuery)
     }
 
     fun getCompositionsInFolder(
         parentFolderId: Long?,
         order: Order,
-        useFileName: Boolean
+        useFileName: Boolean,
     ): List<Composition> {
         val query = CompositionsDao.getCompositionQuery(useFileName)
         query.append(" WHERE folderId = ")
@@ -158,30 +169,43 @@ class CompositionsDaoWrapper(
         return compositionsDao.executeQuery(sqlQuery)
     }
 
-    fun selectAllAsStorageCompositions(): LongSparseArray<StorageComposition> {
-        val result = LongSparseArray<StorageComposition>()
+    fun selectAllAsStorageCompositions(): Map<AudioFileKey, DBComposition> {
+        val result = HashMap<AudioFileKey, DBComposition>()
         val pageSize = 1000
         var index = 0
-        var pageResult: LongSparseArray<StorageComposition>
+        var pageResult: Map<AudioFileKey, DBComposition>
         do {
-            pageResult = AndroidCollectionUtils.mapToSparseArray(
-                compositionsDao.selectAllAsStorageCompositions(pageSize, index),
-                StorageComposition::getStorageId
-            )
+            pageResult = compositionsDao.selectAsDbCompositions(pageSize, index)
+                .associateBy { item -> AudioFileKey(item.parentPath, item.fileName) }
             result.putAll(pageResult)
             index++
-        } while (pageResult.size() == pageSize)
+        } while (pageResult.size == pageSize)
         return result
     }
 
-    fun getStorageId(compositionId: Long): Long {
+    fun requireStorageId(compositionId: Long): Long {
         val storageId = compositionsDao.getStorageId(compositionId)
             ?: throw CompositionNotFoundException("composition not found")
         return storageId
     }
 
+    fun getStorageId(compositionId: Long): Long? {
+        return compositionsDao.getStorageId(compositionId)
+    }
+
     fun selectStorageId(compositionId: Long): Maybe<Long> {
         return Maybe.fromCallable { compositionsDao.getStorageId(compositionId) }
+    }
+
+    fun selectStorageIds(ids: List<Long>): Map<Long, Long> {
+        if (ids.isEmpty()) {
+            return emptyMap()
+        }
+        val result = HashMap<Long, Long>(ids.size)
+        ids.chunked(500).forEach { chunk ->
+            result.putAll(compositionsDao.selectStorageIds(chunk))
+        }
+        return result
     }
 
     fun delete(id: Long) {
@@ -196,7 +220,9 @@ class CompositionsDaoWrapper(
 
     fun deleteAll(ids: Array<Long>) {
         libraryDatabase.runInTransaction {
-            compositionsDao.delete(ids)
+            ids.asIterable().chunked(500).forEach { chunk ->
+                compositionsDao.delete(chunk.toTypedArray())
+            }
             albumsDao.deleteEmptyAlbums()
             artistsDao.deleteEmptyArtists()
             genreDao.deleteEmptyGenres()
@@ -204,8 +230,8 @@ class CompositionsDaoWrapper(
         }
     }
 
-    fun deleteCompositionsWithoutStorageId() {
-        compositionsDao.deleteCompositionsWithoutStorageId()
+    fun deleteCompositionsWithLocalFileStatus(vararg statuses: LocalFileStatus) {
+        compositionsDao.deleteCompositionsWithLocalFileStatus(*statuses)
     }
 
     fun clearAllPathModifyTime() {
@@ -240,46 +266,41 @@ class CompositionsDaoWrapper(
 
     fun updateAlbum(compositionId: Long, albumName: String?) {
         libraryDatabase.runInTransaction {
-            var artistId: Long? = null
-            val existsAlbumId = compositionsDao.getAlbumId(compositionId)
-            if (existsAlbumId != null) {
-                artistId = albumsDao.getArtistId(existsAlbumId)
+            val albumId = if (albumName.isNullOrBlank()) {
+                null
+            } else {
+                var artistId: Long? = null
+                val existsAlbumId = compositionsDao.getAlbumId(compositionId)
+                if (existsAlbumId != null) {
+                    artistId = albumsDao.getArtistId(existsAlbumId)
+                }
+                if (artistId == null) {
+                    artistId = compositionsDao.getArtistId(compositionId)
+                }
+                var targetAlbumId = albumsDao.findAlbum(artistId, albumName)
+                if (targetAlbumId == null && artistId == null) {
+                    targetAlbumId = albumsDao.findAlbum(null, albumName)
+                }
+                targetAlbumId ?: albumsDao.insertAlbum(artistId, albumName)
             }
-            if (artistId == null) {
-                artistId = compositionsDao.getArtistId(compositionId)
-            }
-
-            // find new album by artist and name from albums
-            var albumId = albumsDao.findAlbum(artistId, albumName)
-
-            // if album not exists - create album
-            if (albumId == null && !TextUtils.isEmpty(albumName)) {
-                albumId = albumsDao.insertAlbum(artistId, albumName)
-            }
-
-            // set new albumId
             val oldAlbumId = compositionsDao.getAlbumId(compositionId)
-            compositionsDao.updateAlbum(compositionId, albumId)
-            if (oldAlbumId != null) {
-                albumsDao.deleteEmptyAlbum(oldAlbumId)
+            if (oldAlbumId != albumId) {
+                compositionsDao.updateAlbum(compositionId, albumId)
+                if (oldAlbumId != null) {
+                    albumsDao.deleteEmptyAlbum(oldAlbumId)
+                }
             }
         }
     }
 
     fun updateArtist(id: Long, authorName: String?) {
         libraryDatabase.runInTransaction {
-            // 1) find new artist by name from artists
-            var artistId = artistsDao.findArtistIdByName(authorName)
+            val artistId = artistsDaoWrapper.getOrCreateArtist(authorName)
 
-            // 2) if artist not exists - create artist
-            if (artistId == null && !TextUtils.isEmpty(authorName)) {
-                artistId = artistsDao.insertArtist(authorName)
-            }
-            // 3) set new artistId
             val oldArtistId = compositionsDao.getArtistId(id)
             compositionsDao.updateArtist(id, artistId)
 
-            // 4) if OLD artist exists and has no references - delete him
+            // if OLD artist exists and has no references - delete him
             if (oldArtistId != null) {
                 artistsDao.deleteEmptyArtist(oldArtistId)
             }
@@ -290,13 +311,8 @@ class CompositionsDaoWrapper(
         libraryDatabase.runInTransaction {
             //find album
             val albumId = compositionsDao.getAlbumId(id) ?: return@runInTransaction
-            // 1) find new artist by name from artists
-            var artistId = artistsDao.findArtistIdByName(artistName)
 
-            // 2) if artist not exists - create artist
-            if (artistId == null && !TextUtils.isEmpty(artistName)) {
-                artistId = artistsDao.insertArtist(artistName)
-            }
+            val artistId = artistsDaoWrapper.getOrCreateArtist(artistName)
 
             val albumEntity = albumsDao.getAlbumEntity(albumId)
             val oldArtistId = albumEntity.artistId
@@ -335,62 +351,62 @@ class CompositionsDaoWrapper(
     fun updateTitle(id: Long, title: String?) {
         libraryDatabase.runInTransaction {
             compositionsDao.updateTitle(id, title)
-            compositionsDao.setUpdateTime(id, Date())
+            compositionsDao.setModifyTime(id, System.currentTimeMillis())
         }
     }
 
     fun updateDuration(id: Long, duration: Long) {
         libraryDatabase.runInTransaction {
             compositionsDao.updateDuration(id, duration)
-            compositionsDao.setUpdateTime(id, Date())
+            compositionsDao.setModifyTime(id, System.currentTimeMillis())
         }
     }
 
     fun updateTrackNumber(id: Long, trackNumber: Long?) {
         libraryDatabase.runInTransaction {
             compositionsDao.updateTrackNumber(id, trackNumber)
-            compositionsDao.setUpdateTime(id, Date())
+            compositionsDao.setModifyTime(id, System.currentTimeMillis())
         }
     }
 
     fun updateDiscNumber(id: Long, discNumber: Long?) {
         libraryDatabase.runInTransaction {
             compositionsDao.updateDiscNumber(id, discNumber)
-            compositionsDao.setUpdateTime(id, Date())
+            compositionsDao.setModifyTime(id, System.currentTimeMillis())
         }
     }
 
     fun updateComment(id: Long, text: String?) {
         libraryDatabase.runInTransaction {
             compositionsDao.updateComment(id, text)
-            compositionsDao.setUpdateTime(id, Date())
+            compositionsDao.setModifyTime(id, System.currentTimeMillis())
         }
     }
 
     fun updateLyrics(id: Long, text: String?) {
         libraryDatabase.runInTransaction {
             compositionsDao.updateLyrics(id, text)
-            compositionsDao.setUpdateTime(id, Date())
+            compositionsDao.setModifyTime(id, System.currentTimeMillis())
         }
     }
 
     fun updateFileSize(id: Long, fileSize: Long) {
         libraryDatabase.runInTransaction {
             compositionsDao.updateFileSize(id, fileSize)
-            compositionsDao.setUpdateTime(id, Date())
+            compositionsDao.setModifyTime(id, System.currentTimeMillis())
         }
     }
 
     fun setModifyTimeToCurrent(id: Long) {
-        compositionsDao.setUpdateTime(id, Date())
+        compositionsDao.setModifyTime(id, System.currentTimeMillis())
     }
 
     fun setCompositionPathModifyTime(id: Long, time: Long?) {
         compositionsDao.setPathModifyTime(id, time)
     }
 
-    fun updateCoverModifyTimeAndSize(id: Long, size: Long, date: Date) {
-        compositionsDao.setCoverModifyTimeAndSize(id, size, date)
+    fun updateCoverModifyTimeAndSize(id: Long, size: Long, time: Long) {
+        compositionsDao.setCoverModifyTimeAndSize(id, size, time)
     }
 
     fun updateCoverModifyTime(id: Long, time: Long) {
@@ -401,18 +417,90 @@ class CompositionsDaoWrapper(
         compositionsDao.updateCompositionFileName(id, fileName)
     }
 
-    fun setCorruptionType(corruptionType: CorruptionType?, id: Long) {
-        compositionsDao.setCorruptionType(corruptionType, id)
+    fun setLocalFileStatus(id: Long, status: LocalFileStatus) {
+        compositionsDao.setLocalFileStatus(id, status)
+    }
+
+    fun setCorruptionType(id: Long, corruptionType: CorruptionType?) {
+        compositionsDao.setCorruptionType(id, corruptionType)
+    }
+
+    fun writeErrorAboutComposition(
+        composition: Composition,
+        corruptionType: CorruptionType?,
+    ) {
+        if (composition.corruptionType == corruptionType) {
+            return
+        }
+        libraryDatabase.runInTransaction {
+            val id = composition.id
+            compositionsDao.setCorruptionType(id, corruptionType)
+            if (corruptionType == CorruptionType.NOT_FOUND
+                || corruptionType == CorruptionType.NOT_FOUND_IN_ALL_STORAGES
+            ) {
+                compositionsDao.updateStorageId(id, null)
+                compositionsDao.setCompositionLastFileScanTime(id, 0)
+                if (composition.fileStatus == LocalFileStatus.AVAILABLE) {
+                    compositionsDao.setLocalFileStatus(id, LocalFileStatus.DISAPPEARED)
+                    compositionsDao.setCompositionMissedTime(id, System.currentTimeMillis())
+                }
+            }
+        }
+    }
+
+    fun updateCompositionFileState(
+        composition: FullComposition,
+        storageId: Long,
+        fileModifyTime: Long?,
+        coverModifyTime: Long,
+    ) {
+        libraryDatabase.runInTransaction {
+            val id = composition.id
+            compositionsDao.updateStorageId(id, storageId)
+            compositionsDao.setCompositionMissedTime(id, 0)
+            compositionsDao.setLocalFileStatus(id, LocalFileStatus.AVAILABLE)
+            if (composition.corruptionType == CorruptionType.NOT_FOUND) {
+                compositionsDao.setCorruptionType(id, null)
+            }
+            if (fileModifyTime != null) {
+                compositionsDao.setModifyTime(id, fileModifyTime)
+            }
+            if (coverModifyTime != 0L && coverModifyTime != composition.coverModifyTime) {
+                compositionsDao.setCoverModifyTime(id, coverModifyTime)
+            }
+        }
+    }
+
+    fun setCompositionMissedTime(id: Long, time: Long) {
+        compositionsDao.setCompositionMissedTime(id, time)
+    }
+
+    fun getMissingCompositionsCountObservable(): Observable<Int> {
+        return compositionsDao.getMissingCompositionsCountObservable()
+    }
+
+    fun getMissingAudioFilesObservable(): Observable<List<AudioFileInfo>> {
+        val sb = CompositionsDao.getAudioFileInfoQuery()
+        sb.append(" WHERE missingTime > 0")
+        val sqlQuery = SimpleSQLiteQuery(sb.toString())
+        return compositionsDao.getAudioFilesInfoObservable(sqlQuery)
+    }
+
+    fun deleteMissingCompositions() {
+        libraryDatabase.runInTransaction {
+            compositionsDao.deleteMissingCompositions()
+            foldersDao.deleteFoldersWithoutContainment()
+        }
     }
 
     fun selectNextCompositionsToScan(
         lastCompleteScanTime: Long,
-        filesCount: Int
+        filesCount: Int,
     ): Single<List<FullComposition>> {
         return compositionsDao.selectNextCompositionsToScan(lastCompleteScanTime, filesCount)
     }
 
-    fun setCompositionLastFileScanTime(composition: FullComposition, time: Date) {
+    fun setCompositionLastFileScanTime(composition: FullComposition, time: Long) {
         compositionsDao.setCompositionLastFileScanTime(composition.id, time)
     }
 
@@ -421,23 +509,29 @@ class CompositionsDaoWrapper(
     }
 
     fun updateCompositionsByFileInfo(
-        scannedCompositions: List<Pair<FullComposition, AudioFileInfo>>,
-        allCompositions: List<FullComposition>
+        scannedCompositions: List<Pair<FullComposition, AudioFileTagInfo>>,
+        allCompositions: List<FullComposition>,
+        updateModifyTime: Boolean,
     ) {
         libraryDatabase.runInTransaction {
-            for ((first, second) in scannedCompositions) {
-                updateCompositionByFileInfo(first, second)
+            for ((composition, tagInfo) in scannedCompositions) {
+                val wasChanges = updateCompositionByFileInfo(composition, tagInfo)
+                val id = composition.id
+                // handle case when file was modified by another app
+                if (wasChanges && updateModifyTime && compositionsDao.getCompositionLastFileScanTime(id) != 0L) {
+                    compositionsDao.setModifyTime(id, compositionsDao.getCompositionStorageModifyTime(id))
+                }
             }
-            val currentDate = Date()
+            val currentTime = System.currentTimeMillis()
             for (composition in allCompositions) {
-                setCompositionLastFileScanTime(composition, currentDate)
+                setCompositionLastFileScanTime(composition, currentTime)
             }
         }
     }
 
     fun updateCompositionByFileInfo(
         composition: FullComposition,
-        fileInfo: AudioFileInfo
+        fileInfo: AudioFileTagInfo,
     ): Boolean {
         return libraryDatabase.runInTransaction<Boolean> {
             val id = composition.id
@@ -476,7 +570,7 @@ class CompositionsDaoWrapper(
                 val tagDurationMillis = tagDuration * 1000L
                 compositionsDao.updateDuration(id, tagDurationMillis)
                 if (compositionsDao.selectCorruptionType(id) == CorruptionType.UNKNOWN) {
-                    compositionsDao.setCorruptionType(null, id)
+                    compositionsDao.setCorruptionType(id, null)
                 }
                 wasChanges = true
             }
@@ -525,14 +619,10 @@ class CompositionsDaoWrapper(
     }
 
     fun getAllAsExternalCompositions(parentPath: String?): List<ExternalComposition> {
-        val folderId: Long?
-        if (TextUtils.isEmpty(parentPath)) {
-            folderId = null
+        val folderId = if (parentPath.isNullOrEmpty()) {
+            null
         } else {
-            folderId = findFolderId(parentPath)
-            if (folderId == null) {
-                return emptyList()
-            }
+            findFolderId(parentPath) ?: return emptyList()
         }
         return compositionsDao.getAllAsExternalCompositions(folderId)
     }
@@ -562,7 +652,7 @@ class CompositionsDaoWrapper(
     fun updateCompositionIdsInitialSource(
         compositionsIds: List<Long>,
         initialSource: InitialSource,
-        updateFrom: InitialSource
+        updateFrom: InitialSource,
     ) {
         libraryDatabase.runInTransaction {
             for (id in compositionsIds) {
@@ -574,14 +664,14 @@ class CompositionsDaoWrapper(
     fun updateCompositionInitialSource(
         compositionId: Long,
         initialSource: InitialSource,
-        updateFrom: InitialSource
+        updateFrom: InitialSource,
     ) {
         compositionsDao.updateCompositionInitialSource(compositionId, initialSource, updateFrom)
     }
 
     fun selectDeletedComposition(
         ids: Array<Long>,
-        useFileName: Boolean
+        useFileName: Boolean,
     ): List<DeletedComposition> {
         val query = CompositionsDao.getDeletedCompositionQuery(useFileName, ids.size).toString()
         val sqlQuery = SimpleSQLiteQuery(query, ids)
@@ -594,7 +684,7 @@ class CompositionsDaoWrapper(
 
     fun getCompositionIds(
         fileEntries: List<PlayListEntry>,
-        pathIdMapCache: HashMap<String, Long>
+        pathIdMapCache: HashMap<String, Long>,
     ): List<Long> {
         return fileEntries.mapNotNull { entry ->
             val path = entry.filePath
@@ -604,7 +694,7 @@ class CompositionsDaoWrapper(
                 val nameIds = compositionsDao.findCompositionsByFileName(fileName)
                 for (nameId in nameIds) {
                     val dbPath = compositionsDao.getCompositionParentPath(nameId)
-                    if (parentPath.endsWith(dbPath)) {
+                    if (dbPath.endsWith(parentPath)) {
                         return@getOrPut nameId
                     }
                 }
@@ -619,47 +709,54 @@ class CompositionsDaoWrapper(
     }
 
     fun getCompositionsInFolder(folderId: Long?): List<FileKey> {
-        val compositions = getAllCompositionsInFolder(folderId)
+        val compositions = getAllFilesInFolder(folderId)
         return compositions.map { c -> FileKey(c.fileName, c.parentPath) }
     }
 
     fun findFolderId(filePath: String?): Long? {
-        return findFolderId(filePath, null)
+        if (filePath.isNullOrEmpty()) {
+            return null
+        }
+
+        val volume = foldersDao.findVolumeByPath(filePath) ?: return null
+        val rootFolderId = volume.rootFolderId
+        val relativePath = filePath.removePrefix(volume.path).removePrefix("/")
+        if (relativePath.isEmpty()) {
+            return rootFolderId
+        }
+        return findFolderId(relativePath, rootFolderId)
     }
 
-    private fun findFolderId(filePath: String?, parentId: Long?): Long? {
-        if (filePath.isNullOrEmpty()) {
+    private fun findFolderId(relativePath: String?, parentId: Long?): Long? {
+        if (relativePath.isNullOrEmpty()) {
             return parentId
         }
 
         val folderId: Long?
-        val delimiterIndex = filePath.indexOf('/')
+        val delimiterIndex = relativePath.indexOf('/')
         if (delimiterIndex == -1) {
-            folderId = foldersDao.getFolderByName(parentId, filePath)
+            folderId = foldersDao.getFolderByName(relativePath, parentId)
         } else {
-            val folderName = filePath.substring(0, delimiterIndex)
-            val parentFolderId = foldersDao.getFolderByName(parentId, folderName) ?: return null
-            val folderPath = filePath.substring(delimiterIndex + 1)
+            val folderName = relativePath.substring(0, delimiterIndex)
+            val parentFolderId = foldersDao.getFolderByName(folderName, parentId) ?: return null
+            val folderPath = relativePath.substring(delimiterIndex + 1)
             folderId = findFolderId(folderPath, parentFolderId)
         }
         return folderId
     }
 
     private fun getOrderQuery(order: Order): String {
-        val orderQuery = StringBuilder(" ORDER BY ")
-        when (order.orderType) {
-            OrderType.NAME -> {
-                orderQuery.append("CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END")
-            }
-            OrderType.FILE_NAME -> orderQuery.append("fileName")
-            OrderType.ADD_TIME -> orderQuery.append("dateAdded")
-            OrderType.SIZE -> orderQuery.append("size")
-            OrderType.DURATION -> orderQuery.append("duration")
+        val column = when (order.orderType) {
+            OrderType.NAME -> "CASE WHEN title IS NULL OR title = '' THEN fileName ELSE title END"
+            OrderType.FILE_NAME -> "fileName"
+            OrderType.ADD_TIME -> "addedTime"
+            OrderType.SIZE -> "size"
+            OrderType.DURATION -> "duration"
+            OrderType.ARTIST -> "artist"
             else -> throw IllegalStateException("unknown order type: $order")
         }
-        orderQuery.append(" ")
-        orderQuery.append(if (order.isReversed) "DESC" else "ASC")
-        return orderQuery.toString()
+        val direction = if (order.isReversed) "DESC" else "ASC"
+        return " ORDER BY $column $direction"
     }
 
 }

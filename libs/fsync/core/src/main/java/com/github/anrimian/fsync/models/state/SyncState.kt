@@ -39,7 +39,7 @@ sealed interface SyncState {
 
 
     data class WaitForAllow(val syncEnvConditions: List<SyncEnvCondition>): SyncState
-    data object PendingSync: SyncState
+    data class PendingSync(val nextSyncTime: Long): SyncState
 
     data class Error(
         val throwable: Throwable,

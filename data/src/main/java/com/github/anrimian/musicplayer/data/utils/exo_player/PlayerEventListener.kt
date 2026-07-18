@@ -1,39 +1,21 @@
-package com.github.anrimian.musicplayer.data.utils.exo_player;
+package com.github.anrimian.musicplayer.data.utils.exo_player
 
-import androidx.annotation.NonNull;
-import androidx.media3.common.PlaybackException;
-import androidx.media3.common.Player;
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
 
-import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
+class PlayerEventListener(
+    private val onEnded: () -> Unit,
+    private val errorCallback: (PlaybackException) -> Unit
+) : Player.Listener {
 
-public class PlayerEventListener implements Player.Listener {
-
-    private final Runnable onEnded;
-    private final Callback<PlaybackException> errorCallback;
-
-    public PlayerEventListener(Runnable onEnded, Callback<PlaybackException> errorCallback) {
-        this.onEnded = onEnded;
-        this.errorCallback = errorCallback;
-    }
-
-    @Override
-    public void onPlaybackStateChanged(int state) {
-        //            case Player.STATE_BUFFERING: {
-        //                break;
-        //            }
-        //            case Player.STATE_IDLE: {
-        //                break;
-        //            }
-        //            case Player.STATE_READY: {
-        //                break;
-        //            }
+    override fun onPlaybackStateChanged(state: Int) {
         if (state == Player.STATE_ENDED) {
-            onEnded.run();
+            onEnded()
         }
     }
 
-    @Override
-    public void onPlayerError(@NonNull PlaybackException error) {
-        errorCallback.call(error);
+    override fun onPlayerError(error: PlaybackException) {
+        errorCallback(error)
     }
+
 }

@@ -1,0 +1,10 @@
+*)
+send playpause
+case:
+ - timeout, silence
+ - timeout, send failed
+ - timeout, send success
+ - send failed
+ - send again, previous failed
+ - send again, previous successful
+ - error from device

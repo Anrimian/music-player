@@ -89,7 +89,9 @@ class AboutAppFragment : Fragment(), FragmentNavigationListener {
 
     private fun setLogActionsVisibility(isLogExists: Boolean) {
         val logActionsVisibility = if (isLogExists) View.VISIBLE else View.GONE
-        binding.llLogActions.visibility = logActionsVisibility
+        binding.btnView.visibility = logActionsVisibility
+        binding.btnSend.visibility = logActionsVisibility
+        binding.btnDelete.visibility = logActionsVisibility
         binding.tvLogInfo.visibility = logActionsVisibility
     }
 

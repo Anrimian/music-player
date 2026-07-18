@@ -1,0 +1,49 @@
+*)
+main app exists, has state
+install wear app -> it should have this state
+
+*)
+main app not exists
+install wear app -> show no_device state
+
+*)
+main app exists, has no state
+install wear app -> show no_composition state
+
+*)
+no wear app
+main app shouldn't get wearable state
+
+*)
+wearable exists, has it own state
+reinstall main app, grant permission
+wearable sends event -> mail app just launches foreground service and it's all
+
+A: process inconsistent state and in this case send actual state back
+
+*)
+wearable exists, has it own state
+main app: clear app data and restart -> wearable has no clue about state reset?
+A: yes, no immediate state update, but on event we should receive actual state
+
+*)
+wearable exists, has it own state
+install main, do not grant permission
+send event from wearable -> main app should send error event
+
+*) - FIND
+revoke permission with queue change
+- we can trap into state when we have permission and wearable, but not subscribed on events
+more: case when we have empty queue, but non-empty state and no subscription to device state
+
+*)
+UPDATE PROTOCOL CASE(1)
+install both apps
+update host app. Expect wear show update_wear_state
+update wear app. Expect state disappear
+
+*)
+UPDATE PROTOCOL CASE(2)
+install both apps
+update wear app. Expect wear show update_host_state.
+update host app. Expect state disappear

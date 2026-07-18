@@ -1,19 +1,20 @@
-package com.github.anrimian.musicplayer.data.database.mappers;
+package com.github.anrimian.musicplayer.data.database.mappers
 
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageAudioFile
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 
-public class CompositionCorruptionDetector {
+object CompositionCorruptionDetector {
 
-    public static CorruptionType getCorruptionType(StorageFullComposition composition) {
-        return getCorruptionType(composition.getDuration());
+    fun getCorruptionType(composition: StorageAudioFile): CorruptionType? {
+        return getCorruptionType(composition.duration)
     }
 
-    public static CorruptionType getCorruptionType(long duration) {
-        CorruptionType corruptionType = null;
-        if (duration == 0) {
-            corruptionType = CorruptionType.UNKNOWN;
+    fun getCorruptionType(duration: Long): CorruptionType? {
+        return if (duration == 0L) {
+            CorruptionType.UNKNOWN
+        } else {
+            null
         }
-        return corruptionType;
     }
+
 }

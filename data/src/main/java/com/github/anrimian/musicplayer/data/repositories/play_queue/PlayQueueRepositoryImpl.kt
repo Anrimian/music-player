@@ -6,7 +6,7 @@ import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayQueueIt
 import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl
 import com.github.anrimian.musicplayer.data.utils.rx.retryWithDelay
 import com.github.anrimian.musicplayer.domain.Constants
-import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
@@ -84,6 +84,25 @@ class PlayQueueRepositoryImpl(
         return playQueueObservable.getFlowable()
     }
 
+    override fun getWindowPlayQueueObservable(
+        startOffset: Int,
+        endOffset: Int
+    ): Observable<List<PlayQueueItem>> {
+        return Observable.combineLatest(
+            uiStatePreferences.currentItemIdObservable,
+            settingsPreferences.randomPlayingObservable,
+            settingsPreferences.displayFileNameObservable
+        ) { itemId, isRandom, useFileName ->
+            playQueueDao.getWindowPlayQueueObservable(
+                itemId,
+                isRandom,
+                useFileName,
+                startOffset,
+                endOffset
+            )
+        }.flatMap { o -> o }
+    }
+
     override fun setRandomPlayingEnabled(enabled: Boolean) {
         Completable.fromAction {
             playQueueObservable.clearCache()
@@ -143,7 +162,7 @@ class PlayQueueRepositoryImpl(
         }.subscribeOn(scheduler)
     }
 
-    override fun addCompositionsToPlayNext(compositions: List<Composition>): Completable {
+    override fun addCompositionsToPlayNext(compositions: List<CompositionModel>): Completable {
         return Completable.fromRunnable {
             checkPlayQueueItemsCount(compositions.size)
             val id = uiStatePreferences.currentQueueItemId
@@ -154,7 +173,7 @@ class PlayQueueRepositoryImpl(
         }.subscribeOn(scheduler)
     }
 
-    override fun addCompositionsToEnd(compositions: List<Composition>): Completable {
+    override fun addCompositionsToEnd(compositions: List<CompositionModel>): Completable {
         return Completable.fromRunnable {
             checkPlayQueueItemsCount(compositions.size)
             val id = uiStatePreferences.currentQueueItemId

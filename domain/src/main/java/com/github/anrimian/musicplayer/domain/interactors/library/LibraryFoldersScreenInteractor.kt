@@ -3,13 +3,14 @@ package com.github.anrimian.musicplayer.domain.interactors.library
 import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
+import com.github.anrimian.musicplayer.domain.models.folders.AbstractDirectory
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
+import com.github.anrimian.musicplayer.domain.models.folders.Volume
 import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
-import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.UiStateRepository
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
@@ -21,7 +22,6 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
  */
 class LibraryFoldersScreenInteractor(
     private val foldersInteractor: LibraryFoldersInteractor,
-    private val libraryRepository: LibraryRepository,
     private val uiStateRepository: UiStateRepository
 ) {
 
@@ -42,6 +42,10 @@ class LibraryFoldersScreenInteractor(
 
     fun getFolderObservable(folderId: Long): Observable<FolderInfo> {
         return foldersInteractor.getFolderObservable(folderId)
+    }
+
+    fun getVolumes(): Observable<List<Volume>> {
+        return foldersInteractor.getVolumesObservable()
     }
 
     fun playAllMusicInFolder(folderId: Long?): Completable {
@@ -92,14 +96,14 @@ class LibraryFoldersScreenInteractor(
         return foldersInteractor.renameFolder(folderId, newName)
     }
 
-    fun addFilesToMove(folderId: Long?, fileSources: Collection<FileSource>) {
+    fun addFilesToMove(folderId: Long, fileSources: Collection<FileSource>) {
         filesToMove.clear()
         filesToMove.addAll(fileSources)
         moveFromFolderId = folderId
         moveModeSubject.onNext(true)
     }
 
-    fun addFilesToCopy(folderId: Long?, fileSources: Collection<FileSource>) {
+    fun addFilesToCopy(folderId: Long, fileSources: Collection<FileSource>) {
         filesToCopy.clear()
         filesToCopy.addAll(fileSources)
         moveFromFolderId = folderId
@@ -148,19 +152,19 @@ class LibraryFoldersScreenInteractor(
         return filesToMove
     }
 
-    fun addFolderToIgnore(folder: FolderFileSource): Single<IgnoredFolder> {
+    fun addFolderToIgnore(folder: AbstractDirectory): Single<IgnoredFolder> {
         return foldersInteractor.addFolderToIgnore(folder)
     }
 
-    fun deleteIgnoredFolder(folder: IgnoredFolder): Completable {
-        return foldersInteractor.deleteIgnoredFolder(folder)
+    suspend fun deleteIgnoredFolder(folder: IgnoredFolder) {
+        foldersInteractor.deleteIgnoredFolder(folder)
     }
 
-    fun saveListPosition(folderId: Long?, listPosition: ListPosition) {
+    fun saveListPosition(folderId: Long, listPosition: ListPosition) {
         uiStateRepository.saveFolderListPosition(folderId, listPosition)
     }
 
-    fun getSavedListPosition(folderId: Long?): ListPosition? {
+    fun getSavedListPosition(folderId: Long): ListPosition? {
         return uiStateRepository.getSavedFolderListPosition(folderId)
     }
 }

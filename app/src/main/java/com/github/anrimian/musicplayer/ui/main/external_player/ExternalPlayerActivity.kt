@@ -7,7 +7,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.DrawableRes
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
 import com.github.anrimian.musicplayer.data.models.folders.UriFileReference
@@ -20,14 +20,19 @@ import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
 import com.github.anrimian.musicplayer.ui.common.dialogs.speed.SpeedSelectorDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
+import com.github.anrimian.musicplayer.ui.common.format.TimeFormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.getVolumeIcon
 import com.github.anrimian.musicplayer.ui.common.menu.showVolumePopup
 import com.github.anrimian.musicplayer.ui.common.view.onRewindHold
 import com.github.anrimian.musicplayer.ui.common.view.setSmallDrawableStart
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
+import com.github.anrimian.musicplayer.ui.utils.ImageUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper
+import com.github.anrimian.utils.setAnimatedVectorDrawable
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import moxy.ktx.moxyPresenter
 
@@ -73,13 +78,13 @@ class ExternalPlayerActivity : BaseMvpAppCompatActivity(), ExternalPlayerView {
 
         speedDialogFragmentRunner = DialogFragmentRunner(
             supportFragmentManager,
-            Constants.Tags.SPEED_SELECTOR_TAG
+            AppConstants.Tags.SPEED_SELECTOR_TAG
         ) { fragment ->
             fragment.setSpeedChangeListener(presenter::onPlaybackSpeedSelected)
         }
 
         if (savedInstanceState == null
-            && intent.getBooleanExtra(Constants.Arguments.LAUNCH_PREPARE_ARG, true)
+            && intent.getBooleanExtra(AppConstants.Arguments.LAUNCH_PREPARE_ARG, true)
         ) {
             val uriToPlay = intent.data
             onUriReceived(uriToPlay)
@@ -109,7 +114,7 @@ class ExternalPlayerActivity : BaseMvpAppCompatActivity(), ExternalPlayerView {
         }
         binding.tvComposition.text = CompositionHelper.formatCompositionName(source.title, source.displayName)
         binding.tvCompositionAuthor.text = FormatUtils.formatAuthor(source.artist, this)
-        binding.tvTotalTime.text = FormatUtils.formatMilliseconds(source.duration)
+        binding.tvTotalTime.text = TimeFormatUtils.formatMilliseconds(source.duration)
 
         Components.getAppComponent()
             .imageLoader()
@@ -122,17 +127,17 @@ class ExternalPlayerActivity : BaseMvpAppCompatActivity(), ExternalPlayerView {
 
     override fun showPlayerState(isPlaying: Boolean) {
         if (isPlaying) {
-            AndroidUtils.setAnimatedVectorDrawable(binding.ivPlayPause, R.drawable.anim_play_to_pause)
+            binding.ivPlayPause.setAnimatedVectorDrawable(R.drawable.anim_play_to_pause)
             binding.ivPlayPause.contentDescription = getString(R.string.pause)
         } else {
-            AndroidUtils.setAnimatedVectorDrawable(binding.ivPlayPause, R.drawable.anim_pause_to_play)
+            binding.ivPlayPause.setAnimatedVectorDrawable(R.drawable.anim_pause_to_play)
             binding.ivPlayPause.contentDescription = getString(R.string.play)
         }
     }
 
     override fun showTrackState(currentPosition: Long, duration: Long) {
         seekBarViewWrapper.setProgress(currentPosition, duration)
-        val formattedTime = FormatUtils.formatMilliseconds(currentPosition)
+        val formattedTime = TimeFormatUtils.formatMilliseconds(currentPosition)
         binding.sbTrackState.contentDescription = getString(R.string.position_template, formattedTime)
         binding.tvPlayedTime.text = formattedTime
     }

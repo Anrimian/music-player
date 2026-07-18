@@ -31,7 +31,7 @@ class SetupFragment : MvpAppCompatFragment(), SetupView {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentStartBinding.inflate(inflater, container, false)
         return binding.root
@@ -39,7 +39,7 @@ class SetupFragment : MvpAppCompatFragment(), SetupView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.toolbar.applyTopInsets()
+        binding.statusBarSpace.applyTopInsets()
         binding.root.applyBottomInsets()
 
         binding.progressStateView.onTryAgainClick { onTryAgainButtonClicked() }
@@ -67,8 +67,9 @@ class SetupFragment : MvpAppCompatFragment(), SetupView {
     override fun startSystemServices() {
         val appComponent = Components.getAppComponent()
         appComponent.widgetUpdater().start()
+        appComponent.wearableManager().init()
         appComponent.notificationsDisplayer().removeErrorNotification()
-        appComponent.mediaScannerRepository().runStorageObserver()
+        appComponent.storageScannerInteractor().runStorageObserver()
         appComponent.musicServiceInteractor().prepare()
     }
 

@@ -1,22 +1,24 @@
-package com.github.anrimian.musicplayer.domain.models.utils;
+package com.github.anrimian.musicplayer.domain.models.utils
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.utils.Objects;
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
 
-import javax.annotation.Nonnull;
+object PlayListHelper {
 
-public class PlayListHelper {
-
-    public static boolean areSourcesTheSame(PlayList oldSource, PlayList newSource) {
-        return !hasChanges(oldSource, newSource);
+    @JvmStatic
+    fun areItemsTheSame(oldSource: Playlist, newSource: Playlist): Boolean {
+        return oldSource.id == newSource.id
     }
 
-    public static boolean hasChanges(@Nonnull PlayList first, @Nonnull PlayList second) {
-        return !Objects.equals(first.getName(), second.getName())
-                || !Objects.equals(first.getDateAdded(), second.getDateAdded())
-                || !Objects.equals(first.getDateModified(), second.getDateModified())
-                || first.getCompositionsCount() != second.getCompositionsCount()
-                || first.getTotalDuration() != second.getTotalDuration();
+    fun areSourcesTheSame(oldSource: Playlist, newSource: Playlist): Boolean {
+        return !hasChanges(oldSource, newSource)
     }
+
+    fun hasChanges(first: Playlist, second: Playlist): Boolean {
+        return first.name != second.name
+                || first.addedTime != second.addedTime
+                || first.modifiedTime != second.modifiedTime
+                || first.compositionsCount != second.compositionsCount
+                || first.totalDuration != second.totalDuration
+    }
+
 }

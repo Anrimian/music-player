@@ -1,8 +1,3 @@
-package com.github.anrimian.musicplayer.domain.models.exceptions;
+package com.github.anrimian.musicplayer.domain.models.exceptions
 
-public class FileWriteNotAllowedException extends RuntimeException {
-
-    public FileWriteNotAllowedException(String message) {
-        super(message);
-    }
-}
+class FileWriteNotAllowedException(message: String?) : RuntimeException(message)

@@ -10,7 +10,8 @@ public enum OrderType {
     COMPOSITION_COUNT(5),
     DURATION(7),
     SIZE(9),
-    FILE_NAME(11);
+    FILE_NAME(11),
+    ARTIST(13);
 
     private static final Map<Integer, OrderType> map = new HashMap<>();
 

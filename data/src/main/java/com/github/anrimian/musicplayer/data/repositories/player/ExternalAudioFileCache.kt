@@ -120,12 +120,14 @@ class ExternalAudioFileCache(
 
     private fun sanitizeUriPartForFileName(originalUri: Uri): String {
         val lastPathSegment = originalUri.lastPathSegment ?: "unknown_file"
-        return lastPathSegment.replace(Regex("[^a-zA-Z0-9._-]"), "_").take(100)
+        return lastPathSegment.replace(Regex("[^a-zA-Z0-9._-]"), "_").take(50)
     }
 
     private fun encodeDisplayName(displayName: String): String {
+        val bytes = displayName.toByteArray(Charsets.UTF_8)
+        val truncatedBytes = if (bytes.size > 150) bytes.copyOf(150) else bytes
         return Base64.encodeToString(
-            displayName.take(100).toByteArray(Charsets.UTF_8),
+            truncatedBytes,
             Base64.URL_SAFE or Base64.NO_WRAP
         )
     }

@@ -48,9 +48,9 @@ abstract class BaseWidgetProvider : AppWidgetProvider() {
             WidgetDataHolder.getWidgetColors(context),
             WidgetDataHolder.getWidgetData(context)
         )
-        for (widgetId in appWidgetIds) {
-            appWidgetManager.updateAppWidget(widgetId, remoteViews)
-        }
+        try {
+            appWidgetManager.updateAppWidget(appWidgetIds, remoteViews)
+        } catch (_: Exception) {}
     }
 
     protected abstract fun getWidgetBinder(): WidgetBinder

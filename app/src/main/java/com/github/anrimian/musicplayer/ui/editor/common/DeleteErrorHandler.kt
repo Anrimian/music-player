@@ -8,11 +8,15 @@ class DeleteErrorHandler(
     activityResultCaller: ActivityResultCaller,
     onPermissionGranted: () -> Unit,
     onPermissionDenied: () -> Unit
-) : ErrorHandler(activityResultCaller, onPermissionGranted, {
-    val appComponent = Components.getAppComponent()
-    appComponent.storageFilesDataSource().clearDeleteData()
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-        || appComponent.librarySettingsInteractor().isAppConfirmDeleteDialogEnabled()) {
-        onPermissionDenied()
-    }
-})
+) : ErrorHandler(
+    activityResultCaller = activityResultCaller,
+    onPermissionGranted = onPermissionGranted,
+    onPermissionDenied = {
+        val appComponent = Components.getAppComponent()
+        appComponent.storageFilesDataSource().clearDeleteData()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+            || appComponent.librarySettingsInteractor().isAppConfirmDeleteDialogEnabled()) {
+            onPermissionDenied()
+        }
+    })
+

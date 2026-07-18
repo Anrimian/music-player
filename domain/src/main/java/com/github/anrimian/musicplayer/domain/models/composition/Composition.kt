@@ -1,26 +1,25 @@
 package com.github.anrimian.musicplayer.domain.models.composition
 
-import java.util.Date
-
 /**
  * Created on 24.10.2017.
  */
 open class Composition(
-    val id: Long,
-    val title: String,
-    val artist: String?,
-    val album: String?,
-    val duration: Long,
-    val size: Long,
-    val comment: String?,
-    val storageId: Long?,
-    val dateAdded: Date,
-    val dateModified: Date,
-    val coverModifyTime: Date,
-    val corruptionType: CorruptionType?,
-    val isFileExists: Boolean,
-    val initialSource: InitialSource
-) {
+    override val id: Long,
+    override val title: String,
+    override val artist: String?,
+    override val album: String?,
+    override val duration: Long,
+    override val size: Long,
+    override val comment: String?,
+    override val storageId: Long?,
+    override val addedTime: Long,
+    override val modifiedTime: Long,
+    override val coverModifyTime: Long,
+    override val fileStatus: LocalFileStatus,
+    override val corruptionType: CorruptionType?,
+    override val isFileExists: Boolean,
+    override val initialSource: InitialSource
+) : CompositionModel {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

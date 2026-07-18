@@ -75,7 +75,7 @@ public class AlbumViewHolder extends BaseViewHolder {
     }
 
     private void showCover() {
-        Components.getAppComponent().imageLoader().displayImage(binding.ivCover,
+        Components.INSTANCE.getAppComponent().imageLoader().displayImage(binding.ivCover,
                 album,
                 R.drawable.ic_album_placeholder);
     }

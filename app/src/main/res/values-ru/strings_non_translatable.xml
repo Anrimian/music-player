@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="privacy_policy">Политика конфединциальности</string>
+    <string name="about_app_text_write">напишите</string>
+    <string name="about_app_text_here">напишите</string>
+    <string name="about_app_text_here_link">здесь</string>
+    <string name="patchnotes">Описание обновлений</string>
+    <string name="about_app_text_crowdin" translatable="false">присоединиться к проекту на Crowdin</string>
+
+</resources>

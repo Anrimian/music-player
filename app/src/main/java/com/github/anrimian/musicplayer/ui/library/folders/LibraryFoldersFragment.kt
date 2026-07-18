@@ -18,9 +18,9 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.anrimian.fsync.models.state.file.FileSyncState
-import com.github.anrimian.musicplayer.Constants.Arguments.HIGHLIGHT_COMPOSITION_ID
-import com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG
-import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.AppConstants.Arguments.HIGHLIGHT_COMPOSITION_ID
+import com.github.anrimian.musicplayer.AppConstants.Arguments.ID_ARG
+import com.github.anrimian.musicplayer.AppConstants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentLibraryFoldersBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -37,7 +37,6 @@ import com.github.anrimian.musicplayer.domain.models.order.OrderType
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.applyFabBottomInsets
 import com.github.anrimian.musicplayer.ui.common.applyLibraryProgressViewOffset
-import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.dialogs.input.InputTextDialogFragment
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareCompositions
@@ -47,6 +46,7 @@ import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
 import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
+import com.github.anrimian.musicplayer.ui.common.menu.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.common.view.ViewUtils
 import com.github.anrimian.musicplayer.ui.editor.common.DeleteErrorHandler
@@ -57,10 +57,12 @@ import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryFrag
 import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryPresenter
 import com.github.anrimian.musicplayer.ui.library.common.order.SelectOrderDialogFragment
 import com.github.anrimian.musicplayer.ui.library.folders.adapter.MusicFileSourceAdapter
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.library.folders.volumes.LibraryVolumesFragment
+import com.github.anrimian.musicplayer.ui.playlists.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.settings.folders.ExcludedFoldersFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.applyBottomInsets
+import com.github.anrimian.musicplayer.ui.utils.args
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -89,12 +91,12 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
         private const val LAUNCHED_SEARCH_MODE = "launched_search_mode"
 
         fun newInstance(
-            folderId: Long?,
+            folderId: Long,
             highlightCompositionId: Long = 0,
             lockedSearchMode: Boolean = false,
         ) = LibraryFoldersFragment().apply {
             arguments = Bundle().apply {
-                putLong(ID_ARG, folderId ?: 0)
+                putLong(ID_ARG, folderId)
                 putLong(HIGHLIGHT_COMPOSITION_ID, highlightCompositionId)
                 putBoolean(LOCKED_SEARCH_MODE, lockedSearchMode)
             }
@@ -179,7 +181,6 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
         itemTouchHelper.attachToRecyclerView(binding.rvFileSources)
 
         binding.tvHeader.setOnClickListener { presenter.onBackPathButtonClicked() }
-        binding.ivBackToRoot.setOnClickListener { goToRootFolder() }
 
         binding.fab.setOnClickListener { presenter.onPlayAllButtonClicked() }
         ViewUtils.onLongVibrationClick(binding.fab, presenter::onChangeRandomModePressed)
@@ -241,7 +242,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
         ) { fragment -> fragment.setOnCompleteListener(presenter::onNewFileNameForPasteEntered) }
         progressDialogRunner = DialogFragmentDelayRunner(fm, Tags.PROGRESS_DIALOG_TAG)
 
-        val isSearchLaunched = requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)
+        val isSearchLaunched = args.getBoolean(LAUNCHED_SEARCH_MODE)
         showSubToolbar(requireContext(), isSearchLaunched, animate = false)
         binding.btnPaste.isEnabled = !isSearchLaunched
         binding.btnPasteInNewFolder.isEnabled = !isSearchLaunched
@@ -249,20 +250,19 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
             presenter.onSearchTextChanged(toolbar.getSearchText())
         }
 
-        if (getFolderId() != null) {
-            val slidrConfig = SlidrConfig.Builder().position(SlidrPosition.LEFT).build()
-            SlidrPanel.replace(
-                binding.contentContainer,
-                {
-                    if (requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)) {
-                        toolbar.setSearchModeEnabled(false)
-                    }
-                    toolbar.showSelectionMode(0)
-                    FragmentNavigation.from(parentFragmentManager).goBack()
-                },
-                slidrConfig
-            )
-        }
+        val slidrConfig = SlidrConfig.Builder().position(SlidrPosition.LEFT).build()
+        val fn = FragmentNavigation.from(parentFragmentManager)
+        SlidrPanel.replace(
+            binding.contentContainer,
+            {
+                if (args.getBoolean(LAUNCHED_SEARCH_MODE)) {
+                    toolbar.setSearchModeEnabled(false)
+                }
+                toolbar.showSelectionMode(0)
+                fn.goBack()
+            },
+            slidrConfig
+        )
     }
 
     override fun onStop() {
@@ -276,7 +276,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
     }
 
     override fun onFragmentResumed() {
-        val inLockedSearchMode = requireArguments().getBoolean(LOCKED_SEARCH_MODE)
+        val inLockedSearchMode = args.getBoolean(LOCKED_SEARCH_MODE)
         presenter.onFragmentDisplayed(inLockedSearchMode)
         val act = requireActivity()
         act.findViewById<AdvancedToolbar>(R.id.toolbar).setup {
@@ -285,7 +285,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
             if (inLockedSearchMode) {
                 isSearchLocked = true
             } else {
-                val searchText = if (requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)) {
+                val searchText = if (args.getBoolean(LAUNCHED_SEARCH_MODE)) {
                     configSearchText
                 } else {
                     null
@@ -295,7 +295,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
                     exitListener = { setSearchModeActive(false) },
                     text = searchText
                 )
-                if (requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)) {
+                if (args.getBoolean(LAUNCHED_SEARCH_MODE)) {
                     isSearchLocked = false
                 }
             }
@@ -314,29 +314,21 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
 
     override fun updateList(list: List<FileSource>) {
         adapter.submitList(list)
-        val highlightCompositionId = requireArguments().getLong(HIGHLIGHT_COMPOSITION_ID)
+        val highlightCompositionId = args.getLong(HIGHLIGHT_COMPOSITION_ID)
         if (highlightCompositionId != 0L) {
             highlightComposition(highlightCompositionId)
         }
     }
 
-    override fun showFolderInfo(folder: FolderInfo?) {
-        var showRootButton = false
-        if (folder != null) {
-            binding.tvHeader.text = folder.path
-            showRootButton = !folder.isParentOfParentRoot
-        }
-        binding.ivBackToRoot.isVisible = showRootButton
+    override fun showFolderInfo(folder: FolderInfo) {
+        binding.tvHeader.text = folder.path
+        binding.ivBackToRoot.isVisible = folder.level >= 2
+        binding.ivBackToRoot.setOnClickListener { goToRootFolder(folder.volumeFolderId) }
     }
 
     override fun showEmptyList() {
         binding.fab.visibility = View.GONE
-        val message = if (getFolderId() == null) {
-            R.string.compositions_on_device_not_found
-        } else {
-            R.string.no_compositions_in_folder
-        }
-        binding.progressStateView.showMessage(message, false)
+        binding.progressStateView.showMessage(R.string.no_compositions_in_folder, false)
     }
 
     override fun showEmptySearchResult() {
@@ -420,7 +412,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
         shareCompositions(this, compositions)
     }
 
-    override fun goToMusicStorageScreen(folderId: Long) {
+    override fun goToFolderScreen(folderId: Long) {
         var lockedSearchMode = toolbar.isInSearchMode()
         if (lockedSearchMode && toolbar.getSearchText().isEmpty()) {
             setSearchModeActive(false)
@@ -505,7 +497,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
     }
 
     override fun showAddedIgnoredFolderMessage(folder: IgnoredFolder) {
-        val message = getString(R.string.ignored_folder_added, folder.relativePath)
+        val message = getString(R.string.ignored_folder_added, folder.path)
         binding.listContainer.showSnackbar(
             message,
             duration = Snackbar.LENGTH_LONG,
@@ -535,13 +527,10 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
         adapter.showFileSyncStates(states)
     }
 
-    fun getFolderId(): Long? {
-        val id = requireArguments().getLong(ID_ARG)
-        return if (id == 0L) null else id
-    }
+    fun getFolderId() = args.getLong(ID_ARG)
 
     fun requestHighlightComposition(compositionId: Long) {
-        requireArguments().putLong(HIGHLIGHT_COMPOSITION_ID, compositionId)
+        args.putLong(HIGHLIGHT_COMPOSITION_ID, compositionId)
         highlightComposition(compositionId)
     }
 
@@ -553,7 +542,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
             if (position != -1) {
                 binding.rvFileSources.scrollToPosition(position)
                 binding.rvFileSources.post { adapter.highlightItem(position) }
-                requireArguments().remove(HIGHLIGHT_COMPOSITION_ID)
+                args.remove(HIGHLIGHT_COMPOSITION_ID)
             }
         }
     }
@@ -570,7 +559,7 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
     }
 
     private fun onSelectionModeChanged(enabled: Boolean) {
-        val show = enabled && !requireArguments().getBoolean(LAUNCHED_SEARCH_MODE)
+        val show = enabled && !args.getBoolean(LAUNCHED_SEARCH_MODE)
         com.github.anrimian.musicplayer.ui.utils.ViewUtils.animateVisibility(
             binding.vgFileMenu,
             if (show) View.VISIBLE else View.INVISIBLE
@@ -638,16 +627,14 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
 
     private fun setSearchModeActive(isActive: Boolean) {
         toolbar.setSearchModeEnabled(isActive)
-        requireArguments().putBoolean(LAUNCHED_SEARCH_MODE, isActive)
+        args.putBoolean(LAUNCHED_SEARCH_MODE, isActive)
         binding.btnPaste.isEnabled = !isActive
         binding.btnPasteInNewFolder.isEnabled = !isActive
-        if (getFolderId() != null) {
-            showSubToolbar(binding.btnPaste.context, isActive, true)
-        }
+        showSubToolbar(binding.btnPaste.context, isActive, true)
     }
 
     private fun showSubToolbar(context: Context, isSearchActive: Boolean, animate: Boolean) {
-        val show = getFolderId() != null && !isSearchActive
+        val show = !isSearchActive
 
         val visibility = if (show) View.VISIBLE else View.GONE
 
@@ -704,8 +691,9 @@ class LibraryFoldersFragment : BaseLibraryFragment(), LibraryFoldersView,
         )
     }
 
-    private fun goToRootFolder() {
-        FragmentNavigation.from(parentFragmentManager).newRootFragment(newInstance(null))
+    private fun goToRootFolder(rootFolderId: Long) {
+        FragmentNavigation.from(parentFragmentManager)
+            .newRootFragmentStack(listOf(LibraryVolumesFragment(), newInstance(rootFolderId)))
     }
 
 }

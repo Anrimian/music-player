@@ -6,7 +6,7 @@ import com.github.anrimian.musicplayer.data.storage.source.CompositionSourceEdit
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
-import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileTagInfo
 import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.domain.models.scanner.Idle
 import com.github.anrimian.musicplayer.domain.models.scanner.Running
@@ -18,7 +18,6 @@ import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.FileNotFoundException
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class FileScanner(
@@ -49,12 +48,14 @@ class FileScanner(
     fun getStateObservable(): Observable<FileScannerState> = stateSubject.distinctUntilChanged()
 
     private fun runFileScanner() {
-        val lastCompleteScanTime = if (
-            stateRepository.lastFileScannerVersion == stateRepository.currentFileScannerVersion
-        ) 0L else stateRepository.lastCompleteScanTime
+        val isScannerVersionMatches = stateRepository.lastFileScannerVersion == stateRepository.currentFileScannerVersion
+        val lastCompleteScanTime = if (isScannerVersionMatches) 0L else stateRepository.lastCompleteScanTime
         compositionsDao.selectNextCompositionsToScan(lastCompleteScanTime, FILES_TO_SCAN_COUNT)
             .retry(READ_RETRY_TIMES)
-            .flatMap(this::scanCompositionFiles)
+            .flatMap { compositions -> scanCompositionFiles(
+                compositions = compositions,
+                updateModifyTime = isScannerVersionMatches
+            ) }
             .flatMapMaybe { compositions ->
                 if (compositions.size < FILES_TO_SCAN_COUNT) {
                     onScanCompleted()
@@ -70,7 +71,10 @@ class FileScanner(
             .subscribe()
     }
 
-    private fun scanCompositionFiles(compositions: List<FullComposition>): Single<List<FullComposition>> {
+    private fun scanCompositionFiles(
+        compositions: List<FullComposition>,
+        updateModifyTime: Boolean
+    ): Single<List<FullComposition>> {
         return Observable.fromIterable(compositions)
             .flatMapMaybe { composition ->
                 getCompositionSource(composition)
@@ -78,9 +82,13 @@ class FileScanner(
                     .flatMap(this::getAudioFileInfo)
                     .map { info -> Pair(composition, info) }
             }
-            .collect(::ArrayList, ArrayList<Pair<FullComposition, AudioFileInfo>>::add)
+            .collect(::ArrayList, ArrayList<Pair<FullComposition, AudioFileTagInfo>>::add)
             .doOnSuccess { scannedCompositions ->
-                compositionsDao.updateCompositionsByFileInfo(scannedCompositions, compositions)
+                compositionsDao.updateCompositionsByFileInfo(
+                    scannedCompositions,
+                    compositions,
+                    updateModifyTime
+                )
             }
             .map { compositions }
             .doOnError(this::processError)
@@ -100,10 +108,10 @@ class FileScanner(
             .doOnError(this::processError)
             .defaultIfEmpty(false)
             .onErrorReturnItem(false)
-            .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition, Date()) }
+            .doOnSuccess { compositionsDao.setCompositionLastFileScanTime(composition, System.currentTimeMillis()) }
     }
 
-    private fun getAudioFileInfo(source: CompositionContentSource): Maybe<AudioFileInfo> {
+    private fun getAudioFileInfo(source: CompositionContentSource): Maybe<AudioFileTagInfo> {
         return compositionSourceEditor.getAudioFileInfo(source)
             .timeout(READ_FILE_TIMEOUT_SECONDS, TimeUnit.SECONDS, scheduler)
             .retry(READ_RETRY_TIMES)

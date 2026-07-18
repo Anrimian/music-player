@@ -3,12 +3,13 @@ package com.github.anrimian.musicplayer.ui.library.common.compositions
 import com.github.anrimian.fsync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlaylistsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.ListUtils
@@ -26,7 +27,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
     private val displaySettingsInteractor: DisplaySettingsInteractor,
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     private val playerInteractor: LibraryPlayerInteractor,
-    playListsInteractor: PlayListsInteractor,
+    playListsInteractor: PlaylistsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler,
 ) : BaseLibraryPresenter<V>(playerInteractor, playListsInteractor, uiScheduler, errorParser) {
@@ -36,10 +37,10 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
 
     private var compositions: List<C> = ArrayList()
     private val selectedCompositions = LinkedHashSet<C>()
-    private val compositionsForPlayList: MutableList<Composition> = LinkedList()
+    private val compositionsForPlaylist: MutableList<Composition> = LinkedList()
     private val compositionsToDelete: MutableList<Composition> = LinkedList()
 
-    private var currentComposition: Composition? = null
+    private var currentComposition: CompositionModel? = null
 
     //we can replace it with subj
     private var searchText: String? = null
@@ -139,19 +140,19 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
     }
 
     fun onAddToPlayListButtonClicked(composition: Composition) {
-        compositionsForPlayList.clear()
-        compositionsForPlayList.add(composition)
+        compositionsForPlaylist.clear()
+        compositionsForPlaylist.add(composition)
         viewState.showSelectPlayListDialog()
     }
 
     fun onAddSelectedCompositionToPlayListClicked() {
-        compositionsForPlayList.clear()
-        compositionsForPlayList.addAll(selectedCompositions)
+        compositionsForPlaylist.clear()
+        compositionsForPlaylist.addAll(selectedCompositions)
         viewState.showSelectPlayListDialog()
     }
 
-    fun onPlayListToAddingSelected(playList: PlayList) {
-        performAddToPlaylist(compositionsForPlayList, playList, ::onAddingToPlayListCompleted)
+    fun onPlayListToAddingSelected(playList: Playlist) {
+        performAddToPlaylist(compositionsForPlaylist, playList, ::onAddingToPlayListCompleted)
     }
 
     fun onExitSelectionModeClicked() {
@@ -232,7 +233,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
     }
 
     private fun onAddingToPlayListCompleted() {
-        compositionsForPlayList.clear()
+        compositionsForPlaylist.clear()
         if (selectedCompositions.isNotEmpty()) {
             closeSelectionMode()
         }

@@ -1,4 +1,3 @@
-package com.github.anrimian.musicplayer.domain.models.exceptions;
+package com.github.anrimian.musicplayer.domain.models.exceptions
 
-public class StorageTimeoutException extends RuntimeException {
-}
+class StorageTimeoutException : RuntimeException()

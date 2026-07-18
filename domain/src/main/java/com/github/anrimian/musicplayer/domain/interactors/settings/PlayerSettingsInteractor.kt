@@ -28,6 +28,19 @@ class PlayerSettingsInteractor(
         settingsRepository.isPauseOnZeroVolumeLevelEnabled = enabled
     }
 
+    fun isPauseOnAudioDeviceRemoveEnabled() = settingsRepository.isPauseOnAudioDeviceRemoveEnabled
+
+    fun setPauseOnAudioDeviceRemoveEnabled(enabled: Boolean) {
+        settingsRepository.isPauseOnAudioDeviceRemoveEnabled = enabled
+    }
+
+    fun isSkipSilenceEnabled() = settingsRepository.isSkipSilenceEnabled
+
+    fun setSkipSilenceEnabled(enabled: Boolean) {
+        settingsRepository.isSkipSilenceEnabled = enabled
+        mediaPlayerController.setSkipSilenceEnabled(enabled)
+    }
+
     fun getSoundBalance(): SoundBalance = settingsRepository.soundBalance
 
     fun setSoundBalance(soundBalance: SoundBalance) {

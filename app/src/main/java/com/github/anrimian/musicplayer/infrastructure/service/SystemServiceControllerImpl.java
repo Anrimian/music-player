@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import com.github.anrimian.musicplayer.Constants;
+import com.github.anrimian.musicplayer.AppConstants;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.data.utils.Permissions;
 import com.github.anrimian.musicplayer.di.Components;
@@ -52,7 +52,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
         Intent intent = new Intent(context, MusicService.class);
         intent.putExtra(MusicService.START_FOREGROUND_SIGNAL, true);
-        intent.putExtra(MusicService.REQUEST_CODE, Constants.Actions.PLAY);
+        intent.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.PLAY);
         if (playerType != null) {
             intent.putExtra(MusicService.PLAYER_TYPE, 1);
         }
@@ -91,7 +91,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     private static void checkPermissionsAndStartServiceSafe(Context context, Intent intent) {
         if (!Permissions.hasFilePermission(context)) {
-            Components.getAppComponent()
+            Components.INSTANCE.getAppComponent()
                     .notificationsDisplayer()
                     .showErrorNotification(R.string.no_file_permission);
             return;
@@ -101,7 +101,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
 
     private static void checkPermissionsAndStartServiceFromBg(Context context, Intent intent) {
         if (!Permissions.hasFilePermission(context)) {
-            Components.getAppComponent()
+            Components.INSTANCE.getAppComponent()
                     .notificationsDisplayer()
                     .showErrorNotification(R.string.no_file_permission);
             return;
@@ -135,7 +135,7 @@ public class SystemServiceControllerImpl implements SystemServiceController {
     private static boolean processServiceStartError(Context context, Exception e) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
                 && e instanceof ForegroundServiceStartNotAllowedException) {
-            AppComponent appComponent = Components.getAppComponent();
+            AppComponent appComponent = Components.INSTANCE.getAppComponent();
             appComponent.analytics().processNonFatalError(e);
             appComponent.notificationsDisplayer().showErrorNotification(R.string.app_has_no_system_permission_to_start);
             //check toast on this api version(S)
@@ -165,15 +165,15 @@ public class SystemServiceControllerImpl implements SystemServiceController {
             MusicService service = binder.getService();
             try {
                 ContextCompat.startForegroundService(context, intent);
+                service.startForeground();
             } catch (Exception e) {
                 if (processServiceStartError(context, e)) {
-                    context.unbindService(this);
                     return;
                 }
                 throw e;
+            } finally {
+                context.unbindService(this);
             }
-            service.startForeground();
-            context.unbindService(this);
         }
 
         @Override

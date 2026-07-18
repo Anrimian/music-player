@@ -3,15 +3,20 @@ package com.github.anrimian.musicplayer.domain.repositories
 import com.github.anrimian.musicplayer.domain.models.albums.Album
 import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition
 import com.github.anrimian.musicplayer.domain.models.artist.Artist
+import com.github.anrimian.musicplayer.domain.models.composition.AudioFileInfo
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
+import com.github.anrimian.musicplayer.domain.models.folders.AbstractDirectory
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderInfo
 import com.github.anrimian.musicplayer.domain.models.folders.IgnoredFolder
+import com.github.anrimian.musicplayer.domain.models.folders.Volume
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
+import com.github.anrimian.musicplayer.domain.models.search.CompositionLookup
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
@@ -38,7 +43,15 @@ interface LibraryRepository {
 
     fun deleteComposition(composition: Composition): Single<DeletedComposition>
 
-    fun deleteCompositions(compositions: List<Composition>): Single<List<DeletedComposition>>
+    fun deleteCompositions(compositions: List<CompositionModel>): Single<List<DeletedComposition>>
+
+    fun getMissingCompositionsCountObservable(): Observable<Int>
+
+    fun getMissingAudioFilesObservable(): Observable<List<AudioFileInfo>>
+
+    fun deleteMissingCompositions(): Single<List<DeletedComposition>>
+
+    fun getCompositionKeys(lookup: CompositionLookup): Single<List<FileKey>>
 
     //folders
     fun getFoldersInFolder(
@@ -47,6 +60,8 @@ interface LibraryRepository {
     ): Observable<List<FileSource>>
 
     fun getFolderObservable(folderId: Long): Observable<FolderInfo>
+
+    fun getVolumes(): Observable<List<Volume>>
 
     fun getAllCompositionsInFolder(folderId: Long?): Single<List<Composition>>
 
@@ -59,8 +74,6 @@ interface LibraryRepository {
     fun getAllParentFolders(folderId: Long?): Single<List<Long>>
 
     fun getAllParentFoldersForComposition(compositionId: Long): Single<List<Long>>
-
-    fun getFolderNamesInPath(path: String?): Single<List<String>>
 
     //artists
     fun getArtistsObservable(searchText: String?): Observable<List<Artist>>
@@ -116,14 +129,12 @@ interface LibraryRepository {
     fun getGenreObservable(genreId: Long): Observable<Genre>
 
     //ignored folders
-    fun addFolderToIgnore(folder: FolderFileSource): Single<Pair<IgnoredFolder, List<FileKey>>>
+    fun addFolderToIgnore(dir: AbstractDirectory): Single<Pair<IgnoredFolder, List<FileKey>>>
 
     fun addFolderToIgnore(folder: IgnoredFolder): Single<List<FileKey>>
 
     fun getIgnoredFoldersObservable(): Observable<List<IgnoredFolder>>
 
-    fun deleteIgnoredFolder(folder: IgnoredFolder): Single<List<FileKey>>
-
-    fun deleteIgnoredFolder(folderRelativePath: String): List<FileKey>
+    fun deleteIgnoredFolder(path: String): Single<List<FileKey>>
 
 }

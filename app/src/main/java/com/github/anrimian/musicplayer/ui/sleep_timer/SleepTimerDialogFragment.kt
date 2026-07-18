@@ -11,7 +11,7 @@ import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimer
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerState.DISABLED
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerState.ENABLED
 import com.github.anrimian.musicplayer.domain.interactors.sleep_timer.SleepTimerState.PAUSED
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
+import com.github.anrimian.musicplayer.ui.common.format.TimeFormatUtils
 import com.github.anrimian.musicplayer.ui.sleep_timer.view.TimePickerWrapper
 import moxy.MvpAppCompatDialogFragment
 import moxy.ktx.moxyPresenter
@@ -77,7 +77,7 @@ class SleepTimerDialogFragment : MvpAppCompatDialogFragment(), SleepTimerView {
     }
 
     override fun showRemainingTimeMillis(millis: Long) {
-        binding.tvRemainingTime.text = FormatUtils.formatMilliseconds(millis, false)
+        binding.tvRemainingTime.text = TimeFormatUtils.formatMilliseconds(millis, false)
     }
 
     private fun setPickerVisibility(visibility: Int) {

@@ -8,14 +8,24 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
+import androidx.annotation.Nullable;
+
 import com.github.anrimian.musicplayer.data.controllers.music.equalizer.EqualizerType;
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper;
+import com.github.anrimian.musicplayer.domain.Constants;
+import com.github.anrimian.musicplayer.domain.models.menu.AppMenu;
+import com.github.anrimian.musicplayer.domain.models.menu.MenuConfig;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.domain.models.player.MediaPlayers;
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode;
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository;
+import com.github.anrimian.musicplayer.domain.utils.functions.Opt;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
@@ -52,6 +62,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String DECREASE_VOLUME_ON_AUDIO_FOCUS_LOSS = "decrease_volume_on_audio_focus_loss";
     private static final String PAUSE_ON_AUDIO_FOCUS_LOSS = "pause_on_audio_focus_loss";
     private static final String PAUSE_ON_ZERO_VOLUME_LEVEL = "pause_on_zero_volume_level";
+    private static final String PAUSE_ON_AUDIO_DEVICE_REMOVE = "pause_on_audio_device_remove";
     private static final String SELECTED_EQUALIZER_TYPE = "selected_equalizer_type";
     private static final String KEEP_NOTIFICATION_TIME = "keep_notification_time";
     private static final String VOLUME_LEFT = "volume_left";
@@ -66,6 +77,12 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private static final String ENABLED_MEDIA_PLAYERS = "enabled_media_players";
 
     private static final String BLUETOOTH_CONNECT_AUTO_PLAY_DELAY = "bluetooth_connect_auto_play_delay";
+    private static final String BLUETOOTH_PROCESS_UNSUPPORTED_EVENT = "bluetooth_process_unsupported_event";
+    private static final String IGNORE_PLAY_AFTER_CONNECTION = "ignore_play_after_connection";
+    private static final String BLUETOOTH_AUTO_PLAY = "bluetooth_auto_play";
+
+    private static final String ALLOWED_FILE_EXTENSIONS = "allowed_file_extensions";
+    private static final String IS_SKIP_SILENCE_ENABLED = "is_skip_silence_enabled";
 
     private final BehaviorSubject<Integer> repeatModeSubject = BehaviorSubject.create();
     private final BehaviorSubject<Boolean> randomModeSubject = BehaviorSubject.create();
@@ -88,6 +105,10 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private final BehaviorSubject<Long> audioFileMinDurationSubject = BehaviorSubject.create();
 
     private final BehaviorSubject<Integer> externalPlayerRepeatModeSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Set<String>> allowedFileExtensionsSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> skipSilenceEnabledSubject = BehaviorSubject.create();
+
+    private final Map<AppMenu, BehaviorSubject<Opt<MenuConfig>>> menuConfigSubjects = new ConcurrentHashMap<>();
 
     private final SharedPreferencesHelper preferences;
 
@@ -324,6 +345,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
+    public boolean isPauseOnAudioDeviceRemoveEnabled() {
+        return preferences.getBoolean(PAUSE_ON_AUDIO_DEVICE_REMOVE, true);
+    }
+
+    @Override
+    public void setPauseOnAudioDeviceRemoveEnabled(boolean enabled) {
+        preferences.putBoolean(PAUSE_ON_AUDIO_DEVICE_REMOVE, enabled);
+    }
+
+    @Override
     public void setExternalPlayerRepeatMode(int mode) {
         preferences.putInt(EXTERNAL_PLAYER_REPEAT_MODE, mode);
         externalPlayerRepeatModeSubject.onNext(mode);
@@ -520,16 +551,19 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public void setShowAllAudioFilesEnabled(boolean enabled) {
+    public boolean setShowAllAudioFilesEnabled(boolean enabled) {
         if (enabled != isShowAllAudioFilesEnabled()) {
             preferences.putBoolean(SHOW_ALL_AUDIO_FILES, enabled);
             showAllAudioFilesSubject.onNext(enabled);
+            return true;
         }
+        return false;
     }
 
     @Override
     public boolean isShowAllAudioFilesEnabled() {
-        return preferences.getBoolean(SHOW_ALL_AUDIO_FILES, true);
+//        return preferences.getBoolean(SHOW_ALL_AUDIO_FILES, true);
+        return true; // observe feedback, if no negative - remove this logic
     }
 
     @Override
@@ -586,6 +620,86 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         preferences.putLong(BLUETOOTH_CONNECT_AUTO_PLAY_DELAY, millis);
     }
 
+    @Override
+    public boolean isProcessUnsupportedBluetoothEventEnabled() {
+        return preferences.getBoolean(BLUETOOTH_PROCESS_UNSUPPORTED_EVENT, false);
+    }
+
+    @Override
+    public void setProcessUnsupportedBluetoothEventEnabled(boolean enabled) {
+        preferences.putBoolean(BLUETOOTH_PROCESS_UNSUPPORTED_EVENT, enabled);
+    }
+
+    @Override
+    public boolean isIgnorePlayAfterConnectionEnabled() {
+        return preferences.getBoolean(IGNORE_PLAY_AFTER_CONNECTION, false);
+    }
+
+    @Override
+    public void setIgnorePlayAfterConnectionEnabled(boolean enabled) {
+        preferences.putBoolean(IGNORE_PLAY_AFTER_CONNECTION, enabled);
+    }
+
+    @Override
+    public boolean isBluetoothAutoPlayEnabled() {
+        return preferences.getBoolean(BLUETOOTH_AUTO_PLAY, false);
+    }
+
+    @Override
+    public void setBluetoothAutoPlayEnabled(boolean enabled) {
+        preferences.putBoolean(BLUETOOTH_AUTO_PLAY, enabled);
+    }
+
+    @Override
+    public Set<String> getAllowedFileExtensions() {
+        return preferences.getStringSet(ALLOWED_FILE_EXTENSIONS, Constants.DEFAULT_REMOTE_EXTENSIONS);
+    }
+
+    @Override
+    public void setAllowedFileExtensions(Set<String> extensions) {
+        if (extensions != getAllowedFileExtensions()) {
+            preferences.putStringSet(ALLOWED_FILE_EXTENSIONS, extensions);
+            allowedFileExtensionsSubject.onNext(extensions);
+        }
+    }
+
+    @Override
+    public Observable<Set<String>> getAllowedFileExtensionsObservable() {
+        return withDefaultValue(allowedFileExtensionsSubject, this::getAllowedFileExtensions);
+    }
+
+    @Override
+    public void setMenuConfig(AppMenu appMenu, @Nullable MenuConfig config) {
+        String serialized = MenuConfigSerializer.INSTANCE.serialize(config);
+        preferences.putString(appMenu.getKey(), serialized);
+        BehaviorSubject<Opt<MenuConfig>> subject = menuConfigSubjects.get(appMenu);
+        if (subject != null) {
+            subject.onNext(new Opt<>(config));
+        }
+    }
+
+    @Override
+    @Nullable
+    public MenuConfig getMenuConfig(AppMenu appMenu) {
+        String serialized = preferences.getString(appMenu.getKey());
+        return MenuConfigSerializer.INSTANCE.deserialize(serialized);
+    }
+
+    @Override
+    public Observable<Opt<MenuConfig>> getMenuConfigObservable(AppMenu appMenu) {
+        return withDefaultValue(getMenuSubject(appMenu), () -> new Opt<>(getMenuConfig(appMenu)))
+                .distinctUntilChanged();
+    }
+
+    private BehaviorSubject<Opt<MenuConfig>> getMenuSubject(AppMenu appMenu) {
+        BehaviorSubject<Opt<MenuConfig>> subject = menuConfigSubjects.get(appMenu);
+        if (subject == null) {
+            subject = BehaviorSubject.create();
+            menuConfigSubjects.put(appMenu, subject);
+        }
+        return subject;
+    }
+
     private Order orderFromInt(int order) {
         boolean reversed = false;
         if (order % 2 == 0) {
@@ -601,5 +715,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
             id++;
         }
         return id;
+    }
+
+    @Override
+    public void setSkipSilenceEnabled(boolean enabled) {
+        if (enabled != isSkipSilenceEnabled()) {
+            preferences.putBoolean(IS_SKIP_SILENCE_ENABLED, enabled);
+            skipSilenceEnabledSubject.onNext(enabled);
+        }
+    }
+
+    @Override
+    public boolean isSkipSilenceEnabled() {
+        return preferences.getBoolean(IS_SKIP_SILENCE_ENABLED, false);
+    }
+
+    @Override
+    public Observable<Boolean> getSkipSilenceEnabledObservable() {
+        return withDefaultValue(skipSilenceEnabledSubject, this::isSkipSilenceEnabled)
+                .distinctUntilChanged();
     }
 }

@@ -2,24 +2,23 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.storage.playli
 
 import androidx.core.util.Pair
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
-import com.github.anrimian.musicplayer.data.database.dao.play_list.PlayListsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.dao.playlist.PlaylistsDaoWrapper
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListFile
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlayList
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayList
-import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlayListsProvider
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlaylist
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlaylist
+import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlaylistsProvider
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.util.*
 
 class StoragePlaylistsAnalyzerTest {
 
     private val compositionsDao: CompositionsDaoWrapper = mock()
-    private val playListsDao: PlayListsDaoWrapper = mock()
-    private val playlistsStorageProvider: StoragePlayListsProvider = mock()
+    private val playListsDao: PlaylistsDaoWrapper = mock()
+    private val playlistsStorageProvider: StoragePlaylistsProvider = mock()
     private val playlistsPlaylistFilesStorage: PlaylistFilesStorage = mock()
 
     private val analyzer = StoragePlaylistsAnalyzer(
@@ -31,11 +30,11 @@ class StoragePlaylistsAnalyzerTest {
 
     @Test
     fun `copy new playlist from storage to db test`() {
-        whenever(playListsDao.allAsStoragePlayLists).doReturn(emptyList())
-        val storagePlayList = mock<StoragePlayList>()
+        whenever(playListsDao.getAllAsStoragePlayLists()).doReturn(emptyList())
+        val storagePlayList = mock<StoragePlaylist>()
         val storagePlaylists = mapOf("0", storagePlayList)
 
-        val newDbPlaylists = ArrayList<StoragePlayList>()
+        val newDbPlaylists = ArrayList<StoragePlaylist>()
         analyzer.analyzeStoragePlayListsData(storagePlaylists, emptyList(), newDbPlaylists)
 
         assertEquals(1, newDbPlaylists.size)
@@ -44,10 +43,10 @@ class StoragePlaylistsAnalyzerTest {
 
     @Test
     fun `copy playlist from db to cache test`() {
-        val storagePlayList = mock<AppPlayList> { on { name } doReturn "1" }
+        val storagePlayList = mock<AppPlaylist> { on { name } doReturn "1" }
 
         val newDbPlaylists = ArrayList<PlayListFile>()
-        val newCachePlaylists = ArrayList<AppPlayList>()
+        val newCachePlaylists = ArrayList<AppPlaylist>()
         analyzer.analyzeCachedPlayListsData(
             listOf(storagePlayList),
             emptyList(),
@@ -66,7 +65,7 @@ class StoragePlaylistsAnalyzerTest {
         val filePlayList = mock<PlayListFile> { on { name } doReturn "1" }
 
         val newDbPlaylists = ArrayList<PlayListFile>()
-        val newCachePlaylists = ArrayList<AppPlayList>()
+        val newCachePlaylists = ArrayList<AppPlaylist>()
         analyzer.analyzeCachedPlayListsData(
             emptyList(),
             listOf(filePlayList),
@@ -85,14 +84,14 @@ class StoragePlaylistsAnalyzerTest {
         val testName = "1"
         val filePlayList = mock<PlayListFile> {
             on { name } doReturn testName
-            on { modifyDate } doReturn Date(2L)
+            on { modifyDate } doReturn 2L
         }
-        val dbPlayList = mock<AppPlayList> {
+        val dbPlayList = mock<AppPlaylist> {
             on { name } doReturn testName
-            on { dateModified } doReturn Date(1L)
+            on { modifiedTime } doReturn 1L
         }
 
-        val updateDbPlaylists = ArrayList<Pair<AppPlayList, PlayListFile>>()
+        val updateDbPlaylists = ArrayList<Pair<AppPlaylist, PlayListFile>>()
         analyzer.analyzeCachedPlayListsData(
             listOf(dbPlayList),
             listOf(filePlayList),
@@ -110,16 +109,16 @@ class StoragePlaylistsAnalyzerTest {
         val testName = "1"
         val filePlayList = mock<PlayListFile> {
             on { name } doReturn testName
-            on { modifyDate } doReturn Date(1L)
+            on { modifyDate } doReturn 1L
             on { entries } doReturn listOf(mock())
         }
-        val dbPlayList = mock<AppPlayList> {
+        val dbPlayList = mock<AppPlaylist> {
             on { name } doReturn testName
-            on { dateModified } doReturn Date(1L)
+            on { modifiedTime } doReturn 1L
             on { compositionsCount } doReturn 0
         }
 
-        val updateDbPlaylists = ArrayList<Pair<AppPlayList, PlayListFile>>()
+        val updateDbPlaylists = ArrayList<Pair<AppPlaylist, PlayListFile>>()
         analyzer.analyzeCachedPlayListsData(
             listOf(dbPlayList),
             listOf(filePlayList),

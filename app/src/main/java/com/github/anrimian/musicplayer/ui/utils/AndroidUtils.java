@@ -15,10 +15,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.DeadSystemException;
 import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -42,7 +42,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.content.ContextCompat;
@@ -93,9 +92,15 @@ public class AndroidUtils {
     }
 
     public static boolean isKeyboardWasShown(View view) {
-        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            return imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        try {
+            InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                return imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        } catch (RuntimeException e) {
+            if (!isDeadSystemException(e)) {
+                throw e;
+            }
         }
         return false;
     }
@@ -108,10 +113,16 @@ public class AndroidUtils {
     }
 
     public static void hideKeyboard(View view) {
-        InputMethodManager imm = (InputMethodManager) view.getContext()
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null && imm.isActive()) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        try {
+            InputMethodManager imm = (InputMethodManager) view.getContext()
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null && imm.isActive()) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        } catch (RuntimeException e) {
+            if (!isDeadSystemException(e)) {
+                throw e;
+            }
         }
     }
 
@@ -239,25 +250,6 @@ public class AndroidUtils {
         imageView.setTag(null);
     }
 
-    public static void setAnimatedVectorDrawable(ImageView imageView, @DrawableRes int drawableRes) {
-        setAnimatedVectorDrawable(imageView, drawableRes, true);
-    }
-
-    public static void setAnimatedVectorDrawable(ImageView imageView,
-                                                 @DrawableRes int drawableRes,
-                                                 boolean animate) {
-        Drawable drawable = AppCompatResources.getDrawable(imageView.getContext(), drawableRes);
-        Integer tag = (Integer) imageView.getTag();
-        if (tag != null && tag == drawableRes) {
-            return;
-        }
-        imageView.setTag(drawableRes);
-        imageView.setImageDrawable(drawable);
-        if (animate && tag != null && drawable instanceof Animatable) {
-            ((Animatable) drawable).start();
-        }
-    }
-
     public static void animateItemDrawableCorners(float from,
                                                   float to,
                                                   int duration,
@@ -298,6 +290,20 @@ public class AndroidUtils {
     public static boolean isLaunchedFromHistory(Activity activity) {
         Intent intent = activity.getIntent();
         return intent != null && (intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0;
+    }
+
+    public static boolean isDeadSystemException(Throwable e) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return false;
+        }
+        Throwable cause = e;
+        while (cause != null) {
+            if (cause instanceof DeadSystemException) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
 }

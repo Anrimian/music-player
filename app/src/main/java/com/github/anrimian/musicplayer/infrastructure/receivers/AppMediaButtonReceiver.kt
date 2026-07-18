@@ -16,10 +16,7 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
         if (intent == null
             || intent.action != Intent.ACTION_MEDIA_BUTTON
             || !intent.hasExtra(Intent.EXTRA_KEY_EVENT)) {
-//            handleUnsupportedAction(context) //tmp disabled, observe android auto false-positive play
-            //observation: resume button when process is stopped can be broken. Add setting(enable by default)
-            // "Consider unsupported actions as play-pause command"
-            // "Can cause misbehavior on some devices, disable if playback is started randomly"
+            handleUnsupportedAction(context)
             return
         }
         val keyEvent = intent.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)
@@ -27,7 +24,7 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
             handleExternalAction(context, keyEvent, intent)
             return
         }
-        //process to media browser service
+        // process to media browser service
         super.onReceive(context, intent)
     }
 
@@ -36,14 +33,18 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
      */
     //add option in settings to disable it?
     private fun handleUnsupportedAction(context: Context) {
+        Components.checkInitialization(context)
+        val appComponent = Components.getAppComponent()
+        if (!appComponent.settingsRepository().isProcessUnsupportedBluetoothEventEnabled) {
+            return
+        }
+
         val currentTime = System.currentTimeMillis()
         if (lastUnsupportedEventTime + UNSUPPORTED_EVENT_PROCESS_WINDOW_MILLIS > currentTime) {
             return
         }
         lastUnsupportedEventTime = currentTime
 
-        Components.checkInitialization(context)
-        val appComponent = Components.getAppComponent()
         if (!Permissions.hasFilePermission(context)) {
             appComponent.notificationsDisplayer().showErrorNotification(R.string.no_file_permission)
             return
@@ -61,11 +62,19 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
             appComponent.notificationsDisplayer().showErrorNotification(R.string.no_file_permission)
             return
         }
+        if (BluetoothConnectionReceiver.shouldIgnorePlayEvent()) {
+            return
+        }
 
         val libraryPlayerInteractor = appComponent.libraryPlayerInteractor()
         val playerInteractor = appComponent.playerInteractor()
         when (keyEvent.keyCode) {
-            KeyEvent.KEYCODE_MEDIA_PLAY -> AppAndroidUtils.playPause(context, playerInteractor)
+            KeyEvent.KEYCODE_MEDIA_PLAY,
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                if (keyEvent.action == KeyEvent.ACTION_UP) {
+                    AppAndroidUtils.playPause(context, playerInteractor)
+                }
+            }
             KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
                 if (keyEvent.action == KeyEvent.ACTION_UP) {
                     libraryPlayerInteractor.skipToPrevious()
@@ -77,7 +86,11 @@ class AppMediaButtonReceiver: MediaButtonReceiver() {
                 }
             }
             KeyEvent.KEYCODE_MEDIA_PAUSE,
-            KeyEvent.KEYCODE_MEDIA_STOP -> AppAndroidUtils.playPause(context, playerInteractor)
+            KeyEvent.KEYCODE_MEDIA_STOP -> {
+                if (keyEvent.action == KeyEvent.ACTION_UP) {
+                    AppAndroidUtils.playPause(context, playerInteractor)
+                }
+            }
             KeyEvent.KEYCODE_MEDIA_STEP_FORWARD,
             KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> playerInteractor.fastSeekForward().subscribe()
             KeyEvent.KEYCODE_MEDIA_STEP_BACKWARD,

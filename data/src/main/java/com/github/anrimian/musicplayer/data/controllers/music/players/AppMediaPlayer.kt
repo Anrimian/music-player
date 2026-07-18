@@ -34,6 +34,8 @@ interface AppMediaPlayer {
 
     fun setPlaybackSpeed(speed: Float)
 
+    fun setSkipSilenceEnabled(enabled: Boolean)
+
     fun getTrackPositionObservable(): Observable<Long>
 
     fun getPlayerEventsObservable(): Observable<MediaPlayerEvent>

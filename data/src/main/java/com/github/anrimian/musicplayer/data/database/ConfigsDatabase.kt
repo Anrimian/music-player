@@ -9,7 +9,7 @@ import com.github.anrimian.musicplayer.data.database.entities.folder.IgnoredFold
 
 @Database(
     entities = [ IgnoredFolderEntity::class ],
-    version = 1
+    version = 2
 )
 @TypeConverters(DateConverter::class)
 abstract class ConfigsDatabase: RoomDatabase() {

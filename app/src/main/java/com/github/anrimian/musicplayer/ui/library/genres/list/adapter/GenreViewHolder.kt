@@ -8,6 +8,7 @@ import com.github.anrimian.musicplayer.databinding.ItemGenreBinding
 import com.github.anrimian.musicplayer.domain.Payloads
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
+import com.github.anrimian.musicplayer.ui.common.format.TimeFormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder
 import com.github.anrimian.musicplayer.ui.common.format.wrappers.ItemBackgroundWrapper
 import com.github.anrimian.musicplayer.ui.utils.views.recycler_view.SelectableViewHolder
@@ -104,7 +105,7 @@ class GenreViewHolder(
         sb.append(FormatUtils.formatCompositionsCount(getContext(), genre.compositionsCount))
         val totalDuration = genre.totalDuration
         if (totalDuration != 0L) {
-            sb.append(FormatUtils.formatMilliseconds(totalDuration))
+            sb.append(TimeFormatUtils.formatMilliseconds(totalDuration))
         }
         binding.tvAdditionalInfo.text = sb
     }

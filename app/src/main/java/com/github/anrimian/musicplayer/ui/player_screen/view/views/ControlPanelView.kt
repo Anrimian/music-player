@@ -19,6 +19,7 @@ import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
 import com.github.anrimian.musicplayer.ui.common.compat.CompatUtils
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
+import com.github.anrimian.musicplayer.ui.common.format.TimeFormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.getVolumeIcon
 import com.github.anrimian.musicplayer.ui.common.format.showFileSyncState
 import com.github.anrimian.musicplayer.ui.common.view.onRewindHold
@@ -37,6 +38,7 @@ import com.github.anrimian.musicplayer.ui.utils.views.delegate.ReverseDelegate
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.SlideDelegate
 import com.github.anrimian.musicplayer.ui.utils.views.delegate.VisibilityDelegate
 import com.github.anrimian.musicplayer.ui.utils.views.seek_bar.SeekBarViewWrapper
+import com.github.anrimian.utils.setAnimatedVectorDrawable
 
 class ControlPanelView @JvmOverloads constructor(
     context: Context,
@@ -166,7 +168,7 @@ class ControlPanelView @JvmOverloads constructor(
 
     fun showTrackState(position: Long, duration: Long) {
         seekBarViewWrapper.setProgress(position, duration)
-        val formattedTime = FormatUtils.formatMilliseconds(position)
+        val formattedTime = TimeFormatUtils.formatMilliseconds(position)
         binding.sbTrackState.contentDescription = getString(
             R.string.position_template,
             formattedTime
@@ -180,11 +182,11 @@ class ControlPanelView @JvmOverloads constructor(
         onPlayClick: OnClickListener,
     ) {
         if (isPlaying) {
-            AndroidUtils.setAnimatedVectorDrawable(binding.ivPlayPause, R.drawable.anim_play_to_pause)
+            binding.ivPlayPause.setAnimatedVectorDrawable(R.drawable.anim_play_to_pause)
             binding.ivPlayPause.contentDescription = getString(R.string.pause)
             binding.ivPlayPause.setOnClickListener(onStopClick)
         } else {
-            AndroidUtils.setAnimatedVectorDrawable(binding.ivPlayPause, R.drawable.anim_pause_to_play)
+            binding.ivPlayPause.setAnimatedVectorDrawable(R.drawable.anim_pause_to_play)
             binding.ivPlayPause.contentDescription = getString(R.string.play)
             binding.ivPlayPause.setOnClickListener(onPlayClick)
         }
@@ -206,8 +208,8 @@ class ControlPanelView @JvmOverloads constructor(
         binding.tvPlaybackSpeed.isEnabled = isMusicControlsEnabled
 
         if (item == null) {
-            binding.tvPlayedTime.text = FormatUtils.formatMilliseconds(0)
-            binding.tvTotalTime.text = FormatUtils.formatMilliseconds(0)
+            binding.tvPlayedTime.text = TimeFormatUtils.formatMilliseconds(0)
+            binding.tvTotalTime.text = TimeFormatUtils.formatMilliseconds(0)
             binding.sbTrackState.progress = 0
             binding.tvCurrentComposition.setText(R.string.no_current_composition)
             binding.tvCurrentCompositionArtist.setText(R.string.unknown_author)
@@ -221,7 +223,7 @@ class ControlPanelView @JvmOverloads constructor(
         } else {
             val compositionName = CompositionHelper.formatCompositionName(item)
             binding.tvCurrentComposition.text = compositionName
-            binding.tvTotalTime.text = FormatUtils.formatMilliseconds(item.duration)
+            binding.tvTotalTime.text = TimeFormatUtils.formatMilliseconds(item.duration)
             binding.tvCurrentCompositionArtist.text =
                 FormatUtils.formatCompositionAuthor(item, context)
             binding.bgTouchView.contentDescription =
@@ -263,7 +265,7 @@ class ControlPanelView @JvmOverloads constructor(
         } else {
             R.drawable.anim_shuffle_on_to_off
         }
-        AndroidUtils.setAnimatedVectorDrawable(binding.btnRandomMode, drawable)
+        binding.btnRandomMode.setAnimatedVectorDrawable(drawable)
     }
 
     fun showPlaybackSpeed(speed: Float, onClick: OnClickListener) {
@@ -291,7 +293,7 @@ class ControlPanelView @JvmOverloads constructor(
             binding.tvSleepTime.setBackgroundResource(R.drawable.bg_outline_text_button)
             binding.tvSleepTime.setOnClickListener(onClick)
         }
-        binding.tvSleepTime.text = FormatUtils.formatMilliseconds(remainingMillis)
+        binding.tvSleepTime.text = TimeFormatUtils.formatMilliseconds(remainingMillis)
     }
 
     fun showCurrentCompositionSyncState(syncState: FileSyncState?, item: PlayQueueItem?) {

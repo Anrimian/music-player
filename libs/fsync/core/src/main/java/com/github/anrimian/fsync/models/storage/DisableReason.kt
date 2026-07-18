@@ -4,6 +4,6 @@ enum class DisableReason {
     MANUAL,
     LOGOUT,
     REMOTE_VERSION_IS_TOO_HIGH,
-    SPACE_IS_FULL,
-    WRONG_FILE_PATH,
+    REMOTE_SPACE_IS_FULL,
+    LOCAL_SPACE_IS_FULL,
 }

@@ -11,7 +11,6 @@ import com.github.anrimian.musicplayer.domain.models.order.Order
 import com.github.anrimian.musicplayer.domain.models.order.OrderType
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
-import java.util.Date
 
 class GenresDaoWrapper(
     private val appDatabase: LibraryDatabase,
@@ -65,7 +64,7 @@ class GenresDaoWrapper(
     fun moveGenres(compositionId: Long, fromPos: Int, toPos: Int) {
         appDatabase.runInTransaction {
             genreDao.moveGenres(compositionId, fromPos, toPos)
-            compositionsDao.setUpdateTime(compositionId, Date())
+            compositionsDao.setModifyTime(compositionId, System.currentTimeMillis())
         }
     }
 
@@ -80,7 +79,7 @@ class GenresDaoWrapper(
                 genreDao.increasePositionsAfter(position, compositionId)
             }
             genreDao.insertGenreEntry(compositionId, genreId, position)
-            compositionsDao.setUpdateTime(compositionId, Date())
+            compositionsDao.setModifyTime(compositionId, System.currentTimeMillis())
         }
     }
 
@@ -92,7 +91,7 @@ class GenresDaoWrapper(
             genreDao.removeGenreEntry(compositionId, genreId)
             genreDao.decreasePositionsAfter(position, compositionId)
             genreDao.deleteEmptyGenre(genreId)
-            compositionsDao.setUpdateTime(compositionId, Date())
+            compositionsDao.setModifyTime(compositionId, System.currentTimeMillis())
             return@runInTransaction position
         }
     }
@@ -107,7 +106,7 @@ class GenresDaoWrapper(
             genreDao.insertGenreEntry(compositionId, genreId, position)
             genreDao.removeGenreEntry(compositionId, oldGenreId)
             genreDao.deleteEmptyGenre(oldGenreId)
-            compositionsDao.setUpdateTime(compositionId, Date())
+            compositionsDao.setModifyTime(compositionId, System.currentTimeMillis())
         }
     }
 
@@ -117,7 +116,7 @@ class GenresDaoWrapper(
 
     fun updateGenreName(name: String, genreId: Long, compositionIds: List<Long>) {
         appDatabase.runInTransaction {
-            genreDao.updateGenreCompositionsModifyTime(genreId, Date())
+            genreDao.updateGenreCompositionsModifyTime(genreId, System.currentTimeMillis())
             val existsGenreId = genreDao.findGenre(name)
             if (existsGenreId == null) {
                 genreDao.updateGenreName(name, genreId)
@@ -125,9 +124,9 @@ class GenresDaoWrapper(
             }
             genreDao.changeCompositionsGenre(genreId, existsGenreId)
             genreDao.deleteEmptyGenre(genreId)
-            val date = Date()
+            val time = System.currentTimeMillis()
             for (compositionId in compositionIds) {
-                compositionsDao.setUpdateTime(compositionId, date)
+                compositionsDao.setModifyTime(compositionId, time)
             }
         }
     }

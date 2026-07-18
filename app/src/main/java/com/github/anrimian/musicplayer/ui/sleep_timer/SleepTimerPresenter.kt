@@ -14,8 +14,8 @@ class SleepTimerPresenter(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.showSleepTimerTime(interactor.getSleepTimerTime())
-        subscribeOnSleepTimerState()
-        subscribeOnSleepTimerRemainingTime()
+        interactor.getSleepTimerStateFlow().subscribe(onNext = viewState::showSleepTimerState)
+        interactor.getSleepTimerCountDownObservable().unsafeSubscribeOnUi(viewState::showRemainingTimeMillis)
     }
 
     fun onSleepTimerTimeChanged(millis: Long) {
@@ -39,11 +39,4 @@ class SleepTimerPresenter(
         interactor.stop()
     }
 
-    private fun subscribeOnSleepTimerState() {
-        interactor.getSleepTimerStateObservable().unsafeSubscribeOnUi(viewState::showSleepTimerState)
-    }
-
-    private fun subscribeOnSleepTimerRemainingTime() {
-        interactor.getSleepTimerCountDownObservable().unsafeSubscribeOnUi(viewState::showRemainingTimeMillis)
-    }
 }

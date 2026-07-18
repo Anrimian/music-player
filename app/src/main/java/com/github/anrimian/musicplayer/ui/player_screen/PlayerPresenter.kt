@@ -4,15 +4,15 @@ import com.github.anrimian.fsync.SyncInteractor
 import com.github.anrimian.fsync.models.Optional
 import com.github.anrimian.fsync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException
-import com.github.anrimian.musicplayer.domain.interactors.player.ActionState
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.player.PlayerScreenInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.ActionState
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.PlayerScreenInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlaylistsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
@@ -29,7 +29,7 @@ class PlayerPresenter(
     private val playerInteractor: LibraryPlayerInteractor,
     private val playerScreenInteractor: PlayerScreenInteractor,
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
-    playListsInteractor: PlayListsInteractor,
+    playListsInteractor: PlaylistsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler,
 ) : BaseLibraryPresenter<PlayerView>(
@@ -49,7 +49,7 @@ class PlayerPresenter(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.setButtonPanelState(playerScreenInteractor.isPlayerPanelOpen)
+        viewState.setButtonPanelState(playerScreenInteractor.isPlayerPanelOpen())
         viewState.showActionState(ActionState.NO_STATE)
         subscribeOnUiSettings()
         subscribeOnRandomMode()
@@ -62,59 +62,60 @@ class PlayerPresenter(
         subscribeOnCurrentCompositionSyncState()
         subscribeOnTrackPositionChanging()
         subscribeOnSleepTimerTime()
-        subscribeOnFileScannerState()
-        playerScreenInteractor.playerScreensSwipeObservable
+        subscribeOnCurrentActionsState()
+        playerScreenInteractor.getPlayerScreensSwipeObservable()
             .unsafeSubscribeOnUi(viewState::showScreensSwipeEnabled)
-        playerScreenInteractor.volumeObservable
+        playerScreenInteractor.getVolumeObservable()
             .map(VolumeState::toLong)
             .unsafeSubscribeOnUi(viewState::onVolumeChanged)
-        playerScreenInteractor.actionStateObservable.unsafeSubscribeOnUi(viewState::showActionState)
+        playerScreenInteractor.getActionStateObservable()
+            .unsafeSubscribeOnUi(viewState::showActionState)
 
-        syncInteractor.onAppStarted()
+        syncInteractor.start()
     }
 
     fun onSetupScreenStateRequested() {
         viewState.showDrawerScreen(
-            playerScreenInteractor.selectedDrawerScreen,
-            playerScreenInteractor.selectedPlayListScreenId
+            playerScreenInteractor.getSelectedDrawerScreen(),
+            playerScreenInteractor.getSelectedPlayListScreenId()
         )
-        viewState.showPlayerContentPage(playerScreenInteractor.playerContentPage)
+        viewState.showPlayerContentPage(playerScreenInteractor.getPlayerContentPage())
     }
 
     fun onOpenPlayerPanelClicked() {
-        playerScreenInteractor.isPlayerPanelOpen = true
+        playerScreenInteractor.setPlayerPanelOpen(true)
     }
 
     fun onBottomPanelExpanded() {
-        playerScreenInteractor.isPlayerPanelOpen = true
+        playerScreenInteractor.setPlayerPanelOpen(true)
         viewState.setButtonPanelState(true)
     }
 
     fun onBottomPanelCollapsed() {
-        playerScreenInteractor.isPlayerPanelOpen = false
+        playerScreenInteractor.setPlayerPanelOpen(false)
         viewState.setButtonPanelState(false)
     }
 
     fun onDrawerScreenSelected(screenId: Int) {
-        playerScreenInteractor.selectedDrawerScreen = screenId
+        playerScreenInteractor.setSelectedDrawerScreen(screenId)
         viewState.showDrawerScreen(screenId, 0)
     }
 
     fun onLibraryScreenSelected() {
         viewState.showLibraryScreen(
-            playerScreenInteractor.selectedLibraryScreen,
-            playerScreenInteractor.selectedArtistScreenId,
-            playerScreenInteractor.selectedAlbumScreenId,
-            playerScreenInteractor.selectedGenreScreenId,
+            playerScreenInteractor.getSelectedLibraryScreen(),
+            playerScreenInteractor.getSelectedArtistScreenId(),
+            playerScreenInteractor.getSelectedAlbumScreenId(),
+            playerScreenInteractor.getSelectedGenreScreenId(),
         )
     }
 
     fun onLibraryScreenSelected(screenId: Int) {
-        playerScreenInteractor.selectedLibraryScreen = screenId
+        playerScreenInteractor.setSelectedLibraryScreen(screenId)
     }
 
     fun onPlayerContentPageChanged(position: Int) {
-        playerScreenInteractor.playerContentPage = position
+        playerScreenInteractor.setPlayerContentPage(position)
     }
 
     fun onPlayButtonClicked() {
@@ -155,7 +156,7 @@ class PlayerPresenter(
         viewState.showSelectPlayListDialog()
     }
 
-    fun onPlayListForAddingSelected(playList: PlayList) {
+    fun onPlayListForAddingSelected(playList: Playlist) {
         addPreparedCompositionsToPlayList(playList)
     }
 
@@ -196,15 +197,15 @@ class PlayerPresenter(
         playerInteractor.setPlaybackSpeed(speed)
     }
 
-    fun getPlayerContentPage() = playerScreenInteractor.playerContentPage
+    fun getPlayerContentPage() = playerScreenInteractor.getPlayerContentPage()
 
-    fun isPlayerPanelOpened() = playerScreenInteractor.isPlayerPanelOpen
+    fun isPlayerPanelOpened() = playerScreenInteractor.isPlayerPanelOpen()
 
     private fun subscribeOnRepeatMode() {
         playerInteractor.getRepeatModeObservable().unsafeSubscribeOnUi(viewState::showRepeatMode)
     }
 
-    private fun addPreparedCompositionsToPlayList(playList: PlayList) {
+    private fun addPreparedCompositionsToPlayList(playList: Playlist) {
         performAddToPlaylist(compositionsForPlayList, playList) { compositionsForPlayList.clear() }
     }
 
@@ -222,7 +223,7 @@ class PlayerPresenter(
     }
 
     private fun subscribeOnCurrentCompositionSyncState() {
-        playerScreenInteractor.currentCompositionFileSyncState
+        playerScreenInteractor.getCurrentCompositionFileSyncState()
             .unsafeSubscribeOnUi(this::onCurrentCompositionSyncStateReceived)
     }
 
@@ -247,7 +248,7 @@ class PlayerPresenter(
             if ((currentItem == null) != (newItem == null)) {
                 updateCover = true
             } else if (currentItem != null && newItem != null)  {
-                updateCover = currentItem.dateModified != newItem.dateModified
+                updateCover = currentItem.modifiedTime != newItem.modifiedTime
                         || currentItem.coverModifyTime != newItem.coverModifyTime
                         || currentItem.size != newItem.size
                         || currentItem.isFileExists != newItem.isFileExists
@@ -297,7 +298,7 @@ class PlayerPresenter(
     }
 
     private fun subscribeOnUiSettings() {
-        playerScreenInteractor.coversEnabledObservable
+        playerScreenInteractor.getCoversEnabledObservable()
             .subscribeOnUi(this::onUiSettingsReceived, errorParser::logError)
     }
 
@@ -327,13 +328,13 @@ class PlayerPresenter(
     }
 
     private fun subscribeOnSleepTimerTime() {
-        playerScreenInteractor.sleepTimerCountDownObservable
+        playerScreenInteractor.getSleepTimerCountDownObservable()
             .unsafeSubscribeOnUi(viewState::showSleepTimerRemainingTime)
     }
 
-    private fun subscribeOnFileScannerState() {
-        playerScreenInteractor.fileScannerStateObservable
-            .unsafeSubscribeOnUi(viewState::showFileScannerState)
+    private fun subscribeOnCurrentActionsState() {
+        playerScreenInteractor.getCurrentActionsObservable()
+            .runOnUi(viewState::showCurrentActions, viewState::showErrorMessage)
     }
 
 }

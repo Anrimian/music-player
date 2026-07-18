@@ -9,10 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel;
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList;
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem;
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist;
+import com.github.anrimian.musicplayer.domain.models.playlist.PlaylistEntry;
 import com.github.anrimian.musicplayer.ui.common.snackbars.AppSnackbar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -21,8 +21,8 @@ import java.util.List;
 public class MessagesUtils {
 
     public static String getAddToPlayListCompleteMessage(Context context,
-                                                         PlayList playList,
-                                                         List<Composition> compositions) {
+                                                         Playlist playList,
+                                                         List<CompositionModel> compositions) {
         int size = compositions.size();
         if (size == 1) {
             return context.getString(R.string.add_to_playlist_success_template,
@@ -39,8 +39,8 @@ public class MessagesUtils {
     }
 
     public static String getDeletePlayListItemCompleteMessage(Context context,
-                                                              PlayList playList,
-                                                              List<PlayListItem> items) {
+                                                              Playlist playList,
+                                                              List<PlaylistEntry> items) {
         int size = items.size();
         if (size == 1) {
             return context.getString(R.string.delete_from_playlist_success_template,
@@ -69,7 +69,7 @@ public class MessagesUtils {
         }
     }
 
-    public static String getPlayNextMessage(Context context, List<Composition> compositions) {
+    public static String getPlayNextMessage(Context context, List<CompositionModel> compositions) {
         int size = compositions.size();
         if (size == 1) {
             return context.getString(R.string.play_next_message_single,
@@ -79,7 +79,7 @@ public class MessagesUtils {
         }
     }
 
-    public static String getAddedToQueueMessage(Context context, List<Composition> compositions) {
+    public static String getAddedToQueueMessage(Context context, List<CompositionModel> compositions) {
         int size = compositions.size();
         if (size == 1) {
             return context.getString(R.string.added_to_queue_message_single,

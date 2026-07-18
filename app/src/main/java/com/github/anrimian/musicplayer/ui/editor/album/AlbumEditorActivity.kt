@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.core.view.WindowCompat
 import com.github.anrimian.fsync.models.ProgressInfo
-import com.github.anrimian.musicplayer.Constants
-import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.AppConstants
+import com.github.anrimian.musicplayer.AppConstants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.ActivityAlbumEditBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -37,12 +37,12 @@ class AlbumEditorActivity : BaseMvpAppCompatActivity(), AlbumEditorView {
             context: Context,
             albumId: Long
         ) = Intent(context, AlbumEditorActivity::class.java).apply {
-            putExtra(Constants.Arguments.ALBUM_ID_ARG, albumId)
+            putExtra(AppConstants.Arguments.ALBUM_ID_ARG, albumId)
         }
     }
 
     private val presenter by moxyPresenter {
-        val albumId = intent.getLongExtra(Constants.Arguments.ALBUM_ID_ARG, 0)
+        val albumId = intent.getLongExtra(AppConstants.Arguments.ALBUM_ID_ARG, 0)
         Components.getAlbumEditorComponent(albumId).albumEditorPresenter()
     }
 

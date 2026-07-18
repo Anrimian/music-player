@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.ui.library.compositions
 import com.github.anrimian.fsync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryCompositionsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlaylistsInteractor
 import com.github.anrimian.musicplayer.domain.interactors.settings.DisplaySettingsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.order.Order
@@ -19,7 +19,7 @@ class LibraryCompositionsPresenter(
     playerInteractor: LibraryPlayerInteractor,
     displaySettingsInteractor: DisplaySettingsInteractor,
     syncInteractor: SyncInteractor<FileKey, *, Long>,
-    playListsInteractor: PlayListsInteractor,
+    playListsInteractor: PlaylistsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : BaseLibraryCompositionsPresenter<Composition, LibraryCompositionsView>(

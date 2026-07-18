@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="open_drawer">Navigation öffnen</string>
     <string name="try_again">Nochmal versuchen</string>
     <string name="can_not_work_without_file_permission">App funktioniert nur mit Zugriff auf den Speicher</string>
@@ -12,7 +11,7 @@
     <string name="file_not_found">Datei nicht gefunden</string>
     <string name="compositions_on_device_not_found">Keine Musik auf dem Gerät gefunden</string>
     <string name="compositions_and_folders_for_search_not_found">Keine passenden Titel oder Ordner gefunden</string>
-    <string name="foreground_channel_description">Musikwiedergabe</string>
+    <string name="foreground_channel_name">Musikwiedergabe</string>
     <string name="previous_track">Voriger Titel</string>
     <string name="next_track">Nächster Titel</string>
     <string name="folder">Ordner</string>
@@ -68,16 +67,9 @@
     <string name="now_playing_template">Jetzt läuft: %1$s. Liste öffnen.</string>
     <string name="play_all_in_folder">Ganzen Ordner abspielen</string>
     <string name="delete_playlist">Playlist löschen</string>
-    <string name="storage_timeout_error_message">
-        Der Medienspeicher des Geräts antwortet nicht.
-        Das ist ein seltsamer und sehr seltener Fehler.
-        Vielleicht verschwindet das Problem mit einem Neustart des Geräts.
-    </string>
+    <string name="storage_timeout_error_message">Der Medienspeicher des Geräts antwortet nicht.\nDas ist ein seltsamer und sehr seltener Fehler.\nVielleicht verschwindet das Problem mit einem Neustart des Geräts.</string>
     <string name="select_all">Alle auswählen</string>
-    <string name="file_uri_extract_error">
-        Kann den Dateipfad nicht finden, um „%s“ zu senden.
-        Vielleicht liegt die Datei in einem geschützten Systemordner.
-    </string>
+    <string name="file_uri_extract_error">Kann den Dateipfad nicht finden, um „%s“ zu senden.\nVielleicht liegt die Datei in einem geschützten Systemordner.</string>
     <string name="loading_progress">Lädt …</string>
     <string name="alphabetical_order_desc_title">Z–A</string>
     <string name="add_date_order_desc_title">Neustes zuerst</string>
@@ -121,7 +113,7 @@
     <string name="headset">Kopfhörer</string>
     <string name="scan_storage">Medienspeicher neu einlesen</string>
     <string name="auto_night_mode">Automatischer Nachtmodus</string>
-    <string name="unsupported_format_hint">Nicht unterstützes Format</string>
+    <string name="unsupported_format_hint">Nicht unterstütztes Format</string>
     <string name="artists">Interpreten</string>
     <string name="no_artists_in_library">Kein Interpret in der Sammlung</string>
     <string name="albums">Alben</string>
@@ -188,9 +180,7 @@
     <string name="lyrics">Lyrics</string>
     <string name="check_tags_error">Überprüfung des Tags fehlgeschlagen: %s</string>
     <string name="changing_file_progress">Datei ändern …</string>
-    <string name="android_r_edit_file_permission_denied">
-        Um Dateien zu bearbeiten oder zu löschen, ist seit Android 11 eine ausdrückliche Systemberechtigung notwendig
-    </string>
+    <string name="android_r_edit_file_permission_denied">Um Dateien zu bearbeiten oder zu löschen, ist seit Android 11 eine ausdrückliche Systemberechtigung notwendig</string>
     <string name="error_report">Fehlerbericht</string>
     <string name="critical_error_report_message">Ein schwerwiegender Fehler ist aufgetreten, darum kann diese App nicht starten. Solche Fehler sollten nicht passieren. Die App verschickt Fehlerberichte nicht automatisch, aber eine Logdatei über den Fehler kann manuell per E-Mail versendet werden. Das hilft, den Fehler zu beseitigen.</string>
     <string name="error_report_message">Ein schwerwiegender Fehler ist aufgetreten. Die App verschickt Fehlerberichte nicht automatisch, aber eine Logdatei über den Fehler kann manuell per E-Mail versendet werden. Das hilft, den Fehler zu beseitigen.</string>
@@ -229,7 +219,7 @@
     <string name="show_all_audio_files">Alle Audiodateien anzeigen</string>
     <string name="enabled_media_players">Aktivierte Mediaplayer</string>
     <string name="advanced_settings">Erweiterte Einstellungen</string>
-    <string name="media_players_setting_description">Die App verwendet verschiedene Mediaplayer um Musik abzuspielen. Hier können sie deaktiviert oder anders gewichtet werden. Alle Änderungen werden erst nach einem Neustart der App wirksam.</string>
+    <string name="media_players_setting_description">Die App verwendet verschiedene Mediaplayer, um Musik abzuspielen. Hier können sie deaktiviert oder anders gewichtet werden. Alle Änderungen werden erst nach einem Neustart der App wirksam.</string>
     <string name="sound_balance">Audio-Balance</string>
     <string name="sound_balance_state">Links: %1$d%%, Rechts: %2$d%%</string>
     <string name="language">Sprache</string>
@@ -241,19 +231,16 @@
     <string name="no_lyrics_for_current_composition">Kein Songtext für den aktuellen Titel</string>
     <string name="edit_lyrics">Songtext bearbeiten</string>
     <string name="show_in_folders">In Ordnern anzeigen</string>
-    <string name="file_source_not_found">Externe Datei nicht gefunden</string>
     <string name="file_is_too_large">Datei zu groß</string>
     <string name="preparing_files">Dateien vorbereiten</string>
     <string name="downloading">Herunterladen: %1$d/%2$d</string>
     <string name="downloading_progress">Herunterladen (%d%%)</string>
     <string name="rename_progress_count">Umbenennen (%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? Kann nicht rückgängig gemacht werden!</string>
+    <string name="undone_action_template">Kann nicht rückgängig gemacht werden!</string>
     <string name="delete_composition_template">Titel „%1$s“ löschen</string>
     <string name="delete_empty_folder">Ordner „%s“ löschen</string>
     <string name="delete_folder_template">%2$s aus dem Ordner „%1$s“</string>
-    <string name="android_r_editor_restriction_error">Seit Android 11 dürfen Dateien nur noch kopiert, verschoben oder umbenannt werden, wenn sie in folgenden Ordnern liegen: %s.
-        Bitte Audiodateien dort speichern, dann sollte die Aktion klappen.
-    </string>
+    <string name="android_r_editor_restriction_error">Seit Android 11 dürfen Dateien nur noch in folgenden Ordnern kopiert, verschoben oder umbenannt werden: %s.\nBitte Audiodateien dort speichern, dann sollte die Aktion klappen.</string>
     <string name="folder_already_excluded_from_scanning">Dieser Ordner wird bei der Musiksuche bereits ignoriert.</string>
     <string name="no_file_modify_permission">Keine Berechtigung, die Datei zu verändern</string>
     <string name="interface_settings">Benutzeroberfläche</string>
@@ -295,80 +282,101 @@
     <string name="check_for_duplicates">Playlist auf Dopplungen prüfen, bevor neue Titel hinzugefügt werden</string>
     <string name="more_template">… %d mehr</string>
     <string name="add_without_duplicates">Ohne Dopplungen hinzufügen</string>
-
+    <string name="process_unsupported_actions">Nicht erkanntes Medienereignis als Play/Pause-Befehl behandeln</string>
+    <string name="process_unsupported_actions_description">Kann unerwartete Wiedergabe/Pause verursachen</string>
+    <string name="ignore_play_after_connection">Befehl „Wiedergabe“ für 3 Sekunden ignorieren, wenn ein Bluetooth-Gerät verbunden wird</string>
+    <string name="ignore_play_after_connection_description">Kann ungewollte Wiedergabe beim Verbinden verhindern</string>
+    <string name="pause_on_audio_device_remove">Pausieren, wenn das Audiogerät getrennt wird</string>
+    <string name="missing_files_detected">Fehlende Audiodateien erkannt</string>
+    <!-- !Not verified by native speaker! -->
+    <string name="missing_files_description">Das Android-System meldet, dass diese Dateien an ihren ursprünglichen Speicherorten nicht mehr verfügbar sind.\nSie wurden möglicherweise verschoben, von einer anderen App gelöscht oder befinden sich auf einer getrennten SD-Karte.\nSie können diese ungültigen Einträge aus Ihrer Bibliothek entfernen.\nNicht verfügbare Titel (%d):</string>
+    <!---->
+    <string name="see_more">Mehr anzeigen (%d)</string>
+    <string name="remove">Entfernen</string>
+    <string name="delete_missing_compositions_title">Titel löschen?</string>
+    <string name="file_not_found_in_all_storages">Datei weder lokal noch im Cloud-Speicher gefunden</string>
+    <string name="question_template">%1$s? %2$s</string>
+    <string name="allowed_file_extensions">Erlaubte Dateierweiterungen</string>
+    <string name="allowed_extensions_state">Nur Dateien mit diesen Erweiterungen werden der Sammlung hinzugefügt: \n%s</string>
+    <string name="allowed_file_extensions_description">Erweiterungen werden durch das Symbol \',\' getrennt</string>
+    <string name="restore_default">Standard wiederherstellen</string>
+    <string name="not_allowed_path">Unzulässiger Pfad zum Schreiben der Datei</string>
+    <string name="configure_menu">Menü konfigurieren</string>
+    <string name="configure_menu_items">Menüpunkte konfigurieren</string>
+    <string name="save">Speichern</string>
+    <string name="menu_group_primary">Hauptmenü</string>
+    <string name="menu_group_secondary">Weitere</string>
+    <string name="menu_group_hidden">Versteckt</string>
+    <string name="undo">Rückgängig</string>
+    <string name="playlist_sorted">Playlist sortiert</string>
+    <string name="artist_order">Nach Künstler</string>
+    <string name="skip_silence">Stille überspringen</string>
+    <string name="skip_silence_summary">Stille länger als %.1fs automatisch überspringen</string>
+    <string name="android_media_player_skip_silence_note">Überspringen von Stille wird nicht unterstützt</string>
+    <string name="system_interaction">Systeminteraktion</string>
+    <string name="sound_processing">Klangverarbeitung</string>
     <plurals name="compositions_count">
         <item quantity="one">%1$s Titel</item>
         <item quantity="other">%1$s Titel</item>
     </plurals>
-
     <plurals name="files_count">
         <item quantity="one">%1$s Datei</item>
         <item quantity="other">%1$s Dateien</item>
     </plurals>
-
     <plurals name="albums_count">
         <item quantity="one">%1$s Album</item>
         <item quantity="other">%1$s Alben</item>
     </plurals>
-
     <plurals name="play_next_message">
         <item quantity="one">%s Titel wird als nächstes abgespielt</item>
         <item quantity="other">%s Titel werden als nächstes abgespielt</item>
     </plurals>
-
     <plurals name="added_to_queue_message">
         <item quantity="one">%s Titel zur Wiedergabeliste hinzugefügt</item>
         <item quantity="other">%s Titel zur Wiedergabeliste hinzugefügt</item>
     </plurals>
-
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d Titel zu „%2$s“ hinzugefügt</item>
         <item quantity="other">%1$d Titel zu „%2$s“ hinzugefügt</item>
     </plurals>
-
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d Titel aus „%2$s“ entfernt</item>
         <item quantity="other">%1$d Titel aus „%2$s“ entfernt</item>
     </plurals>
-
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d Titel gelöscht</item>
         <item quantity="other">%1$d Titel gelöscht</item>
     </plurals>
-
     <plurals name="seconds_template">
         <item quantity="one">%1$d Sekunde</item>
         <item quantity="other">%1$d Sekunden</item>
     </plurals>
-
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="one">%d Titel löschen</item>
         <item quantity="other">%d Titel löschen</item>
     </plurals>
-
     <plurals name="for_at_least_minutes">
         <item quantity="one">Für mindestens %d Minute</item>
         <item quantity="other">Für mindestens %d Minuten</item>
     </plurals>
-
     <plurals name="export_playlists_success">
         <item quantity="one">%d Playlist auf internen Speicher gesichert</item>
         <item quantity="other">%d Playlists auf internen Speicher gesichert</item>
     </plurals>
-
     <plurals name="playlist_import_partial_success">
         <item quantity="one">Playlist erfolgreich importiert, aber %d Datei wurde nicht in der Sammlung gefunden</item>
         <item quantity="other">Playlist erfolgreich importiert, aber %d Dateien wurden nicht in der Sammlung gefunden</item>
     </plurals>
-
     <plurals name="delete_playlists_template">
-        <item quantity="one">%d Playlist löschen</item>
-        <item quantity="other">%d Playlists löschen</item>
+        <item quantity="one">%d Playlist löschen?</item>
+        <item quantity="other">%d Playlists löschen?</item>
     </plurals>
-
     <plurals name="delete_playlists_success">
         <item quantity="one">%d Playlist gelöscht</item>
         <item quantity="other">%d Playlists gelöscht</item>
     </plurals>
-
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="one">%1$d Titel aus der Sammlung löschen? %2$s</item>
+        <item quantity="other">%1$d Titel aus der Sammlung löschen? %2$s</item>
+    </plurals>
 </resources>

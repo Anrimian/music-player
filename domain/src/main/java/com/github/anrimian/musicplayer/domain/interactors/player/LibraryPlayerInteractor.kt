@@ -4,6 +4,7 @@ import com.github.anrimian.fsync.SyncInteractor
 import com.github.anrimian.musicplayer.domain.Constants
 import com.github.anrimian.musicplayer.domain.interactors.analytics.Analytics
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.composition.CurrentComposition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
@@ -15,6 +16,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.content.RemoteS
 import com.github.anrimian.musicplayer.domain.models.composition.content.TooLargeSourceException
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException
 import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
+import com.github.anrimian.musicplayer.domain.models.exceptions.NotAllowedPathException
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.PlayerState
@@ -80,15 +82,15 @@ class LibraryPlayerInteractor(
     private var currentItem: PlayQueueItem? = null
 
     fun prepare() {
-        ensureSourceReady().onErrorComplete().subscribe()
+        ensureSourceReady().doOnError(analytics::processNonFatalError).onErrorComplete().subscribe()
     }
 
     @JvmOverloads
     fun setCompositionsQueueAndPlay(
-        compositions: List<Composition>,
+        compositions: List<CompositionModel>,
         firstPosition: Int = Constants.NO_POSITION,
     ): Completable {
-        return setQueueAndPlay(compositions.map(Composition::id), firstPosition)
+        return setQueueAndPlay(compositions.map(CompositionModel::id), firstPosition)
     }
 
     fun setQueueAndPlay(
@@ -228,6 +230,14 @@ class LibraryPlayerInteractor(
         }
     }
 
+    fun getTrackPosition(): Single<Long> {
+        return if (playerCoordinatorInteractor.isPlayerTypeActive(PlayerType.LIBRARY)) {
+            getActualTrackPosition()
+        } else {
+            trackPositionSubject.getValue(0L)
+        }
+    }
+
     fun getTrackPositionObservable(): Observable<Long> {
         return trackPositionSubject.getObservable()
     }
@@ -273,6 +283,13 @@ class LibraryPlayerInteractor(
         return playQueueRepository.getPlayQueueObservable()
     }
 
+    fun getWindowPlayQueueObservable(
+        startOffset: Int,
+        endOffset: Int,
+    ): Observable<List<PlayQueueItem>> {
+        return playQueueRepository.getWindowPlayQueueObservable(startOffset, endOffset)
+    }
+
     fun deleteComposition(composition: Composition): Single<DeletedComposition> {
         return libraryRepository.deleteComposition(composition)
             .flatMap { c ->
@@ -280,9 +297,11 @@ class LibraryPlayerInteractor(
             }
     }
 
-    fun deleteCompositions(compositions: List<Composition>): Single<List<DeletedComposition>> {
+    fun deleteCompositions(compositions: List<CompositionModel>): Single<List<DeletedComposition>> {
         return libraryRepository.deleteCompositions(compositions)
-            .doOnSuccess { c -> syncInteractor.onLocalFilesDeleted(c.toFileKeys()) }
+            .flatMap { c ->
+                syncInteractor.onLocalFilesDeleted(c.toFileKeys()).andThen(Single.just(c))
+            }
     }
 
     fun removeQueueItem(item: PlayQueueItem): Completable {
@@ -297,12 +316,12 @@ class LibraryPlayerInteractor(
         return playQueueRepository.swapItems(firstItem, secondItem)
     }
 
-    fun addCompositionsToPlayNext(compositions: List<Composition>): Single<List<Composition>> {
+    fun addCompositionsToPlayNext(compositions: List<CompositionModel>): Single<List<CompositionModel>> {
         return playQueueRepository.addCompositionsToPlayNext(compositions)
             .toSingleDefault(compositions)
     }
 
-    fun addCompositionsToEnd(compositions: List<Composition>): Single<List<Composition>> {
+    fun addCompositionsToEnd(compositions: List<CompositionModel>): Single<List<CompositionModel>> {
         return playQueueRepository.addCompositionsToEnd(compositions)
             .toSingleDefault(compositions)
     }
@@ -460,6 +479,7 @@ class LibraryPlayerInteractor(
 
     private fun getCurrentComposition(): Single<Opt<PlayQueueItem>> {
         return playQueueRepository.getCurrentQueueItemObservable()
+            .doOnError(analytics::processNonFatalError)
             .onErrorComplete()
             .map { event -> Opt(event.playQueueItem) }
             .first(Opt())
@@ -469,17 +489,9 @@ class LibraryPlayerInteractor(
         return Observable.combineLatest(
             playQueueRepository.getCurrentQueueItemObservable(),
             getIsPlayingStateObservable(),
-            ::CurrentComposition
+            { playQueueEvent, isPlaying -> CurrentComposition(playQueueEvent.playQueueItem, isPlaying) }
         ).distinctUntilChanged()
             .attachGateObservable(currentCompositionGateSubject)
-    }
-
-    private fun getTrackPosition(): Single<Long> {
-        return if (playerCoordinatorInteractor.isPlayerTypeActive(PlayerType.LIBRARY)) {
-            getActualTrackPosition()
-        } else {
-            return trackPositionSubject.getValue(0L)
-        }
     }
 
     private fun getActualTrackPosition(): Single<Long> {
@@ -577,11 +589,13 @@ class LibraryPlayerInteractor(
 
     private fun saveCurrentItemTrackPosition(trackPosition: Long): Completable {
         return playQueueRepository.setCurrentItemTrackPosition(trackPosition)
+            .doOnError(analytics::processNonFatalError)
             .onErrorComplete()
     }
 
     private fun resetItemTrackPosition(itemId: Long): Completable {
         return playQueueRepository.setItemTrackPosition(itemId, 0L)
+            .doOnError(analytics::processNonFatalError)
             .onErrorComplete()
     }
 
@@ -589,10 +603,11 @@ class LibraryPlayerInteractor(
         return when (throwable) {
             is UnsupportedSourceException -> CorruptionType.UNSUPPORTED
             is LocalSourceNotFoundException -> CorruptionType.NOT_FOUND
-            is RemoteSourceNotFoundException -> CorruptionType.SOURCE_NOT_FOUND
+            is RemoteSourceNotFoundException -> CorruptionType.NOT_FOUND_IN_ALL_STORAGES
             is TooLargeSourceException -> CorruptionType.TOO_LARGE_SOURCE
             is CorruptedMediaFileException -> CorruptionType.FILE_IS_CORRUPTED
             is FileReadTimeoutException -> CorruptionType.FILE_READ_TIMEOUT
+            is NotAllowedPathException -> CorruptionType.NOT_ALLOWED_PATH
             else -> CorruptionType.UNKNOWN
         }
     }

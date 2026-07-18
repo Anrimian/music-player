@@ -11,8 +11,8 @@ import com.github.anrimian.musicplayer.data.controllers.music.equalizer.internal
 import com.github.anrimian.musicplayer.data.models.exceptions.NoCompositionsToInsertException;
 import com.github.anrimian.musicplayer.data.models.exceptions.NoPlaylistItemsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyDeletedException;
-import com.github.anrimian.musicplayer.data.models.exceptions.PlayListAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlayListNotCreatedException;
+import com.github.anrimian.musicplayer.data.models.exceptions.PlaylistAlreadyExistsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.PlaylistEntryInsertException;
 import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayListItemsException;
 import com.github.anrimian.musicplayer.data.models.exceptions.TooManyPlayQueueItemsException;
@@ -22,7 +22,6 @@ import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions
 import com.github.anrimian.musicplayer.data.repositories.library.edit.exceptions.MoveInTheSameFolderException;
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.M3UEditorException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.GenreAlreadyPresentException;
-import com.github.anrimian.musicplayer.data.storage.exceptions.NotAllowedPathException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.UnavailableMediaStoreException;
 import com.github.anrimian.musicplayer.data.storage.providers.music.RecoverableSecurityExceptionExt;
@@ -33,6 +32,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.content.LocalSo
 import com.github.anrimian.musicplayer.domain.models.composition.content.UnsupportedSourceException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.FolderAlreadyIgnoredException;
+import com.github.anrimian.musicplayer.domain.models.exceptions.NotAllowedPathException;
 import com.github.anrimian.musicplayer.domain.models.exceptions.StorageTimeoutException;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateError;
 import com.github.anrimian.musicplayer.domain.utils.validation.ValidateException;
@@ -74,7 +74,7 @@ public class DefaultErrorParser extends ErrorParser {
             }
         }
         if (throwable instanceof PlayListNotCreatedException
-                || throwable instanceof PlayListAlreadyExistsException) {
+                || throwable instanceof PlaylistAlreadyExistsException) {
             return error(R.string.play_list_with_this_name_already_exists);
         }
         if (throwable instanceof PlayListAlreadyDeletedException) {
@@ -94,7 +94,12 @@ public class DefaultErrorParser extends ErrorParser {
                     errorCommand.getMessage().toLowerCase()));
         }
         if (throwable instanceof FileNotFoundException || throwable instanceof LocalSourceNotFoundException) {
-            return error(R.string.file_not_found);
+            String message = throwable.getMessage();
+            String text = getString(R.string.file_not_found);
+            if (message != null) {
+                text = text + " (" + message + ")";
+            }
+            return new ErrorCommand(text);
         }
         if (throwable instanceof MoveInTheSameFolderException) {
             return error(R.string.move_in_the_same_folder_error);
@@ -139,7 +144,7 @@ public class DefaultErrorParser extends ErrorParser {
         }
         if (throwable instanceof NotAllowedPathException) {
             return new ErrorCommand(
-                    getString(R.string.android_r_editor_restriction_error, throwable.getMessage())
+                    getString(R.string.android_r_editor_restriction_error, ((NotAllowedPathException) throwable).getAllowedFolders())
             );
         }
         if (throwable instanceof M3UEditorException) {

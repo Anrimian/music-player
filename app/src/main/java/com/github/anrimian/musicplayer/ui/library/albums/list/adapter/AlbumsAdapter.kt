@@ -20,7 +20,10 @@ class AlbumsAdapter(
 ) : MvpDiffAdapter<Album, AlbumViewHolder>(
     lifecycleOwner,
     recyclerView,
-    SimpleDiffItemCallback(AlbumHelper::areSourcesTheSame, AlbumHelper::getChangePayload)
+    SimpleDiffItemCallback(
+        AlbumHelper::areSourcesTheSame,
+        AlbumHelper::getChangePayload
+    )
 ) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {

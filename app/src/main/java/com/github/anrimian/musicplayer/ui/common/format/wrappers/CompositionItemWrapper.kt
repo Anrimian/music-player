@@ -15,24 +15,25 @@ import com.github.anrimian.fsync.models.state.file.FileSyncState
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.Payloads
-import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.ui.common.format.ColorFormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
+import com.github.anrimian.musicplayer.ui.common.format.TimeFormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.description.DescriptionSpannableStringBuilder
 import com.github.anrimian.musicplayer.ui.common.format.getHighlightColor
 import com.github.anrimian.musicplayer.ui.common.format.showFileSyncState
 import com.github.anrimian.musicplayer.ui.common.progress.ProgressView
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.colorFromAttr
 import com.github.anrimian.musicplayer.ui.utils.getHighlightAnimator
+import com.github.anrimian.utils.setAnimatedVectorDrawable
 
-open class CompositionItemWrapper<T: Composition>(
+open class CompositionItemWrapper<T: CompositionModel>(
     itemView: View,
     onIconClickListener: (T) -> Unit,
-    onClickListener: (T) -> Unit
+    onClickListener: (T) -> Unit,
 ) {
     private val tvMusicName: TextView = itemView.findViewById(R.id.tv_composition_name)
     private val tvAdditionalInfo: TextView = itemView.findViewById(R.id.tv_additional_info)
@@ -148,8 +149,7 @@ open class CompositionItemWrapper<T: Composition>(
     }
 
     fun showAsPlaying(isPlaying: Boolean, animate: Boolean) {
-        AndroidUtils.setAnimatedVectorDrawable(
-            ivPlay,
+        ivPlay.setAnimatedVectorDrawable(
             if (isPlaying) R.drawable.anim_play_to_pause else R.drawable.anim_pause_to_play,
             animate
         )
@@ -180,7 +180,7 @@ open class CompositionItemWrapper<T: Composition>(
 
     protected open fun getAdditionalInfo(sb: SpannableStringBuilder) {
         sb.append(FormatUtils.formatCompositionAuthor(composition, getContext()))
-        sb.append(FormatUtils.formatMilliseconds(composition.duration))
+        sb.append(TimeFormatUtils.formatMilliseconds(composition.duration))
         val corruptionHint = getCorruptionTypeHint(composition)
         if (corruptionHint != null) {
             sb.append(corruptionHint)
@@ -233,15 +233,16 @@ open class CompositionItemWrapper<T: Composition>(
         itemBackgroundWrapper.showStateColor(endColor, true)
     }
 
-    private fun getCorruptionTypeHint(composition: Composition): String? {
+    private fun getCorruptionTypeHint(composition: CompositionModel): String? {
         val corruptionType = composition.corruptionType ?: return null
         return when (corruptionType) {
             CorruptionType.UNSUPPORTED -> getContext().getString(R.string.unsupported_format_hint)
             CorruptionType.NOT_FOUND -> getContext().getString(R.string.file_not_found)
-            CorruptionType.SOURCE_NOT_FOUND -> getContext().getString(R.string.file_source_not_found)
+            CorruptionType.NOT_FOUND_IN_ALL_STORAGES -> getContext().getString(R.string.file_not_found_in_all_storages)
             CorruptionType.TOO_LARGE_SOURCE -> getContext().getString(R.string.file_is_too_large)
             CorruptionType.FILE_IS_CORRUPTED -> getContext().getString(R.string.file_is_corrupted)
             CorruptionType.FILE_READ_TIMEOUT -> getContext().getString(R.string.file_read_timeout)
+            CorruptionType.NOT_ALLOWED_PATH -> getContext().getString(R.string.not_allowed_path)
             else -> getContext().getString(R.string.unknown_play_error)
         }
     }

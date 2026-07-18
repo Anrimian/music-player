@@ -1,10 +1,9 @@
-package com.github.anrimian.musicplayer.domain.models.player;
+package com.github.anrimian.musicplayer.domain.models.player
 
 /**
  * Created on 10.12.2017.
  */
-
-public enum AudioFocusEvent {
+enum class AudioFocusEvent {
     GAIN,
     LOSS,
     LOSS_SHORTLY,

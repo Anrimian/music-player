@@ -1,481 +1,564 @@
-package com.github.anrimian.musicplayer.ui.notifications;
+package com.github.anrimian.musicplayer.ui.notifications
 
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_REPEAT_MODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.CHANGE_SHUFFLE_NODE;
-import static com.github.anrimian.musicplayer.Constants.Actions.CLOSE;
-import static com.github.anrimian.musicplayer.Constants.Actions.FAST_FORWARD;
-import static com.github.anrimian.musicplayer.Constants.Actions.PAUSE;
-import static com.github.anrimian.musicplayer.Constants.Actions.PLAY;
-import static com.github.anrimian.musicplayer.Constants.Actions.REWIND;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_NEXT;
-import static com.github.anrimian.musicplayer.Constants.Actions.SKIP_TO_PREVIOUS;
-import static com.github.anrimian.musicplayer.Constants.Arguments.LAUNCH_PREPARE_ARG;
-import static com.github.anrimian.musicplayer.Constants.Arguments.OPEN_PLAYER_PANEL_ARG;
-import static com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName;
-import static com.github.anrimian.musicplayer.infrastructure.service.music.MusicService.REQUEST_CODE;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRandomModeIcon;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeIcon;
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getRepeatModeText;
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.os.Build
+import android.support.v4.media.session.MediaSessionCompat
+import androidx.annotation.StringRes
+import androidx.core.app.NotificationCompat.Action
+import androidx.core.app.NotificationCompat.Builder
+import androidx.core.app.NotificationCompat.PRIORITY_HIGH
+import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
+import androidx.media.app.NotificationCompat
+import com.github.anrimian.musicplayer.AppConstants
+import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
+import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
+import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource
+import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting
+import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
+import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
+import com.github.anrimian.musicplayer.ui.common.format.getRemoteViewPlayerStateIcon
+import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader
+import com.github.anrimian.musicplayer.ui.main.MainActivity
+import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerActivity
+import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder
+import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
+import com.github.anrimian.utils.pIntentFlag
+import javax.annotation.Nonnull
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Build;
-import android.os.DeadSystemException;
-import android.service.notification.StatusBarNotification;
-import android.support.v4.media.session.MediaSessionCompat;
+class MediaNotificationsDisplayerImpl(
+    private val context: Context,
+    private val notificationBuilder: AppNotificationBuilder,
+    private val coverImageLoader: CoverImageLoader
+) : MediaNotificationsDisplayer {
 
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.core.app.NotificationCompat;
+    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-import com.github.anrimian.musicplayer.Constants;
-import com.github.anrimian.musicplayer.R;
-import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource;
-import com.github.anrimian.musicplayer.domain.models.composition.source.LibraryCompositionSource;
-import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotificationSetting;
-import com.github.anrimian.musicplayer.domain.utils.functions.Callback;
-import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService;
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtilsKt;
-import com.github.anrimian.musicplayer.ui.common.images.CoverImageLoader;
-import com.github.anrimian.musicplayer.ui.main.MainActivity;
-import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerActivity;
-import com.github.anrimian.musicplayer.ui.notifications.builder.AppNotificationBuilder;
-import com.github.anrimian.musicplayer.ui.utils.AndroidUtilsKt;
+    private var notificationInfoState: NotificationInfoState? = null
+    private var currentNotificationBitmap: Bitmap? = null
+    private var cancellationRunnable: Runnable? = null
 
-import javax.annotation.Nonnull;
-
-public class MediaNotificationsDisplayerImpl implements MediaNotificationsDisplayer {
-
-    private static final int FOREGROUND_NOTIFICATION_ID = 1;
-    public static final String FOREGROUND_CHANNEL_ID = "0";
-
-    private final Context context;
-    private final NotificationManager notificationManager;
-    private final AppNotificationBuilder notificationBuilder;
-    private final CoverImageLoader coverImageLoader;
-
-    private NotificationInfoState notificationInfoState;
-    private Bitmap currentNotificationBitmap;
-    private Runnable cancellationRunnable;
-
-    public MediaNotificationsDisplayerImpl(Context context,
-                                           AppNotificationBuilder notificationBuilder,
-                                           CoverImageLoader coverImageLoader) {
-        this.context = context;
-        this.notificationBuilder = notificationBuilder;
-        this.coverImageLoader = coverImageLoader;
-
-        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
+    init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
-                    context.getString(R.string.foreground_channel_description),
-                    NotificationManager.IMPORTANCE_LOW);
-            notificationManager.createNotificationChannel(channel);
+            val channel = NotificationChannel(
+                FOREGROUND_CHANNEL_ID,
+                context.getString(R.string.foreground_channel_name),
+                NotificationManager.IMPORTANCE_LOW
+            )
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
-    @Override
-    public void startStubForegroundNotification(Service service, MediaSessionCompat mediaSession) {
-        service.startForeground(FOREGROUND_NOTIFICATION_ID, getStubNotification(mediaSession));
+    override fun startStubForegroundNotification(
+        service: Service,
+        mediaSession: MediaSessionCompat
+    ) {
+        NotificationUtils.startMediaPlaybackForeground(service, FOREGROUND_NOTIFICATION_ID, getStubNotification(mediaSession))
     }
 
-    @Override
-    public Notification getStubNotification(MediaSessionCompat mediaSession) {
-        androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle();
-        style.setMediaSession(mediaSession.getSessionToken());
-        return new NotificationCompat.Builder(context, FOREGROUND_CHANNEL_ID)
-                .setContentTitle("")
-                .setContentText("")
-                .setSmallIcon(R.drawable.ic_notification_icon)
-                .setShowWhen(false)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .setStyle(style)
-                .build();
+    override fun getStubNotification(mediaSession: MediaSessionCompat): Notification {
+        val style = NotificationCompat.MediaStyle()
+        style.setMediaSession(mediaSession.sessionToken)
+        
+        val intentPlayPause = Intent(context, MusicService::class.java)
+        intentPlayPause.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.PLAY)
+        val pIntentPlayPause = PendingIntent.getService(
+            context,
+            AppConstants.Actions.PLAY,
+            intentPlayPause,
+            pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+        )
+        val playPauseAction = Action(
+            getRemoteViewPlayerStateIcon(AppConstants.RemoteViewPlayerState.PAUSE),
+            getString(R.string.play),
+            pIntentPlayPause
+        )
+        
+        return Builder(context, FOREGROUND_CHANNEL_ID)
+            .setContentTitle(context.getString(R.string.app_name))
+            .setContentText("")
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setShowWhen(false)
+            .setPriority(PRIORITY_HIGH)
+            .setVisibility(VISIBILITY_PUBLIC)
+            .setCategory(Notification.CATEGORY_SERVICE)
+            .addAction(playPauseAction)
+            .setStyle(style)
+            .build()
     }
 
-    @Override
-    public void startForegroundNotification(Service service,
-                                            int isPlayingState,
-                                            @Nullable CompositionSource source,
-                                            MediaSessionCompat mediaSession,
-                                            int repeatMode,
-                                            boolean randomMode,
-                                            @Nullable MusicNotificationSetting notificationSetting,
-                                            boolean reloadCover) {
-        notificationInfoState = new NotificationInfoState(
-                isPlayingState,
-                source,
-                mediaSession,
-                repeatMode,
-                randomMode,
-                notificationSetting
-        );
+    override fun startForegroundNotification(
+        service: Service,
+        isPlayingState: Int,
+        source: CompositionSource?,
+        mediaSession: MediaSessionCompat,
+        repeatMode: Int,
+        randomMode: Boolean,
+        notificationSetting: MusicNotificationSetting?,
+        reloadCover: Boolean
+    ) {
+        notificationInfoState = NotificationInfoState(
+            isPlayingState,
+            source,
+            mediaSession,
+            repeatMode,
+            randomMode,
+            notificationSetting
+        )
 
-        Notification notification = getDefaultMusicNotification(isPlayingState,
-                source,
-                mediaSession,
-                repeatMode,
-                randomMode,
-                notificationSetting)
-                .build();
-        service.startForeground(FOREGROUND_NOTIFICATION_ID, notification);
+        val notification = getDefaultMusicNotification(
+            isPlayingState,
+            source,
+            mediaSession,
+            repeatMode,
+            randomMode,
+            notificationSetting
+        ).build()
+        NotificationUtils.startMediaPlaybackForeground(service, FOREGROUND_NOTIFICATION_ID, notification)
 
         if (reloadCover) {
-            showMusicNotificationWithCover(source, notificationSetting);
+            showMusicNotificationWithCover(source, notificationSetting)
         }
     }
 
-    @Override
-    public void updateForegroundNotification(int isPlayingState,
-                                             @Nullable CompositionSource source,
-                                             MediaSessionCompat mediaSession,
-                                             int repeatMode,
-                                             boolean randomMode,
-                                             MusicNotificationSetting notificationSetting,
-                                             boolean reloadCover) {
+    override fun updateForegroundNotification(
+        isPlayingState: Int,
+        source: CompositionSource?,
+        mediaSession: MediaSessionCompat,
+        repeatMode: Int,
+        randomMode: Boolean,
+        notificationSetting: MusicNotificationSetting?,
+        reloadCover: Boolean
+    ) {
         if (!isNotificationVisible(notificationManager, FOREGROUND_NOTIFICATION_ID)) {
-            return;
+            return
         }
 
-        notificationInfoState = new NotificationInfoState(
-                isPlayingState,
-                source,
-                mediaSession,
-                repeatMode,
-                randomMode,
-                notificationSetting
-        );
+        notificationInfoState = NotificationInfoState(
+            isPlayingState,
+            source,
+            mediaSession,
+            repeatMode,
+            randomMode,
+            notificationSetting
+        )
 
-        Notification notification = getDefaultMusicNotification(isPlayingState,
-                source,
-                mediaSession,
-                repeatMode,
-                randomMode,
-                notificationSetting)
-                .build();
-        safeNotify(notificationManager, FOREGROUND_NOTIFICATION_ID, notification);
+        val notification = getDefaultMusicNotification(
+            isPlayingState,
+            source,
+            mediaSession,
+            repeatMode,
+            randomMode,
+            notificationSetting
+        ).build()
+        safeNotify(notificationManager, FOREGROUND_NOTIFICATION_ID, notification)
 
         if (reloadCover) {
-            showMusicNotificationWithCover(source, notificationSetting);
+            showMusicNotificationWithCover(source, notificationSetting)
         }
     }
 
-    @Override
-    public void cancelCoverLoadingForForegroundNotification() {
-        if (cancellationRunnable != null) {
-            cancellationRunnable.run();
-        }
+    override fun cancelCoverLoadingForForegroundNotification() {
+        cancellationRunnable?.run()
     }
 
-    private void showMusicNotificationWithCover(@Nullable CompositionSource source,
-                                                @Nullable MusicNotificationSetting notificationSetting) {
-        cancelCoverLoadingForForegroundNotification();
+    private fun showMusicNotificationWithCover(
+        source: CompositionSource?,
+        notificationSetting: MusicNotificationSetting?
+    ) {
+        cancelCoverLoadingForForegroundNotification()
 
         if (source == null) {
-            return;
+            return
         }
 
-        boolean showCovers = false;
+        var showCovers = false
         if (notificationSetting != null) {
-            showCovers = notificationSetting.isShowCovers();
+            showCovers = notificationSetting.isShowCovers
         }
         if (!showCovers) {
-            return;
+            return
         }
 
         //keep in mind, we cancel and get short update with an old data
         cancellationRunnable = getCompositionSourceCover(
-                source,
-                bitmap -> {
-                    if (notificationInfoState == null) {
-                        return;
-                    }
+            source,
+            { bitmap ->
+                var currentBitmap = bitmap
+                val infoState = notificationInfoState ?: return@getCompositionSourceCover
 
-                    boolean showNotificationCoverStub = true;
-                    MusicNotificationSetting setting = notificationInfoState.notificationSetting;
-                    if (setting != null) {
-                        showNotificationCoverStub = setting.isShowNotificationCoverStub();
-                    }
-                    if (bitmap == null && showNotificationCoverStub) {
-                        bitmap = coverImageLoader.getDefaultNotificationBitmap();
-                    }
+                var showNotificationCoverStub = true
+                val setting = infoState.notificationSetting
+                if (setting != null) {
+                    showNotificationCoverStub = setting.isShowNotificationCoverStub
+                }
+                if (currentBitmap == null && showNotificationCoverStub) {
+                    currentBitmap = coverImageLoader.getDefaultNotificationBitmap()
+                }
 
-                    NotificationCompat.Builder builder = getDefaultMusicNotification(
-                            notificationInfoState.isPlayingState,
-                            notificationInfoState.source,
-                            notificationInfoState.mediaSession,
-                            notificationInfoState.repeatMode,
-                            notificationInfoState.randomMode,
-                            notificationInfoState.notificationSetting
-                    );
+                val builder = getDefaultMusicNotification(
+                    infoState.isPlayingState,
+                    infoState.source,
+                    infoState.mediaSession,
+                    infoState.repeatMode,
+                    infoState.randomMode,
+                    infoState.notificationSetting
+                )
 
-                    builder.setLargeIcon(bitmap);
-                    currentNotificationBitmap = bitmap;
-                    safeNotify(notificationManager, FOREGROUND_NOTIFICATION_ID, builder.build());
-                },
-                coverImageLoader);
+                builder.setLargeIcon(currentBitmap)
+                currentNotificationBitmap = currentBitmap
+                safeNotify(notificationManager, FOREGROUND_NOTIFICATION_ID, builder.build())
+            },
+            coverImageLoader
+        )
     }
 
-    private NotificationCompat.Builder getDefaultMusicNotification(int isPlayingState,
-                                                                   @Nullable CompositionSource source,
-                                                                   MediaSessionCompat mediaSession,
-                                                                   int repeatMode,
-                                                                   boolean randomMode,
-                                                                   @Nullable MusicNotificationSetting notificationSetting) {
-        Intent intent;
-        if (source instanceof ExternalCompositionSource) {
-            intent = new Intent(context, ExternalPlayerActivity.class);
-            intent.putExtra(LAUNCH_PREPARE_ARG, false);
+    private fun getDefaultMusicNotification(
+        isPlayingState: Int,
+        source: CompositionSource?,
+        mediaSession: MediaSessionCompat,
+        repeatMode: Int,
+        randomMode: Boolean,
+        notificationSetting: MusicNotificationSetting?
+    ): Builder {
+        val intent: Intent?
+        if (source is ExternalCompositionSource) {
+            intent = Intent(context, ExternalPlayerActivity::class.java)
+            intent.putExtra(AppConstants.Arguments.LAUNCH_PREPARE_ARG, false)
         } else {
-            intent = new Intent(context, MainActivity.class);
-            intent.putExtra(OPEN_PLAYER_PANEL_ARG, true);
+            intent = Intent(context, MainActivity::class.java)
+            intent.putExtra(AppConstants.Arguments.OPEN_PLAYER_PANEL_ARG, true)
         }
-        PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+        val pIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+        )
 
-        boolean coloredNotification = false;
-        boolean showNotificationCoverStub = true;
-        boolean showCovers = false;
+        var coloredNotification = false
+        var showNotificationCoverStub = true
+        var showCovers = false
         if (notificationSetting != null) {
-            coloredNotification = notificationSetting.isColoredNotification();
-            showNotificationCoverStub = notificationSetting.isShowNotificationCoverStub();
-            showCovers = notificationSetting.isShowCovers();
+            coloredNotification = notificationSetting.isColoredNotification
+            showNotificationCoverStub = notificationSetting.isShowNotificationCoverStub
+            showCovers = notificationSetting.isShowCovers
         }
 
-        NotificationCompat.Builder builder = notificationBuilder.buildMusicNotification(context)
-                .setColorized(coloredNotification)
-                .setSmallIcon(R.drawable.ic_notification_icon)
-                .setContentIntent(pIntent)
-                .setShowWhen(false)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setCategory(Notification.CATEGORY_SERVICE);
+        val builder = notificationBuilder.buildMusicNotification(context)
+            .setColorized(coloredNotification)
+            .setSmallIcon(R.drawable.ic_notification_icon)
+            .setContentIntent(pIntent)
+            .setShowWhen(false)
+            .setPriority(PRIORITY_HIGH)
+            .setVisibility(VISIBILITY_PUBLIC)
+            .setCategory(Notification.CATEGORY_SERVICE)
 
         if (source != null) {
-            formatCompositionSource(source, builder);
-            setActionsToNotification(isPlayingState, source, mediaSession, repeatMode, randomMode, builder);
+            formatCompositionSource(source, builder)
+            setActionsToNotification(
+                isPlayingState,
+                source,
+                mediaSession,
+                repeatMode,
+                randomMode,
+                builder
+            )
+        } else {
+            builder.setContentTitle(context.getString(R.string.app_name))
+            
+            val intentPlayPause = Intent(context, MusicService::class.java)
+            intentPlayPause.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.PLAY)
+            val pIntentPlayPause = PendingIntent.getService(
+                context,
+                AppConstants.Actions.PLAY,
+                intentPlayPause,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
+            val playPauseAction = Action(
+                getRemoteViewPlayerStateIcon(AppConstants.RemoteViewPlayerState.PAUSE),
+                getString(R.string.play),
+                pIntentPlayPause
+            )
+            builder.addAction(playPauseAction)
         }
 
         if (showCovers) {
-            Bitmap bitmap = currentNotificationBitmap;
+            var bitmap = currentNotificationBitmap
             if (!showNotificationCoverStub && bitmap == coverImageLoader.getDefaultNotificationBitmap()) {
-                bitmap = null;
+                bitmap = null
             }
-            if ((bitmap == null || bitmap.isRecycled()) && showNotificationCoverStub) {
-                bitmap = coverImageLoader.getDefaultNotificationBitmap();
+            if ((bitmap == null || bitmap.isRecycled) && showNotificationCoverStub) {
+                bitmap = coverImageLoader.getDefaultNotificationBitmap()
             }
-            builder.setLargeIcon(bitmap);
+            builder.setLargeIcon(bitmap)
         }
 
-        return builder;
+        return builder
     }
 
-    private void setActionsToNotification(int isPlayingState,
-                                          @Nonnull CompositionSource source,
-                                          MediaSessionCompat mediaSession,
-                                          int repeatMode,
-                                          boolean randomMode,
-                                          NotificationCompat.Builder builder) {
-        int requestCode = isPlayingState == Constants.RemoteViewPlayerState.PAUSE? PLAY: PAUSE;
-        Intent intentPlayPause = new Intent(context, MusicService.class);
-        intentPlayPause.putExtra(REQUEST_CODE, requestCode);
-        PendingIntent pIntentPlayPause = PendingIntent.getService(context,
-                requestCode,
-                intentPlayPause,
-                AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+    private fun setActionsToNotification(
+        isPlayingState: Int,
+        @Nonnull source: CompositionSource,
+        mediaSession: MediaSessionCompat,
+        repeatMode: Int,
+        randomMode: Boolean,
+        builder: Builder
+    ) {
+        val requestCode = if (isPlayingState == AppConstants.RemoteViewPlayerState.PAUSE) {
+            AppConstants.Actions.PLAY
+        } else {
+            AppConstants.Actions.PAUSE
+        }
+        val intentPlayPause = Intent(context, MusicService::class.java)
+        intentPlayPause.putExtra(MusicService.REQUEST_CODE, requestCode)
+        val pIntentPlayPause = PendingIntent.getService(
+            context,
+            requestCode,
+            intentPlayPause,
+            pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+        )
 
-        NotificationCompat.Action playPauseAction = new NotificationCompat.Action(
-                FormatUtilsKt.getRemoteViewPlayerStateIcon(isPlayingState),
-                getString(isPlayingState == Constants.RemoteViewPlayerState.PAUSE? R.string.play: R.string.pause),
-                pIntentPlayPause);
+        val playPauseAction = Action(
+            getRemoteViewPlayerStateIcon(isPlayingState),
+            getString(if (isPlayingState == AppConstants.RemoteViewPlayerState.PAUSE) R.string.play else R.string.pause),
+            pIntentPlayPause
+        )
 
-        androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle();
-        style.setMediaSession(mediaSession.getSessionToken());
+        val style = NotificationCompat.MediaStyle()
+        style.setMediaSession(mediaSession.sessionToken)
 
-        if (source instanceof LibraryCompositionSource) {
-            Intent intentChangeRandomMode = new Intent(context, MusicService.class);
-            intentChangeRandomMode.putExtra(REQUEST_CODE, CHANGE_SHUFFLE_NODE);
-            PendingIntent pIntentChangeRandomMode = PendingIntent.getService(context,
-                    CHANGE_SHUFFLE_NODE,
-                    intentChangeRandomMode,
-                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-            NotificationCompat.Action changeRandomModeAction = new NotificationCompat.Action(
-                    getRandomModeIcon(randomMode),
-                    context.getString(R.string.content_description_shuffle),
-                    pIntentChangeRandomMode);
+        if (source is LibraryCompositionSource) {
+            val intentChangeRandomMode = Intent(context, MusicService::class.java)
+            intentChangeRandomMode.putExtra(
+                MusicService.REQUEST_CODE,
+                AppConstants.Actions.CHANGE_SHUFFLE_NODE
+            )
+            val pIntentChangeRandomMode = PendingIntent.getService(
+                context,
+                AppConstants.Actions.CHANGE_SHUFFLE_NODE,
+                intentChangeRandomMode,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
+            val changeRandomModeAction = Action(
+                FormatUtils.getRandomModeIcon(randomMode),
+                context.getString(R.string.content_description_shuffle),
+                pIntentChangeRandomMode
+            )
 
-            Intent intentSkipToPrevious = new Intent(context, MusicService.class);
-            intentSkipToPrevious.putExtra(REQUEST_CODE, SKIP_TO_PREVIOUS);
-            PendingIntent pIntentSkipToPrevious = PendingIntent.getService(context,
-                    SKIP_TO_PREVIOUS,
-                    intentSkipToPrevious,
-                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+            val intentSkipToPrevious = Intent(context, MusicService::class.java)
+            intentSkipToPrevious.putExtra(
+                MusicService.REQUEST_CODE,
+                AppConstants.Actions.SKIP_TO_PREVIOUS
+            )
+            val pIntentSkipToPrevious = PendingIntent.getService(
+                context,
+                AppConstants.Actions.SKIP_TO_PREVIOUS,
+                intentSkipToPrevious,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
 
-            Intent intentSkipToNext = new Intent(context, MusicService.class);
-            intentSkipToNext.putExtra(REQUEST_CODE, SKIP_TO_NEXT);
-            PendingIntent pIntentSkipToNext = PendingIntent.getService(context,
-                    SKIP_TO_NEXT,
-                    intentSkipToNext,
-                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+            val intentSkipToNext = Intent(context, MusicService::class.java)
+            intentSkipToNext.putExtra(
+                MusicService.REQUEST_CODE,
+                AppConstants.Actions.SKIP_TO_NEXT
+            )
+            val pIntentSkipToNext = PendingIntent.getService(
+                context,
+                AppConstants.Actions.SKIP_TO_NEXT,
+                intentSkipToNext,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
 
-            Intent intentChangeRepeatMode = new Intent(context, MusicService.class);
-            intentChangeRepeatMode.putExtra(REQUEST_CODE, CHANGE_REPEAT_MODE);
-            PendingIntent pIntentChangeRepeatMode = PendingIntent.getService(context,
-                    CHANGE_REPEAT_MODE,
-                    intentChangeRepeatMode,
-                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-            NotificationCompat.Action changeRepeatModeAction = new NotificationCompat.Action(
-                    getRepeatModeIcon(repeatMode),
-                    getString(getRepeatModeText(repeatMode)),
-                    pIntentChangeRepeatMode);
+            val intentChangeRepeatMode = Intent(context, MusicService::class.java)
+            intentChangeRepeatMode.putExtra(
+                MusicService.REQUEST_CODE,
+                AppConstants.Actions.CHANGE_REPEAT_MODE
+            )
+            val pIntentChangeRepeatMode = PendingIntent.getService(
+                context,
+                AppConstants.Actions.CHANGE_REPEAT_MODE,
+                intentChangeRepeatMode,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
+            val changeRepeatModeAction = Action(
+                FormatUtils.getRepeatModeIcon(repeatMode),
+                getString(FormatUtils.getRepeatModeText(repeatMode)),
+                pIntentChangeRepeatMode
+            )
 
-            style.setShowActionsInCompactView(1, 2, 3);
+            style.setShowActionsInCompactView(1, 2, 3)
 
             builder.addAction(changeRandomModeAction)
-                    .addAction(R.drawable.ic_skip_previous, getString(R.string.previous_track), pIntentSkipToPrevious)
-                    .addAction(playPauseAction)
-                    .addAction(R.drawable.ic_skip_next, getString(R.string.next_track), pIntentSkipToNext)
-                    .addAction(changeRepeatModeAction);
+                .addAction(
+                    R.drawable.ic_skip_previous,
+                    getString(R.string.previous_track),
+                    pIntentSkipToPrevious
+                )
+                .addAction(playPauseAction)
+                .addAction(
+                    R.drawable.ic_skip_next,
+                    getString(R.string.next_track),
+                    pIntentSkipToNext
+                )
+                .addAction(changeRepeatModeAction)
         }
-        if (source instanceof ExternalCompositionSource) {
-            Intent intentChangeRepeatMode = new Intent(context, MusicService.class);
-            intentChangeRepeatMode.putExtra(REQUEST_CODE, CHANGE_REPEAT_MODE);
-            PendingIntent pIntentChangeRepeatMode = PendingIntent.getService(context,
-                    CHANGE_REPEAT_MODE,
-                    intentChangeRepeatMode,
-                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
-            NotificationCompat.Action changeRepeatModeAction = new NotificationCompat.Action(
-                    getRepeatModeIcon(repeatMode),
-                    getString(getRepeatModeText(repeatMode)),
-                    pIntentChangeRepeatMode);
+        if (source is ExternalCompositionSource) {
+            val intentChangeRepeatMode = Intent(context, MusicService::class.java)
+            intentChangeRepeatMode.putExtra(
+                MusicService.REQUEST_CODE,
+                AppConstants.Actions.CHANGE_REPEAT_MODE
+            )
+            val pIntentChangeRepeatMode = PendingIntent.getService(
+                context,
+                AppConstants.Actions.CHANGE_REPEAT_MODE,
+                intentChangeRepeatMode,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
+            val changeRepeatModeAction = Action(
+                FormatUtils.getRepeatModeIcon(repeatMode),
+                getString(FormatUtils.getRepeatModeText(repeatMode)),
+                pIntentChangeRepeatMode
+            )
 
-            Intent intentRewind = new Intent(context, MusicService.class);
-            intentRewind.putExtra(REQUEST_CODE, REWIND);
-            PendingIntent pIntentRewind = PendingIntent.getService(context,
-                    REWIND,
-                    intentRewind,
-                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+            val intentRewind = Intent(context, MusicService::class.java)
+            intentRewind.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.REWIND)
+            val pIntentRewind = PendingIntent.getService(
+                context,
+                AppConstants.Actions.REWIND,
+                intentRewind,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
 
-            Intent intentFastForward = new Intent(context, MusicService.class);
-            intentFastForward.putExtra(REQUEST_CODE, FAST_FORWARD);
-            PendingIntent pIntentFastForward = PendingIntent.getService(context,
-                    FAST_FORWARD,
-                    intentFastForward,
-                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+            val intentFastForward = Intent(context, MusicService::class.java)
+            intentFastForward.putExtra(
+                MusicService.REQUEST_CODE,
+                AppConstants.Actions.FAST_FORWARD
+            )
+            val pIntentFastForward = PendingIntent.getService(
+                context,
+                AppConstants.Actions.FAST_FORWARD,
+                intentFastForward,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
 
-            Intent intentClose = new Intent(context, MusicService.class);
-            intentClose.putExtra(REQUEST_CODE, CLOSE);
-            PendingIntent pIntentClose = PendingIntent.getService(context,
-                    CLOSE,
-                    intentClose,
-                    AndroidUtilsKt.pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT));
+            val intentClose = Intent(context, MusicService::class.java)
+            intentClose.putExtra(MusicService.REQUEST_CODE, AppConstants.Actions.CLOSE)
+            val pIntentClose = PendingIntent.getService(
+                context,
+                AppConstants.Actions.CLOSE,
+                intentClose,
+                pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+            )
 
-            style.setShowActionsInCompactView(1, 2, 3);
+            style.setShowActionsInCompactView(1, 2, 3)
 
             builder.addAction(changeRepeatModeAction)
-                    .addAction(R.drawable.ic_rewind, getString(R.string.rewind), pIntentRewind)
-                    .addAction(playPauseAction)
-                    .addAction(R.drawable.ic_fast_forward, getString(R.string.fast_forward), pIntentFastForward)
-                    .addAction(R.drawable.ic_close, getString(R.string.close), pIntentClose);
+                .addAction(R.drawable.ic_rewind, getString(R.string.rewind), pIntentRewind)
+                .addAction(playPauseAction)
+                .addAction(
+                    R.drawable.ic_fast_forward,
+                    getString(R.string.fast_forward),
+                    pIntentFastForward
+                )
+                .addAction(R.drawable.ic_close, getString(R.string.close), pIntentClose)
         }
 
-        builder.setStyle(style);
+        builder.setStyle(style)
     }
 
-    private void formatCompositionSource(@Nonnull CompositionSource source,
-                                         NotificationCompat.Builder builder) {
-        if (source instanceof LibraryCompositionSource) {
-            Composition composition = ((LibraryCompositionSource) source).getComposition();
-            builder.setContentTitle(formatCompositionName(composition))
-                    .setContentText(formatCompositionAuthor(composition, context));
+    private fun formatCompositionSource(
+        @Nonnull source: CompositionSource,
+        builder: Builder
+    ) {
+        if (source is LibraryCompositionSource) {
+            val composition = source.composition
+            builder.setContentTitle(CompositionHelper.formatCompositionName(composition))
+                .setContentText(FormatUtils.formatCompositionAuthor(composition, context))
         }
-        if (source instanceof ExternalCompositionSource) {
-            ExternalCompositionSource eSource = (ExternalCompositionSource) source;
-            builder.setContentTitle(formatCompositionName(eSource.getTitle(), eSource.getDisplayName()))
-                    .setContentText(formatAuthor(eSource.getArtist(), context));
+        if (source is ExternalCompositionSource) {
+            builder.setContentTitle(
+                CompositionHelper.formatCompositionName(
+                    source.title,
+                    source.displayName
+                )
+            ).setContentText(FormatUtils.formatAuthor(source.artist, context))
         }
     }
 
-    private boolean isNotificationVisible(NotificationManager notificationManager,
-                                          int notificationId) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+    private fun isNotificationVisible(
+        notificationManager: NotificationManager,
+        notificationId: Int
+    ): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
-                StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
-                for (StatusBarNotification notification : notifications) {
-                    if (notification.getId() == notificationId) {
-                        return true;
+                val notifications = notificationManager.getActiveNotifications()
+                for (notification in notifications) {
+                    if (notification.id == notificationId) {
+                        return true
                     }
                 }
-                return false;
-            } catch (Exception ignored) {} //getActiveNotifications() can throw exception on android 6
+                return false
+            } catch (_: Exception) {
+            } //getActiveNotifications() can throw exception on android 6
         }
-        return true;
+        return true
     }
 
 
-    private void safeNotify(NotificationManager notificationManager,
-                            int id,
-                            Notification notification) {
+    private fun safeNotify(
+        notificationManager: NotificationManager,
+        id: Int,
+        notification: Notification?
+    ) {
         try {
-            notificationManager.notify(id, notification);
-        } catch (RuntimeException e) {
-            Throwable cause = e.getCause();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && cause instanceof DeadSystemException) {
-                return;
+            notificationManager.notify(id, notification)
+        } catch (e: RuntimeException) {
+            if (AndroidUtils.isDeadSystemException(e)) {
+                return
             }
-            throw e;
+            throw e
         }
     }
 
-    private String getString(@StringRes int resId) {
-        return context.getString(resId);
+    private fun getString(@StringRes resId: Int): String {
+        return context.getString(resId)
     }
 
-    private static Runnable getCompositionSourceCover(@Nonnull CompositionSource source,
-                                                     Callback<Bitmap> onCompleted,
-                                                     CoverImageLoader coverImageLoader) {
-        if (source instanceof LibraryCompositionSource) {
-            Composition composition = ((LibraryCompositionSource) source).getComposition();
-            return coverImageLoader.loadNotificationImage(composition, onCompleted);
-        }
-        if (source instanceof ExternalCompositionSource) {
-            return coverImageLoader.loadNotificationImage((ExternalCompositionSource) source, onCompleted);
-        }
-        throw new IllegalStateException();
-    }
+    private class NotificationInfoState(
+        val isPlayingState: Int,
+        val source: CompositionSource?,
+        val mediaSession: MediaSessionCompat,
+        val repeatMode: Int,
+        val randomMode: Boolean,
+        val notificationSetting: MusicNotificationSetting?
+    )
 
-    private static class NotificationInfoState {
-        final int isPlayingState;
-        final @Nullable CompositionSource source;
-        final MediaSessionCompat mediaSession;
-        final int repeatMode;
-        final boolean randomMode;
-        final MusicNotificationSetting notificationSetting;
+    companion object {
+        private const val FOREGROUND_NOTIFICATION_ID = 1
+        const val FOREGROUND_CHANNEL_ID: String = "0"
 
-        public NotificationInfoState(int isPlayingState,
-                                     @Nullable CompositionSource source,
-                                     MediaSessionCompat mediaSession,
-                                     int repeatMode,
-                                     boolean randomMode,
-                                     MusicNotificationSetting notificationSetting) {
-            this.isPlayingState = isPlayingState;
-            this.source = source;
-            this.mediaSession = mediaSession;
-            this.repeatMode = repeatMode;
-            this.randomMode = randomMode;
-            this.notificationSetting = notificationSetting;
+        private fun getCompositionSourceCover(
+            source: CompositionSource,
+            onCompleted: (Bitmap?) -> Unit,
+            coverImageLoader: CoverImageLoader
+        ): Runnable {
+            if (source is LibraryCompositionSource) {
+                val composition = source.composition
+                return coverImageLoader.loadNotificationImage(composition, onCompleted)
+            }
+            if (source is ExternalCompositionSource) {
+                return coverImageLoader.loadNotificationImage(source, onCompleted)
+            }
+            throw IllegalStateException()
         }
     }
 }

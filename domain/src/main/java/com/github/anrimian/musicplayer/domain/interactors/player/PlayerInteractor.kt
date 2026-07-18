@@ -195,20 +195,18 @@ class PlayerInteractor(
     }
 
     fun onSeekStarted() {
-        if (playerStateSubject.value == PlayerState.PLAY) {
-            pauseInternal()
-        }
+        stopTracingTrackPosition()
     }
 
     fun onSeekFinished(position: Long) {
-        if (playerStateSubject.value == PlayerState.PLAY) {
-            resumeInternal()
-        }
         if (!isPreparing) {
             musicPlayerController.seekTo(position)
         }
         updateCurrentPosition(position)
         trackPositionChangeSubject.onNext(position)
+        if (playerStateSubject.value == PlayerState.PLAY) {
+            startTracingTrackPosition()
+        }
     }
 
     fun fastSeekForward(): Single<Long> {
@@ -388,6 +386,9 @@ class PlayerInteractor(
     }
 
     private fun onAudioBecomingNoisy() {
+        if (!settingsRepository.isPauseOnAudioDeviceRemoveEnabled) {
+            return
+        }
         systemServiceController.stopMusicService()
         if (pausedTransient) {
             pausedTransient = false

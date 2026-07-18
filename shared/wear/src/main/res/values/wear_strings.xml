@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wear_path_prefix" translatable="false">/wear-command</string>
+    <string name="wear_capability" translatable="false">smp-node-companion</string>
+    <string name="wear_device_capability" translatable="false">smp-node-host</string>
+</resources>

@@ -17,6 +17,7 @@ class CompositeMediaPlayer(
     private val mediaPlayers: ArrayList<() -> AppMediaPlayer>,
     private var currentPlaySpeed: Float,
     private var currentSoundBalance: SoundBalance,
+    private var currentSkipSilenceEnabled: Boolean,
 ): AppMediaPlayer {
 
     private val playerEventsSubject = PublishSubject.create<MediaPlayerEvent>()
@@ -103,6 +104,11 @@ class CompositeMediaPlayer(
         currentPlayer.setPlaybackSpeed(speed)
     }
 
+    override fun setSkipSilenceEnabled(enabled: Boolean) {
+        currentSkipSilenceEnabled = enabled
+        currentPlayer.setSkipSilenceEnabled(enabled)
+    }
+
     override fun release() {
         currentSource = null
         currentPlayer.release()
@@ -131,6 +137,7 @@ class CompositeMediaPlayer(
         val newPlayer = mediaPlayers[index]()
         newPlayer.setPlaybackSpeed(currentPlaySpeed)
         newPlayer.setSoundBalance(currentSoundBalance)
+        newPlayer.setSkipSilenceEnabled(currentSkipSilenceEnabled)
 
         playerDisposable.clear()
         playerDisposable.add(newPlayer.getPlayerEventsObservable()

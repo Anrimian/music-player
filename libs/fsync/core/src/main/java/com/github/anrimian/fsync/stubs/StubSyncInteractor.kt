@@ -5,6 +5,7 @@ import com.github.anrimian.fsync.models.Optional
 import com.github.anrimian.fsync.models.RemoteFileSource
 import com.github.anrimian.fsync.models.SyncEnvCondition
 import com.github.anrimian.fsync.models.catalog.ChangedKey
+import com.github.anrimian.fsync.models.run.ScheduledTaskRunResult
 import com.github.anrimian.fsync.models.state.SyncState
 import com.github.anrimian.fsync.models.state.file.FileSyncState
 import com.github.anrimian.fsync.models.storage.RemoteStorageFullInfo
@@ -14,11 +15,17 @@ import com.github.anrimian.fsync.models.task.FileTaskInfo
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
+import java.io.FileNotFoundException
 
 class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
-    override fun onAppStarted() {}
+    override fun start() {}
+    override fun onAppVisibilityChanged(isVisible: Boolean) {}
+    override fun isAppVisible() = false
     override fun requestFileSync(ignoreConditions: Boolean) {}
+    override fun runScheduledSync(): Single<ScheduledTaskRunResult> = Single.never()
     override fun cancelCurrentTask() {}
+    override fun postponeTasksExecution() {}
+    override fun isLongTaskDetected() = false
 
     override fun runFileTasks() {}
 
@@ -50,14 +57,20 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
         restoredKeys: List<K>,
         changedKeys: List<ChangedKey<K>>,
         time: Long,
-    )= Completable.complete()
+    ) = Completable.complete()
+    override fun onLocalFilesChanged(
+        disappeared: List<K>,
+        reappeared: List<K>,
+        changedKeys: List<ChangedKey<K>>,
+        time: Long,
+    ) = Completable.complete()
     override fun notifyLocalFileChanged() {}
+    override fun isSyncAvailable() = false
     override fun isSyncEnabled() = false
     override fun setSyncEnabled(enabled: Boolean) {}
     override fun isSyncEnabledAndSet() = false
     override fun resetStoragesState() = Completable.complete()
     override fun resetStoragesStateAndLogout() = Completable.complete()
-    override fun onScheduledSyncCalled(): Completable = Completable.never()
     override fun getSyncConditions(): List<SyncEnvCondition> {
         return emptyList()
     }
@@ -92,11 +105,7 @@ class StubSyncInteractor<K, T, I> : SyncInteractor<K, T, I> {
         return Observable.never()
     }
 
-    override fun getHasScheduledTasksObservable(): Observable<Boolean> {
-        return Observable.never()
-    }
-
     override fun requestFileSource(fileId: I): Single<RemoteFileSource> {
-        return Single.never()
+        return Single.error(FileNotFoundException())
     }
 }

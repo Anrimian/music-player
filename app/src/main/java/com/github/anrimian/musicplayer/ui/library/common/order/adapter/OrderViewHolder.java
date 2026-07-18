@@ -1,5 +1,7 @@
 package com.github.anrimian.musicplayer.ui.library.common.order.adapter;
 
+import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getOrderTitle;
+
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
@@ -9,8 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.anrimian.musicplayer.R;
 import com.github.anrimian.musicplayer.domain.models.order.OrderType;
 import com.github.anrimian.musicplayer.ui.utils.OnItemClickListener;
-
-import static com.github.anrimian.musicplayer.ui.common.format.FormatUtils.getOrderTitle;
 
 class OrderViewHolder extends RecyclerView.ViewHolder {
 

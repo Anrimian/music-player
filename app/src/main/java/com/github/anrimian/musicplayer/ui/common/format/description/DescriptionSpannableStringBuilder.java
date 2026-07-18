@@ -9,10 +9,11 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 
 import com.github.anrimian.musicplayer.R;
+import com.github.anrimian.musicplayer.ui.common.text.CenteredImageSpan;
 
 public class DescriptionSpannableStringBuilder extends SpannableStringBuilder {
 
-    private static final int DEFAULT_DIVIDER = R.drawable.ic_description_text_circle;
+    private static final int DEFAULT_DIVIDER = R.drawable.ic_secondary_text_circle;
 
     private final Context context;
     private final @DrawableRes int dividerDrawableRes;

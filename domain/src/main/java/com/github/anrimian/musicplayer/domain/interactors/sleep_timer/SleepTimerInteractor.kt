@@ -1,57 +1,71 @@
 package com.github.anrimian.musicplayer.domain.interactors.sleep_timer
 
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
+import com.github.anrimian.musicplayer.domain.models.player.PlayerState
 import com.github.anrimian.musicplayer.domain.repositories.SettingsRepository
+import com.github.anrimian.musicplayer.domain.utils.coroutines.onSuccess
+import com.github.anrimian.musicplayer.domain.utils.coroutines.tickerLongValueFlow
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.rx3.asFlow
+import kotlinx.coroutines.rx3.asObservable
+import kotlin.time.Duration.Companion.seconds
 
 const val NO_TIMER = -1L
 
 class SleepTimerInteractor(
     private val libraryPlayerInteractor: LibraryPlayerInteractor,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val appComputationScope: CoroutineScope,
 ) {
 
-    private val timerCountDownSubject = BehaviorSubject.createDefault(NO_TIMER)
-    private val sleepTimerStateSubject = BehaviorSubject.createDefault(SleepTimerState.DISABLED)
+    private val timerCountDownFlow = MutableStateFlow(NO_TIMER)
+    private val sleepTimerStateFlow = MutableStateFlow(SleepTimerState.DISABLED)
 
-    private var timerDisposable: Disposable? = null
+    private var timerJob: Job? = null
     private var remainingMillis: Long = 0
 
     fun start() {
         startSleepTimer(settingsRepository.sleepTimerTime)
-        sleepTimerStateSubject.onNext(SleepTimerState.ENABLED)
+        sleepTimerStateFlow.value = SleepTimerState.ENABLED
     }
 
     fun stop() {
-        timerDisposable?.dispose()
+        timerJob?.cancel()
         remainingMillis = 0L
-        timerCountDownSubject.onNext(NO_TIMER)
-        sleepTimerStateSubject.onNext(SleepTimerState.DISABLED)
+        timerCountDownFlow.value = NO_TIMER
+        sleepTimerStateFlow.value = SleepTimerState.DISABLED
     }
 
     fun pause() {
-        timerDisposable?.dispose()
-        sleepTimerStateSubject.onNext(SleepTimerState.PAUSED)
+        timerJob?.cancel()
+        sleepTimerStateFlow.value = SleepTimerState.PAUSED
     }
 
     fun resume() {
         startSleepTimer(remainingMillis)
-        sleepTimerStateSubject.onNext(SleepTimerState.ENABLED)
+        sleepTimerStateFlow.value = SleepTimerState.ENABLED
     }
 
-    fun getSleepTimerCountDownObservable(): Observable<Long> = timerCountDownSubject
+    fun getSleepTimerCountDownObservable(): Observable<Long> = timerCountDownFlow.asObservable()
 
-    fun getSleepTimerStateObservable(): Observable<SleepTimerState> = sleepTimerStateSubject
+    fun getSleepTimerStateFlow(): Flow<SleepTimerState> = sleepTimerStateFlow
 
     fun setPlayLastSong(playLastSong: Boolean) {
         settingsRepository.isSleepTimerPlayLastSong = playLastSong
     }
 
     fun setSleepTimerTime(millis: Long) {
-        if (sleepTimerStateSubject.value == SleepTimerState.ENABLED) {
+        if (sleepTimerStateFlow.value == SleepTimerState.ENABLED) {
             return
         }
         settingsRepository.sleepTimerTime = millis
@@ -61,22 +75,26 @@ class SleepTimerInteractor(
 
     private fun startSleepTimer(timeMillis: Long) {
         remainingMillis = timeMillis
-        timerDisposable = Observable.interval(1, TimeUnit.SECONDS)
-                .map {
-                    remainingMillis -= 1000L
-                    return@map remainingMillis
+        timerJob = libraryPlayerInteractor.getPlayerStateObservable().asFlow()
+            .flatMapLatest { playerState ->
+                if (playerState == PlayerState.PLAY) {
+                    tickerLongValueFlow(remainingMillis, -1000L, 1.seconds, 1.seconds)
+                        .onEach { millis -> remainingMillis = millis }
+                } else {
+                    flowOf(remainingMillis)
                 }
-                .doOnSubscribe { timerCountDownSubject.onNext(remainingMillis) }
-                .doOnNext(timerCountDownSubject::onNext)
-                .takeUntil { millis: Long -> millis < 0 }
-                .doOnComplete(this::onTimerFinished)
-                .subscribe()
+            }
+            .onStart { timerCountDownFlow.value = remainingMillis }
+            .onEach { millis -> timerCountDownFlow.value = millis }
+            .takeWhile { millis -> millis >= 0 }
+            .onSuccess(::onTimerFinished)
+            .launchIn(appComputationScope)
     }
 
     private fun onTimerFinished() {
         libraryPlayerInteractor.pause()
-        timerCountDownSubject.onNext(NO_TIMER)
-        sleepTimerStateSubject.onNext(SleepTimerState.DISABLED)
+        timerCountDownFlow.value = NO_TIMER
+        sleepTimerStateFlow.value = SleepTimerState.DISABLED
     }
 
 }

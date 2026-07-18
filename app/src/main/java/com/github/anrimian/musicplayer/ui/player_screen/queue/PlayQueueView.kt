@@ -6,7 +6,7 @@ import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposit
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryView
-import com.github.anrimian.musicplayer.ui.utils.moxy.SingleOneExecution
+import com.github.anrimian.utils.moxy.SingleOneExecution
 import moxy.viewstate.strategy.AddToEndSingleTagStrategy
 import moxy.viewstate.strategy.StateStrategyType
 import moxy.viewstate.strategy.alias.AddToEndSingle

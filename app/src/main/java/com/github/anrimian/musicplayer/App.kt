@@ -1,52 +1,49 @@
-package com.github.anrimian.musicplayer;
+package com.github.anrimian.musicplayer
 
-import android.app.Application;
-import android.content.Context;
-
-import androidx.appcompat.app.AppCompatDelegate;
-
-import com.github.anrimian.musicplayer.data.utils.Permissions;
-import com.github.anrimian.musicplayer.di.Components;
-import com.github.anrimian.musicplayer.di.app.AppComponent;
-import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer;
-import com.github.anrimian.musicplayer.utils.DevTools;
-
-import io.reactivex.rxjava3.plugins.RxJavaPlugins;
+import android.app.Application
+import android.content.Context
+import com.github.anrimian.musicplayer.data.utils.Permissions
+import com.github.anrimian.musicplayer.di.Components
+import com.github.anrimian.musicplayer.domain.utils.rx.RxJavaErrorConsumer
+import com.github.anrimian.musicplayer.utils.AppVisibilityTracker
+import com.github.anrimian.musicplayer.utils.DevTools
+import com.github.anrimian.musicplayer.utils.system.SystemCrashExceptionHandler
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
 
 /**
  * Created on 20.10.2017.
  */
+abstract class App : Application() {
 
-public abstract class App extends Application {
-
-    public App() {
-        super();
-        RxJavaPlugins.setErrorHandler(new RxJavaErrorConsumer());
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    init {
+        RxJavaPlugins.setErrorHandler(RxJavaErrorConsumer())
     }
 
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        initComponents(base);
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        initComponents(base)
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        DevTools.run(this);
+    override fun onCreate() {
+        super.onCreate()
+        DevTools.run(this)
+        SystemCrashExceptionHandler.init()
 
-        AppComponent appComponent = Components.getAppComponent();
-        appComponent.appLogger().initFatalErrorRecorder();
+        val appComponent = Components.getAppComponent()
+        appComponent.appLogger().initFatalErrorRecorder()
 
         if (Permissions.hasFilePermission(this)
-                && !appComponent.loggerRepository().wasCriticalFatalError()
+            && !appComponent.loggerRepository().wasCriticalFatalError()
         ) {
-            appComponent.widgetUpdater().start();
-            appComponent.mediaScannerRepository().runStorageObserver();
+            appComponent.widgetUpdater().start()
+            appComponent.wearableManager().init()
+            appComponent.storageScannerInteractor().runStorageObserver()
+            registerActivityLifecycleCallbacks(
+                AppVisibilityTracker(appComponent.syncInteractor()::onAppVisibilityChanged)
+            )
         }
     }
 
-    protected abstract void initComponents(Context appContext);
+    protected abstract fun initComponents(appContext: Context)
 
 }

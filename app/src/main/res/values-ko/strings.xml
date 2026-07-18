@@ -11,7 +11,7 @@
     <string name="file_not_found">파일을 찾을 수 없습니다.</string>
     <string name="compositions_on_device_not_found">기기에서 음악을 찾을 수 없습니다.</string>
     <string name="compositions_and_folders_for_search_not_found">검색 결과와 일치하는 음악 및 폴더를 찾을 수 없습니다.</string>
-    <string name="foreground_channel_description">Foreground player 알림</string>
+    <string name="foreground_channel_name">Foreground player 알림</string>
     <string name="previous_track">이전 트랙</string>
     <string name="next_track">다음 트랙</string>
     <string name="folder">폴더</string>
@@ -67,12 +67,9 @@
     <string name="now_playing_template">지금 재생 중: %1$s. 재생 대기열 열기.</string>
     <string name="play_all_in_folder">폴더 전체 재생</string>
     <string name="delete_playlist">재생목록 삭제</string>
-    <string name="storage_timeout_error_message">        장치 미디어 저장소가 응답하지 않습니다.
-        이것은 정말 이상하고 드문 문제입니다.
-        장치를 재부팅하면 이 문제가 해결될 수 있습니다.    </string>
+    <string name="storage_timeout_error_message">장치 미디어 저장소가 응답하지 않습니다.\n이것은 정말 이상하고 드문 문제입니다.\n장치를 재부팅하면 이 문제가 해결될 수 있습니다.</string>
     <string name="select_all">모두 선택</string>
-    <string name="file_uri_extract_error">보낼 음악 \"%s\"의 시스템 경로를 가져올 수 없습니다.
-        개인 시스템 폴더에있을 수 있습니다.    </string>
+    <string name="file_uri_extract_error">보낼 음악 \"%s\"의 시스템 경로를 가져올 수 없습니다.\n개인 시스템 폴더에있을 수 있습니다.</string>
     <string name="loading_progress">로딩 중…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
     <string name="add_date_order_desc_title">최신순</string>
@@ -135,7 +132,7 @@
     <string name="change_album_artist">앨범 아티스트 변경</string>
     <string name="edit_album_tags">앨범 태그 편집</string>
     <string name="by_composition_count">음악 개수별</string>
-    <string name="by_duration">기간별</string>
+    <string name="by_duration">길이</string>
     <string name="longest_first">가장 긴 것부터</string>
     <string name="more_first">더 먼저</string>
     <string name="artist_already_exists">이 이름을 가진 아티스트가 이미 존재합니다.</string>
@@ -158,7 +155,7 @@
     <string name="play_next_message_single">음악 \"%s\"은 다음에 재생됩니다.</string>
     <string name="added_to_queue_message_single">음악 \"%s\"이 플레이 종료 대기열에 추가되었습니다.</string>
     <string name="queue_item_removed">대기열 항목이 제거되었습니다.</string>
-    <string name="by_size">크기별</string>
+    <string name="by_size">크기</string>
     <string name="largest_first">가장 큰 것부터</string>
     <string name="log_info_text">치명적이지 않은 일부 오류가 발생했으며 이에 대한 정보가 로그 파일에 기록되었습니다. 응용 프로그램은 로그를 자동으로 보내지 않지만 수동으로 보낼 수 있습니다. 그러면 앱 품질을 개선하는 데 도움이 됩니다. 현재 로그 파일 크기: %d kB</string>
     <string name="view_file">파일 보기</string>
@@ -188,7 +185,7 @@
     <string name="critical_error_report_message">치명적인 오류가 발생했으며이 앱으로 인해 시작할 수 없습니다. 이 오류가 나타나는 것은 매우 바람직하지 않습니다. 응용 프로그램은 정보를 자동으로 보내지 않지만 오류 로그가있는 파일을 전자 메일로 수동으로 보낼 수 있습니다. 이렇게 하면 이 오류를 수정하는 데 도움이 됩니다.</string>
     <string name="error_report_message">오류가 발생했습니다. 응용 프로그램은 정보를 자동으로 보내지 않지만 오류 로그가있는 파일을 전자 메일로 수동으로 보낼 수 있습니다. 이렇게 하면 이 오류를 수정하는 데 도움이 됩니다.</string>
     <string name="show_error_report_dialog_on_start">앱 충돌 후 애플리케이션 시작 시 오류 보고서 대화 상자 표시</string>
-    <string name="do_not_show_confirm_delete_dialog">삭제 확인 대화 상자를 표시하지 않기.</string>
+    <string name="do_not_show_confirm_delete_dialog">삭제 확인 대화 상자를 표시하지 않기</string>
     <string name="app_equalizer">앱 이퀄라이저</string>
     <string name="presets">프리셋</string>
     <string name="playback_speed">재생 속도</string>
@@ -210,13 +207,13 @@
     <string name="show_covers_on_lock_screen">잠금 화면과 안드로이드 오토에 커버 표시</string>
     <string name="equalizer_initialization_error">인앱 이퀄라이저를 초기화할 수 없습니다. 다시 시작해 보십시오.</string>
     <string name="restart">다시 시작</string>
-    <string name="scan_storage_description">일반적으로 장치의 파일에 대한 모든 변경 사항은 자동으로 나타납니다. 그러나 일부 장치 또는 시스템 빌드에서는 작동하지 않습니다. 이 버튼은 파일 스캔을 수동으로 실행합니다.</string>
+    <string name="scan_storage_description">일반적으로 장치의 파일에 대한 모든 변경 사항은 자동으로 나타납니다. 그러나 일부 장치 또는 시스템 빌드에서는 작동하지 않습니다. 이 버튼을 누르면 파일 스캔을 수동으로 실행합니다.</string>
     <string name="scanning_completed">스캔 완료</string>
     <string name="pause_on_zero_volume_level">볼륨 레벨이 0이 되면 재생 중지</string>
     <string name="covers">커버</string>
     <string name="display_composition_file_name">제목 대신 음악 파일 이름 표시</string>
-    <string name="name_order">이름별</string>
-    <string name="file_name_order">파일 이름별</string>
+    <string name="name_order">제목</string>
+    <string name="file_name_order">파일명</string>
     <string name="play_list_is_empty">재생 목록이 비어 있습니다. 음악은 라이브러리 화면의 재생 목록에 추가할 수 있습니다.</string>
     <string name="file_scanner_state">파일 태그 스캔 : %s</string>
     <string name="show_all_audio_files">모든 오디오 파일 표시</string>
@@ -234,18 +231,16 @@
     <string name="no_lyrics_for_current_composition">현재 음악에 대한 가사 없음</string>
     <string name="edit_lyrics">가사 편집</string>
     <string name="show_in_folders">저장 위치 보기</string>
-    <string name="file_source_not_found">원격 파일을 찾을 수 없음</string>
     <string name="file_is_too_large">파일이 너무 큽니다.</string>
     <string name="preparing_files">파일 준비 중</string>
     <string name="downloading">다운로드: %1$d/%2$d</string>
     <string name="downloading_progress">다운로드(%d%%)</string>
     <string name="rename_progress_count">이름 바꾸기(%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? 이 작업은 취소할 수 없습니다.</string>
+    <string name="undone_action_template">이 작업은 취소할 수 없습니다.</string>
     <string name="delete_composition_template">노래 삭제 \"%1$s\"</string>
     <string name="delete_empty_folder">폴더 삭제 \"%s\"</string>
     <string name="delete_folder_template">%2$s 폴더 \"%1$s\"에서</string>
-    <string name="android_r_editor_restriction_error">Android 11부터 파일 복사/이동/이름 바꾸기는 \"%s\" 폴더에서만 허용됩니다.
-        오디오 파일을 이 폴더에 넣으면 작업이 올바르게 수행되어야 합니다.    </string>
+    <string name="android_r_editor_restriction_error">Android 11부터 파일 복사/이동/이름 바꾸기는 \"%s\" 폴더에서만 허용됩니다.\n오디오 파일을 이 폴더에 넣으면 작업이 올바르게 수행되어야 합니다.</string>
     <string name="folder_already_excluded_from_scanning">이 폴더는 이미 검사에서 제외되었습니다.</string>
     <string name="no_file_modify_permission">파일을 수정할 수 있는 권한이 없습니다.</string>
     <string name="interface_settings">인터페이스</string>
@@ -267,7 +262,7 @@
     <string name="disc_short">디스크 %d</string>
     <string name="track_short">트랙 %d</string>
     <string name="with_delay">%.1fs 지연</string>
-    <string name="insert_to_playlist_beginning">재생 목록의 시작 부분에 새 음악악 삽입</string>
+    <string name="insert_to_playlist_beginning">재생 목록의 시작 부분에 새 음악 삽입</string>
     <string name="export_playlist">.m3u 파일로 저장</string>
     <string name="import_playlist">재생 목록 가져오기</string>
     <string name="overwrite_playlist">이 이름의 재생 목록이 이미 있습니다. \n덮어쓰시겠습니까?</string>
@@ -287,65 +282,85 @@
     <string name="check_for_duplicates">새 음악을 추가하기 전에 재생 목록에 중복이 있는지 확인</string>
     <string name="more_template">…%d 더</string>
     <string name="add_without_duplicates">중복 없이 추가</string>
-
+    <string name="process_unsupported_actions">인식할 수 없는 모든 미디어 이벤트를 재생/일시정지 명령으로 처리</string>
+    <string name="process_unsupported_actions_description">예기치 않은 재생/일시정지를 유발할 수 있습니다</string>
+    <string name="ignore_play_after_connection">블루투스 연결 후 3초 동안 \'재생\' 명령 무시</string>
+    <string name="ignore_play_after_connection_description">연결 시 예기치 않은 재생을 방지할 수 있습니다</string>
+    <string name="pause_on_audio_device_remove">오디오 출력 장치 분리 시 일시정지</string>
+    <string name="missing_files_detected">누락된 오디오 파일 발견</string>
+    <!-- !Not verified by native speaker! -->
+    <string name="missing_files_description">Android 시스템에서 해당 파일이 원래 위치에 더 이상 없다고 보고합니다.\n다른 앱이 이동 또는 삭제했거나 연결 해제된 SD 카드에 있을 수 있습니다.\n라이브러리에서 이러한 잘못된 항목을 삭제할 수 있습니다.\n사용할 수 없는 노래 (%d):</string>
+    <!---->
+    <string name="see_more">더 보기 (%d)</string>
+    <string name="remove">삭제</string>
+    <string name="delete_missing_compositions_title">음악을 삭제하시겠습니까?</string>
+    <string name="file_not_found_in_all_storages">로컬 또는 클라우드 저장소에서 파일을 찾을 수 없습니다</string>
+    <string name="question_template">%1$s? %2$s</string>
+    <string name="allowed_file_extensions">허용되는 파일 확장자</string>
+    <string name="allowed_extensions_state">다음 확장자를 가진 파일만 라이브러리에 포함됩니다: \n%s</string>
+    <string name="allowed_file_extensions_description">확장자는 \',\' 기호로 구분됩니다</string>
+    <string name="restore_default">기본값으로 복원</string>
+    <string name="not_allowed_path">파일을 쓰기 위해 허용되지 않는 경로</string>
+    <string name="configure_menu">메뉴 구성</string>
+    <string name="configure_menu_items">메뉴 항목 구성</string>
+    <string name="save">저장</string>
+    <string name="menu_group_primary">기본</string>
+    <string name="menu_group_secondary">추가</string>
+    <string name="menu_group_hidden">숨김</string>
+    <string name="undo">실행 취소</string>
+    <string name="playlist_sorted">재생 목록이 정렬되었습니다</string>
+    <string name="artist_order">아티스트 기준</string>
+    <string name="skip_silence">무음 건너뛰기</string>
+    <string name="skip_silence_summary">%.1f초보다 긴 무음 부분을 자동으로 건너뜁니다</string>
+    <string name="android_media_player_skip_silence_note">무음 건너뛰기를 지원하지 않습니다</string>
+    <string name="system_interaction">시스템 상호작용</string>
+    <string name="sound_processing">소리 구성</string>
     <plurals name="compositions_count">
-        <item quantity="other">%1$s 음악</item>
+        <item quantity="other">%1$s 곡</item>
     </plurals>
-
     <plurals name="files_count">
         <item quantity="other">%1$s 파일</item>
     </plurals>
-
     <plurals name="albums_count">
         <item quantity="other">%1$s 앨범</item>
     </plurals>
-
     <plurals name="play_next_message">
         <item quantity="other">%s 음악이 다음에 재생됩니다.</item>
     </plurals>
-
     <plurals name="added_to_queue_message">
         <item quantity="other">%s 재생 대기열의 끝에 음악이 추가되었습니다.</item>
     </plurals>
-
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="other">%1$d 재생목록에 음악이 추가됨 \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="other">%1$d 재생목록에서 음악이 삭제됨 \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_compositions_success">
         <item quantity="other">%1$d 음악이 삭제됨</item>
     </plurals>
-
     <plurals name="seconds_template">
         <item quantity="other">%1$d 초</item>
     </plurals>
-
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="other">음악 삭제 %d </item>
     </plurals>
-
     <plurals name="for_at_least_minutes">
         <item quantity="other">적어도 %d 분 동안</item>
     </plurals>
-
     <plurals name="export_playlists_success">
         <item quantity="other">재생 목록을 성공적으로 가져왔지만 %d 라이브러리에서 파일을 찾을 수 없습니다.</item>
     </plurals>
-
     <plurals name="playlist_import_partial_success">
         <item quantity="other">재생 목록을 성공적으로 가져왔지만 %d 라이브러리에서 파일을 찾을 수 없습니다.</item>
     </plurals>
-
     <plurals name="delete_playlists_template">
-        <item quantity="other">재생목록 삭제 %d </item>
+        <item quantity="other">재생목록 삭제 %d?</item>
     </plurals>
-
     <plurals name="delete_playlists_success">
         <item quantity="other">%d 재생 목록이 삭제됨</item>
     </plurals>
-
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="other">라이브러리에서 %1$d곡의 음악을 삭제하시겠습니까? %2$s</item>
+    </plurals>
 </resources>

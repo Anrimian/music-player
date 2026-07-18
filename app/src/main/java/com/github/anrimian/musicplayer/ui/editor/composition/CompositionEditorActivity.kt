@@ -13,15 +13,15 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import com.beloo.widget.chipslayoutmanager.ChipsLayoutManager
 import com.github.anrimian.fsync.models.state.file.FileSyncState
 import com.github.anrimian.fsync.models.state.file.FileTaskType
-import com.github.anrimian.musicplayer.Constants
-import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.AppConstants
+import com.github.anrimian.musicplayer.AppConstants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.models.image.UriImageSource
 import com.github.anrimian.musicplayer.databinding.ActivityCompositionEditBinding
 import com.github.anrimian.musicplayer.databinding.ItemGenreChipAddBinding
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
-import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
+import com.github.anrimian.musicplayer.domain.models.composition.LocalFileStatus
 import com.github.anrimian.musicplayer.domain.utils.FileUtils
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
@@ -58,13 +58,13 @@ class CompositionEditorActivity : BaseMvpAppCompatActivity(), CompositionEditorV
     companion object {
         fun newIntent(context: Context, compositionId: Long): Intent {
             val intent = Intent(context, CompositionEditorActivity::class.java)
-            intent.putExtra(Constants.Arguments.COMPOSITION_ID_ARG, compositionId)
+            intent.putExtra(AppConstants.Arguments.COMPOSITION_ID_ARG, compositionId)
             return intent
         }
     }
 
     private val presenter by moxyPresenter {
-        val compositionId = intent.getLongExtra(Constants.Arguments.COMPOSITION_ID_ARG, 0)
+        val compositionId = intent.getLongExtra(AppConstants.Arguments.COMPOSITION_ID_ARG, 0)
         Components.getCompositionEditorComponent(compositionId).compositionEditorPresenter()
     }
 
@@ -182,7 +182,7 @@ class CompositionEditorActivity : BaseMvpAppCompatActivity(), CompositionEditorV
         }
         editGenreDialogFragmentRunner = DialogFragmentRunner(fm, Tags.EDIT_GENRE_TAG) { fragment ->
             fragment.setComplexCompleteListener { name, extra ->
-                presenter.onNewGenreNameEntered(name, extra.getString(Constants.Arguments.NAME_ARG)!!)
+                presenter.onNewGenreNameEntered(name, extra.getString(AppConstants.Arguments.NAME_ARG)!!)
             }
         }
         trackNumberDialogFragmentRunner = DialogFragmentRunner(fm, Tags.TRACK_NUMBER_TAG) { fragment ->
@@ -204,7 +204,7 @@ class CompositionEditorActivity : BaseMvpAppCompatActivity(), CompositionEditorV
         progressDialogRunner = DialogFragmentDelayRunner(
             fm,
             Tags.PROGRESS_DIALOG_TAG,
-            delayMillis = Constants.EDIT_DIALOG_DELAY_MILLIS,
+            delayMillis = AppConstants.EDIT_DIALOG_DELAY_MILLIS,
             fragmentInitializer = { fragment -> fragment.setCancellationListener {
                 presenter.onEditActionCancelled()
             } }
@@ -317,7 +317,7 @@ class CompositionEditorActivity : BaseMvpAppCompatActivity(), CompositionEditorV
             genre,
             hints = genres,
             canBeEmpty = false,
-            extra = Bundle().apply { putString(Constants.Arguments.NAME_ARG, genre) }
+            extra = Bundle().apply { putString(AppConstants.Arguments.NAME_ARG, genre) }
         )
         editGenreDialogFragmentRunner.show(fragment)
     }
@@ -440,7 +440,7 @@ class CompositionEditorActivity : BaseMvpAppCompatActivity(), CompositionEditorV
     }
 
     override fun showSyncState(fileSyncState: FileSyncState?, composition: FullComposition) {
-        val isFileRemote = composition.storageId == null && composition.initialSource == InitialSource.REMOTE
+        val isFileRemote = composition.fileStatus == LocalFileStatus.LIBRARY_ENTRY_ONLY
         binding.pvFileState.showFileSyncState(fileSyncState, isFileRemote)
         progressDialogRunner.runAction { dialog ->
             val message = if (fileSyncState?.taskType == FileTaskType.DOWNLOAD) {

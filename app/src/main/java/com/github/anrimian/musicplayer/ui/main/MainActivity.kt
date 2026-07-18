@@ -11,12 +11,11 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.utils.Permissions
 import com.github.anrimian.musicplayer.databinding.DialogErrorReportBinding
 import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.ui.common.activity.BaseAppCompatActivity
 import com.github.anrimian.musicplayer.ui.main.setup.SetupFragment
 import com.github.anrimian.musicplayer.ui.player_screen.PlayerFragment
@@ -29,10 +28,10 @@ class MainActivity : BaseAppCompatActivity() {
 
     companion object {
 
-        fun showInFolders(activity: FragmentActivity, composition: Composition) {
+        fun showInFolders(activity: FragmentActivity, compositionId: Long) {
             val currentFragment = activity.supportFragmentManager.findFragmentById(R.id.main_activity_container)
             if (currentFragment is PlayerFragment) {
-                currentFragment.locateCompositionInFolders(composition)
+                currentFragment.locateCompositionInFolders(compositionId)
             }
         }
 
@@ -125,8 +124,8 @@ class MainActivity : BaseAppCompatActivity() {
     }
 
     private fun getOpenPlayerPanelArg(intent: Intent): Boolean {
-        val openPlayerPanel = intent.getBooleanExtra(Constants.Arguments.OPEN_PLAYER_PANEL_ARG, false)
-        getIntent().removeExtra(Constants.Arguments.OPEN_PLAYER_PANEL_ARG)
+        val openPlayerPanel = intent.getBooleanExtra(AppConstants.Arguments.OPEN_PLAYER_PANEL_ARG, false)
+        getIntent().removeExtra(AppConstants.Arguments.OPEN_PLAYER_PANEL_ARG)
         return openPlayerPanel
     }
 
@@ -192,7 +191,8 @@ class MainActivity : BaseAppCompatActivity() {
                 (activity as MainActivity).startScreens()
                 if (Permissions.hasFilePermission(requireContext())) {
                     appComponent.widgetUpdater().start()
-                    appComponent.mediaScannerRepository().runStorageObserver()
+                    appComponent.wearableManager().init()
+                    appComponent.storageScannerInteractor().runStorageObserver()
                     appComponent.musicServiceInteractor().prepare()
                 }
             }

@@ -1,6 +1,6 @@
 package com.github.anrimian.musicplayer.domain.repositories
 
-import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueData
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
@@ -24,6 +24,11 @@ interface PlayQueueRepository {
 
     fun getPlayQueueObservable(): Flowable<List<PlayQueueItem>>
 
+    fun getWindowPlayQueueObservable(
+        startOffset: Int,
+        endOffset: Int
+    ): Observable<List<PlayQueueItem>>
+
     fun setRandomPlayingEnabled(enabled: Boolean)
 
     fun skipToNext(): Single<Int>
@@ -38,9 +43,9 @@ interface PlayQueueRepository {
 
     fun swapItems(first: PlayQueueItem, second: PlayQueueItem): Completable
 
-    fun addCompositionsToPlayNext(compositions: List<Composition>): Completable
+    fun addCompositionsToPlayNext(compositions: List<CompositionModel>): Completable
 
-    fun addCompositionsToEnd(compositions: List<Composition>): Completable
+    fun addCompositionsToEnd(compositions: List<CompositionModel>): Completable
 
     fun isCurrentCompositionAtEndOfQueue(): Single<Boolean>
 

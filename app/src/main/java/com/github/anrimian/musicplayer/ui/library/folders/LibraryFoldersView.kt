@@ -39,7 +39,7 @@ interface LibraryFoldersView : BaseLibraryView {
     fun showError(errorCommand: ErrorCommand)
 
     @AddToEndSingle
-    fun showFolderInfo(folder: FolderInfo?)
+    fun showFolderInfo(folder: FolderInfo)
 
     @StateStrategyType(value = AddToEndSingleTagStrategy::class, tag = PROGRESS_DIALOG_STATE)
     fun hideProgressDialog()
@@ -84,7 +84,7 @@ interface LibraryFoldersView : BaseLibraryView {
     fun sendCompositions(compositions: List<Composition>)
 
     @Skip
-    fun goToMusicStorageScreen(folderId: Long)
+    fun goToFolderScreen(folderId: Long)
 
     @AddToEndSingle
     fun setDisplayCoversEnabled(isCoversEnabled: Boolean)

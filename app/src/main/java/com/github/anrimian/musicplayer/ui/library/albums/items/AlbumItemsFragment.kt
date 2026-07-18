@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.anrimian.fsync.models.state.file.FileSyncState
-import com.github.anrimian.musicplayer.Constants
-import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.AppConstants
+import com.github.anrimian.musicplayer.AppConstants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentBaseFabListBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -35,7 +35,7 @@ import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.library.albums.items.adapter.AlbumCompositionsAdapter
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlists.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.applyBottomInsets
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -56,7 +56,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView,
     companion object {
         fun newInstance(albumId: Long) = AlbumItemsFragment().apply {
             arguments = Bundle().apply {
-                putLong(Constants.Arguments.ID_ARG, albumId)
+                putLong(AppConstants.Arguments.ID_ARG, albumId)
             }
         }
     }
@@ -165,7 +165,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView,
         toolbar.setSubtitle(FormatUtils.formatAlbumAdditionalInfo(
             context,
             album,
-            R.drawable.ic_description_text_circle_inverse
+            R.drawable.ic_secondary_text_circle_inverse
         ))
     }
 
@@ -270,7 +270,7 @@ class AlbumItemsFragment : BaseLibraryCompositionsFragment(), AlbumItemsView,
         adapter.showFileSyncStates(states)
     }
 
-    private fun getAlbumId() = requireArguments().getLong(Constants.Arguments.ID_ARG)
+    private fun getAlbumId() = requireArguments().getLong(AppConstants.Arguments.ID_ARG)
 
     private fun onOptionsItemClicked(item: MenuItem) {
         when (item.itemId) {

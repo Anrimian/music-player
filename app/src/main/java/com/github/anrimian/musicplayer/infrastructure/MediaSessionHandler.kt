@@ -14,7 +14,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.view.KeyEvent
 import android.widget.Toast
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
 import com.github.anrimian.musicplayer.data.utils.rx.retryWithDelay
@@ -33,6 +33,7 @@ import com.github.anrimian.musicplayer.domain.models.player.service.MusicNotific
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper
 import com.github.anrimian.musicplayer.domain.utils.functions.Opt
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
+import com.github.anrimian.musicplayer.infrastructure.receivers.BluetoothConnectionReceiver
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ALBUM_ID_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ALBUM_ITEMS_ACTION_ID
@@ -48,20 +49,20 @@ import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppM
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.PLAYLIST_ID_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.PLAYLIST_ITEMS_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.POSITION_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.RECENT_MEDIA_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.RESUME_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SEARCH_ITEMS_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SEARCH_QUERY_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SHUFFLE_ALL_AND_PLAY_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.music.CompositionSourceModelHelper
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
-import com.github.anrimian.musicplayer.ui.common.AppAndroidUtils
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
 import com.github.anrimian.musicplayer.ui.main.MainActivity
 import com.github.anrimian.musicplayer.ui.main.external_player.ExternalPlayerActivity
 import com.github.anrimian.musicplayer.ui.utils.getParcelable
-import com.github.anrimian.musicplayer.ui.utils.pIntentFlag
+import com.github.anrimian.utils.pIntentFlag
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -75,7 +76,7 @@ class MediaSessionHandler(
     private val musicServiceInteractor: MusicServiceInteractor,
     private val ioScheduler: Scheduler,
     private val uiScheduler: Scheduler,
-    private val errorParser: ErrorParser,
+    private val errorParser: ErrorParser
 ) {
 
     private var mediaSession: MediaSessionCompat? = null
@@ -87,6 +88,10 @@ class MediaSessionHandler(
     private val playbackState = PlaybackState()
     private val metadataState = MetadataState()
 
+    private var lastMetadataSource: CompositionSource? = null
+    private var lastMetadataSettings: MusicNotificationSetting? = null
+    private var currentArtLoadCancellable: Runnable? = null
+
     fun getMediaSession(): MediaSessionCompat {
         if (mediaSession == null) {
             mediaSession = MediaSessionCompat(context, MusicService::javaClass.name).apply {
@@ -95,6 +100,8 @@ class MediaSessionHandler(
                 val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON, null, context, AppMediaButtonReceiver::class.java)
                 val pMediaButtonIntent = PendingIntent.getBroadcast(context, 0, mediaButtonIntent, pIntentFlag())
                 setMediaButtonReceiver(pMediaButtonIntent)
+
+                isActive = true
             }
             subscribeOnPlayQueue()
             subscribeOnMediaSessionMetadata()
@@ -117,9 +124,18 @@ class MediaSessionHandler(
     private fun release() {
         actionDisposable?.dispose()
         mediaSessionDisposable.clear()
+        currentArtLoadCancellable?.run()
+        currentArtLoadCancellable = null
+        lastMetadataSource = null
+        lastMetadataSettings = null
         mediaSession?.run {
 //            isActive = false //removed after build 129. Observe and see how it works
-            release()
+            try {
+                setSessionActivity(null)
+                release()
+            } catch (_: Exception) {
+                // OEM bugs (e.g. Vivo) can throw SecurityException from ISession.destroy()
+            }
         }
         mediaSession = null
     }
@@ -129,19 +145,20 @@ class MediaSessionHandler(
             playerInteractor.getPlayerStateObservable(),
             libraryPlayerInteractor.getCurrentQueueItemObservable(),
             playerInteractor.getCurrentSourceObservable(),
-            musicServiceInteractor.trackPositionChangeObservable,
-            musicServiceInteractor.playbackSpeedObservable,
-            musicServiceInteractor.repeatModeObservable,
-            musicServiceInteractor.randomModeObservable,
+            musicServiceInteractor.getTrackPositionChangeObservable(),
+            musicServiceInteractor.getPlaybackSpeedObservable(),
+            musicServiceInteractor.getRepeatModeObservable(),
+            musicServiceInteractor.getRandomModeObservable(),
             playbackState::set
         ).flatMapSingle { state ->
-            musicServiceInteractor.trackPosition
+            musicServiceInteractor.getTrackPosition()
                 .map { trackPosition ->
                     state.trackPosition = trackPosition
                     return@map state
                 }
-        }.observeOn(uiScheduler)
-            .subscribe(this::onPlayBackStateReceived))
+        }.retryWithDelay(10, 10, TimeUnit.SECONDS)
+            .observeOn(uiScheduler)
+            .subscribe(this::onPlayBackStateReceived, errorParser::logError))
     }
 
     private fun onPlayBackStateReceived(playbackState: PlaybackState) {
@@ -151,9 +168,12 @@ class MediaSessionHandler(
             else -> {
                 val playbackStateBuilder = PlaybackStateCompat.Builder()
                     .setState(PlaybackStateCompat.STATE_NONE, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1.0f)
-                    .setActions(0L)
+                    .setActions(
+                        PlaybackStateCompat.ACTION_PLAY
+                                or PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
+                                or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                    )
                 getMediaSession().setPlaybackState(playbackStateBuilder.build())
-                getMediaSession().isActive = false
             }
         }
     }
@@ -207,7 +227,7 @@ class MediaSessionHandler(
         getMediaSession().setShuffleMode(PlaybackStateCompat.SHUFFLE_MODE_NONE)
 
         val activityIntent = Intent(context, ExternalPlayerActivity::class.java)
-        activityIntent.putExtra(Constants.Arguments.LAUNCH_PREPARE_ARG, false)
+        activityIntent.putExtra(AppConstants.Arguments.LAUNCH_PREPARE_ARG, false)
         val pActivityIntent = PendingIntent.getActivity(context, 0, activityIntent, pIntentFlag())
         getMediaSession().setSessionActivity(pActivityIntent)
     }
@@ -286,30 +306,69 @@ class MediaSessionHandler(
     private fun subscribeOnMediaSessionMetadata() {
         mediaSessionDisposable.add(Observable.combineLatest(
             playerInteractor.getCurrentSourceObservable(),
-            musicServiceInteractor.notificationSettingObservable,
+            musicServiceInteractor.getNotificationSettingObservable(),
+            libraryPlayerInteractor.getCurrentItemPositionObservable().toObservable()
+                .map { pos -> pos + 1 } // AVRCP value is 1-based. Map for this
+                .startWithItem(0),
+            libraryPlayerInteractor.getPlayQueueSizeObservable()
+                .startWithItem(0),
             metadataState::set
-        ).observeOn(uiScheduler)
-            .subscribe(this::onMetadataStateReceived))
+        ).retryWithDelay(10, 10, TimeUnit.SECONDS)
+            .observeOn(uiScheduler)
+            .subscribe(this::onMetadataStateReceived, errorParser::logError))
     }
 
     private fun onMetadataStateReceived(state: MetadataState) {
         val metadataBuilder = MediaMetadataCompat.Builder()
         val currentSource = state.currentSource.value
 
+        val trackNumber: Long
+        val totalTracks: Long
+        if (currentSource is LibraryCompositionSource) {
+            trackNumber = state.trackNumber
+            totalTracks = state.totalTracks
+        } else {
+            trackNumber = 0L
+            totalTracks = 0L
+        }
+
         CompositionSourceModelHelper.updateMediaSessionMetadata(
             currentSource,
             metadataBuilder,
             getMediaSession(),
-            context
+            context,
+            trackNumber,
+            totalTracks
         )
 
-        //we can use uri
-        CompositionSourceModelHelper.updateMediaSessionAlbumArt(
+
+        val sourceChanged = !sameSource(lastMetadataSource, currentSource)
+        val settingsChanged = lastMetadataSettings != state.settings
+        if (!sourceChanged && !settingsChanged) {
+            return
+        }
+
+        currentArtLoadCancellable?.run()
+        currentArtLoadCancellable = null
+        lastMetadataSource = currentSource
+        lastMetadataSettings = state.settings
+
+        currentArtLoadCancellable = CompositionSourceModelHelper.updateMediaSessionAlbumArt(
             currentSource,
             metadataBuilder,
             getMediaSession(),
             state.settings
         )
+    }
+
+    private fun sameSource(a: CompositionSource?, b: CompositionSource?): Boolean {
+        if (a == null && b == null) {
+            return true
+        }
+        if (a == null || b == null) {
+            return false
+        }
+        return CompositionSourceModelHelper.areSourcesTheSame(a, b)
     }
 
     private fun subscribeOnPlayQueue() {
@@ -330,7 +389,7 @@ class MediaSessionHandler(
 
     private fun toSessionQueueItems(
         playQueue: List<PlayQueueItem>,
-        isLibrarySource: Boolean,
+        isLibrarySource: Boolean
     ): List<MediaSessionCompat.QueueItem> {
         return if (isLibrarySource) playQueue.map(this::toSessionQueueItem) else emptyList()
     }
@@ -345,7 +404,7 @@ class MediaSessionHandler(
 
     private fun setMediaState(
         playbackStateBuilder: PlaybackStateCompat.Builder,
-        playbackState: PlaybackState,
+        playbackState: PlaybackState
     ) {
         val playerState = when (val playerState = playbackState.playerState) {
             PlayerState.IDLE -> PlaybackStateCompat.STATE_NONE
@@ -374,13 +433,19 @@ class MediaSessionHandler(
     private class MetadataState {
         lateinit var currentSource: Opt<CompositionSource>
         lateinit var settings: MusicNotificationSetting
+        var trackNumber: Long = 0
+        var totalTracks: Long = 0
 
         fun set(
             currentSource: Opt<CompositionSource>,
             settings: MusicNotificationSetting,
+            trackNumber: Int,
+            totalTracks: Int
         ): MetadataState {
             this.currentSource = currentSource
             this.settings = settings
+            this.trackNumber = trackNumber.toLong()
+            this.totalTracks = totalTracks.toLong()
             return this
         }
     }
@@ -401,7 +466,7 @@ class MediaSessionHandler(
             trackPosition: Long,
             playbackSpeed: Float,
             repeatMode: Int,
-            randomMode: Boolean,
+            randomMode: Boolean
         ): PlaybackState {
             this.playerState = playerState
             this.playQueueCurrentItem = playQueueCurrentItem
@@ -419,11 +484,11 @@ class MediaSessionHandler(
         private var lastEventTime = 0L
 
         override fun onPlay() {
-            AppAndroidUtils.playPause(context, playerInteractor)
+            SystemServiceControllerImpl.startPlayForegroundService(context)
         }
 
         override fun onPause() {
-            AppAndroidUtils.playPause(context, playerInteractor)
+            playerInteractor.pause()
         }
 
         override fun onStop() {
@@ -478,7 +543,8 @@ class MediaSessionHandler(
 
         override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
             when(mediaId) {
-                RESUME_ACTION_ID -> SystemServiceControllerImpl.startPlayForegroundService(context)
+                RESUME_ACTION_ID,
+                RECENT_MEDIA_ACTION_ID -> SystemServiceControllerImpl.startPlayForegroundService(context)
                 PAUSE_ACTION_ID -> libraryPlayerInteractor.pause()
                 SHUFFLE_ALL_AND_PLAY_ACTION_ID -> {
                     actionDisposable = musicServiceInteractor.shuffleAllAndPlay()
@@ -613,6 +679,13 @@ class MediaSessionHandler(
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             //fix for case when double or triple tap is considered as skipTo + play/pause
             val keyEvent = mediaButtonEvent.getParcelable<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+
+            if (keyEvent != null && keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
+                if (BluetoothConnectionReceiver.shouldIgnorePlayEvent()) {
+                    return true
+                }
+            }
+
             if (keyEvent != null && keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
                 if (lastEventTime + PLAY_EVENT_LOCK_WINDOW_MILLIS > System.currentTimeMillis()) {
                     return true

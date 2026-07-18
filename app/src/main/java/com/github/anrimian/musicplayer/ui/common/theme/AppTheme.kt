@@ -139,6 +139,62 @@ class AppTheme(
             R.color.color_control_highlight,
             false
         )
+        val MATTE_DARK_BLUE = AppTheme(
+            12,
+            R.style.MatteDarkBlueTheme,
+            R.color.matte_dark_background_level_1,
+            R.color.matte_dark_background_level_0,
+            R.color.colorAccentDark,
+            R.color.color_control_highlight_dark,
+            true
+        )
+
+        val MATTE_DARK_ORANGE = AppTheme(
+            13,
+            R.style.MatteDarkOrangeTheme,
+            R.color.matte_dark_background_level_1,
+            R.color.matte_dark_background_level_0,
+            R.color.color_orange_dark_accent,
+            R.color.color_control_highlight_dark,
+            true
+        )
+
+        val MATTE_DARK_GREEN = AppTheme(
+            14,
+            R.style.MatteDarkGreenTheme,
+            R.color.matte_dark_background_level_1,
+            R.color.matte_dark_background_level_0,
+            R.color.colorGreenDarkAccent,
+            R.color.color_control_highlight_dark,
+            true
+        )
+        val COMPLETELY_BLACK_RED = AppTheme(
+            15,
+            R.style.CompletelyBlackRedTheme,
+            android.R.color.black,
+            android.R.color.black,
+            R.color.colorRedDarkAccent,
+            R.color.color_control_highlight_dark,
+            true
+        )
+        val WHITE_PINK = AppTheme(
+            16,
+            R.style.PrimaryPinkTheme,
+            R.color.colorPinkPrimary,
+            R.color.light_background_level_0,
+            R.color.colorPinkAccent,
+            R.color.color_control_highlight,
+            false
+        )
+        val MATTE_DARK_PINK = AppTheme(
+            17,
+            R.style.MatteDarkPinkTheme,
+            R.color.matte_dark_background_level_1,
+            R.color.matte_dark_background_level_0,
+            R.color.colorPinkAccent,
+            R.color.color_control_highlight_dark,
+            true
+        )
 
         @RequiresApi(Build.VERSION_CODES.S)
         fun getSystemWhiteTheme() = AppTheme(
@@ -173,18 +229,25 @@ class AppTheme(
 
         fun appThemes() = arrayOf(
             WHITE_PURPLE_TEAL,
-            DARK,
+            MATTE_DARK_BLUE,
             WHITE_INDIGO_GREEN,
-            DARK_ORANGE,
-            WHITE_TEAL_PINK,
-            DARK_GREEN,
+            MATTE_DARK_GREEN,
+            WHITE_ORANGE,
+            MATTE_DARK_ORANGE,
+            WHITE_PINK,
+            MATTE_DARK_PINK,
+            WHITE_RED,
+            COMPLETELY_BLACK_RED,
             COMPLETELY_WHITE,
             COMPLETELY_BLACK,
-            WHITE_RED,
-            WHITE_ORANGE,
+            WHITE_BLUE_ORANGE,
+            DARK,
+            WHITE_TEAL_PINK,
+            DARK_ORANGE,
             WHITE_PURPLE_PINK,
-            WHITE_BLUE_ORANGE
+            DARK_GREEN
         )
+
     }
 
 }

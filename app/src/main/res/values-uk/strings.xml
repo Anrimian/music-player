@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="open_drawer">Відкрити бокове меню</string>
     <string name="try_again">Спробувати знову</string>
     <string name="can_not_work_without_file_permission">Додаток не може працювати без дозволу до доступу до файлів</string>
@@ -12,7 +11,7 @@
     <string name="file_not_found">Файл не знайдено</string>
     <string name="compositions_on_device_not_found">Композицій на пристрої не знайдено</string>
     <string name="compositions_and_folders_for_search_not_found">Композицій і папок, відповідних до результатів пошуку, не знайдено</string>
-    <string name="foreground_channel_description">Сповіщення про проигравання музики</string>
+    <string name="foreground_channel_name">Сповіщення про проигравання музики</string>
     <string name="previous_track">Минулий трек</string>
     <string name="next_track">Наступний трек</string>
     <string name="folder">Папка</string>
@@ -48,7 +47,7 @@
     <string name="deleting">Видалення</string>
     <string name="delete_composition_success">Композиція \"%1$s\" видалена</string>
     <string name="search">Пошук</string>
-    <string name="play_queue">Чегра відтворення</string>
+    <string name="play_queue">Черга відтворення</string>
     <string name="pause">Пауза</string>
     <string name="play">Грати</string>
     <string name="play_all">Грати все</string>
@@ -68,9 +67,9 @@
     <string name="now_playing_template">Зараз відтворюється: %1$s. Відкрити чергу відтворення.</string>
     <string name="play_all_in_folder">Програти все в папці</string>
     <string name="delete_playlist">Видалити плейлист</string>
-    <string name="storage_timeout_error_message">Медіа сховище пристрою не відповідає. Це дуже дивна і рідкісна помилка. Спробуйте перезавантажити пристрій, можливо, це вирішить цю проблему.</string>
+    <string name="storage_timeout_error_message">Медіа сховище пристрою не відповідає.\nЦе дуже дивна і рідкісна помилка.\nСпробуйте перезавантажити пристрій, можливо, це вирішить цю проблему.</string>
     <string name="select_all">Виділити все</string>
-    <string name="file_uri_extract_error">Не вдалось отримати системний шлях до композиції \"%s\" для відправки. Можливо, вона в закритій системній папці.</string>
+    <string name="file_uri_extract_error">Не вдалось отримати системний шлях до композиції \"%s\" для відправки.\nМожливо, вона в закритій системній папці.</string>
     <string name="loading_progress">Завантаження…</string>
     <string name="alphabetical_order_desc_title">Я - А</string>
     <string name="add_date_order_desc_title">Спочатку пізніші</string>
@@ -181,9 +180,7 @@
     <string name="lyrics">Текст композиції</string>
     <string name="check_tags_error">Не вдалось перевірити теги композиції: %s</string>
     <string name="changing_file_progress">Зміна файлу…</string>
-    <string name="android_r_edit_file_permission_denied">
-        Починаючи з Android 11 редагування та видалення файлів потребує явного дозволу системи
-    </string>
+    <string name="android_r_edit_file_permission_denied">Починаючи з Android 11 редагування та видалення файлів потребує явного дозволу системи</string>
     <string name="error_report">Звіт про помилку</string>
     <string name="critical_error_report_message">Відбулась фатальна помилка і через це додаток не може запуститись. Поява таких помилок дуже небажана. Додаток не відсилає ніякої інформації автоматично, але ви можете відправити файл зі звітом про помилку вручну по пошті. Це допоможе виправити цю помилку.</string>
     <string name="error_report_message">Відбулась фатальна помилка. Поява таких помилок дуже небажана. Додаток не відсилає ніякої інформації автоматично, але ви можете відправити файл зі звітом про помилку вручну по пошті. Це допоможе виправити цю помилку.</string>
@@ -234,19 +231,16 @@
     <string name="no_lyrics_for_current_composition">Немає тексту поточної композиції</string>
     <string name="edit_lyrics">Редагувати текст композиції</string>
     <string name="show_in_folders">Показати в папках</string>
-    <string name="file_source_not_found">Видалений файл не знайдено</string>
     <string name="file_is_too_large">Файл занадто великий</string>
     <string name="preparing_files">Підготовка файлів</string>
     <string name="downloading">Завантаження: %1$d/%2$d</string>
     <string name="downloading_progress">Завантаження(%d%%)</string>
     <string name="rename_progress_count">Перейменування(%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? Цю дію не можна буде скасувати.</string>
+    <string name="undone_action_template">Цю дію не можна буде скасувати.</string>
     <string name="delete_composition_template">Видалити композицію \"%1$s\"</string>
     <string name="delete_empty_folder">Видалити папку \"%s\"</string>
     <string name="delete_folder_template">%2$s з папки \"%1$s\"</string>
-    <string name="android_r_editor_restriction_error">Починаючи з Android 11 копіювання/переміщення/перейменування файлів дозволено тільки в папках: \"%s\".
-        Перемістіть аудіо файли в ці папки і дія повинна працювати коректно.
-    </string>
+    <string name="android_r_editor_restriction_error">Починаючи з Android 11 копіювання/переміщення/перейменування файлів дозволено тільки в папках: \"%s\".\nПеремістіть аудіо файли в ці папки і дія повинна працювати коректно.</string>
     <string name="folder_already_excluded_from_scanning">Цю папку вже виключено зі сканування</string>
     <string name="no_file_modify_permission">Відсутній дозвіл для модифікації файлу</string>
     <string name="interface_settings">Інтерфейс</string>
@@ -260,7 +254,7 @@
     <string name="file_read_timeout">Перевищено час читання файлу</string>
     <string name="tag_reading_error">Помилка читання тегів: %s</string>
     <string name="track_number">Номер треку</string>
-    <string name="change_track_number">	Змінити номер треку</string>
+    <string name="change_track_number">Змінити номер треку</string>
     <string name="disc_number">Номер диску</string>
     <string name="change_disc_number">Змінити номер диску</string>
     <string name="comment">Комментар</string>
@@ -288,110 +282,133 @@
     <string name="check_for_duplicates">Перевіряти плейлист на дублікати перед додаванням нових композицій</string>
     <string name="more_template">…ще %d</string>
     <string name="add_without_duplicates">Додати без дублікатів</string>
-
+    <string name="process_unsupported_actions">Розглядати будь-яку нерозпізнану медіаподію як команду відтворення/паузи</string>
+    <string name="process_unsupported_actions_description">Може спричинити несподіване відтворення/паузу</string>
+    <string name="ignore_play_after_connection">Ігнорувати команди «Відтворити» протягом 3 секунд після підключення Bluetooth</string>
+    <string name="ignore_play_after_connection_description">Може запобігти неочікуваному відтворенню під час підключення</string>
+    <string name="pause_on_audio_device_remove">Призупиняти після відключення пристрою виводу звуку</string>
+    <string name="missing_files_detected">Виявлено відсутні аудіофайли</string>
+    <!-- !Not verified by native speaker! -->
+    <string name="missing_files_description">Система Android повідомляє, що ці файли більше недоступні за своїм початковим розташуванням.\nМожливо, вони були переміщені, видалені іншим додатком або знаходяться на відключеній карті пам\'яті.\nВи можете видалити ці недійсні записи з бібліотеки.\nНедоступні композиції (%d):</string>
+    <!---->
+    <string name="see_more">Показати ще (%d)</string>
+    <string name="remove">Видалити</string>
+    <string name="delete_missing_compositions_title">Видалити композиції?</string>
+    <string name="file_not_found_in_all_storages">Файл не знайдено ані локально, ані в хмарі</string>
+    <string name="question_template">%1$s? %2$s</string>
+    <string name="allowed_file_extensions">Дозволені розширення файлів</string>
+    <string name="allowed_extensions_state">У медіатеку будуть додаватися тільки файли з такими розширеннями: \n%s</string>
+    <string name="allowed_file_extensions_description">Розширення розділяються символом \',\'</string>
+    <string name="restore_default">Відновити за замовчуванням</string>
+    <string name="not_allowed_path">Недопустимий шлях для запису файлу</string>
+    <string name="configure_menu">Налаштувати меню</string>
+    <string name="configure_menu_items">Налаштувати пункти меню</string>
+    <string name="save">Зберегти</string>
+    <string name="menu_group_primary">Основні</string>
+    <string name="menu_group_secondary">Додаткові</string>
+    <string name="menu_group_hidden">Приховані</string>
+    <string name="undo">Скасувати</string>
+    <string name="playlist_sorted">Плейліст відсортовано</string>
+    <string name="artist_order">За виконавцем</string>
+    <string name="skip_silence">Пропускати тишу</string>
+    <string name="skip_silence_summary">Автоматично пропускати тихі ділянки довші за %.1f с.</string>
+    <string name="android_media_player_skip_silence_note">Не підтримує пропуск тиші</string>
+    <string name="system_interaction">Взаємодія з системою</string>
+    <string name="sound_processing">Обробка звуку</string>
     <plurals name="compositions_count">
         <item quantity="one">%1$s композиція</item>
         <item quantity="few">%1$s композиції</item>
         <item quantity="many">%1$s композицій</item>
         <item quantity="other">%1$s композиції</item>
     </plurals>
-
     <plurals name="files_count">
         <item quantity="one">%1$s файл</item>
         <item quantity="few">%1$s файла</item>
         <item quantity="many">%1$s файлів</item>
         <item quantity="other">%1$s файлів</item>
     </plurals>
-
     <plurals name="albums_count">
         <item quantity="one">%1$s альбом</item>
         <item quantity="few">%1$s альбома</item>
         <item quantity="many">%1$s альбомів</item>
         <item quantity="other">%1$s альбомів</item>
     </plurals>
-
     <plurals name="play_next_message">
         <item quantity="one">%s композиція буде програна наступною</item>
         <item quantity="few">%s композиції будуть програні наступними</item>
         <item quantity="many">%s композицій будуть програними наступними</item>
         <item quantity="other">%s композицій будуть програними наступними</item>
     </plurals>
-
     <plurals name="added_to_queue_message">
         <item quantity="one">%s композиція додана в кінець черги відтворення</item>
         <item quantity="few">%s композиції додані в кінець черги відтворення</item>
         <item quantity="many">%s композицій додано в кінець черги відтворення</item>
         <item quantity="other">%s композицій додано в кінець черги відтворення</item>
     </plurals>
-
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d композиція додана в плейлист \"%2$s\"</item>
         <item quantity="few">%1$d композиції додані в плейлист \"%2$s\"</item>
         <item quantity="many">%1$d композицій додано в плейлист \"%2$s\"</item>
         <item quantity="other">%1$d композицій додано в плейлист \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d композиція видалена з плейлиста \"%2$s\"</item>
         <item quantity="few">%1$d композицій видалено з плейлиста \"%2$s\"</item>
         <item quantity="many">%1$d композицій видалено з плейлиста \"%2$s\"</item>
         <item quantity="other">%1$d композицій видалено з плейлиста \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d композиція видалена</item>
         <item quantity="few">%1$d композиції видалено</item>
         <item quantity="many">%1$d композицій видалено</item>
         <item quantity="other">%1$d композицій видалено</item>
     </plurals>
-
     <plurals name="seconds_template">
         <item quantity="one">%1$d секунда</item>
         <item quantity="few">%1$d секунди</item>
         <item quantity="many">%1$d секунд</item>
         <item quantity="other">%1$d секунд</item>
     </plurals>
-
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="one">Видалити %d композицію</item>
         <item quantity="few">Видалити %1$s композиції</item>
         <item quantity="many">Видалити %1$s композицій</item>
         <item quantity="other">Видалити %d композицій</item>
     </plurals>
-
     <plurals name="for_at_least_minutes">
         <item quantity="one">Протягом не менше %d хвилини</item>
         <item quantity="few">Протягом не менше %d хвилин</item>
         <item quantity="many">Протягом не менше %d хвилин</item>
         <item quantity="other">Протягом не менше %d хвилин</item>
     </plurals>
-
     <plurals name="export_playlists_success">
         <item quantity="one">%d плейлист було збережено у внутрішнє сховище</item>
         <item quantity="few">%d плейлиста були збережені у внутрішнє сховище</item>
         <item quantity="many">%d плейлистів були збережені у внутрішнє сховище</item>
         <item quantity="other">%d плейлистів були збережені у внутрішнє сховище</item>
     </plurals>
-
     <plurals name="playlist_import_partial_success">
         <item quantity="one">Плейлист було імпортовано успішно, але %d файл був не знайдений в бібліотеці</item>
         <item quantity="few">Плейлист було імпортовано успішно, але %d файли були не знайдені в бібліотеці</item>
         <item quantity="many">Плейлист було імпортовано успішно, але %d файлів були не знайдені в бібліотеці</item>
         <item quantity="other">Плейлист було імпортовано успішно, але %d файлів були не знайдені в бібліотеці</item>
     </plurals>
-
     <plurals name="delete_playlists_template">
-        <item quantity="one">Видалити %d плейлист</item>
-        <item quantity="few">Видалити %d плейлисти</item>
-        <item quantity="many">Видалити %d плейлистів</item>
-        <item quantity="other">Видалити %d плейлистів</item>
+        <item quantity="one">Видалити %d плейлист?</item>
+        <item quantity="few">Видалити %d плейлисти?</item>
+        <item quantity="many">Видалити %d плейлистів?</item>
+        <item quantity="other">Видалити %d плейлистів?</item>
     </plurals>
-
     <plurals name="delete_playlists_success">
         <item quantity="one">%d плейлист видалено</item>
         <item quantity="few">%d плейлисти видалено</item>
         <item quantity="many">%d плейлистів видалено</item>
         <item quantity="other">%d плейлистів видалено</item>
     </plurals>
-
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="one">Видалити %1$d композицію з вашої бібліотеки? %2$s</item>
+        <item quantity="few">Видалити %1$d композиції з вашої бібліотеки? %2$s</item>
+        <item quantity="many">Видалити %1$d композицій з вашої бібліотеки? %2$s</item>
+        <item quantity="other">Видалити %1$d композицій з вашої бібліотеки? %2$s</item>
+    </plurals>
 </resources>

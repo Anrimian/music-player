@@ -5,17 +5,21 @@ import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
 import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.ContextThemeWrapper
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
+import android.widget.CompoundButton
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
@@ -33,6 +37,17 @@ fun View.onLongClick(onClick: () -> Unit) {
     setOnLongClickListener { v ->
         onClick()
         true
+    }
+}
+
+fun CompoundButton.onCheckChanged(listener: (Boolean) -> Unit) {
+    setOnCheckedChangeListener { _, isChecked -> listener(isChecked) }
+}
+
+fun CompoundButton.setCheckedImmediately(checked: Boolean) {
+    if (isChecked != checked) {
+        isChecked = checked
+        jumpDrawablesToCurrentState()
     }
 }
 
@@ -130,8 +145,8 @@ fun ViewPager2.onPageScrolled(
     onScrolled: (
         position: Int,
         positionOffset: Float,
-        positionOffsetPixels: Int
-    ) -> Unit
+        positionOffsetPixels: Int,
+    ) -> Unit,
 ) {
     registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {}
@@ -139,7 +154,7 @@ fun ViewPager2.onPageScrolled(
         override fun onPageScrolled(
             position: Int,
             positionOffset: Float,
-            positionOffsetPixels: Int
+            positionOffsetPixels: Int,
         ) {
             if (positionOffset < 0f || positionOffset > 1f) {
                 return
@@ -209,4 +224,19 @@ inline fun DrawerLayout.addDrawerStateListener(
 
         override fun onDrawerStateChanged(newState: Int) {}
     })
+}
+
+fun TextView.getCharY(charIndex: Int): Int {
+    layout ?: return -1 // Layout may be null right after change to the text view
+
+    val lineOfText = layout.getLineForOffset(charIndex)
+    return layout.getLineTop(lineOfText)
+}
+
+@SuppressLint("ClickableViewAccessibility")
+fun View.doOnTouch(action: (MotionEvent) -> Unit) {
+    setOnTouchListener { _, event ->
+        action(event)
+        return@setOnTouchListener false
+    }
 }

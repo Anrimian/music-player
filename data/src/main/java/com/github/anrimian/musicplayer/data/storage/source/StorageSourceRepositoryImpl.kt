@@ -4,7 +4,7 @@ import com.github.anrimian.musicplayer.data.database.dao.compositions.Compositio
 import com.github.anrimian.musicplayer.data.models.composition.file.StorageCompositionSource
 import com.github.anrimian.musicplayer.data.models.composition.source.ExternalCompositionSource
 import com.github.anrimian.musicplayer.data.models.composition.source.UriContentSource
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider
+import com.github.anrimian.musicplayer.data.storage.providers.music.SystemAudioCatalogProvider
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
 import com.github.anrimian.musicplayer.domain.models.composition.content.FileReadTimeoutException
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
@@ -19,7 +19,7 @@ private const val STORAGE_TIMEOUT_SECONDS = 3L
 
 class StorageSourceRepositoryImpl(
     private val compositionsDao: CompositionsDaoWrapper,
-    private val storageMusicProvider: StorageMusicProvider,
+    private val systemAudioCatalogProvider: SystemAudioCatalogProvider,
     private val compositionSourceEditor: CompositionSourceEditor,
     private val scheduler: Scheduler,
 ): StorageSourceRepository {
@@ -28,6 +28,19 @@ class StorageSourceRepositoryImpl(
         return getStorageCompositionSource(compositionId)
             .timeout(STORAGE_TIMEOUT_SECONDS, TimeUnit.SECONDS, Maybe.error(FileReadTimeoutException()))
             .subscribeOn(scheduler)
+    }
+
+    override fun getStorageSources(
+        compositionIds: List<Long>
+    ): Single<Map<Long, CompositionContentSource>> {
+        return Single.fromCallable {
+            val storageIds = compositionsDao.selectStorageIds(compositionIds)
+            val result = HashMap<Long, CompositionContentSource>(storageIds.size)
+            for ((id, storageId) in storageIds) {
+                result[id] = StorageCompositionSource(systemAudioCatalogProvider.getCompositionUri(storageId))
+            }
+            result as Map<Long, CompositionContentSource>
+        }.subscribeOn(scheduler)
     }
 
     override fun getExternalStorageSource(
@@ -47,12 +60,12 @@ class StorageSourceRepositoryImpl(
     }
 
     override fun getCompositionFileDescriptor(compositionId: Long): FileDescriptor {
-        val storageId = compositionsDao.getStorageId(compositionId)
-        return storageMusicProvider.getFileDescriptor(storageId)
+        val storageId = compositionsDao.requireStorageId(compositionId)
+        return systemAudioCatalogProvider.getFileDescriptor(storageId)
     }
 
     private fun getStorageCompositionSource(compositionId: Long): Maybe<CompositionContentSource> {
         return compositionsDao.selectStorageId(compositionId)
-            .map { id -> StorageCompositionSource(storageMusicProvider.getCompositionUri(id)) }
+            .map { id -> StorageCompositionSource(systemAudioCatalogProvider.getCompositionUri(id)) }
     }
 }

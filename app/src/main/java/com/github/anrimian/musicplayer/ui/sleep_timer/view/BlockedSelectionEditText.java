@@ -22,7 +22,10 @@ public class BlockedSelectionEditText extends
     protected void onSelectionChanged(int selStart, int selEnd) {
         super.onSelectionChanged(selStart, selEnd);
         //on selection move cursor to end of text
-        setSelection(this.length());
+        int length = this.length();
+        if (selStart != length || selEnd != length) {
+            post(() -> setSelection(length));
+        }
     }
 
 }

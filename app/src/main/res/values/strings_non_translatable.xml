@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="file_provider_authorities" translatable="false">
-        com.github.anrimian.simplemusicplayer.share_file_provider
-    </string>
-    <string name="covers_file_provider_authorities" translatable="false">
-                com.github.anrimian.simplemusicplayer.covers_file_provider
-    </string>
+
     <string name="feedback_email" translatable="false">smusicplayer.feedback@gmail.com</string>
     <string name="log_email" translatable="false">musicplayer.dummylogs@gmail.com</string>
     <string name="source_code_link" translatable="false">https://github.com/Anrimian/music-player</string>
-    <string name="privacy_policy_link" translatable="false">https://github.com/Anrimian/music-player/blob/master/privacy-policy.md</string>
     <string name="patch_notes_link" translatable="false">https://github.com/Anrimian/music-player/releases</string>
+    <string name="crowdin_link" translatable="false">https://crowdin.com/project/s-music-player</string>
 
-    <string name="app_name" translatable="false">Music Player</string>
     <string name="title_external_player" translatable="false">Music Player - Play File</string>
     <string name="useless_image" translatable="false">Useless image</string>
 
@@ -37,8 +31,10 @@
     <string name="privacy_policy" translatable="false">Privacy policy</string>
     <string name="about_app_text_here_link" translatable="false">here</string>
     <string name="patchnotes" translatable="false">Patch notes</string>
+    <string name="about_app_text_crowdin" translatable="false">join the project on Crowdin</string>
 
     <string name="percentage_template" translatable="false">%d%%</string>
+    <string name="braces_template" translatable="false">(%d)</string>
 
     <!--experimental one-->
     <string name="app_has_no_system_permission_to_start" translatable="false">App has no system permission to start</string>

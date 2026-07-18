@@ -25,6 +25,7 @@ open class CompositionsAdapter<T : Composition>(
     private val iconClickListener: (Int, T) -> Unit,
     private val menuClickListener: (View, Int, T) -> Unit,
     diffCallback: DiffUtil.ItemCallback<T> = SimpleDiffItemCallback(
+        CompositionHelper::areItemsTheSame,
         CompositionHelper::areSourcesTheSame,
         CompositionHelper::getChangePayload
     )

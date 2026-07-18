@@ -2,6 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,38 +13,37 @@
         android:clipToPadding="false"
         android:background="?android:attr/colorBackground">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/content_vertical_margin">
 
             <CheckBox
                 style="@style/CheckboxStyle"
                 android:id="@+id/cbShowReportDialogOnStart"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/show_error_report_dialog_on_start"
                 android:layout_marginTop="@dimen/list_vertical_margin"
                 android:layout_marginBottom="@dimen/list_vertical_margin"
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:layout_marginStart="@dimen/content_horizontal_margin"/>
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
                 android:id="@+id/tvLogInfo"
                 style="@style/TextStyle.Medium"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:text="@string/log_info_text"/>
-
-        <LinearLayout
-            android:id="@+id/llLogActions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="end"
-            android:gravity="end">
+                android:text="@string/log_info_text"
+                app:layout_constraintTop_toBottomOf="@id/cbShowReportDialogOnStart"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <Button
                 android:id="@+id/btnDelete"
@@ -54,7 +54,14 @@
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
                 android:layout_marginTop="@dimen/content_vertical_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+                app:layout_constraintTop_toBottomOf="@id/tvLogInfo"
+                app:layout_constraintEnd_toStartOf="@id/btnView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintWidth_min="100dp"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                tools:text="fdаааааааааааааааааd"/>
 
             <Button
                 android:id="@+id/btnView"
@@ -63,7 +70,14 @@
                 android:layout_height="wrap_content"
                 android:text="@string/view_file"
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+                android:layout_marginBottom="@dimen/content_vertical_margin"
+                app:layout_constraintTop_toTopOf="@id/btnDelete"
+                app:layout_constraintEnd_toStartOf="@id/btnSend"
+                app:layout_constraintStart_toEndOf="@id/btnDelete"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintWidth_min="100dp"
+                tools:text="fdd"/>
 
             <Button
                 android:id="@+id/btnSend"
@@ -72,15 +86,24 @@
                 android:layout_height="wrap_content"
                 android:text="@string/send_file"
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"/>
+                android:layout_marginBottom="@dimen/content_vertical_margin"
+                app:layout_constraintTop_toTopOf="@id/btnView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnView"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintWidth_min="100dp"
+                tools:text="fdd"/>
 
-        </LinearLayout>
-
-        <View
-            android:id="@+id/dividerLog"
-            style="@style/Divider.Horizontal"
-            android:layout_marginStart="@dimen/content_horizontal_margin"
-            android:layout_marginEnd="@dimen/content_horizontal_margin"/>
+            <View
+                android:id="@+id/dividerLog"
+                style="@style/Divider.Horizontal.Constraint"
+                android:layout_marginStart="@dimen/content_horizontal_margin"
+                android:layout_marginEnd="@dimen/content_horizontal_margin"
+                android:layout_marginTop="@dimen/content_vertical_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnDelete"/>
 
             <TextView
                 android:id="@+id/tvAbout"
@@ -90,10 +113,12 @@
                 android:layout_marginStart="@dimen/content_horizontal_margin"
                 android:layout_marginEnd="@dimen/content_horizontal_margin"
                 android:layout_marginTop="@dimen/content_vertical_margin"
-                android:layout_marginBottom="@dimen/content_vertical_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dividerLog"
                 tools:text="@string/about_app_text"/>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 </FrameLayout>

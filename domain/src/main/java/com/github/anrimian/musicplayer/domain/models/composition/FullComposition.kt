@@ -1,7 +1,5 @@
 package com.github.anrimian.musicplayer.domain.models.composition
 
-import java.util.Date
-
 /**
  * Created on 24.10.2017.
  */
@@ -20,11 +18,11 @@ class FullComposition(
     val size: Long,
     val id: Long,
     val storageId: Long?,
-    val dateAdded: Date,
-    val dateModified: Date,
-    val coverModifyTime: Date,
-    val corruptionType: CorruptionType?,
-    val initialSource: InitialSource
+    val addedTime: Long,
+    val modifiedTime: Long,
+    val coverModifyTime: Long,
+    val fileStatus: LocalFileStatus,
+    val corruptionType: CorruptionType?
 ) {
 
     override fun equals(other: Any?): Boolean {

@@ -1,0 +1,59 @@
+[versions]
+#core
+kotlinMetadataVersion = "2.3.10"
+#noinspection GradleDependency - will use it until min api = 23
+roomVersionLegacy = "2.7.2"
+#noinspection GradleDependency
+viewModelVersionLegacy = "2.8.7"
+#noinspection GradleDependency
+composeBomLegacy = "2025.11.01"
+#noinspection GradleDependency
+activityComposeVersionLegacy = "1.10.0"
+#noinspection GradleDependency
+glideVersionLegacy = "4.16.0"
+#noinspection GradleDependency
+glideComposeVersionLegacy = "1.0.0-alpha.6"
+#noinspection GradleDependency
+media3Version = "1.8.0"
+#noinspection GradleDependency
+workManagerVersion = "2.10.5"
+#noinspection GradleDependency
+playServicesAuthVersionLegacy = "20.7.0"
+#noinspection GradleDependency
+googleIdVersionLegacy = "1.1.1"
+
+
+
+#testing
+#noinspection GradleDependency - will use it until min api = 23
+androidXTestWorkVersionLegacy = "2.10.1"
+
+[libraries]
+#core
+kotlinMetadataJvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlinMetadataVersion" }
+
+viewModel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "viewModelVersionLegacy" }
+viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "viewModelVersionLegacy" }
+
+room = { module = "androidx.room:room-runtime", version.ref = "roomVersionLegacy" }
+roomRx = { module = "androidx.room:room-rxjava3", version.ref = "roomVersionLegacy" }
+roomCompiler = { module = "androidx.room:room-compiler", version.ref = "roomVersionLegacy" }
+
+composeBomLegacy = { module = "androidx.compose:compose-bom", version.ref = "composeBomLegacy" }
+
+activityComposeLegacy = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersionLegacy" }
+
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersionLegacy" }
+glideCompiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glideVersionLegacy" }
+glideCompose = { module = "com.github.bumptech.glide:compose", version.ref = "glideComposeVersionLegacy" }
+
+exoPlayerCore = { module = "androidx.media3:media3-exoplayer", version.ref = "media3Version" }
+
+workManager = { module = "androidx.work:work-runtime", version.ref = "workManagerVersion" }
+workManagerRx = { module = "androidx.work:work-rxjava3", version.ref = "workManagerVersion" }
+
+playServicesAuth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersionLegacy" }
+googleId = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleIdVersionLegacy" }
+
+#tests
+androidXTestWork = { module = "androidx.work:work-testing", version.ref = "androidXTestWorkVersionLegacy" }

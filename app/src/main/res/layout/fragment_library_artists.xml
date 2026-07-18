@@ -10,6 +10,8 @@
         android:importantForAccessibility="no"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/list_library_bottom_padding"
         tools:listitem="@layout/item_storage_music" />
 
     <com.github.anrimian.musicplayer.ui.utils.views.progress_state.ProgressStateView

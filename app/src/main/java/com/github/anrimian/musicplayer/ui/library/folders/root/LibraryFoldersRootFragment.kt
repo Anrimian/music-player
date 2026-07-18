@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.github.anrimian.musicplayer.Constants.Arguments.HIGHLIGHT_COMPOSITION_ID
+import androidx.fragment.app.Fragment
+import com.github.anrimian.musicplayer.AppConstants.Arguments.HIGHLIGHT_COMPOSITION_ID
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentRootLibraryFoldersBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -12,6 +13,8 @@ import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.toolbar.AdvancedToolbar
 import com.github.anrimian.musicplayer.ui.library.common.setupLibraryTitle
 import com.github.anrimian.musicplayer.ui.library.folders.LibraryFoldersFragment
+import com.github.anrimian.musicplayer.ui.library.folders.volumes.LibraryVolumesFragment
+import com.github.anrimian.musicplayer.ui.utils.args
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.BackActionRemoveCallback
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigation
 import com.github.anrimian.musicplayer.ui.utils.fragments.navigation.FragmentNavigationListener
@@ -104,8 +107,8 @@ class LibraryFoldersRootFragment : MvpAppCompatFragment(), FolderRootView,
         backActionRemoveCallback.remove()
     }
 
-    override fun showFolderScreens(ids: List<Long?>) {
-        val highlightCompositionId = requireArguments().getLong(HIGHLIGHT_COMPOSITION_ID)
+    override fun showFolderScreens(ids: List<Long>) {
+        val highlightCompositionId = args.getLong(HIGHLIGHT_COMPOSITION_ID)
 
         //if we have highlight request and target fragment is on top without active search,
         // just proceed call without creation
@@ -119,23 +122,23 @@ class LibraryFoldersRootFragment : MvpAppCompatFragment(), FolderRootView,
                 }
             }
             if (!isSearchActive && currentFragment.getFolderId() == ids.last()) {
-                requireArguments().remove(HIGHLIGHT_COMPOSITION_ID)
+                args.remove(HIGHLIGHT_COMPOSITION_ID)
                 currentFragment.requestHighlightComposition(highlightCompositionId)
                 return
             }
         }
 
-        navigation.addNewFragmentStack(
-            ids.mapIndexed { index, folderId ->
-                if (index == ids.lastIndex && highlightCompositionId != 0L) {
-                    requireArguments().remove(HIGHLIGHT_COMPOSITION_ID)
-                    LibraryFoldersFragment.newInstance(folderId, highlightCompositionId)
-                } else {
-                    LibraryFoldersFragment.newInstance(folderId)
-                }
-            },
-            R.anim.anim_alpha_appear
-        )
+        val fragments = ArrayList<Fragment>(ids.size + 1)
+        fragments.add(LibraryVolumesFragment())
+        ids.forEachIndexed { index, folderId ->
+            if (index == ids.lastIndex && highlightCompositionId != 0L) {
+                args.remove(HIGHLIGHT_COMPOSITION_ID)
+                fragments.add(LibraryFoldersFragment.newInstance(folderId, highlightCompositionId))
+            } else {
+                fragments.add(LibraryFoldersFragment.newInstance(folderId))
+            }
+        }
+        navigation.addNewFragmentStack(fragments, R.anim.anim_alpha_appear)
     }
 
     override fun showProgress() {
@@ -151,12 +154,12 @@ class LibraryFoldersRootFragment : MvpAppCompatFragment(), FolderRootView,
     }
 
     fun revealComposition(compositionId: Long) {
-        requireArguments().putLong(HIGHLIGHT_COMPOSITION_ID, compositionId)
+        args.putLong(HIGHLIGHT_COMPOSITION_ID, compositionId)
         setupFolderTree()
     }
 
     private fun setupFolderTree() {
-        val highlightCompositionId = requireArguments().getLong(HIGHLIGHT_COMPOSITION_ID)
+        val highlightCompositionId = args.getLong(HIGHLIGHT_COMPOSITION_ID)
         if (highlightCompositionId != 0L) {
             presenter.onNavigateToCompositionRequested(highlightCompositionId)
         } else if (!navigation.hasScreens()) {

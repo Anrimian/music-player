@@ -305,12 +305,12 @@ public class UiStateRepositoryImpl implements UiStateRepository {
     }
 
     @Override
-    public ListPosition getSavedFolderListPosition(@Nullable Long id) {
+    public ListPosition getSavedFolderListPosition(Long id) {
         return foldersPositionsPreference.get(id);
     }
 
     @Override
-    public void saveAlbumListPosition(@Nullable Long id, ListPosition listPosition) {
+    public void saveAlbumListPosition(Long id, ListPosition listPosition) {
         albumsPositionsPreference.put(id, listPosition);
     }
 

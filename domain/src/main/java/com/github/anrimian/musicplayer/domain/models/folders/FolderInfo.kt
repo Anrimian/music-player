@@ -2,8 +2,9 @@ package com.github.anrimian.musicplayer.domain.models.folders
 
 class FolderInfo(
     val id: Long,
+    val volumeFolderId: Long,
     val path: String,
-    val isParentOfParentRoot: Boolean
+    val level: Int
 ) {
 
     override fun equals(other: Any?): Boolean {

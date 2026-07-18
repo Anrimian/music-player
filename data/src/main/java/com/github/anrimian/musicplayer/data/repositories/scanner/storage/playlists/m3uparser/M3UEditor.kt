@@ -5,7 +5,6 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
 import java.io.PrintWriter
-import java.util.Date
 
 private const val EDITOR_VERSION = 1
 
@@ -22,8 +21,8 @@ class M3UEditor {
         val pw = PrintWriter(stream)
         pw.println(M3U_START_MARKER)
         pw.println(M3U_VERSION + EDITOR_VERSION)
-        pw.println(M3U_CREATE_DATE + playlistFile.createDate.time)
-        pw.println(M3U_MODIFY_DATE + playlistFile.modifyDate.time)
+        pw.println(M3U_CREATE_DATE + playlistFile.createDate)
+        pw.println(M3U_MODIFY_DATE + playlistFile.modifyDate)
         for(entry in playlistFile.entries) {
             pw.println(entry.filePath)
         }
@@ -67,8 +66,8 @@ class M3UEditor {
 
         return PlayListFile(
             fileName,
-            Date(createTime),
-            Date(modifyTime),
+            createTime,
+            modifyTime,
             entries
         )
     }

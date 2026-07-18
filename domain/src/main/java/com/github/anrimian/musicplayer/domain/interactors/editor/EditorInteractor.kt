@@ -9,6 +9,7 @@ import com.github.anrimian.musicplayer.domain.models.image.ImageSource
 import com.github.anrimian.musicplayer.domain.models.sync.FileKey
 import com.github.anrimian.musicplayer.domain.models.utils.toChangedKey
 import com.github.anrimian.musicplayer.domain.repositories.EditorRepository
+import com.github.anrimian.musicplayer.domain.repositories.LibraryFilesRepository
 import com.github.anrimian.musicplayer.domain.repositories.LibraryRepository
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository
 import io.reactivex.rxjava3.core.Completable
@@ -21,6 +22,7 @@ class EditorInteractor(
     private val syncInteractor: SyncInteractor<FileKey, *, Long>,
     private val editorRepository: EditorRepository,
     private val libraryRepository: LibraryRepository,
+    private val libraryFilesRepository: LibraryFilesRepository,
     private val storageSourceRepository: StorageSourceRepository,
 ) {
 
@@ -105,7 +107,7 @@ class EditorInteractor(
     }
 
     fun editCompositionFileName(compositionId: Long, newFileName: String): Completable {
-        return editorRepository.changeCompositionFileName(compositionId, newFileName)
+        return libraryFilesRepository.changeCompositionFileName(compositionId, newFileName)
             .flatMapCompletable { result ->
                 syncInteractor.onLocalFileKeyChanged(
                     result.changedFiles.first().toChangedKey(),
@@ -128,7 +130,7 @@ class EditorInteractor(
     }
 
     fun updateAlbumName(
-        name: String?,
+        name: String,
         albumId: Long,
         downloadingSubject: BehaviorSubject<Long>,
         editingSubject: BehaviorSubject<Long>,
@@ -156,7 +158,7 @@ class EditorInteractor(
     }
 
     fun updateArtistName(
-        name: String?,
+        name: String,
         artistId: Long,
         affectedFilesCount: (Int) -> Unit,
         downloadingSubject: BehaviorSubject<Long>,

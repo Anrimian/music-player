@@ -60,7 +60,7 @@ class AlbumEditorPresenter(
         }
     }
 
-    fun onNewNameEntered(name: String?) {
+    fun onNewNameEntered(name: String) {
         performChangeAction { downloadingSubject, editingSubject ->
             editorInteractor.updateAlbumName(name, albumId, downloadingSubject, editingSubject)
         }

@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.anrimian.fsync.models.state.file.FileSyncState
-import com.github.anrimian.musicplayer.Constants
-import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.AppConstants
+import com.github.anrimian.musicplayer.AppConstants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.FragmentBaseFabListBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -34,7 +34,7 @@ import com.github.anrimian.musicplayer.ui.editor.genre.RenameGenreDialogFragment
 import com.github.anrimian.musicplayer.ui.equalizer.EqualizerDialogFragment
 import com.github.anrimian.musicplayer.ui.library.common.compositions.BaseLibraryCompositionsFragment
 import com.github.anrimian.musicplayer.ui.library.compositions.adapter.CompositionsAdapter
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlists.choose.ChoosePlayListDialogFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.applyBottomInsets
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentRunner
@@ -55,7 +55,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView,
     companion object {
         fun newInstance(genreId: Long) = GenreItemsFragment().apply {
             arguments = Bundle().apply {
-                putLong(Constants.Arguments.ID_ARG, genreId)
+                putLong(AppConstants.Arguments.ID_ARG, genreId)
             }
         }
     }
@@ -269,7 +269,7 @@ class GenreItemsFragment : BaseLibraryCompositionsFragment(), GenreItemsView,
         adapter.showFileSyncStates(states)
     }
 
-    private fun getGenreId() = requireArguments().getLong(Constants.Arguments.ID_ARG)
+    private fun getGenreId() = requireArguments().getLong(AppConstants.Arguments.ID_ARG)
 
     private fun onOptionsItemClicked(item: MenuItem) {
         when (item.itemId) {

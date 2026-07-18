@@ -3,7 +3,6 @@ package com.github.anrimian.musicplayer.ui.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -68,9 +67,11 @@ fun Fragment.isTabletLand(): Boolean {
     return requireContext().isTabletLand()
 }
 
+val Fragment.ctx get() = context!!
+
 val Fragment.args get() = arguments!!
 
-fun Fragment.attrColor(@AttrRes attr: Int) = context!!.attrColor(attr)
+fun Fragment.attrColor(@AttrRes attr: Int) = ctx.attrColor(attr)
 
 fun Fragment.getDimensionPixelSize(@DimenRes resId: Int): Int {
     return resources.getDimensionPixelSize(resId)
@@ -130,16 +131,6 @@ fun startAppLocaleSettings(activity: Activity) {
     intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
     intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
     activity.startActivity(intent)
-}
-
-fun pIntentFlag(flags: Int = 0): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-    PendingIntent.FLAG_IMMUTABLE or flags
-} else {
-    flags
-}
-
-fun broadcastPendingIntentFlag(): Int {
-    return pIntentFlag(PendingIntent.FLAG_UPDATE_CURRENT)
 }
 
 @SuppressLint("ClickableViewAccessibility")

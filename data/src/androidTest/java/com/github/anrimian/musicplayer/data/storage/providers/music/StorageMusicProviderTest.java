@@ -6,37 +6,37 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.collection.LongSparseArray;
-
-import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
+import com.github.anrimian.musicplayer.domain.Constants;
+import com.github.anrimian.musicplayer.domain.interactors.analytics.NoOpAnalytics;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import hu.akarnokd.rxjava3.math.MathObservable;
 import io.reactivex.rxjava3.core.Observable;
 
 public class StorageMusicProviderTest {
 
-    private StorageMusicProvider storageMusicProvider;
+    private SystemAudioCatalogProvider storageMusicProvider;
 
     @BeforeEach
     public void before() {
         Context appContext = getInstrumentation().getTargetContext();
-        StorageAlbumsProvider storageAlbumsProvider = new StorageAlbumsProvider(appContext);
-        storageMusicProvider = new StorageMusicProvider(appContext, storageAlbumsProvider);
+        storageMusicProvider = new SystemAudioCatalogProvider(appContext, NoOpAnalytics.INSTANCE);
     }
 
     @Test
     public void testRepositoryReturnValues() {
-        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions(0, false);
+        Map<AudioFileKey, StorageAudioFile> map = storageMusicProvider.getAudioFiles(0, false, Constants.DEFAULT_REMOTE_EXTENSIONS);
         if (map == null) {
-            map = new LongSparseArray<>();
+            map = new HashMap<>();
         }
-        for(int i = 0, size = map.size(); i < size; i++) {
-            StorageFullComposition composition = map.valueAt(i);
+        for(var composition : map.values()) {
             System.out.println(composition);
-            assertNotNull(composition.getRelativePath());
+            assertNotNull(composition.getParentPath());
         }
     }
 
@@ -52,7 +52,7 @@ public class StorageMusicProviderTest {
 
     private long load() {
         long startTime = System.currentTimeMillis();
-        LongSparseArray<StorageFullComposition> map = storageMusicProvider.getCompositions( 0, false);
+        Map<AudioFileKey, StorageAudioFile> map = storageMusicProvider.getAudioFiles(0, false, Constants.DEFAULT_REMOTE_EXTENSIONS);
         if (map == null) {
             Log.d("KEK", "load failed");
         }

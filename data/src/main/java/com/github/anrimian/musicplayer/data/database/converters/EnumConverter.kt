@@ -1,56 +1,47 @@
-package com.github.anrimian.musicplayer.data.database.converters;
+package com.github.anrimian.musicplayer.data.database.converters
 
-import androidx.room.TypeConverter;
+import androidx.room.TypeConverter
+import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
+import com.github.anrimian.musicplayer.domain.models.composition.InitialSource.Companion.fromId
+import com.github.anrimian.musicplayer.domain.models.composition.LocalFileStatus
 
-import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType;
-import com.github.anrimian.musicplayer.domain.models.composition.InitialSource;
-import com.github.anrimian.musicplayer.domain.models.composition.InitialSourceKt;
-import com.github.anrimian.musicplayer.domain.models.order.OrderType;
-
-import javax.annotation.Nullable;
-
-public class EnumConverter {
+class EnumConverter {
 
     @TypeConverter
-    public CorruptionType toEnum(@Nullable String name) {
-        if (name == null) {
-            return null;
-        }
-        return CorruptionType.valueOf(name);
+    fun toLocalFileStatus(id: Int): LocalFileStatus {
+        return LocalFileStatus.fromId(id)
     }
 
     @TypeConverter
-    public String toName(@Nullable CorruptionType value) {
+    fun toId(value: LocalFileStatus): Int {
+        return value.id
+    }
+
+    @TypeConverter
+    fun toEnum(id: Int?): CorruptionType? {
+        if (id == null) {
+            return null
+        }
+        return CorruptionType.fromId(id)
+    }
+
+    @TypeConverter
+    fun toId(value: CorruptionType?): Int? {
         if (value == null) {
-            return null;
+            return null
         }
-        return value.name();
+        return value.id
     }
 
     @TypeConverter
-    public OrderType toOrderType(@Nullable String name) {
-        if (name == null) {
-            return null;
-        }
-        return OrderType.valueOf(name);
+    fun toInitialSource(value: Int): InitialSource {
+        return fromId(value)
     }
 
     @TypeConverter
-    public String toName(@Nullable OrderType value) {
-        if (value == null) {
-            return null;
-        }
-        return value.name();
-    }
-
-    @TypeConverter
-    public InitialSource toInitialSource(int value) {
-        return InitialSourceKt.fromId(value);
-    }
-
-    @TypeConverter
-    public int toInt(InitialSource value) {
-        return value.getId();
+    fun toInt(value: InitialSource): Int {
+        return value.id
     }
 
 }

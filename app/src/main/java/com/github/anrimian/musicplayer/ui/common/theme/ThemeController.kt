@@ -94,7 +94,7 @@ class ThemeController(private val context: Context) {
 
     private fun currentShapeStyle() = if (isCircleShapeEnabled()) R.style.RoundedCorners else R.style.RoundedRectangleCorners
 
-    private fun getLatestDarkTheme() = AppTheme.getTheme(preferences.getInt(LATEST_DARK_THEME_ID, AppTheme.DARK.id))
+    private fun getLatestDarkTheme() = AppTheme.getTheme(preferences.getInt(LATEST_DARK_THEME_ID, AppTheme.MATTE_DARK_BLUE.id))
 
     private fun setLatestDarkTheme(appTheme: AppTheme) {
         preferences.putInt(LATEST_DARK_THEME_ID, appTheme.id)

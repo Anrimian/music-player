@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="open_drawer">Çekmeceyi Aç</string>
     <string name="try_again">Tekrar deneyin</string>
     <string name="can_not_work_without_file_permission">Uygulama, dosya izni olmadan çalışamaz</string>
@@ -12,7 +11,7 @@
     <string name="file_not_found">Dosya bulunamadı</string>
     <string name="compositions_on_device_not_found">Cihazda şarkı bulunamadı</string>
     <string name="compositions_and_folders_for_search_not_found">Arama sonuçlarıyla eşleşen kompozisyonlar ve klasörler bulunamadı</string>
-    <string name="foreground_channel_description">Ön plan oyuncu bildirimi</string>
+    <string name="foreground_channel_name">Ön plan oyuncu bildirimi</string>
     <string name="previous_track">Önceki parça</string>
     <string name="next_track">Sonraki parça</string>
     <string name="folder">Klasör</string>
@@ -68,16 +67,9 @@
     <string name="now_playing_template">Şu anda oynatılıyor: %1$s.  Oynatma sırasını açın.</string>
     <string name="play_all_in_folder">Tümünü klasörde oynat</string>
     <string name="delete_playlist">Oynatma listesini sil</string>
-    <string name="storage_timeout_error_message">
-         Cihaz medya depolama alanı yanıt vermiyor.
-         Bu gerçekten garip ve nadir bir sorundur.
-         Cihazı yeniden başlatmayı deneyin, belki bu sorunu çözecektir.
-    </string>
+    <string name="storage_timeout_error_message">Cihaz medya depolama alanı yanıt vermiyor.\nBu gerçekten garip ve nadir bir sorundur.\nCihazı yeniden başlatmayı deneyin, belki bu sorunu çözecektir.</string>
     <string name="select_all">Tümünü seç</string>
-    <string name="file_uri_extract_error">
-         Gönderilecek \"%s\" kompozisyonunun sistem yolu alınamıyor.
-         Muhtemelen özel sistem klasöründedir.
-     </string>
+    <string name="file_uri_extract_error">Gönderilecek \"%s\" kompozisyonunun sistem yolu alınamıyor.\nMuhtemelen özel sistem klasöründedir.</string>
     <string name="loading_progress">Yükleniyor…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
     <string name="add_date_order_desc_title">Önce daha sonra</string>
@@ -188,9 +180,7 @@
     <string name="lyrics">Şarkı Sözleri</string>
     <string name="check_tags_error">Kompozisyon etiketleri kontrol edilemedi: %s</string>
     <string name="changing_file_progress">Dosya değiştiriliyor…</string>
-    <string name="android_r_edit_file_permission_denied">
-         Android 11\'den dosyaları düzenlemek ve silmek, açık sistem izni gerektirir
-     </string>
+    <string name="android_r_edit_file_permission_denied">Android 11\'den dosyaları düzenlemek ve silmek, açık sistem izni gerektirir</string>
     <string name="error_report">Hata raporu</string>
     <string name="critical_error_report_message">Önemli bir hata oluştu ve bu uygulama nedeniyle başlatılamıyor.  Bu hataların ortaya çıkması son derece istenmeyen bir durumdur.  Uygulama herhangi bir bilgiyi otomatik olarak göndermez, ancak hata günlüğü olan dosyayı e-posta ile manuel olarak gönderebilirsiniz.  Bu, bu hatayı düzeltmeye yardımcı olacaktır.</string>
     <string name="error_report_message">Önemli bir hata oluştu.  Uygulama herhangi bir bilgiyi otomatik olarak göndermez, ancak hata günlüğü olan dosyayı e-posta ile manuel olarak gönderebilirsiniz.  Bu, bu hatayı düzeltmeye yardımcı olacaktır.</string>
@@ -241,19 +231,16 @@
     <string name="no_lyrics_for_current_composition">Mevcut beste için şarkı sözü yok</string>
     <string name="edit_lyrics">Şarkı sözlerini düzenle</string>
     <string name="show_in_folders">Klasörlerde göster</string>
-    <string name="file_source_not_found">Uzak dosya bulunamadı</string>
     <string name="file_is_too_large">Dosya çok büyük</string>
     <string name="preparing_files">Dosyalar hazırlanıyor</string>
     <string name="downloading">İndiriliyor: %1$d/%2$d</string>
     <string name="downloading_progress">İndiriliyor(%d%%)</string>
     <string name="rename_progress_count">Yeniden adlandırılıyor(%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s?  Bu işlem geri alınamaz.</string>
+    <string name="undone_action_template">Bu işlem geri alınamaz.</string>
     <string name="delete_composition_template">Şarkıyı \"%1$s\" sil</string>
     <string name="delete_empty_folder">\"%s\" klasörünü sil</string>
     <string name="delete_folder_template">%2$s \"%1$s\" klasöründen</string>
-    <string name="android_r_editor_restriction_error">Android 11\'den dosyaların kopyalanmasına/taşınmasına/yeniden adlandırılmasına yalnızca şu klasörlerde izin verilir: \"%s\".
-         Ses dosyalarını bu klasörlere yerleştirin ve işlemin doğru şekilde gerçekleştirilmesi gerekir.
-     </string>
+    <string name="android_r_editor_restriction_error">Android 11\'den dosyaların kopyalanmasına/taşınmasına/yeniden adlandırılmasına yalnızca şu klasörlerde izin verilir: \"%s\".\nSes dosyalarını bu klasörlere yerleştirin ve işlemin doğru şekilde gerçekleştirilmesi gerekir.</string>
     <string name="folder_already_excluded_from_scanning">Bu klasör zaten tarama dışında bırakıldı</string>
     <string name="no_file_modify_permission">Dosyayı değiştirme izni yok</string>
     <string name="interface_settings">Arayüz</string>
@@ -295,80 +282,101 @@
     <string name="check_for_duplicates">Yeni kompozisyonlar eklemeden önce çalma listesinde yinelenen kompozisyon olup olmadığını kontrol edin</string>
     <string name="more_template">…%d fazla</string>
     <string name="add_without_duplicates">Yinelemeler olmadan ekle</string>
-
+    <string name="process_unsupported_actions">Bilinmeyen medya etkinliklerini oynat/duraklat komutu olarak kabul et</string>
+    <string name="process_unsupported_actions_description">Beklenmeyen oynatma/duraklatmaya neden olabilir</string>
+    <string name="ignore_play_after_connection">Bluetooth bağlandıktan sonra 3 saniye boyunca \'Oynat\' komutlarını yoksay</string>
+    <string name="ignore_play_after_connection_description">Bağlanırken beklenmeyen oynatmayı önleyebilir</string>
+    <string name="pause_on_audio_device_remove">Ses çıkış cihazının bağlantısı kesildiğinde duraklat</string>
+    <string name="missing_files_detected">Eksik ses dosyaları algılandı</string>
+    <!-- !Not verified by native speaker! -->
+    <string name="missing_files_description">Android sistemi bu dosyaların orijinal konumlarında artık bulunmadığını bildiriyor.\nTaşınmış, başka bir uygulama tarafından silinmiş veya bağlantısı kesilmiş bir SD kartta olabilirler.\nBu geçersiz girişleri kitaplığınızdan kaldırabilirsiniz.\nKullanılamayan şarkılar (%d):</string>
+    <!---->
+    <string name="see_more">Daha fazlasını gör (%d)</string>
+    <string name="remove">Kaldır</string>
+    <string name="delete_missing_compositions_title">Besteleri sil?</string>
+    <string name="file_not_found_in_all_storages">Dosya yerel olarak veya bulut depolarında bulunamadı</string>
+    <string name="question_template">%1$s? %2$s</string>
+    <string name="allowed_file_extensions">İzin verilen dosya uzantıları</string>
+    <string name="allowed_extensions_state">Kitaplığa yalnızca bu uzantılara sahip dosyalar dahil edilecektir: \n%s</string>
+    <string name="allowed_file_extensions_description">Uzantılar \',\' sembolüyle ayrılır</string>
+    <string name="restore_default">Varsayılana geri yükle</string>
+    <string name="not_allowed_path">Dosya yazmak için izin verilmeyen yol</string>
+    <string name="configure_menu">Menüyü yapılandır</string>
+    <string name="configure_menu_items">Menü öğelerini yapılandır</string>
+    <string name="save">Kaydet</string>
+    <string name="menu_group_primary">Ana</string>
+    <string name="menu_group_secondary">Ek</string>
+    <string name="menu_group_hidden">Gizli</string>
+    <string name="undo">Geri al</string>
+    <string name="playlist_sorted">Oynatma listesi sıralandı</string>
+    <string name="artist_order">Sanatçıya göre</string>
+    <string name="skip_silence">Sessizliği atla</string>
+    <string name="skip_silence_summary">%.1fs\'den uzun sessiz kısımları otomatik olarak atla</string>
+    <string name="android_media_player_skip_silence_note">Sessizliği atlamayı desteklemiyor</string>
+    <string name="system_interaction">Sistem etkileşimi</string>
+    <string name="sound_processing">Ses işleme</string>
     <plurals name="compositions_count">
         <item quantity="one">%1$s şarkı</item>
         <item quantity="other">Şarkılar %1$s</item>
     </plurals>
-
     <plurals name="files_count">
         <item quantity="one">%1$s dosya</item>
         <item quantity="other">%1$s dosya</item>
     </plurals>
-
     <plurals name="albums_count">
         <item quantity="one">%1$s albüm</item>
         <item quantity="other">%1$s albüm</item>
     </plurals>
-
     <plurals name="play_next_message">
         <item quantity="one">sonraki %s şarkı çalınacak</item>
         <item quantity="other">%s şarkı daha sonra çalınacak</item>
     </plurals>
-
     <plurals name="added_to_queue_message">
         <item quantity="one">%s şarkı oynatma sırasının sonuna eklendi</item>
         <item quantity="other">%s şarkı çalma sırasının sonuna eklendi</item>
     </plurals>
-
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d şarkı çalma listesine eklendi\"%2$s\"</item>
         <item quantity="other">çalma listesine eklenen şarkılar %1$d \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d şarkı çalma listesinden silindi \"%2$s\"</item>
         <item quantity="other">çalma listesinden silinen şarkılar %1$d \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d şarkı silindi</item>
         <item quantity="other">%1$d şarkı silindi</item>
     </plurals>
-
     <plurals name="seconds_template">
         <item quantity="one">%1$d saniye</item>
         <item quantity="other">%1$d saniye</item>
     </plurals>
-
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="one">%d şarkıyı sil</item>
         <item quantity="other">Sil %d</item>
     </plurals>
-
     <plurals name="for_at_least_minutes">
         <item quantity="one">En az %d dakika için</item>
         <item quantity="other">En az %d dakika boyunca</item>
     </plurals>
-
     <plurals name="export_playlists_success">
         <item quantity="one">%d oynatma listesi dahili depolamaya kaydedildi</item>
         <item quantity="other">%d oynatma listeleri dahili depolamaya kaydedildi</item>
     </plurals>
-
     <plurals name="playlist_import_partial_success">
         <item quantity="one">Oynatma listesi başarıyla içe aktarıldı, ancak %d dosya kitaplıkta bulunamadı</item>
         <item quantity="other">Oynatma listesi başarıyla içe aktarıldı, ancak kitaplıkta %d dosya bulunamadı</item>
     </plurals>
-
     <plurals name="delete_playlists_template">
-        <item quantity="one">d oynatma listesini sil</item>
-        <item quantity="other">d oynatma listelerini sil</item>
+        <item quantity="one">d oynatma listesini sil?</item>
+        <item quantity="other">d oynatma listelerini sil?</item>
     </plurals>
-
     <plurals name="delete_playlists_success">
         <item quantity="one">%d oynatma listesi silindi</item>
         <item quantity="other">d oynatma listeleri silindi</item>
     </plurals>
-
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="one">%1$d besteyi kitaplığınızdan silmek istiyor musunuz? %2$s</item>
+        <item quantity="other">%1$d besteyi kitaplığınızdan silmek istiyor musunuz? %2$s</item>
+    </plurals>
 </resources>

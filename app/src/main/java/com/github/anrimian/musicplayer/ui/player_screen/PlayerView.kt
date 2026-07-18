@@ -1,11 +1,11 @@
 package com.github.anrimian.musicplayer.ui.player_screen
 
 import com.github.anrimian.fsync.models.state.file.FileSyncState
-import com.github.anrimian.musicplayer.domain.interactors.player.ActionState
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.ActionState
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.CurrentAction
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
-import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.library.common.library.BaseLibraryView
 import moxy.viewstate.strategy.alias.AddToEndSingle
@@ -79,7 +79,7 @@ interface PlayerView : BaseLibraryView {
     fun showSleepTimerRemainingTime(remainingMillis: Long)
 
     @AddToEndSingle
-    fun showFileScannerState(state: FileScannerState)
+    fun showCurrentActions(action: CurrentAction)
 
     @AddToEndSingle
     fun showCurrentCompositionSyncState(syncState: FileSyncState?, item: PlayQueueItem?)

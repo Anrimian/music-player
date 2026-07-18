@@ -74,6 +74,12 @@
     </style>
 
     <style name="ButtonBrightStyle" parent="@style/Widget.AppCompat.Button.Colored">
+        <item name="android:background">@drawable/bg_button_bright_rounded</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
     </style>
 
     <style name="ButtonOutlineStyle" parent="@style/Widget.AppCompat.Button">

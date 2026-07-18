@@ -1,34 +1,20 @@
-package com.github.anrimian.musicplayer.data.database.utils;
+package com.github.anrimian.musicplayer.data.database.utils
 
-import static com.github.anrimian.musicplayer.domain.utils.TextUtils.isEmpty;
+object DatabaseUtils {
 
-public class DatabaseUtils {
-
-    public static String getSearchArg(String arg) {
-        return arg == null ? null : '%' + arg + '%';
+    fun getSearchArg(arg: String?): String? {
+        return arg?.let { "%$it%" }
     }
 
-    public static String[] getSearchArgs(String arg, int count) {
-        if (isEmpty(arg)) {
-            arg = null;
-        }
-
-        String[] result = new String[count];
-        for (int i = 0; i < count; i++) {
+    fun getSearchArgs(arg: String?, count: Int): Array<String?> {
+        val verifiedArg = if (arg.isNullOrEmpty()) null else arg
+        return Array(count) { i ->
             if (i == 0) {
-                result[i] = arg;
+                verifiedArg
             } else {
-                result[i] = arg == null? null : "%" + arg + "%";
+                getSearchArg(verifiedArg)
             }
         }
-        return result;
     }
 
-    public static Object[] toArgs(Object arg, int times) {
-        Object[] result = new Object[times];
-        for (int i = 0; i < times; i++) {
-            result[i] = arg;
-        }
-        return result;
-    }
 }

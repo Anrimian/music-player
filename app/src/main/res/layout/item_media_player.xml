@@ -10,18 +10,32 @@
     <TextView
         style="@style/TextStyle.Medium"
         android:id="@+id/tvMediaPlayerName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/content_internal_margin"
         android:layout_marginEnd="@dimen/content_horizontal_margin"
         android:maxLines="2"
         app:layout_constraintTop_toTopOf="@id/ivDrag"
-        app:layout_constraintBottom_toBottomOf="@id/ivDrag"
+        app:layout_constraintBottom_toTopOf="@+id/tvMediaPlayerSubtitle"
         app:layout_constraintStart_toEndOf="@id/ivDrag"
         app:layout_constraintEnd_toStartOf="@id/swMediaPlayer"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constrainedWidth="true"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="Android media player"/>
+
+    <TextView
+        style="@style/TextStyle.Subtitle.Small"
+        android:id="@+id/tvMediaPlayerSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/content_internal_margin"
+        android:layout_marginEnd="@dimen/content_horizontal_margin"
+        app:layout_constraintTop_toBottomOf="@id/tvMediaPlayerName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ivDrag"
+        app:layout_constraintEnd_toStartOf="@id/swMediaPlayer"
+        tools:text="Does not support skipping silence"/>
 
     <ImageView
         style="@style/ButtonStyle"

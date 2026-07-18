@@ -1,8 +1,7 @@
 package com.github.anrimian.musicplayer.data.storage.files
 
-import com.github.anrimian.musicplayer.data.repositories.library.edit.models.CompositionMoveData
 import com.github.anrimian.musicplayer.data.storage.providers.music.FilePathComposition
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider
+import com.github.anrimian.musicplayer.data.storage.providers.music.SystemAudioCatalogProvider
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.exceptions.FileWriteNotAllowedException
 import com.github.anrimian.musicplayer.domain.utils.FileUtils
@@ -10,59 +9,57 @@ import java.io.File
 import java.util.LinkedList
 
 class StorageFilesDataSourceImpl(
-    private val storageMusicProvider: StorageMusicProvider
+    private val systemAudioCatalogProvider: SystemAudioCatalogProvider
 ) : StorageFilesDataSource {
 
-    override fun renameCompositionsFolder(
-        compositions: Collection<CompositionMoveData>,
-        folderRelativePath: String,
-        newDirectoryName: String,
+    override fun renameCompositionsDirectory(
+        files: List<StorageFileInfo>,
+        folderPath: String,
+        newFolderPath: String,
     ): List<Pair<Long, String>> {
-        if (compositions.isEmpty()) {
+        if (files.isEmpty()) {
             return emptyList()
         }
-        val newFolderRelativePath = FileUtils.replaceFileName(folderRelativePath, newDirectoryName)
         val updatedCompositions = LinkedList<FilePathComposition>()
         val updatedNames = LinkedList<Pair<Long, String>>()
         val filesToRename = LinkedList<Pair<String, String>>()
-        var folderPath: String? = null
+        var oldFolderPath: String? = null
         var folderNewFullPath: String? = null
-        for (composition in compositions) {
-            val storageId = composition.storageId ?: continue
+        for (file in files) {
+            val storageId = file.storageId
             val filePath = getCompositionFilePath(storageId)
 
-            val newPath = filePath.replace(folderRelativePath, newFolderRelativePath)
+            val newPath = filePath.replace(folderPath, newFolderPath)
             val formattedNewPath = FileUtils.getUniqueFilePath(newPath)
             if (formattedNewPath != newPath) {
                 filesToRename.add(filePath to formattedNewPath)
-                updatedNames.add(composition.id to FileUtils.getFileName(formattedNewPath))
+                updatedNames.add(file.id to FileUtils.getFileName(formattedNewPath))
             }
             updatedCompositions.add(FilePathComposition(storageId, formattedNewPath))
 
-            if (folderPath == null) {
-                folderPath = filePath.substring(0, filePath.indexOf(folderRelativePath) + folderRelativePath.length)
-                folderNewFullPath = folderPath.replace(folderRelativePath, newFolderRelativePath)
+            if (oldFolderPath == null) {
+                oldFolderPath = filePath.substring(0, filePath.indexOf(folderPath) + folderPath.length)
+                folderNewFullPath = oldFolderPath.replace(folderPath, newFolderPath)
             }
         }
 
         for (paths in filesToRename) {
             FileUtils.renameFile(paths.first, paths.second)
         }
-        renameFolder(folderPath!!, folderNewFullPath!!)
-        storageMusicProvider.updateCompositionsFilePath(updatedCompositions)
+        renameFolder(oldFolderPath!!, folderNewFullPath!!)
+        systemAudioCatalogProvider.updateCompositionsFilePath(updatedCompositions)
 
         return updatedNames
     }
 
-    override fun renameCompositionFile(composition: CompositionMoveData, fileName: String): String {
-        val storageId = composition.storageId ?: return fileName
+    override fun renameCompositionFile(storageId: Long, fileName: String): String {
         val oldPath = getCompositionFilePath(storageId)
         val newPath = FileUtils.replaceFileName(oldPath, fileName)
         val formattedNewPath = FileUtils.getUniqueFilePath(newPath)
 
         FileUtils.renameFile(oldPath, formattedNewPath)
 
-        storageMusicProvider.updateCompositionsFilePath(
+        systemAudioCatalogProvider.updateCompositionsFilePath(
             listOf(FilePathComposition(storageId, formattedNewPath))
         )
 
@@ -70,27 +67,27 @@ class StorageFilesDataSourceImpl(
     }
 
     override fun moveCompositionsToDirectory(
-        compositions: Collection<CompositionMoveData>,
-        fromFolderRelativePath: String,
-        toFolderRelativePath: String,
+        files: Collection<StorageFileInfo>,
+        fromFolderPath: String,
+        toFolderPath: String,
     ): List<Pair<Long, String>> {
         val updatedCompositions = LinkedList<FilePathComposition>()
         val updatedNames = LinkedList<Pair<Long, String>>()
         val filesToMove = LinkedList<Pair<String, String>>()
-        for (composition in compositions) {
-            val storageId = composition.storageId ?: continue
+        for (composition in files) {
+            val storageId = composition.storageId
             val filePath = getCompositionFilePath(storageId)
 
-            val newPath = if (fromFolderRelativePath.isEmpty()) {
+            val newPath = if (fromFolderPath.isEmpty()) {
                 val lastDelimiterIndex = filePath.lastIndexOf('/')//case without delimiters?
-                filePath.replaceRange(lastDelimiterIndex, lastDelimiterIndex, "/$toFolderRelativePath")
+                filePath.replaceRange(lastDelimiterIndex, lastDelimiterIndex, "/$toFolderPath")
             } else {
-                val formattedFromFolderRelativePath = if (toFolderRelativePath.isEmpty()) {
-                    "/$fromFolderRelativePath"
+                val formattedFromFolderRelativePath = if (toFolderPath.isEmpty()) {
+                    "/$fromFolderPath"
                 } else {
-                    fromFolderRelativePath
+                    fromFolderPath
                 }
-                filePath.replace(formattedFromFolderRelativePath, toFolderRelativePath)
+                filePath.replace(formattedFromFolderRelativePath, toFolderPath)
             }
             val formattedNewPath = FileUtils.getUniqueFilePath(newPath)
             if (formattedNewPath != newPath) {
@@ -102,8 +99,43 @@ class StorageFilesDataSourceImpl(
         for (paths in filesToMove) {
             FileUtils.moveFile(paths.first, paths.second)
         }
-        storageMusicProvider.updateCompositionsFilePath(updatedCompositions)
+        systemAudioCatalogProvider.updateCompositionsFilePath(updatedCompositions)
         return updatedNames
+    }
+
+    override fun executePathChange(
+        moveOperations: List<StorageMoveOperation>
+    ): List<Pair<Long, String>> {
+        val updatedCompositions = LinkedList<FilePathComposition>()
+        val changedFileNames = LinkedList<Pair<Long, String>>()
+        val filesToMove = LinkedList<Pair<String, String>>()
+
+        for (operation in moveOperations) {
+            val fileInfo = operation.file
+            val storageId = fileInfo.storageId
+            val compositionId = fileInfo.id
+            val newFullPath = operation.newPath
+
+            val oldPath = getCompositionFilePath(storageId)
+
+            val formattedNewPath = FileUtils.getUniqueFilePath(newFullPath)
+            val formattedNewFileName = FileUtils.getFileName(formattedNewPath)
+
+            if (formattedNewFileName != fileInfo.fileName) {
+                changedFileNames.add(compositionId to formattedNewFileName)
+            }
+
+            filesToMove.add(oldPath to formattedNewPath)
+            updatedCompositions.add(FilePathComposition(storageId, formattedNewPath))
+        }
+
+        for ((oldPath, newPath) in filesToMove) {
+            FileUtils.moveFile(oldPath, newPath)
+        }
+
+        systemAudioCatalogProvider.updateCompositionsFilePath(updatedCompositions)
+
+        return changedFileNames
     }
 
     override fun deleteCompositionFiles(
@@ -113,7 +145,7 @@ class StorageFilesDataSourceImpl(
         for (composition in compositions) {
             deleteFile(composition)
         }
-        storageMusicProvider.deleteCompositions(
+        systemAudioCatalogProvider.deleteCompositions(
             compositions.mapNotNull(DeletedComposition::storageId)
         )
         return compositions
@@ -123,7 +155,7 @@ class StorageFilesDataSourceImpl(
         deleteFile(composition)
         val storageId = composition.storageId
         if (storageId != null) {
-            storageMusicProvider.deleteComposition(storageId)
+            systemAudioCatalogProvider.deleteComposition(storageId)
         }
         return composition
     }
@@ -132,7 +164,7 @@ class StorageFilesDataSourceImpl(
 
     private fun deleteFile(composition: DeletedComposition) {
         val storageId = composition.storageId ?: return
-        val filePath = storageMusicProvider.getCompositionFilePath(storageId) ?: return
+        val filePath = systemAudioCatalogProvider.getCompositionFilePath(storageId) ?: return
         val parentDirectory = File(filePath).parentFile
         FileManager.deleteFile(filePath)
         if (parentDirectory != null) {
@@ -141,7 +173,7 @@ class StorageFilesDataSourceImpl(
     }
 
     private fun getCompositionFilePath(storageId: Long): String {
-        return storageMusicProvider.getCompositionFilePath(storageId)
+        return systemAudioCatalogProvider.getCompositionFilePath(storageId)
             ?: throw RuntimeException("composition path not found in system media store")
     }
 

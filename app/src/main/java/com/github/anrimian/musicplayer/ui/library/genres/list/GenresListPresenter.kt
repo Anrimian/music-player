@@ -3,10 +3,10 @@ package com.github.anrimian.musicplayer.ui.library.genres.list
 import com.github.anrimian.musicplayer.data.utils.rx.mapError
 import com.github.anrimian.musicplayer.domain.interactors.library.LibraryGenresInteractor
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlaylistsInteractor
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.order.Order
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
 import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.domain.utils.TextUtils
 import com.github.anrimian.musicplayer.domain.utils.rx.RxUtils
@@ -19,7 +19,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 class GenresListPresenter(
     private val interactor: LibraryGenresInteractor,
     playerInteractor: LibraryPlayerInteractor,
-    playListsInteractor: PlayListsInteractor,
+    playListsInteractor: PlaylistsInteractor,
     errorParser: ErrorParser,
     uiScheduler: Scheduler
 ) : BaseLibraryPresenter<GenresListView>(
@@ -99,7 +99,7 @@ class GenresListPresenter(
         viewState.showSelectPlayListDialog(selectedGenres, true)
     }
 
-    fun onPlayListToAddingSelected(playList: PlayList, genres: LongArray, closeMultiselect: Boolean) {
+    fun onPlayListToAddingSelected(playList: Playlist, genres: LongArray, closeMultiselect: Boolean) {
         performAddToPlaylist(interactor.getCompositionsInGenresIds(genres), playList) {
             onAddingToPlayListCompleted(closeMultiselect)
         }

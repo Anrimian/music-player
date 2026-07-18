@@ -3,7 +3,7 @@ package com.github.anrimian.musicplayer.domain.models.albums
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.CorruptionType
 import com.github.anrimian.musicplayer.domain.models.composition.InitialSource
-import java.util.Date
+import com.github.anrimian.musicplayer.domain.models.composition.LocalFileStatus
 
 class AlbumComposition(
     id: Long,
@@ -14,9 +14,10 @@ class AlbumComposition(
     size: Long,
     comment: String?,
     storageId: Long?,
-    dateAdded: Date,
-    dateModified: Date,
-    coverModifyTime: Date,
+    addedTime: Long,
+    modifiedTime: Long,
+    coverModifyTime: Long,
+    fileStatus: LocalFileStatus,
     corruptionType: CorruptionType?,
     isFileExists: Boolean,
     initialSource: InitialSource,
@@ -31,9 +32,10 @@ class AlbumComposition(
     size,
     comment,
     storageId,
-    dateAdded,
-    dateModified,
+    addedTime,
+    modifiedTime,
     coverModifyTime,
+    fileStatus,
     corruptionType,
     isFileExists,
     initialSource

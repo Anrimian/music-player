@@ -41,15 +41,21 @@ public class RxAudioFocus {
                     .setOnAudioFocusChangeListener(audioFocusObservable)
                     .build();
             audioFocusResult = audioManager.requestAudioFocus(request);
+            if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                return audioFocusObservable.getObservable()
+                        .doOnDispose(() -> audioManager.abandonAudioFocusRequest(request));
+            }
         } else {
-            //W/AudioManager: Use of stream types is deprecated for operations other than volume control
-            //W/AudioManager: See the documentation of requestAudioFocus() for what to use instead with android.media.AudioAttributes to qualify your playback use case
+            // W/AudioManager: Use of stream types is deprecated for operations other than
+            // volume control
+            // W/AudioManager: See the documentation of requestAudioFocus() for what to use
+            // instead with android.media.AudioAttributes to qualify your playback use case
             audioFocusResult = audioManager.requestAudioFocus(audioFocusObservable, streamType,
                     durationHint);
-        }
-        if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            return audioFocusObservable.getObservable()
-                    .doOnDispose(() -> audioManager.abandonAudioFocus(audioFocusObservable));
+            if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                return audioFocusObservable.getObservable()
+                        .doOnDispose(() -> audioManager.abandonAudioFocus(audioFocusObservable));
+            }
         }
         return null;
     }

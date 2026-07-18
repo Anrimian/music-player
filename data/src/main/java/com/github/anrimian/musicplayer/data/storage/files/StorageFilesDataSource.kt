@@ -1,6 +1,5 @@
 package com.github.anrimian.musicplayer.data.storage.files
 
-import com.github.anrimian.musicplayer.data.repositories.library.edit.models.CompositionMoveData
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 
 interface StorageFilesDataSource {
@@ -9,19 +8,21 @@ interface StorageFilesDataSource {
      * if dest folder already exist - files will be merged
      * returns id-new_file_name - if name was changed after rename
      */
-    fun renameCompositionsFolder(
-        compositions: Collection<CompositionMoveData>,
-        folderRelativePath: String,
-        newDirectoryName: String
+    fun renameCompositionsDirectory(
+        files: List<StorageFileInfo>,
+        folderPath: String,
+        newFolderPath: String
     ): List<Pair<Long, String>>
 
-    fun renameCompositionFile(composition: CompositionMoveData, fileName: String): String
+    fun renameCompositionFile(storageId: Long, fileName: String): String
 
     fun moveCompositionsToDirectory(
-        compositions: Collection<CompositionMoveData>,
-        fromFolderRelativePath: String,
-        toFolderRelativePath: String
+        files: Collection<StorageFileInfo>,
+        fromFolderPath: String,
+        toFolderPath: String
     ): List<Pair<Long, String>>
+
+    fun executePathChange(moveOperations: List<StorageMoveOperation>): List<Pair<Long, String>>
 
     fun deleteCompositionFiles(
         compositions: List<DeletedComposition>,

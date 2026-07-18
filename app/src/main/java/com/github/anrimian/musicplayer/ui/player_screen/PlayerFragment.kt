@@ -10,33 +10,36 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.github.anrimian.fsync.models.state.file.FileSyncState
-import com.github.anrimian.musicplayer.Constants
-import com.github.anrimian.musicplayer.Constants.Tags
+import com.github.anrimian.musicplayer.AppConstants
+import com.github.anrimian.musicplayer.AppConstants.Tags
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.utils.Permissions
 import com.github.anrimian.musicplayer.databinding.FragmentPlayerBinding
 import com.github.anrimian.musicplayer.databinding.PartialDrawerHeaderBinding
 import com.github.anrimian.musicplayer.di.Components
-import com.github.anrimian.musicplayer.domain.interactors.player.ActionState
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.ActionState
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.CurrentAction
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.MissingCompositions
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.NoAction
+import com.github.anrimian.musicplayer.domain.interactors.player.screen.ScannerRunning
 import com.github.anrimian.musicplayer.domain.models.Screens
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.composition.DeletedComposition
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueItem
 import com.github.anrimian.musicplayer.domain.models.player.modes.RepeatMode
-import com.github.anrimian.musicplayer.domain.models.scanner.FileScannerState
-import com.github.anrimian.musicplayer.domain.models.scanner.Running
 import com.github.anrimian.musicplayer.domain.models.volume.VolumeState
 import com.github.anrimian.musicplayer.ui.about.AboutAppFragment
 import com.github.anrimian.musicplayer.ui.common.applyDrawerHeaderInsets
-import com.github.anrimian.musicplayer.ui.common.attachBackPressedCallback
-import com.github.anrimian.musicplayer.ui.common.dialogs.composition.showCompositionPopupMenu
+import com.github.anrimian.musicplayer.ui.common.dialogs.missing.MissingFilesDialogFragment
 import com.github.anrimian.musicplayer.ui.common.dialogs.shareComposition
 import com.github.anrimian.musicplayer.ui.common.dialogs.showConfirmDeleteDialog
 import com.github.anrimian.musicplayer.ui.common.dialogs.speed.SpeedSelectorDialogFragment
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.common.format.MessagesUtils
+import com.github.anrimian.musicplayer.ui.common.format.getMissingFilesMessage
 import com.github.anrimian.musicplayer.ui.common.format.showSnackbar
 import com.github.anrimian.musicplayer.ui.common.menu.PopupMenuWindow
+import com.github.anrimian.musicplayer.ui.common.menu.composition.showCompositionPopupMenu
 import com.github.anrimian.musicplayer.ui.common.menu.showVolumePopup
 import com.github.anrimian.musicplayer.ui.common.navigation.ScreensMap
 import com.github.anrimian.musicplayer.ui.common.toolbar.ToolbarBackgroundDrawable
@@ -57,15 +60,16 @@ import com.github.anrimian.musicplayer.ui.library.genres.list.GenresListFragment
 import com.github.anrimian.musicplayer.ui.main.setup.SetupFragment
 import com.github.anrimian.musicplayer.ui.player_screen.lyrics.LyricsFragment
 import com.github.anrimian.musicplayer.ui.player_screen.queue.PlayQueueFragment
+import com.github.anrimian.musicplayer.ui.player_screen.view.PlayerScreenBinder
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.NavigationDrawerWrapper
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapper
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.PlayerPanelWrapperImpl
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.TabletPlayerPanelWrapper
 import com.github.anrimian.musicplayer.ui.player_screen.view.wrappers.ToolbarNavigationWrapper
-import com.github.anrimian.musicplayer.ui.playlist_screens.choose.ChoosePlayListDialogFragment
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlist.PlayListFragment
-import com.github.anrimian.musicplayer.ui.playlist_screens.playlists.PlayListsFragment
-import com.github.anrimian.musicplayer.ui.settings.SettingsFragment
+import com.github.anrimian.musicplayer.ui.playlists.choose.ChoosePlayListDialogFragment
+import com.github.anrimian.musicplayer.ui.playlists.details.PlaylistDetailsFragment
+import com.github.anrimian.musicplayer.ui.playlists.list.PlaylistsFragment
+import com.github.anrimian.musicplayer.ui.settings.main.SettingsFragment
 import com.github.anrimian.musicplayer.ui.sleep_timer.SleepTimerDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.addDrawerStateListener
@@ -102,8 +106,8 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
             playlistUriStr: String? = null
         ) = PlayerFragment().apply {
             arguments = Bundle().apply {
-                putBoolean(Constants.Arguments.OPEN_PLAYER_PANEL_ARG, openPlayQueue)
-                putString(Constants.Arguments.PLAYLIST_IMPORT_ARG, playlistUriStr)
+                putBoolean(AppConstants.Arguments.OPEN_PLAYER_PANEL_ARG, openPlayQueue)
+                putString(AppConstants.Arguments.PLAYLIST_IMPORT_ARG, playlistUriStr)
             }
         }
     }
@@ -119,7 +123,10 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
 
     private val viewDisposable = CompositeDisposable()
 
+    private lateinit var playerScreenBinder: PlayerScreenBinder
+
     private lateinit var navigation: FragmentNavigation
+
     private lateinit var navigationDrawerWrapper: NavigationDrawerWrapper
     private lateinit var toolbarNavigationWrapper: ToolbarNavigationWrapper
     private lateinit var playerPanelWrapper: PlayerPanelWrapper
@@ -145,6 +152,9 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        playerScreenBinder = Components.getAppComponent().playerScreenBinder()
+        playerScreenBinder.setupMenu(binding.navigationView)
 
         binding.toolbar.applyTopInsets()
         binding.toolbarPlayQueue.applyTopInsets()
@@ -175,8 +185,8 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
 
         val isLargeLand = binding.clBottomSheetContainer == null
         var isBottomSheetExpanded = !isLargeLand && presenter.isPlayerPanelOpened()
-        if (requireArguments().getBoolean(Constants.Arguments.OPEN_PLAYER_PANEL_ARG)) {
-            requireArguments().remove(Constants.Arguments.OPEN_PLAYER_PANEL_ARG)
+        if (requireArguments().getBoolean(AppConstants.Arguments.OPEN_PLAYER_PANEL_ARG)) {
+            requireArguments().remove(AppConstants.Arguments.OPEN_PLAYER_PANEL_ARG)
             presenter.onOpenPlayerPanelClicked()
             isBottomSheetExpanded = true
         }
@@ -271,14 +281,14 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
         binding.toolbarPlayQueue.setTitleClickListener(this::onPlayerTitleClicked)
 
         if (savedInstanceState == null) {
-            val playlistImportUri = requireArguments().getString(Constants.Arguments.PLAYLIST_IMPORT_ARG)
+            val playlistImportUri = requireArguments().getString(AppConstants.Arguments.PLAYLIST_IMPORT_ARG)
             if (playlistImportUri == null) {
                 presenter.onSetupScreenStateRequested()
             } else {
-                requireArguments().remove(Constants.Arguments.PLAYLIST_IMPORT_ARG)
+                requireArguments().remove(AppConstants.Arguments.PLAYLIST_IMPORT_ARG)
                 selectedDrawerItemId = R.id.menu_play_lists
                 binding.navigationView.setCheckedItem(R.id.menu_play_lists)
-                startFragment(PlayListsFragment.newInstance(playlistImportUri))
+                startFragment(PlaylistsFragment.newInstance(playlistImportUri))
             }
         } else {
             selectedDrawerItemId = savedInstanceState.getInt(SELECTED_DRAWER_ITEM, NO_ITEM)
@@ -347,9 +357,9 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
             Screens.LIBRARY -> presenter.onLibraryScreenSelected()
             Screens.PLAY_LISTS -> {
                 val fragments: MutableList<Fragment> = ArrayList()
-                fragments.add(PlayListsFragment.newInstance())
+                fragments.add(PlaylistsFragment.newInstance())
                 if (selectedPlayListScreenId != 0L) {
-                    fragments.add(PlayListFragment.newInstance(selectedPlayListScreenId))
+                    fragments.add(PlaylistDetailsFragment.newInstance(selectedPlayListScreenId))
                 }
                 navigation.newRootFragmentStack(fragments, 0, R.anim.anim_alpha_appear)
             }
@@ -478,14 +488,27 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
         }
     }
 
-    override fun showFileScannerState(state: FileScannerState) {
-        if (state is Running) {
-            val fileName = state.composition.fileName
-            drawerHeaderBinding.tvFileScannerState.text = getString(R.string.file_scanner_state, fileName)
-            drawerHeaderBinding.tvFileScannerState.visibility = View.VISIBLE
-        } else {
+    override fun showCurrentActions(action: CurrentAction) {
+        if (action == NoAction) {
             drawerHeaderBinding.tvFileScannerState.visibility = View.INVISIBLE
+            drawerHeaderBinding.tvFileScannerState.setOnClickListener(null)
+            return
         }
+        drawerHeaderBinding.tvFileScannerState.visibility = View.VISIBLE
+        val text = when(action) {
+            is ScannerRunning -> {
+                drawerHeaderBinding.tvFileScannerState.setOnClickListener(null)
+                getString(R.string.file_scanner_state, action.composition.fileName)
+            }
+            is MissingCompositions -> {
+                drawerHeaderBinding.tvFileScannerState.setOnClickListener {
+                    MissingFilesDialogFragment().safeShow(this)
+                }
+                getMissingFilesMessage(requireContext(), action.count)
+            }
+            else -> ""
+        }
+        drawerHeaderBinding.tvFileScannerState.text = text
     }
 
     override fun showCurrentCompositionSyncState(syncState: FileSyncState?, item: PlayQueueItem?) {
@@ -501,8 +524,9 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
     }
 
     override fun showActionState(actionState: ActionState) {
-        Components.getAppComponent().actionStateBinder().bind(binding.toolbar, actionState)
+        playerScreenBinder.bindActionState(binding.toolbar, actionState)
     }
+
 
     fun openPlayerPanel() {
         presenter.onOpenPlayerPanelClicked()
@@ -512,7 +536,7 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
     fun openImportPlaylistScreen(uriStr: String) {
         playerPanelWrapper.collapseBottomPanelSmoothly {
             val currentFragment = navigation.fragmentOnTop
-            if (currentFragment is PlayListsFragment) {
+            if (currentFragment is PlaylistsFragment) {
                 currentFragment.importPlaylist(uriStr)
             } else {
                 if (selectedDrawerItemId != R.id.menu_play_lists) {
@@ -520,24 +544,23 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
                     binding.navigationView.setCheckedItem(R.id.menu_play_lists)
                     presenter.onDrawerScreenSelected(Screens.PLAY_LISTS)
                 }
-                navigation.newRootFragment(PlayListsFragment.newInstance(uriStr), 0, 0)
+                navigation.newRootFragment(PlaylistsFragment.newInstance(uriStr), 0, 0)
             }
         }
     }
 
-    fun locateCompositionInFolders(composition: Composition) {
+    fun locateCompositionInFolders(compositionId: Long) {
         playerPanelWrapper.collapseBottomPanelSmoothly {
-            val id = composition.id
             val currentFragment = navigation.fragmentOnTop
             if (currentFragment is LibraryFoldersRootFragment) {
-                currentFragment.revealComposition(id)
+                currentFragment.revealComposition(compositionId)
             } else {
                 if (selectedDrawerItemId != R.id.menu_library) {
                     selectedDrawerItemId = R.id.menu_library
                     binding.navigationView.setCheckedItem(R.id.menu_library)
                 }
                 presenter.onLibraryScreenSelected(Screens.LIBRARY_FOLDERS)
-                startFragment(LibraryFoldersRootFragment.newInstance(id))
+                startFragment(LibraryFoldersRootFragment.newInstance(compositionId))
             }
         }
     }
@@ -555,7 +578,7 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
             when (item.itemId) {
                 R.id.menu_add_to_playlist -> presenter.onAddQueueItemToPlayListButtonClicked(queueItem)
                 R.id.menu_edit -> startActivity(CompositionEditorActivity.newIntent(requireContext(), queueItem.id))
-                R.id.menu_show_in_folders -> locateCompositionInFolders(queueItem)
+                R.id.menu_show_in_folders -> locateCompositionInFolders(queueItem.id)
                 R.id.menu_share -> shareComposition(this, queueItem)
                 R.id.menu_delete -> presenter.onDeleteCompositionButtonClicked(queueItem)
             }
@@ -563,6 +586,10 @@ class PlayerFragment : BaseLibraryFragment(), PlayerView {
     }
 
     private fun onNavigationItemSelected(item: MenuItem): Boolean {
+        if (playerScreenBinder.onNavigationItemSelected(item, binding.navigationView)) {
+            binding.drawer.closeDrawer(GravityCompat.START)
+            return false
+        }
         val itemId = item.itemId
         var selected = false
         when {

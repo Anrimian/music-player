@@ -1,171 +1,148 @@
-package com.github.anrimian.musicplayer.data.database.dao.albums;
+package com.github.anrimian.musicplayer.data.database.dao.albums
 
-import static com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils.getSearchArgs;
+import androidx.sqlite.db.SimpleSQLiteQuery
+import com.github.anrimian.musicplayer.data.database.LibraryDatabase
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao
+import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper
+import com.github.anrimian.musicplayer.data.database.utils.DatabaseUtils
+import com.github.anrimian.musicplayer.domain.models.albums.Album
+import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition
+import com.github.anrimian.musicplayer.domain.models.composition.Composition
+import com.github.anrimian.musicplayer.domain.models.order.Order
+import com.github.anrimian.musicplayer.domain.models.order.OrderType
+import com.github.anrimian.musicplayer.domain.utils.rx.firstListItemOrComplete
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
-import androidx.annotation.Nullable;
-import androidx.sqlite.db.SimpleSQLiteQuery;
+class AlbumsDaoWrapper(
+    private val libraryDatabase: LibraryDatabase,
+    private val albumsDao: AlbumsDao,
+    private val artistsDao: ArtistsDao,
+    private val artistsDaoWrapper: ArtistsDaoWrapper
+) {
 
-import com.github.anrimian.musicplayer.data.database.LibraryDatabase;
-import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDao;
-import com.github.anrimian.musicplayer.data.database.dao.artist.ArtistsDaoWrapper;
-import com.github.anrimian.musicplayer.domain.models.albums.Album;
-import com.github.anrimian.musicplayer.domain.models.albums.AlbumComposition;
-import com.github.anrimian.musicplayer.domain.models.composition.Composition;
-import com.github.anrimian.musicplayer.domain.models.order.Order;
-import com.github.anrimian.musicplayer.domain.utils.TextUtils;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Single;
-
-public class AlbumsDaoWrapper {
-
-    private final LibraryDatabase libraryDatabase;
-    private final AlbumsDao albumsDao;
-    private final ArtistsDao artistsDao;
-    private final ArtistsDaoWrapper artistsDaoWrapper;
-
-    public AlbumsDaoWrapper(LibraryDatabase libraryDatabase,
-                            AlbumsDao albumsDao,
-                            ArtistsDao artistsDao,
-                            ArtistsDaoWrapper artistsDaoWrapper) {
-        this.libraryDatabase = libraryDatabase;
-        this.albumsDao = albumsDao;
-        this.artistsDao = artistsDao;
-        this.artistsDaoWrapper = artistsDaoWrapper;
+    fun getAllObservable(order: Order, searchText: String?): Observable<List<Album>> {
+        val query = """
+            SELECT id AS id,
+                name AS name, 
+                (SELECT name FROM artists WHERE artists.id = albums.artistId) AS artist, 
+                (SELECT count() FROM compositions WHERE albumId = albums.id) AS compositionsCount 
+            FROM albums
+            $SEARCH_QUERY
+            ${getOrderQuery(order)}
+        """
+        val sqlQuery = SimpleSQLiteQuery(query, DatabaseUtils.getSearchArgs(searchText, 3))
+        return albumsDao.getAllObservable(sqlQuery)
     }
 
-    public Observable<List<Album>> getAllObservable(Order order, String searchText) {
-        String query = "SELECT id as id," +
-                "name as name, " +
-                "(SELECT name FROM artists WHERE artists.id = albums.artistId) as artist, " +
-                "(SELECT count() FROM compositions WHERE albumId = albums.id) as compositionsCount " +
-                "FROM albums";
-        query += getSearchQuery();
-        query += getOrderQuery(order);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, getSearchArgs(searchText, 3));
-        return albumsDao.getAllObservable(sqlQuery);
+    fun getAllAlbumsForArtistObservable(artistId: Long): Observable<List<Album>> {
+        return albumsDao.getAllAlbumsForArtistObservable(artistId)
     }
 
-    public Observable<List<Album>> getAllAlbumsForArtistObservable(long artistId) {
-        return albumsDao.getAllAlbumsForArtistObservable(artistId);
+    fun getCompositionsInAlbumObservable(
+        albumId: Long,
+        useFileName: Boolean
+    ): Observable<List<AlbumComposition>> {
+        val query = AlbumsDao.getAlbumCompositionsQuery(useFileName)
+        val sqlQuery = SimpleSQLiteQuery(query, arrayOf<Any>(albumId))
+        return albumsDao.getCompositionsInAlbumObservable(sqlQuery)
     }
 
-    public Observable<List<AlbumComposition>> getCompositionsInAlbumObservable(long albumId, boolean useFileName) {
-        String query = AlbumsDao.getAlbumCompositionsQuery(useFileName);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] { albumId } );
-        return albumsDao.getCompositionsInAlbumObservable(sqlQuery);
+    fun getCompositionsInAlbum(albumId: Long, useFileName: Boolean): List<Composition> {
+        val query = AlbumsDao.getCompositionsQuery(useFileName)
+        val sqlQuery = SimpleSQLiteQuery(query, arrayOf<Any>(albumId))
+        return albumsDao.getCompositionsInAlbum(sqlQuery)
     }
 
-    public List<Composition> getCompositionsInAlbum(long albumId, boolean useFileName) {
-        String query = AlbumsDao.getCompositionsQuery(useFileName);
-        SimpleSQLiteQuery sqlQuery = new SimpleSQLiteQuery(query, new Object[] { albumId } );
-        return albumsDao.getCompositionsInAlbum(sqlQuery);
+    fun getCompositionIdsInAlbum(albumId: Long): Single<List<Long>> {
+        return albumsDao.getCompositionIdsInAlbum(albumId)
     }
 
-    public Single<List<Long>> getCompositionIdsInAlbum(long albumId) {
-        return albumsDao.getCompositionIdsInAlbum(albumId);
-    }
-
-    public Observable<Album> getAlbumObservable(long albumId) {
+    fun getAlbumObservable(albumId: Long): Observable<Album> {
         return albumsDao.getAlbumObservable(albumId)
-                .takeWhile(list -> !list.isEmpty())
-                .map(list -> list.get(0));
+            .firstListItemOrComplete()
     }
 
-    public String[] getAlbumNames() {
-        return albumsDao.getAlbumNames();
+    fun getAlbumNames(): Array<String> {
+        return albumsDao.getAlbumNames()
     }
 
-    public void updateAlbumName(String name, long id) {
-        libraryDatabase.runInTransaction(() -> {
-            albumsDao.updateAlbumCompositionsModifyTime(id, new Date());
-
-            Long artistId = albumsDao.getArtistId(id);
-            Long existAlbumId = albumsDao.findAlbum(artistId, name);
+    fun updateAlbumName(albumId: Long, name: String) {
+        libraryDatabase.runInTransaction {
+            albumsDao.updateAlbumCompositionsModifyTime(albumId, System.currentTimeMillis())
+            val artistId = albumsDao.getArtistId(albumId)
+            val existAlbumId = albumsDao.findAlbum(artistId, name)
             if (existAlbumId == null) {
-                albumsDao.updateAlbumName(name, id);
+                albumsDao.updateAlbumName(name, albumId)
             } else {
-                albumsDao.changeCompositionsAlbum(id, existAlbumId);
-                albumsDao.deleteEmptyAlbum(id);
+                albumsDao.changeCompositionsAlbum(albumId, existAlbumId)
+                albumsDao.deleteEmptyAlbum(albumId)
             }
-        });
+        }
     }
 
-    public void updateAlbumArtist(long albumId, String artistName) {
-        libraryDatabase.runInTransaction(() -> {
-            albumsDao.updateAlbumCompositionsModifyTime(albumId, new Date());
+    fun updateAlbumArtist(albumId: Long, artistName: String?) {
+        libraryDatabase.runInTransaction {
+            albumsDao.updateAlbumCompositionsModifyTime(albumId, System.currentTimeMillis())
+            val artistId = artistsDaoWrapper.getOrCreateArtist(artistName)
 
-            Long artistId = artistsDao.findArtistIdByName(artistName);
+            val albumName = albumsDao.getAlbumName(albumId)
+            val existingAlbumId = albumsDao.findAlbum(artistId, albumName)
 
-            if (artistId != null) {
-                String albumName = albumsDao.getAlbumName(albumId);
-                Long existAlbumId = albumsDao.findAlbum(artistId, albumName);
-                if (existAlbumId != null) {
-                    albumsDao.changeCompositionsAlbum(albumId, existAlbumId);
-                    albumsDao.deleteEmptyAlbum(albumId);
-                    return;
-                }
+            if (existingAlbumId != null && existingAlbumId != albumId) {
+                // Merge into the existing other album
+                albumsDao.changeCompositionsAlbum(albumId, existingAlbumId)
+                albumsDao.deleteEmptyAlbum(albumId)
             } else {
-                if (!TextUtils.isEmpty(artistName)) {
-                    artistId = artistsDao.insertArtist(artistName);
+                // If not found - set artist id to album.
+                val oldArtistId = albumsDao.getArtistId(albumId)
+                albumsDao.setAuthorId(albumId, artistId)
+                if (oldArtistId != null) {
+                    artistsDao.deleteEmptyArtist(oldArtistId)
                 }
             }
-            Long oldArtistId = albumsDao.getArtistId(albumId);
-            albumsDao.setAuthorId(albumId, artistId);
-            if (oldArtistId != null) {
-                artistsDao.deleteEmptyArtist(oldArtistId);
-            }
-        });
+        }
     }
 
-    @Nullable
-    public Long getOrInsertAlbum(String albumName,
-                                 String albumArtist,
-                                 Map<String, Long> artistsCache,
-                                 Map<String, Long> albumsCache) {
+    fun getOrInsertAlbum(
+        albumName: String?,
+        albumArtist: String?,
+        artistsCache: MutableMap<String, Long>,
+        albumsCache: MutableMap<String, Long>
+    ): Long? {
         if (albumName == null) {
-            return null;
+            return null
         }
-        Long albumArtistId = artistsDaoWrapper.getOrInsertArtist(albumArtist, artistsCache);
+        val albumArtistId = artistsDaoWrapper.getOrInsertArtist(albumArtist, artistsCache)
 
-        String cacheKey = albumName + albumArtist;//with low chance, but can be collision here
-        Long albumId = albumsCache.get(cacheKey);
+
+        val cacheKey = albumName + albumArtist // with low chance, but can be collision here
+        var albumId = albumsCache[cacheKey]
         if (albumId != null) {
-            return albumId;
+            return albumId
         }
-
-        albumId = albumsDao.findAlbum(albumArtistId, albumName);
+        albumId = albumsDao.findAlbum(albumArtistId, albumName)
         if (albumId == null) {
-            albumId = albumsDao.insertAlbum(albumArtistId, albumName);
+            albumId = albumsDao.insertAlbum(albumArtistId, albumName)
         }
-        albumsCache.put(cacheKey, albumId);
-        return albumId;
+        albumsCache[cacheKey] = albumId
+        return albumId
     }
 
-    private String getOrderQuery(Order order) {
-        StringBuilder orderQuery = new StringBuilder(" ORDER BY ");
-        switch (order.getOrderType()) {
-            case NAME: {
-                orderQuery.append("name");
-                break;
-            }
-            case COMPOSITION_COUNT: {
-                orderQuery.append("compositionsCount");
-                break;
-            }
-            default: throw new IllegalStateException("unknown order type" + order);
+    private fun getOrderQuery(order: Order): String {
+        val orderColumn = when (order.orderType) {
+            OrderType.NAME -> "name"
+            OrderType.ARTIST -> "artist"
+            OrderType.COMPOSITION_COUNT -> "compositionsCount"
+            else -> throw IllegalStateException("unknown order type$order")
         }
-        orderQuery.append(" ");
-        orderQuery.append(order.isReversed()? "DESC" : "ASC");
-        return orderQuery.toString();
+        val direction = if (order.isReversed) "DESC" else "ASC"
+        return "ORDER BY $orderColumn $direction"
     }
 
-    private String getSearchQuery() {
-        return " WHERE (? IS NULL OR (name LIKE ? OR artist NOTNULL AND artist LIKE ?))";
+    companion object {
+        private const val SEARCH_QUERY =
+            " WHERE (? IS NULL OR (name LIKE ? OR artist NOTNULL AND artist LIKE ?))"
     }
 
 }

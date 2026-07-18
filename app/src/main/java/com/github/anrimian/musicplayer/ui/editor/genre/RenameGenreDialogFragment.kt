@@ -1,8 +1,8 @@
 package com.github.anrimian.musicplayer.ui.editor.genre
 
 import android.os.Bundle
-import com.github.anrimian.musicplayer.Constants.Arguments.ID_ARG
-import com.github.anrimian.musicplayer.Constants.Arguments.NAME_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.ID_ARG
+import com.github.anrimian.musicplayer.AppConstants.Arguments.NAME_ARG
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.ui.editor.batch.BatchEditorDialogFragment
 import com.github.anrimian.musicplayer.ui.editor.batch.BatchEditorPresenter
@@ -20,7 +20,7 @@ class RenameGenreDialogFragment: BatchEditorDialogFragment<RenameGenreView>(), R
 
     override fun createPresenter(): BatchEditorPresenter<RenameGenreView> {
         val id = requireArguments().getLong(ID_ARG)
-        val name = requireArguments().getString(NAME_ARG)
+        val name = requireArguments().getString(NAME_ARG)!!
         return Components.getGenreEditorComponent(id, name).renameGenrePresenter()
     }
 

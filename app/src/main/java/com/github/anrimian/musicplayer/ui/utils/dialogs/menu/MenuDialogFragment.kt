@@ -9,7 +9,7 @@ import android.view.View
 import androidx.annotation.MenuRes
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogMenuBinding
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
@@ -49,7 +49,7 @@ class MenuDialogFragment : DialogFragment() {
         onCompleteListener?.invoke(menuItem)
         complexCompleteListener?.invoke(
             menuItem,
-            args.getBundle(Constants.Arguments.EXTRA_DATA_ARG)!!
+            args.getBundle(AppConstants.Arguments.EXTRA_DATA_ARG)!!
         )
         dismissAllowingStateLoss()
     }
@@ -67,7 +67,7 @@ class MenuDialogFragment : DialogFragment() {
             arguments = Bundle().apply {
                 putInt(MENU_ARG, menuRes)
                 putString(TITLE_ARG, title)
-                putBundle(Constants.Arguments.EXTRA_DATA_ARG, extra)
+                putBundle(AppConstants.Arguments.EXTRA_DATA_ARG, extra)
             }
         }
 

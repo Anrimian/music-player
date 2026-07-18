@@ -12,7 +12,7 @@ class PlayListFileNameValidatorTest {
     @Test
     fun testGetFormattedPlaylistName(@TempDir dir: File) {
         val name = "আমার-সোনার-বাংলা-আমি-তোমায়-ভালোবাসি-চিরদিন-তোমার-আকাশ-তোমার-বাতাস-আমার-প্রাণে-বাজায়-বাঁশি-ও-মা-ফাগুনে-তোর"
-        val formattedName = PlayListFileNameValidator.getFormattedPlaylistName(name)
+        val formattedName = PlaylistFileNameValidator.getFormattedPlaylistName(name)
         assertNotEquals(name, formattedName)
         val file = File(dir, formattedName)
         assertTrue(file.createNewFile())
@@ -21,7 +21,7 @@ class PlayListFileNameValidatorTest {
     @Test
     fun testGetFormattedPlaylistNameWithSymbols(@TempDir dir: File) {
         val name = "আমার/-সোনার-বাংলা-আমি-তোমায়-ভালোবাসি-চিরদিন-তোমার-আকাশ-তোমার-বাতাস-আমার-প্রাণে-বাজায়-বাঁশি-ও-মা-ফাগুনে-তোর"
-        val formattedName = PlayListFileNameValidator.getFormattedPlaylistName(name)
+        val formattedName = PlaylistFileNameValidator.getFormattedPlaylistName(name)
         assertNotEquals(name, formattedName)
         val file = File(dir, formattedName)
         assertTrue(file.createNewFile())
@@ -30,7 +30,7 @@ class PlayListFileNameValidatorTest {
     @Test
     fun testGetFormattedPlaylistNameWithOnlyForbiddenSymbols(@TempDir dir: File) {
         val name = "/"
-        val formattedName = PlayListFileNameValidator.getFormattedPlaylistName(name)
+        val formattedName = PlaylistFileNameValidator.getFormattedPlaylistName(name)
         assertNotEquals(name, formattedName)
         val file = File(dir, formattedName)
         assertTrue(file.createNewFile())
@@ -39,7 +39,7 @@ class PlayListFileNameValidatorTest {
     @Test
     fun testIsPlaylistNameNotTooLong() {
         val name = "আমার-সোনার-বাংলা-আমি-তোমায়-ভালোবাসি-চিরদিন-তোমার-আকাশ-তোমার-বাতাস-আমার-প্রাণে-বাজায়-বাঁশি-ও-মা-ফাগুনে-তোর.m3u"
-        assertFalse(PlayListFileNameValidator.isPlaylistNameNotTooLong(name))
+        assertFalse(PlaylistFileNameValidator.isPlaylistNameNotTooLong(name))
     }
 
 }

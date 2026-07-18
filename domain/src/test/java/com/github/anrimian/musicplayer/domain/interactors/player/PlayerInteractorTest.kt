@@ -88,6 +88,7 @@ class PlayerInteractorTest {
 
         whenever(settingsRepository.isDecreaseVolumeOnAudioFocusLossEnabled).thenReturn(true)
         whenever(settingsRepository.isPauseOnAudioFocusLossEnabled).thenReturn(true)
+        whenever(settingsRepository.isPauseOnAudioDeviceRemoveEnabled).thenReturn(true)
 
         whenever(musicPlayerController.prepareToPlay(any())).thenReturn(Completable.complete())
         whenever(musicPlayerController.getTrackPositionObservable()).thenReturn(positionSubject)
@@ -979,6 +980,85 @@ class PlayerInteractorTest {
                 PlayerState.PAUSE,
             )
             isPlayingStateSubscriber.assertValues(false, true, false)
+        }
+
+        @Nested
+        @DisplayName("seek")
+        inner class Seek {
+
+            @Test
+            fun `seek started does not pause playback`() {
+                playerInteractor.onSeekStarted()
+
+                verify(musicPlayerController, times(1)).pause()
+                playerStateSubscriber.assertValues(
+                    PlayerState.IDLE,
+                    PlayerState.LOADING,
+                    PlayerState.PREPARING,
+                    PlayerState.PAUSE,
+                    PlayerState.PLAY,
+                )
+                isPlayingStateSubscriber.assertValues(false, true)
+            }
+
+            @Test
+            fun `seek started stops track position tracing`() {
+                playerInteractor.onSeekStarted()
+
+                // Emit a real position update from the player — it must NOT reach the subscriber
+                // because tracing was stopped
+                positionSubject.onNext(12345L)
+
+                // Only the initial startPosition (0L) should be present
+                positionSubscriber.assertValues(startPosition)
+            }
+
+            @Test
+            fun `seek finished applies position and resumes tracing`() {
+                val seekPosition = 5000L
+                playerInteractor.onSeekStarted()
+                playerInteractor.onSeekFinished(seekPosition)
+
+                inOrder.verify(musicPlayerController).seekTo(eq(seekPosition))
+
+                // After seek finished, tracing is restarted — a new emission from the
+                // controller must now reach the subscriber
+                val newRealPosition = 5100L
+                positionSubject.onNext(newRealPosition)
+
+                positionSubscriber.assertValues(startPosition, seekPosition, newRealPosition)
+            }
+
+            @Test
+            fun `seek finished while paused does not restart tracing`() {
+                playerInteractor.pause()
+                playerInteractor.onSeekStarted()
+                playerInteractor.onSeekFinished(3000L)
+
+                inOrder.verify(musicPlayerController).seekTo(eq(3000L))
+
+                // Tracing must NOT be restarted — player is paused
+                positionSubject.onNext(9999L)
+                positionSubscriber.assertValues(startPosition, 3000L) // start + seek position
+            }
+
+            @Test
+            fun `seek does not resume playback`() {
+                playerInteractor.onSeekStarted()
+                playerInteractor.onSeekFinished(3000L)
+
+                verify(musicPlayerController, times(1)).pause()
+                // resume() was called once on initial play(), not again after seek
+                verify(musicPlayerController, times(1)).resume()
+                playerStateSubscriber.assertValues(
+                    PlayerState.IDLE,
+                    PlayerState.LOADING,
+                    PlayerState.PREPARING,
+                    PlayerState.PAUSE,
+                    PlayerState.PLAY,
+                )
+                isPlayingStateSubscriber.assertValues(false, true)
+            }
         }
     }
 

@@ -1,563 +1,998 @@
-package com.github.anrimian.musicplayer.data.database;
 
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+package com.github.anrimian.musicplayer.data.database
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.collection.LongSparseArray;
-import androidx.room.migration.Migration;
-import androidx.room.util.CursorUtil;
-import androidx.sqlite.db.SupportSQLiteDatabase;
-
-import com.github.anrimian.musicplayer.data.database.converters.EnumConverter;
-import com.github.anrimian.musicplayer.data.database.dao.ignoredfolders.IgnoredFoldersDao;
-import com.github.anrimian.musicplayer.data.database.mappers.CompositionCorruptionDetector;
-import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl;
-import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbum;
-import com.github.anrimian.musicplayer.data.storage.providers.albums.StorageAlbumsProvider;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageFullComposition;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
-import com.github.anrimian.musicplayer.data.utils.Permissions;
-import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper;
-import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlayListFileNameValidator;
-import com.github.anrimian.musicplayer.domain.utils.FileUtils;
-import com.github.anrimian.musicplayer.domain.utils.TextUtils;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.ContentValues
+import android.content.Context
+import android.content.pm.PackageManager
+import android.database.sqlite.SQLiteDatabase
+import androidx.collection.LongSparseArray
+import androidx.core.content.edit
+import androidx.room.OnConflictStrategy
+import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.room.util.getColumnIndex
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.github.anrimian.musicplayer.data.database.converters.EnumConverter
+import com.github.anrimian.musicplayer.data.database.mappers.CompositionCorruptionDetector
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.M3UEditor
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListEntry
+import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListFile
+import com.github.anrimian.musicplayer.data.repositories.state.UiStateRepositoryImpl
+import com.github.anrimian.musicplayer.data.storage.providers.FileVolume
+import com.github.anrimian.musicplayer.data.storage.providers.music.AudioFileKey
+import com.github.anrimian.musicplayer.data.storage.providers.music.StorageAudioFile
+import com.github.anrimian.musicplayer.data.storage.providers.music.SystemAudioCatalogProvider
+import com.github.anrimian.musicplayer.data.utils.db.CursorWrapper
+import com.github.anrimian.musicplayer.domain.Constants
+import com.github.anrimian.musicplayer.domain.interactors.analytics.NoOpAnalytics
+import com.github.anrimian.musicplayer.domain.interactors.playlists.validators.PlaylistFileNameValidator
+import com.github.anrimian.musicplayer.domain.models.composition.LocalFileStatus
+import com.github.anrimian.musicplayer.domain.utils.FileUtils
+import java.io.File
+import java.util.LinkedList
 
 @SuppressLint("RestrictedApi")
-class Migrations {
+internal object Migrations {
 
-    static Migration MIGRATION_16_17 = new Migration(16, 17) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `trackNumber` INTEGER, `discNumber` INTEGER, `comment` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `pathModifyTime` INTEGER, `lastScanDate` INTEGER NOT NULL, `coverModifyTime` INTEGER NOT NULL, `corruptionType` TEXT, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
-            database.execSQL(
-                    "INSERT INTO `compositions_temp` (" +
-                            "id, artistId, albumId, folderId, storageId, title, trackNumber, " +
-                            "discNumber, comment, lyrics, fileName, duration, size, dateAdded, " +
-                            "dateModified, pathModifyTime, lastScanDate, coverModifyTime, corruptionType, " +
-                            "initialSource" +
-                            ") SELECT " +
-                            "id, artistId, albumId, folderId, storageId, title, trackNumber, " +
-                            "discNumber, comment, lyrics, fileName, duration, size, dateAdded, " +
-                            "dateModified, NULL, lastScanDate, coverModifyTime, corruptionType, " +
-                            "initialSource FROM compositions"
-            );
+    val MIGRATION_19_20: Migration = object : Migration(19, 20) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            val availableStatus = LocalFileStatus.AVAILABLE.id
 
-            database.execSQL("DROP TABLE `compositions`");
-            database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
+            db.execSQL(
+                """
+                CREATE TEMP TABLE temp_composition_remap (
+                    loser_id INTEGER NOT NULL,
+                    survivor_id INTEGER NOT NULL,
+                    PRIMARY KEY (loser_id)
+                )
+                """
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS idx_migration_19_20_dedup ON compositions(folderId, fileName)"
+            )
+            db.execSQL(
+                """
+                INSERT INTO temp_composition_remap (loser_id, survivor_id)
+                SELECT c.id,
+                       (SELECT s.id FROM compositions s
+                        WHERE s.folderId = c.folderId AND s.fileName = c.fileName
+                        ORDER BY CASE WHEN s.localFileStatus = $availableStatus AND s.storageId IS NOT NULL
+                                      THEN 0 ELSE 1 END, s.id
+                        LIMIT 1)
+                FROM compositions c
+                WHERE c.folderId IS NOT NULL
+                  AND c.id <> (SELECT s.id FROM compositions s
+                        WHERE s.folderId = c.folderId AND s.fileName = c.fileName
+                        ORDER BY CASE WHEN s.localFileStatus = $availableStatus AND s.storageId IS NOT NULL
+                                      THEN 0 ELSE 1 END, s.id
+                        LIMIT 1)
+                """
+            )
 
-            database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
-            database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
-            database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
+            db.execSQL(
+                """
+                UPDATE play_lists_entries
+                SET audioId = (SELECT survivor_id FROM temp_composition_remap WHERE loser_id = play_lists_entries.audioId)
+                WHERE audioId IN (SELECT loser_id FROM temp_composition_remap)
+                """
+            )
+            db.execSQL(
+                """
+                UPDATE play_queue
+                SET audioId = (SELECT survivor_id FROM temp_composition_remap WHERE loser_id = play_queue.audioId)
+                WHERE audioId IN (SELECT loser_id FROM temp_composition_remap)
+                """
+            )
+            db.execSQL(
+                """
+                DELETE FROM genre_entries
+                WHERE compositionId IN (SELECT loser_id FROM temp_composition_remap)
+                AND EXISTS (
+                    SELECT 1
+                    FROM genre_entries survivor_entry
+                    INNER JOIN temp_composition_remap remap ON remap.loser_id = genre_entries.compositionId
+                    WHERE survivor_entry.genreId = genre_entries.genreId
+                      AND survivor_entry.compositionId = remap.survivor_id
+                )
+                """
+            )
+            db.execSQL(
+                """
+                UPDATE genre_entries
+                SET compositionId = (
+                    SELECT survivor_id FROM temp_composition_remap WHERE loser_id = genre_entries.compositionId
+                )
+                WHERE compositionId IN (SELECT loser_id FROM temp_composition_remap)
+                """
+            )
+            db.execSQL("DELETE FROM compositions WHERE id IN (SELECT loser_id FROM temp_composition_remap)")
+            db.execSQL("DROP INDEX IF EXISTS idx_migration_19_20_dedup")
+            db.execSQL("DROP TABLE temp_composition_remap")
         }
-    };
-
-
-    static Migration getMigration15_16(Context context) {
-        return new Migration(15, 16) {
-            @Override
-            public void migrate(@NonNull SupportSQLiteDatabase db) {
-                db.execSQL("CREATE TABLE IF NOT EXISTS `track_positions` (`queueItemId` INTEGER NOT NULL, `trackPosition` INTEGER NOT NULL, `writeTime` INTEGER NOT NULL, PRIMARY KEY(`queueItemId`), FOREIGN KEY(`queueItemId`) REFERENCES `play_queue`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
-
-                SharedPreferences prefs = context.getSharedPreferences("ui_preferences", Context.MODE_PRIVATE);
-                long itemId = prefs.getLong("current_play_queue_id", UiStateRepositoryImpl.NO_ITEM);
-                if (itemId == UiStateRepositoryImpl.NO_ITEM) {
-                    return;
-                }
-                long position = prefs.getLong("track_position", 0L);
-                if (position != 0L) {
-                    db.execSQL("INSERT INTO track_positions (queueItemId, trackPosition, writeTime) VALUES (" + itemId + ", + " + position + ", " + System.currentTimeMillis() + ")");
-                }
-                prefs.edit()
-                        .putLong("library_genres_position", prefs.getLong("library_agenres_position", 0L))
-                        .remove("library_agenres_position")
-                        .remove("track_position")
-                        .apply();
-            }
-        };
     }
 
-    static Migration MIGRATION_14_15 = new Migration(14, 15) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("DROP TABLE `genres`");
-            database.execSQL("DROP TABLE `genre_entries`");
+    fun getMigration18_19(
+        context: Context,
+        audioCatalogProvider: SystemAudioCatalogProvider,
+    ): Migration {
 
-            database.execSQL("CREATE TABLE IF NOT EXISTS `genres` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)");
-            database.execSQL("CREATE TABLE IF NOT EXISTS `genre_entries` (`genreId` INTEGER NOT NULL, `compositionId` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`genreId`, `compositionId`), FOREIGN KEY(`compositionId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`genreId`) REFERENCES `genres`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+        class VolumeMigrationInfo(val id: Long, val rootFolderId: Long)
 
-            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_genres_name` ON `genres` (`name`)");
-            database.execSQL("CREATE INDEX IF NOT EXISTS `index_genre_entries_compositionId` ON `genre_entries` (`compositionId`)");
+        return object : Migration(18, 19) {
 
-            try (Cursor c = database.query("SELECT id, name FROM play_lists")) {
-                CursorWrapper cursorWrapper = new CursorWrapper(c);
-                while (c.moveToNext()) {
-                    String name = cursorWrapper.getString("name");
-                    if (TextUtils.isEmpty(name)) {
-                        continue;
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `volumes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageKey` TEXT NOT NULL, `path` TEXT NOT NULL, `isPrimary` INTEGER NOT NULL)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_volumes_path` ON `volumes` (`path`)")
+                db.execSQL("ALTER TABLE `folders` ADD COLUMN `volumeId` INTEGER REFERENCES `volumes`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE ")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_folders_volumeId` ON `folders` (`volumeId`)")
+
+                val storageAudioFiles = audioCatalogProvider.getAudioFiles(0, true, Constants.DEFAULT_REMOTE_EXTENSIONS)
+                    ?.mapKeys { entry -> entry.value.storageId }
+
+                if (storageAudioFiles.isNullOrEmpty()) {
+                    return
+                }
+
+                val usedVolumes = storageAudioFiles.values
+                    .mapNotNull { file -> FileVolume.fromCanonicalPathOrNull(file.parentPath) }
+                    .distinctBy { vol -> vol.path }
+
+                val volumeInfoMap = mutableMapOf<String, VolumeMigrationInfo>()
+                for (volume in usedVolumes) {
+                    val volumeValues = ContentValues().apply {
+                        put("storageKey", volume.storageKey)
+                        put("path", volume.path)
+                        put("isPrimary", if (volume.isPrimary) 1 else 0)
                     }
-                    String newName = PlayListFileNameValidator.INSTANCE.getFormattedPlaylistName(name);
+                    val volumeId = db.insert("volumes", SQLiteDatabase.CONFLICT_REPLACE, volumeValues)
 
-                    if (!name.equals(newName)) {
-                        int i = 0;
+                    val rootFolderValues = ContentValues().apply {
+                        put("name", volume.storageKey)
+                        put("volumeId", volumeId)
+                    }
+                    val rootFolderId = db.insert("folders", SQLiteDatabase.CONFLICT_NONE, rootFolderValues)
+                    volumeInfoMap[volume.path] = VolumeMigrationInfo(id = volumeId, rootFolderId = rootFolderId)
+                }
 
-                        while (isPlaylistWithNameExists(database, newName)) {
-                            StringBuilder sb = new StringBuilder(newName);
-                            sb.setCharAt(0, (char) i);
-                            newName = sb.toString();
+
+                // Compositions and Folders Migration
+                // First, get a map of all original root folders (parentId IS NULL).
+                // This is crucial for re-parenting them later.
+                val currentRootFolders = mutableMapOf<String, Long>()
+                db.query("SELECT id, name FROM folders WHERE parentId IS NULL AND volumeId IS NULL").use { cursor ->
+                    val idIndex = cursor.getColumnIndexOrThrow("id")
+                    val nameIndex = cursor.getColumnIndexOrThrow("name")
+                    while (cursor.moveToNext()) {
+                        currentRootFolders[cursor.getString(nameIndex)] = cursor.getLong(idIndex)
+                    }
+                }
+
+                // This recursive query reconstructs the full relative path for each composition.
+                val c = db.query("""
+                    WITH RECURSIVE folder_path(id, path) AS (
+                        SELECT id, name FROM folders WHERE parentId IS NULL
+                        UNION ALL
+                        SELECT f.id, fp.path || '/' || f.name FROM folders AS f
+                        JOIN folder_path AS fp ON f.parentId = fp.id
+                    )
+                    SELECT c.id AS compositionId, c.storageId, fp.path AS relativePath
+                    FROM compositions AS c
+                    LEFT JOIN folder_path AS fp ON c.folderId = fp.id
+                """)
+
+                val folderCache = mutableMapOf<String, Long>()
+
+                c.use { cursor ->
+                    val idIndex = cursor.getColumnIndexOrThrow("compositionId")
+                    val storageIdIndex = cursor.getColumnIndexOrThrow("storageId")
+                    val oldPathIndex = cursor.getColumnIndexOrThrow("relativePath")
+
+                    while (cursor.moveToNext()) {
+                        val compositionId = cursor.getLong(idIndex)
+                        val storageId = cursor.getLong(storageIdIndex)
+                        val relativePath = cursor.getString(oldPathIndex)
+                        val fullParentPath = storageAudioFiles[storageId]?.parentPath
+
+                        if (fullParentPath != null && fullParentPath != relativePath) {
+                            val newFolderId = getOrCreateFolder(
+                                db,
+                                fullParentPath,
+                                folderCache,
+                                currentRootFolders,
+                                volumeInfoMap
+                            )
+                            db.execSQL(
+                                "UPDATE compositions SET folderId = ? WHERE id = ?",
+                                arrayOf(newFolderId, compositionId)
+                            )
                         }
-
-                        long id = cursorWrapper.getLong("id");
-                        database.execSQL("UPDATE play_lists SET name = ? WHERE id = ?", new Object[] { newName, id });
                     }
                 }
-            }
-        }
-    };
 
-    private static boolean isPlaylistWithNameExists(SupportSQLiteDatabase database, String name) {
-        try (Cursor c = database.query("SELECT exists(SELECT 1 FROM play_lists WHERE name = ? LIMIT 1)", new Object[] { name })) {
-            c.moveToNext();
-            return c.getInt(0) != 0;
-        }
-    }
+                // Ignored Folders Migration
+                val allParentPaths = storageAudioFiles.values
+                    .map { audioFile -> audioFile.parentPath }
+                    .distinct()
 
-    static Migration getMigration13_14(Context context) {
-        return new Migration(13, 14) {
-            @Override
-            public void migrate(@NonNull SupportSQLiteDatabase database) {
-                DatabaseManager databaseManager = new DatabaseManager(context);
-                IgnoredFoldersDao dao = databaseManager.getConfigsDatabase().ignoredFoldersDao();
+                val configsDb = Room.databaseBuilder(context, ConfigsDatabase::class.java, "configs_database")
+                    .addMigrations(MIGRATION_CONFIG_1_2)
+                    .build()
+                try {
+                    val cdb = configsDb.openHelper.writableDatabase
+                    cdb.beginTransaction()
+                    try {
+                        val ignoredCursor = cdb.query("SELECT path FROM ignored_folders")
 
-                try (Cursor c = database.query("SELECT relativePath, addDate FROM ignored_folders")) {
-                    CursorWrapper cursorWrapper = new CursorWrapper(c);
-                    while (c.moveToNext()) {
-                        String path = cursorWrapper.getString("relativePath");
-                        long date = cursorWrapper.getLong("addDate");
-                        //noinspection ConstantConditions
-                        dao.insert(path, new Date(date));
-                    }
-                }
-                database.execSQL("DROP TABLE ignored_folders");
-            }
-        };
-    }
+                        val updates = mutableListOf<Pair<String, String>>()
 
-    static Migration MIGRATION_12_13 = new Migration(12, 13) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `trackNumber` INTEGER, `discNumber` INTEGER, `comment` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `lastScanDate` INTEGER NOT NULL, `coverModifyTime` INTEGER NOT NULL, `corruptionType` TEXT, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
+                        ignoredCursor.use { cursor ->
+                            val pathIndex = cursor.getColumnIndexOrThrow("path")
+                            while (cursor.moveToNext()) {
+                                val oldIgnoredPath = cursor.getString(pathIndex)
+                                val newPathMatch = allParentPaths
+                                    .filter { path -> path.endsWith(oldIgnoredPath) }
+                                    .minByOrNull { path -> path.length }
 
-            database.execSQL(
-                    "INSERT INTO `compositions_temp` (" +
-                            "id, artistId, albumId, folderId, storageId, title, trackNumber, " +
-                            "discNumber, comment, lyrics, fileName, duration, size, dateAdded, " +
-                            "dateModified, lastScanDate, coverModifyTime, corruptionType," +
-                            "initialSource" +
-                            ") SELECT " +
-                            "id, artistId, albumId, folderId, storageId, title, trackNumber, " +
-                            "discNumber, comment, lyrics, fileName, duration, size, dateAdded, " +
-                            "dateModified, lastScanDate, coverModifyTime, corruptionType," +
-                            "initialSource FROM compositions"
-            );
-
-            database.execSQL("DROP TABLE `compositions`");
-            database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
-
-            database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
-            database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
-            database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
-        }
-    };
-
-    static Migration MIGRATION_11_12 = new Migration(11, 12) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE compositions ADD COLUMN trackNumber INTEGER");
-            database.execSQL("ALTER TABLE compositions ADD COLUMN discNumber INTEGER");
-            database.execSQL("ALTER TABLE compositions ADD COLUMN comment TEXT");
-        }
-    };
-
-    static Migration MIGRATION_10_11 = new Migration(10, 11) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `albums_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
-
-            database.execSQL(
-                    "INSERT INTO `albums_temp` (" +
-                            "id, artistId, name" +
-                            ") SELECT " +
-                            "id, artistId, name " +
-                            "FROM albums"
-            );
-
-            database.execSQL("DROP TABLE `albums`");
-            database.execSQL("ALTER TABLE `albums_temp` RENAME TO `albums`");
-
-            database.execSQL("CREATE INDEX IF NOT EXISTS `index_albums_artistId` ON `albums` (`artistId`)");
-            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_albums_artistId_name` ON `albums` (`artistId`, `name`)");
-        }
-    };
-
-    static Migration MIGRATION_9_10 = new Migration(9, 10) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE compositions ADD COLUMN coverModifyTime INTEGER NOT NULL DEFAULT 0");
-        }
-    };
-
-    static Migration MIGRATION_8_9 = new Migration(8, 9) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `lastScanDate` INTEGER NOT NULL, `corruptionType` TEXT, `audioFileType` INTEGER NOT NULL, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
-
-            database.execSQL(
-                    "INSERT INTO `compositions_temp` (" +
-                            "id, artistId, albumId, folderId, storageId, title, lyrics, fileName," +
-                            "duration, size, dateAdded, dateModified, lastScanDate, corruptionType," +
-                            "audioFileType, initialSource" +
-                            ") SELECT " +
-                            "id, artistId, albumId, folderId, storageId, title, lyrics, fileName," +
-                            "duration, size, dateAdded, dateModified, lastScanDate, corruptionType," +
-                            "1 AS audioFileType, 1 AS initialSource FROM compositions"
-            );
-
-            database.execSQL("DROP TABLE `compositions`");
-            database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
-
-            database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
-            database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
-            database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
-        }
-    };
-
-    static Migration MIGRATION_7_8 = new Migration(7, 8) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE compositions ADD COLUMN lastScanDate INTEGER NOT NULL DEFAULT 0");
-        }
-    };
-
-    static Migration MIGRATION_6_7 = new Migration(6, 7) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE compositions ADD COLUMN lyrics TEXT");
-        }
-    };
-
-    static Migration MIGRATION_5_6 = new Migration(5, 6) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE compositions ADD COLUMN fileName TEXT");
-
-            //migrate file name
-            try (Cursor c = database.query("SELECT id, filePath FROM compositions")) {
-                while (c.moveToNext()) {
-                    long id = c.getLong(CursorUtil.getColumnIndex(c, "id"));
-                    String filePath = c.getString(CursorUtil.getColumnIndex(c, "filePath"));
-
-                    String fileName = FileUtils.formatFileName(filePath, true);
-
-                    ContentValues cv = new ContentValues();
-                    cv.put("fileName", fileName);
-
-                    database.update("compositions",
-                            SQLiteDatabase.CONFLICT_REPLACE,
-                            cv,
-                            "id = ?",
-                            new String[]{String.valueOf(id)}
-                    );
-                }
-            }
-        }
-    };
-
-    static Migration MIGRATION_4_5 = new Migration(4, 5) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `ignored_folders` (`relativePath` TEXT NOT NULL, `addDate` INTEGER, PRIMARY KEY(`relativePath`))");
-
-            database.execSQL("CREATE TABLE IF NOT EXISTS `folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentId` INTEGER, `name` TEXT, FOREIGN KEY(`parentId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
-            database.execSQL("CREATE  INDEX `index_folders_parentId` ON `folders` (`parentId`)");
-
-            //migrate compositions
-            database.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
-
-            //don't migrate folders, they will update automatically on next storage rescan
-            try (Cursor c = database.query("SELECT * FROM compositions")) {
-                CursorWrapper cursorWrapper = new CursorWrapper(c);
-                while (c.moveToNext()) {
-                    ContentValues cv = new ContentValues();
-
-                    cv.put("id", cursorWrapper.getLong( "id"));
-                    cv.put("artistId", cursorWrapper.getLong("artistId"));
-                    cv.put("albumId", cursorWrapper.getLong( "albumId"));
-                    cv.put("storageId", cursorWrapper.getLong("storageId"));
-                    cv.put("title", cursorWrapper.getString("title"));
-                    cv.put("filePath", cursorWrapper.getString("filePath"));
-                    cv.put("duration", cursorWrapper.getLong( "duration"));
-                    cv.put("size", cursorWrapper.getLong( "size"));
-                    cv.put("dateAdded", cursorWrapper.getLong("dateAdded"));
-                    cv.put("dateModified", cursorWrapper.getLong("dateModified"));
-                    cv.put("corruptionType", cursorWrapper.getString("corruptionType"));
-                    database.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv);
-                }
-
-                database.execSQL("DROP TABLE `compositions`");
-                database.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`");
-
-                database.execSQL("CREATE  INDEX `index_compositions_folderId` ON compositions (`folderId`)");
-                database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
-                database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
-            }
-        }
-    };
-
-    @SuppressLint("RestrictedApi")
-    private static Long getLong(Cursor c, String columnName) {
-        int columnIndex = CursorUtil.getColumnIndex(c, columnName);
-        if (columnIndex < 0 || c.isNull(columnIndex)) {
-            return null;
-        } else {
-            return c.getLong(columnIndex);
-        }
-    }
-
-    static Migration getMigration3_4(Context context) {
-        return new Migration(3, 4) {
-            @Override
-            public void migrate(@NonNull SupportSQLiteDatabase database) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS artists (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT)");
-                database.execSQL("CREATE UNIQUE INDEX `index_artists_name` ON artists (`name`)");
-
-                database.execSQL("CREATE TABLE IF NOT EXISTS albums (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT, `firstYear` INTEGER NOT NULL, `lastYear` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
-                database.execSQL("CREATE  INDEX `index_albums_artistId` ON albums (`artistId`)");
-                database.execSQL("CREATE UNIQUE INDEX `index_albums_artistId_name` ON albums (`artistId`, `name`)");
-
-                //compositions
-                database.execSQL("CREATE TABLE IF NOT EXISTS compositions_temp (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `storageId` INTEGER, `title` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )");
-
-                StorageAlbumsProvider storageAlbumsProvider = new StorageAlbumsProvider(context);
-                StorageMusicProvider provider = new StorageMusicProvider(context, storageAlbumsProvider);
-                LongSparseArray<StorageFullComposition> storageCompositions;
-                if (Permissions.hasFilePermission(context)) {
-                    storageCompositions = provider.getCompositions(0, false);
-                    if (storageCompositions == null) {
-                        storageCompositions = new LongSparseArray<>();
-                    }
-                } else {
-                    storageCompositions = new LongSparseArray<>();
-                }
-
-                Map<String, Long> artistCache = new HashMap<>();
-                Map<String, Long> albumsCache = new HashMap<>();
-                try (Cursor c = database.query("SELECT * FROM compositions")) {
-                    CursorWrapper cursorWrapper = new CursorWrapper(c);
-                    while (c.moveToNext()) {
-                        ContentValues cv = new ContentValues();
-
-                        //artists
-                        String artist = cursorWrapper.getString("artist");
-                        Long artistId = insertArtist(artist, database, artistCache);
-                        cv.put("artistId", artistId);
-
-                        long storageId = cursorWrapper.getLong("storageId");
-
-                        //albums
-                        Long albumId = null;
-                        if (storageId != 0) {
-                            StorageFullComposition composition = storageCompositions.get(storageId);
-                            if (composition != null) {
-                                StorageAlbum album = composition.getStorageAlbum();
-                                if (album != null) {
-                                    Long albumArtistId = insertArtist(album.getArtist(), database, artistCache);
-                                    albumId = insertAlbum(album, albumArtistId, database, albumsCache);
+                                if (newPathMatch != null && newPathMatch != oldIgnoredPath) {
+                                    updates.add(Pair(newPathMatch, oldIgnoredPath))
                                 }
                             }
                         }
-                        cv.put("albumId", albumId);
 
-                        cv.put("id", cursorWrapper.getLong("id"));
-                        cv.put("storageId", storageId);
-                        cv.put("title", cursorWrapper.getString("title"));
-                        cv.put("filePath", cursorWrapper.getString("filePath"));
-                        cv.put("duration", cursorWrapper.getLong("duration"));
-                        cv.put("size", cursorWrapper.getLong("size"));
-                        cv.put("dateAdded", cursorWrapper.getLong("dateAdded"));
-                        cv.put("dateModified", cursorWrapper.getLong("dateModified"));
-                        cv.put("corruptionType", cursorWrapper.getString("corruptionType"));
-                        database.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv);
+                        updates.forEach { (newPath, oldPath) ->
+                            cdb.execSQL(
+                                "UPDATE OR REPLACE ignored_folders SET path = ? WHERE path = ?",
+                                arrayOf(newPath, oldPath)
+                            )
+                        }
+                        cdb.setTransactionSuccessful()
+                    } finally {
+                        cdb.endTransaction()
                     }
+                } finally {
+                    configsDb.close()
                 }
 
-                database.execSQL("DROP TABLE compositions");
-                database.execSQL("ALTER TABLE compositions_temp RENAME TO compositions");
-                database.execSQL("CREATE  INDEX `index_compositions_artistId` ON compositions (`artistId`)");
-                database.execSQL("CREATE  INDEX `index_compositions_albumId` ON compositions (`albumId`)");
 
-                database.execSQL("CREATE TABLE IF NOT EXISTS genres (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `name` TEXT)");
-                database.execSQL("CREATE UNIQUE INDEX `index_genres_name` ON genres (`name`)");
-                database.execSQL("CREATE TABLE IF NOT EXISTS genre_entries (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `audioId` INTEGER NOT NULL, `genreId` INTEGER NOT NULL, `storageId` INTEGER, FOREIGN KEY(`audioId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`genreId`) REFERENCES `genres`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
-                database.execSQL("CREATE  INDEX `index_genre_entries_audioId` ON genre_entries (`audioId`)");
-                database.execSQL("CREATE  INDEX `index_genre_entries_genreId` ON genre_entries (`genreId`)");
+                // Normalize playlist entries order position
+                // Create a temporary table to store the stable mapping
+                db.execSQL("CREATE TEMP TABLE temp_normalized_positions (itemId INTEGER PRIMARY KEY, newPosition INTEGER)")
+                // Snapshot the correct dense positions into the temporary table
+                db.execSQL("""
+                    INSERT INTO temp_normalized_positions (itemId, newPosition)
+                    SELECT itemId, (
+                        SELECT COUNT(*) 
+                        FROM play_lists_entries AS items 
+                        WHERE items.playListId = ple.playListId 
+                          AND (items.orderPosition < ple.orderPosition OR (items.orderPosition = ple.orderPosition AND items.itemId < ple.itemId))
+                    )
+                    FROM play_lists_entries AS ple
+                """)
+                // Update the original table from the static snapshot
+                db.execSQL("""
+                    UPDATE play_lists_entries 
+                    SET orderPosition = (SELECT newPosition FROM temp_normalized_positions WHERE itemId = play_lists_entries.itemId)
+                """)
+                db.execSQL("DROP TABLE temp_normalized_positions")
+
+                // Migrate playlist file cache
+                try {
+                    val playlistDir = File(context.filesDir, "playlists")
+                    val m3uFiles = playlistDir.listFiles { _, name -> name.endsWith(".m3u") }
+                    if (m3uFiles != null && m3uFiles.isNotEmpty()) {
+                        val fileNameMap = storageAudioFiles.values.groupBy { storageAudioFile -> storageAudioFile.fileName }
+                        val m3uEditor = M3UEditor()
+                        for (file in m3uFiles) {
+                            try {
+                                val playlistFile = file.inputStream().use { stream -> 
+                                    m3uEditor.read(PlaylistFileNameValidator.getPlaylistName(file.name), stream) 
+                                }
+                                var updated = false
+                                val newEntries = playlistFile.entries.map { entry ->
+                                    val entryPath = entry.filePath
+                                    val entryFileName = FileUtils.getFileName(entryPath)
+                                    val candidates = fileNameMap[entryFileName]
+                                    val match = candidates?.find { candidate ->
+                                        val candidateFullPath = candidate.parentPath + "/" + candidate.fileName
+                                        candidateFullPath.endsWith(entryPath)
+                                    }
+                                    if (match != null) {
+                                        val fullPath = match.parentPath + "/" + match.fileName
+                                        if (fullPath != entryPath) {
+                                            updated = true
+                                            return@map PlayListEntry(fullPath)
+                                        }
+                                    }
+                                    entry
+                                }
+                                if (updated) {
+                                    val newPlaylistFile = PlayListFile(
+                                        playlistFile.name,
+                                        playlistFile.createDate,
+                                        playlistFile.modifyDate,
+                                        newEntries
+                                    )
+                                    file.outputStream().use { stream -> 
+                                        m3uEditor.write(newPlaylistFile, stream) 
+                                    }
+                                }
+                            } catch (_: Exception) {
+                                // Skip files that fail to parse
+                            }
+                        }
+                    }
+                } catch (_: Exception) {
+                    // Fail-safe for the entire cache migration block
+                }
+
+                val prefs = context.getSharedPreferences("state_preferences", Context.MODE_PRIVATE)
+                prefs.edit { remove("root_folder_path") }
+
+                val settingsPrefs = context.getSharedPreferences("settings_preferences", Context.MODE_PRIVATE)
+                settingsPrefs.edit {
+                    val isBluetoothAutoplayEnabled = context.packageManager
+                        .getComponentEnabledSetting(
+                            ComponentName(
+                                context,
+                                "com.github.anrimian.musicplayer.infrastructure.receivers.BluetoothConnectionReceiver"
+                            )
+                        ) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                    putBoolean("bluetooth_auto_play", isBluetoothAutoplayEnabled)
+                }
             }
-        };
+
+            /**
+             * A raw SQL implementation to find/create a folder structure,
+             * now with logic to correctly re-parent old root folders.
+             */
+            private fun getOrCreateFolder(
+                db: SupportSQLiteDatabase,
+                folderPath: String,
+                cache: MutableMap<String, Long>,
+                unprocessedRootFolders: MutableMap<String, Long>,
+                volumeInfoMap: Map<String, VolumeMigrationInfo>,
+            ): Long? {
+                if (cache.containsKey(folderPath)) {
+                    return cache[folderPath]
+                }
+                val volumePath = volumeInfoMap.keys
+                    .filter { p -> folderPath.startsWith(p) }
+                    .maxByOrNull { p -> p.length } ?: return null
+
+                val volumeInfo = volumeInfoMap[volumePath]!!
+                val volumeId = volumeInfo.id
+                val rootFolderId = volumeInfo.rootFolderId
+
+                val relativePath = folderPath.substring(volumePath.length).removePrefix("/")
+                if (relativePath.isEmpty()) {
+                    cache[folderPath] = rootFolderId
+                    return rootFolderId
+                }
+
+                val pathSegments = relativePath.split('/')
+                var currentParentId = rootFolderId
+
+                for (i in pathSegments.indices) {
+                    val segment = pathSegments[i]
+                    val currentPath = volumePath + "/" + pathSegments.subList(0, i + 1).joinToString("/")
+
+                    if (cache.containsKey(currentPath)) {
+                        currentParentId = cache[currentPath]!!
+                        continue
+                    }
+
+                    var folderId = findFolderId(db, segment, currentParentId)
+
+                    // If not found, check if it was an old root folder that needs re-parenting.
+                    if (folderId == null) {
+                        val rootIdToReparent = unprocessedRootFolders[segment]
+                        if (rootIdToReparent != null) {
+                            db.execSQL(
+                                "UPDATE folders SET parentId = ? WHERE id = ?",
+                                arrayOf(currentParentId, rootIdToReparent)
+                            )
+                            folderId = rootIdToReparent
+                            unprocessedRootFolders.remove(segment)
+                        }
+                    }
+
+                    // If still not found, it's a completely new folder, so insert it.
+                    if (folderId == null) {
+                        val values = ContentValues().apply {
+                            put("name", segment)
+                            put("parentId", currentParentId)
+                            put("volumeId", volumeId)
+                        }
+                        folderId = db.insert("folders", SQLiteDatabase.CONFLICT_REPLACE, values)
+                    }
+
+                    cache[currentPath] = folderId
+                    currentParentId = folderId
+                }
+                return currentParentId
+            }
+
+            private fun findFolderId(db: SupportSQLiteDatabase, name: String, parentId: Long): Long? {
+                db.query("SELECT id FROM folders WHERE name = ? AND parentId = ?", arrayOf(name, parentId.toString())).use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        return cursor.getLong(cursor.getColumnIndexOrThrow("id"))
+                    }
+                }
+                return null
+            }
+
+        }
     }
 
-    @Nullable
-    private static Long insertArtist(String artist,
-                                     SupportSQLiteDatabase database,
-                                     Map<String, Long> artistCache) {
-        Long artistId = null;
+    val MIGRATION_CONFIG_1_2 = object : Migration(1, 2) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE `ignored_folders_tmp` (`path` TEXT NOT NULL, `addTime` INTEGER NOT NULL, PRIMARY KEY(`path`))")
+            db.execSQL("INSERT INTO `ignored_folders_tmp` (`path`, `addTime`) SELECT `relativePath`, `addDate` FROM `ignored_folders`")
+            db.execSQL("DROP TABLE `ignored_folders`")
+            db.execSQL("ALTER TABLE `ignored_folders_tmp` RENAME TO `ignored_folders`")
+        }
+    }
+
+    val MIGRATION_17_18: Migration = object : Migration(17, 18) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `title` TEXT, `trackNumber` INTEGER, `discNumber` INTEGER, `comment` TEXT, `lyrics` TEXT, `fileName` TEXT NOT NULL, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `storageId` INTEGER, `addedTime` INTEGER NOT NULL, `modifiedTime` INTEGER NOT NULL, `storageModifyTime` INTEGER NOT NULL, `pathModifyTime` INTEGER, `lastScanTime` INTEGER NOT NULL, `missingTime` INTEGER NOT NULL, `coverModifyTime` INTEGER NOT NULL, `localFileStatus` INTEGER NOT NULL, `corruptionType` INTEGER, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+            // moves values from modifyTime to storageModifyTime and set modifyTime to default(0)
+            db.execSQL(
+                """
+                INSERT INTO `compositions_temp` (
+                    id, artistId, albumId, folderId, storageId, title, trackNumber, 
+                    discNumber, comment, lyrics, fileName, duration, size, addedTime, 
+                    modifiedTime, storageModifyTime, lastScanTime, missingTime, coverModifyTime, localFileStatus, 
+                    corruptionType, initialSource
+                ) SELECT 
+                    id, artistId, albumId, folderId, storageId, title, trackNumber, 
+                    discNumber, comment, lyrics, fileName, duration, size, dateAdded, 
+                    0, dateModified, lastScanDate, 0, coverModifyTime, ${LocalFileStatus.AVAILABLE.id}, 
+                    CASE corruptionType 
+                        WHEN 'UNKNOWN' THEN '1'
+                        WHEN 'UNSUPPORTED' THEN '2'
+                        WHEN 'NOT_FOUND' THEN '3'
+                        WHEN 'SOURCE_NOT_FOUND' THEN '4'
+                        WHEN 'TOO_LARGE_SOURCE' THEN '5'
+                        WHEN 'FILE_IS_CORRUPTED' THEN '6'
+                        WHEN 'FILE_READ_TIMEOUT' THEN '7'
+                    END, 
+                    initialSource FROM compositions
+                """
+            )
+
+            db.execSQL("DROP TABLE `compositions`")
+            db.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`")
+
+            db.execSQL("CREATE INDEX `index_compositions_folderId` ON compositions (`folderId`)")
+            db.execSQL("CREATE INDEX `index_compositions_artistId` ON compositions (`artistId`)")
+            db.execSQL("CREATE INDEX `index_compositions_albumId` ON compositions (`albumId`)")
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS `folders_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentId` INTEGER, `name` TEXT NOT NULL, FOREIGN KEY(`parentId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            db.execSQL("INSERT INTO `folders_temp` (id, parentId, name) SELECT id, parentId, IFNULL(name, '') FROM folders")
+            db.execSQL("DROP TABLE `folders`")
+            db.execSQL("ALTER TABLE `folders_temp` RENAME TO `folders`")
+            db.execSQL("CREATE INDEX `index_folders_parentId` ON `folders` (`parentId`)")
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS `albums_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+            db.execSQL("INSERT INTO `albums_temp` (id, artistId, name) SELECT id, artistId, IFNULL(name, '') FROM albums")
+            db.execSQL("DROP TABLE `albums`")
+            db.execSQL("ALTER TABLE `albums_temp` RENAME TO `albums`")
+            db.execSQL("CREATE INDEX `index_albums_artistId` ON `albums` (`artistId`)")
+            db.execSQL("CREATE UNIQUE INDEX `index_albums_artistId_name` ON `albums` (`artistId`, `name`)")
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS `artists_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)")
+            db.execSQL("INSERT INTO `artists_temp` (id, name) SELECT id, IFNULL(name, '') FROM artists")
+            db.execSQL("DROP TABLE `artists`")
+            db.execSQL("ALTER TABLE `artists_temp` RENAME TO `artists`")
+            db.execSQL("CREATE UNIQUE INDEX `index_artists_name` ON `artists` (`name`)")
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS `play_lists_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `name` TEXT NOT NULL, `addedTime` INTEGER NOT NULL, `modifiedTime` INTEGER NOT NULL)")
+            db.execSQL("INSERT INTO `play_lists_temp` (id, storageId, name, addedTime, modifiedTime) SELECT id, storageId, IFNULL(name, ''), dateAdded, dateModified FROM play_lists")
+            db.execSQL("DROP TABLE `play_lists`")
+            db.execSQL("ALTER TABLE `play_lists_temp` RENAME TO `play_lists`")
+            db.execSQL("CREATE UNIQUE INDEX `index_play_lists_name` ON `play_lists` (`name`)")
+        }
+    }
+
+    val MIGRATION_16_17: Migration = object : Migration(16, 17) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `trackNumber` INTEGER, `discNumber` INTEGER, `comment` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `pathModifyTime` INTEGER, `lastScanDate` INTEGER NOT NULL, `coverModifyTime` INTEGER NOT NULL, `corruptionType` TEXT, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+            db.execSQL(
+                """
+                INSERT INTO `compositions_temp` (
+                    id, artistId, albumId, folderId, storageId, title, trackNumber, 
+                    discNumber, comment, lyrics, fileName, duration, size, dateAdded, 
+                    dateModified, pathModifyTime, lastScanDate, coverModifyTime, corruptionType, 
+                    initialSource
+                ) SELECT 
+                    id, artistId, albumId, folderId, storageId, title, trackNumber, 
+                    discNumber, comment, lyrics, fileName, duration, size, dateAdded, 
+                    dateModified, NULL, lastScanDate, coverModifyTime, corruptionType, 
+                    initialSource FROM compositions
+                """
+            )
+
+            db.execSQL("DROP TABLE `compositions`")
+            db.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`")
+
+            db.execSQL("CREATE INDEX `index_compositions_folderId` ON compositions (`folderId`)")
+            db.execSQL("CREATE INDEX `index_compositions_artistId` ON compositions (`artistId`)")
+            db.execSQL("CREATE INDEX `index_compositions_albumId` ON compositions (`albumId`)")
+        }
+    }
+
+
+    fun getMigration15_16(context: Context): Migration {
+        return object : Migration(15, 16) {
+
+            @SuppressLint("UseKtx")
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `track_positions` (`queueItemId` INTEGER NOT NULL, `trackPosition` INTEGER NOT NULL, `writeTime` INTEGER NOT NULL, PRIMARY KEY(`queueItemId`), FOREIGN KEY(`queueItemId`) REFERENCES `play_queue`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+
+                val prefs = context.getSharedPreferences("ui_preferences", Context.MODE_PRIVATE)
+                val itemId = prefs.getLong("current_play_queue_id", UiStateRepositoryImpl.NO_ITEM)
+                if (itemId == UiStateRepositoryImpl.NO_ITEM) {
+                    return
+                }
+                val position = prefs.getLong("track_position", 0L)
+                if (position != 0L) {
+                    db.execSQL("INSERT INTO track_positions (queueItemId, trackPosition, writeTime) VALUES ($itemId, + $position, ${System.currentTimeMillis()})")
+                }
+                prefs.edit()
+                    .putLong("library_genres_position", prefs.getLong("library_agenres_position", 0L))
+                    .remove("library_agenres_position")
+                    .remove("track_position")
+                    .apply()
+            }
+        }
+    }
+
+    val MIGRATION_14_15: Migration = object : Migration(14, 15) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE `genres`")
+            db.execSQL("DROP TABLE `genre_entries`")
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS `genres` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)")
+            db.execSQL("CREATE TABLE IF NOT EXISTS `genre_entries` (`genreId` INTEGER NOT NULL, `compositionId` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`genreId`, `compositionId`), FOREIGN KEY(`compositionId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`genreId`) REFERENCES `genres`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_genres_name` ON `genres` (`name`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_genre_entries_compositionId` ON `genre_entries` (`compositionId`)")
+
+            db.query("SELECT id, name FROM play_lists").use { c ->
+                val cursorWrapper = CursorWrapper(c)
+                while (c.moveToNext()) {
+                    val name = cursorWrapper.getString("name")
+                    if (name.isNullOrEmpty()) {
+                        continue
+                    }
+                    var newName = PlaylistFileNameValidator.getFormattedPlaylistName(name)
+
+                    if (name != newName) {
+                        var i = 0
+                        while (isPlaylistWithNameExists(db, newName)) {
+                            val sb = StringBuilder(newName)
+                            sb.setCharAt(0, i.toChar())
+                            newName = sb.toString()
+                            i++
+                        }
+
+                        val id = cursorWrapper.getLong("id")
+                        db.execSQL(
+                            "UPDATE play_lists SET name = ? WHERE id = ?",
+                            arrayOf<Any>(newName, id)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun isPlaylistWithNameExists(db: SupportSQLiteDatabase, name: String?): Boolean {
+        db.query(
+            "SELECT exists(SELECT 1 FROM play_lists WHERE name = ? LIMIT 1)",
+            arrayOf<Any?>(name)
+        ).use { c ->
+            c.moveToNext()
+            return c.getInt(0) != 0
+        }
+    }
+
+    fun getMigration13_14(context: Context): Migration {
+        return object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                val configsDb = Room.databaseBuilder(context, ConfigsDatabase::class.java, "configs_database")
+                    .build()
+                try {
+                    val cdb = configsDb.openHelper.writableDatabase
+                    cdb.beginTransaction()
+                    try {
+                        db.query("SELECT relativePath, addDate FROM ignored_folders").use { c ->
+                            val pathIndex = c.getColumnIndexOrThrow("relativePath")
+                            val dateIndex = c.getColumnIndexOrThrow("addDate")
+
+                            while (c.moveToNext()) {
+                                val path = c.getString(pathIndex)
+                                val date = c.getLong(dateIndex)
+                                val cv = ContentValues().apply {
+                                    put("relativePath", path)
+                                    put("addDate", date)
+                                }
+                                cdb.insert("ignored_folders", OnConflictStrategy.REPLACE, cv)
+                            }
+                        }
+                        cdb.setTransactionSuccessful()
+                    } finally {
+                        cdb.endTransaction()
+                    }
+                } finally {
+                    configsDb.close()
+                }
+                db.execSQL("DROP TABLE ignored_folders")
+            }
+        }
+    }
+
+    val MIGRATION_12_13: Migration = object : Migration(12, 13) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `trackNumber` INTEGER, `discNumber` INTEGER, `comment` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `lastScanDate` INTEGER NOT NULL, `coverModifyTime` INTEGER NOT NULL, `corruptionType` TEXT, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+
+            db.execSQL(
+                """
+                INSERT INTO `compositions_temp` (
+                    id, artistId, albumId, folderId, storageId, title, trackNumber, 
+                    discNumber, comment, lyrics, fileName, duration, size, dateAdded, 
+                    dateModified, lastScanDate, coverModifyTime, corruptionType,
+                    initialSource
+                ) SELECT 
+                    id, artistId, albumId, folderId, storageId, title, trackNumber, 
+                    discNumber, comment, lyrics, fileName, duration, size, dateAdded, 
+                    dateModified, lastScanDate, coverModifyTime, corruptionType,
+                    initialSource FROM compositions
+                """
+            )
+
+            db.execSQL("DROP TABLE `compositions`")
+            db.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`")
+
+            db.execSQL("CREATE INDEX `index_compositions_folderId` ON compositions (`folderId`)")
+            db.execSQL("CREATE INDEX `index_compositions_artistId` ON compositions (`artistId`)")
+            db.execSQL("CREATE INDEX `index_compositions_albumId` ON compositions (`albumId`)")
+        }
+    }
+
+    val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE compositions ADD COLUMN trackNumber INTEGER")
+            db.execSQL("ALTER TABLE compositions ADD COLUMN discNumber INTEGER")
+            db.execSQL("ALTER TABLE compositions ADD COLUMN comment TEXT")
+        }
+    }
+
+    val MIGRATION_10_11: Migration = object : Migration(10, 11) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `albums_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+
+            db.execSQL(
+                """
+                INSERT INTO `albums_temp` (
+                    id, artistId, name
+                ) SELECT 
+                    id, artistId, name 
+                    FROM albums
+                """
+            )
+
+            db.execSQL("DROP TABLE `albums`")
+            db.execSQL("ALTER TABLE `albums_temp` RENAME TO `albums`")
+
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_albums_artistId` ON `albums` (`artistId`)")
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_albums_artistId_name` ON `albums` (`artistId`, `name`)")
+        }
+    }
+
+    val MIGRATION_9_10: Migration = object : Migration(9, 10) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE compositions ADD COLUMN coverModifyTime INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
+    val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `lyrics` TEXT, `fileName` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `lastScanDate` INTEGER NOT NULL, `corruptionType` TEXT, `audioFileType` INTEGER NOT NULL, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+
+            db.execSQL(
+                """
+                INSERT INTO `compositions_temp` (
+                    id, artistId, albumId, folderId, storageId, title, lyrics, fileName,
+                    duration, size, dateAdded, dateModified, lastScanDate, corruptionType,
+                    audioFileType, initialSource
+                ) SELECT 
+                    id, artistId, albumId, folderId, storageId, title, lyrics, fileName,
+                    duration, size, dateAdded, dateModified, lastScanDate, corruptionType,
+                    1 AS audioFileType, 1 AS initialSource FROM compositions
+                """
+            )
+
+            db.execSQL("DROP TABLE `compositions`")
+            db.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`")
+
+            db.execSQL("CREATE INDEX `index_compositions_folderId` ON compositions (`folderId`)")
+            db.execSQL("CREATE INDEX `index_compositions_artistId` ON compositions (`artistId`)")
+            db.execSQL("CREATE INDEX `index_compositions_albumId` ON compositions (`albumId`)")
+        }
+    }
+
+    val MIGRATION_7_8: Migration = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE compositions ADD COLUMN lastScanDate INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
+    val MIGRATION_6_7: Migration = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE compositions ADD COLUMN lyrics TEXT")
+        }
+    }
+
+    val MIGRATION_5_6: Migration = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE compositions ADD COLUMN fileName TEXT")
+
+            db.query("SELECT id, filePath FROM compositions").use { c ->
+                while (c.moveToNext()) {
+                    val id = c.getLong(getColumnIndex(c, "id"))
+                    val filePath = c.getString(getColumnIndex(c, "filePath"))
+
+                    val fileName = FileUtils.formatFileName(filePath, true)
+
+                    val cv = ContentValues()
+                    cv.put("fileName", fileName)
+
+                    db.update(
+                        "compositions",
+                        SQLiteDatabase.CONFLICT_REPLACE,
+                        cv,
+                        "id = ?",
+                        arrayOf(id.toString())
+                    )
+                }
+            }
+        }
+    }
+
+    val MIGRATION_4_5: Migration = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `ignored_folders` (`relativePath` TEXT NOT NULL, `addDate` INTEGER, PRIMARY KEY(`relativePath`))")
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS `folders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentId` INTEGER, `name` TEXT, FOREIGN KEY(`parentId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            db.execSQL("CREATE INDEX `index_folders_parentId` ON `folders` (`parentId`)")
+
+            //migrate compositions
+            db.execSQL("CREATE TABLE IF NOT EXISTS `compositions_temp` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `storageId` INTEGER, `title` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+
+            db.query("SELECT * FROM compositions").use { c ->
+                val cursorWrapper = CursorWrapper(c)
+                while (c.moveToNext()) {
+                    val cv = ContentValues()
+
+                    cv.put("id", cursorWrapper.getLong("id"))
+                    cv.put("artistId", cursorWrapper.getLong("artistId"))
+                    cv.put("albumId", cursorWrapper.getLong("albumId"))
+                    cv.put("storageId", cursorWrapper.getLong("storageId"))
+                    cv.put("title", cursorWrapper.getString("title"))
+                    cv.put("filePath", cursorWrapper.getString("filePath"))
+                    cv.put("duration", cursorWrapper.getLong("duration"))
+                    cv.put("size", cursorWrapper.getLong("size"))
+                    cv.put("dateAdded", cursorWrapper.getLong("dateAdded"))
+                    cv.put("dateModified", cursorWrapper.getLong("dateModified"))
+                    cv.put("corruptionType", cursorWrapper.getString("corruptionType"))
+                    db.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv)
+                }
+
+                db.execSQL("DROP TABLE `compositions`")
+                db.execSQL("ALTER TABLE `compositions_temp` RENAME TO `compositions`")
+
+                db.execSQL("CREATE INDEX `index_compositions_folderId` ON compositions (`folderId`)")
+                db.execSQL("CREATE INDEX `index_compositions_artistId` ON compositions (`artistId`)")
+                db.execSQL("CREATE INDEX `index_compositions_albumId` ON compositions (`albumId`)")
+            }
+        }
+    }
+
+    private fun getLong(c: android.database.Cursor, columnName: String): Long? {
+        val columnIndex = getColumnIndex(c, columnName)
+        return if (columnIndex < 0 || c.isNull(columnIndex)) {
+            null
+        } else {
+            c.getLong(columnIndex)
+        }
+    }
+
+    fun getMigration3_4(): Migration {
+        return object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS artists (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT)")
+                db.execSQL("CREATE UNIQUE INDEX `index_artists_name` ON artists (`name`)")
+
+                db.execSQL("CREATE TABLE IF NOT EXISTS albums (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT, `firstYear` INTEGER NOT NULL, `lastYear` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+                db.execSQL("CREATE INDEX `index_albums_artistId` ON albums (`artistId`)")
+                db.execSQL("CREATE UNIQUE INDEX `index_albums_artistId_name` ON albums (`artistId`, `name`)")
+
+                //compositions
+                db.execSQL("CREATE TABLE IF NOT EXISTS compositions_temp (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `storageId` INTEGER, `title` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+
+                val artistCache = HashMap<String?, Long?>()
+                HashMap<String?, Long?>()
+                db.query("SELECT * FROM compositions").use { c ->
+                    val cursorWrapper = CursorWrapper(c)
+                    while (c.moveToNext()) {
+                        val cv = ContentValues()
+
+                        //artists
+                        val artist = cursorWrapper.getString("artist")
+                        val artistId = insertArtist(artist, db, artistCache)
+                        cv.put("artistId", artistId)
+
+                        val storageId = cursorWrapper.getLong("storageId")
+
+                        cv.put("id", cursorWrapper.getLong("id"))
+                        cv.put("storageId", storageId)
+                        cv.put("title", cursorWrapper.getString("title"))
+                        cv.put("filePath", cursorWrapper.getString("filePath"))
+                        cv.put("duration", cursorWrapper.getLong("duration"))
+                        cv.put("size", cursorWrapper.getLong("size"))
+                        cv.put("dateAdded", cursorWrapper.getLong("dateAdded"))
+                        cv.put("dateModified", cursorWrapper.getLong("dateModified"))
+                        cv.put("corruptionType", cursorWrapper.getString("corruptionType"))
+                        db.insert("compositions_temp", SQLiteDatabase.CONFLICT_REPLACE, cv)
+                    }
+                }
+                db.execSQL("DROP TABLE compositions")
+                db.execSQL("ALTER TABLE compositions_temp RENAME TO compositions")
+                db.execSQL("CREATE INDEX `index_compositions_artistId` ON compositions (`artistId`)")
+                db.execSQL("CREATE INDEX `index_compositions_albumId` ON compositions (`albumId`)")
+
+                db.execSQL("CREATE TABLE IF NOT EXISTS genres (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `name` TEXT)")
+                db.execSQL("CREATE UNIQUE INDEX `index_genres_name` ON genres (`name`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS genre_entries (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `audioId` INTEGER NOT NULL, `genreId` INTEGER NOT NULL, `storageId` INTEGER, FOREIGN KEY(`audioId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`genreId`) REFERENCES `genres`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+                db.execSQL("CREATE INDEX `index_genre_entries_audioId` ON genre_entries (`audioId`)")
+                db.execSQL("CREATE INDEX `index_genre_entries_genreId` ON genre_entries (`genreId`)")
+            }
+        }
+    }
+
+    private fun insertArtist(
+        artist: String?,
+        db: SupportSQLiteDatabase,
+        artistCache: MutableMap<String?, Long?>,
+    ): Long? {
+        var artistId: Long? = null
         if (artist != null) {
-            artistId = artistCache.get(artist);
+            artistId = artistCache[artist]
             if (artistId == null) {
-                ContentValues cvArt = new ContentValues();
-                cvArt.put("name", artist);
-                artistId = database.insert("artists", SQLiteDatabase.CONFLICT_REPLACE, cvArt);
-                artistCache.put(artist, artistId);
+                val cvArt = ContentValues()
+                cvArt.put("name", artist)
+                artistId = db.insert("artists", SQLiteDatabase.CONFLICT_REPLACE, cvArt)
+                artistCache[artist] = artistId
             }
         }
-        return artistId;
+        return artistId
     }
 
-    private static Long insertAlbum(StorageAlbum album,
-                                    Long albumArtistId,
-                                    SupportSQLiteDatabase database,
-                                    Map<String, Long> albumsCache) {
-        String albumName = album.getAlbum();
-
-        Long albumId = albumsCache.get(albumName);
-        if (albumId != null) {
-            return albumId;
-        }
-
-        ContentValues cvAlb = new ContentValues();
-        cvAlb.put("artistId", albumArtistId);
-        cvAlb.put("name", album.getAlbum());
-        cvAlb.put("firstYear", 0);
-        cvAlb.put("lastYear", 0);
-
-        albumId = database.insert("albums", SQLiteDatabase.CONFLICT_REPLACE, cvAlb);
-
-        albumsCache.put(albumName, albumId);
-        return albumId;
-    }
-
-    static Migration MIGRATION_2_3 = new Migration(2, 3) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
+    val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
             //copy values with verified index
-            LongSparseArray<Integer> positionMap = new LongSparseArray<>();
-            try (Cursor c = database.query("SELECT id FROM play_queue ORDER BY position")) {
-                CursorWrapper cursorWrapper = new CursorWrapper(c);
-                for (int i = 0; i < c.getCount(); i++) {
-                    c.moveToPosition(i);
-                    positionMap.put(cursorWrapper.getLong("id"), i);
+            val positionMap = LongSparseArray<Int>()
+            db.query("SELECT id FROM play_queue ORDER BY position").use { c ->
+                val cursorWrapper = CursorWrapper(c)
+                for (i in 0 until c.count) {
+                    c.moveToPosition(i)
+                    positionMap.put(cursorWrapper.getLong("id"), i)
                 }
             }
-
-            LinkedList<ContentValues> cvList = new LinkedList<>();
-            try (Cursor c = database.query("SELECT id, audioId FROM play_queue ORDER BY shuffledPosition")) {
-                CursorWrapper cursorWrapper = new CursorWrapper(c);
-                for (int i = 0; i < c.getCount(); i++) {
-                    c.moveToPosition(i);
-                    ContentValues cv = new ContentValues();
-                    long id = cursorWrapper.getLong("id");
-                    cv.put("id", id);
-                    cv.put("audioId", cursorWrapper.getLong("audioId"));
-                    cv.put("position", positionMap.get(id));
-                    cv.put("shuffledPosition", i);
-                    cvList.add(cv);
-                }
-            }
-
-            database.execSQL("DELETE FROM play_queue");
-            for (ContentValues cv: cvList) {
-                database.insert("play_queue", SQLiteDatabase.CONFLICT_REPLACE, cv);
-            }
-
-            database.execSQL("CREATE UNIQUE INDEX `index_play_queue_position` ON `play_queue` (`position`)");
-            database.execSQL("CREATE UNIQUE INDEX `index_play_queue_shuffledPosition` ON `play_queue` (`shuffledPosition`)");
-        }
-    };
-
-    static Migration getMigration1_2(Context context) {
-        return new Migration(1, 2) {
-            @Override
-            public void migrate(@NonNull SupportSQLiteDatabase database) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `compositions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `artist` TEXT, `title` TEXT, `album` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT)");
-                StorageAlbumsProvider albumsProvider = new StorageAlbumsProvider(context);
-                StorageMusicProvider provider = new StorageMusicProvider(context, albumsProvider);
-
-                EnumConverter enumConverter = new EnumConverter();
-                LongSparseArray<StorageFullComposition> map = provider.getCompositions(0, false);
-                if (map == null) {
-                    map = new LongSparseArray<>();
-                }
-                for(int i = 0, size = map.size(); i < size; i++) {
-                    StorageFullComposition composition = map.valueAt(i);
-                    ContentValues cv = new ContentValues();
-                    cv.put("storageId", composition.getStorageId());
-                    cv.put("artist", composition.getArtist());
-                    cv.put("title", composition.getTitle());
-                    StorageAlbum storageAlbum = composition.getStorageAlbum();
-                    if (storageAlbum != null) {
-                        cv.put("album", storageAlbum.getAlbum());
+            val cvList = LinkedList<ContentValues>()
+            db.query("SELECT id, audioId FROM play_queue ORDER BY shuffledPosition")
+                .use { c ->
+                    val cursorWrapper = CursorWrapper(c)
+                    for (i in 0 until c.count) {
+                        c.moveToPosition(i)
+                        val cv = ContentValues()
+                        val id = cursorWrapper.getLong("id")
+                        cv.put("id", id)
+                        cv.put("audioId", cursorWrapper.getLong("audioId"))
+                        cv.put("position", positionMap.get(id))
+                        cv.put("shuffledPosition", i)
+                        cvList.add(cv)
                     }
-                    cv.put("filePath", composition.getRelativePath());
-                    cv.put("duration", composition.getDuration());
-                    cv.put("size", composition.getSize());
-                    cv.put("dateAdded", composition.getDateAdded().getTime());
-                    cv.put("dateModified", composition.getDateModified().getTime());
-                    cv.put("corruptionType", enumConverter.toName(CompositionCorruptionDetector.getCorruptionType(composition.getDuration())));
-                    database.insert("compositions", SQLiteDatabase.CONFLICT_REPLACE, cv);
+                }
+            db.execSQL("DELETE FROM play_queue")
+            for (cv in cvList) {
+                db.insert("play_queue", SQLiteDatabase.CONFLICT_REPLACE, cv)
+            }
+
+            db.execSQL("CREATE UNIQUE INDEX `index_play_queue_position` ON `play_queue` (`position`)")
+            db.execSQL("CREATE UNIQUE INDEX `index_play_queue_shuffledPosition` ON `play_queue` (`shuffledPosition`)")
+        }
+    }
+
+    fun getMigration1_2(context: Context): Migration {
+        return object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `compositions` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `artist` TEXT, `title` TEXT, `album` TEXT, `filePath` TEXT, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `dateAdded` INTEGER, `dateModified` INTEGER, `corruptionType` TEXT)")
+                val provider = SystemAudioCatalogProvider(context, NoOpAnalytics)
+
+                val enumConverter = EnumConverter()
+                val map: Map<AudioFileKey, StorageAudioFile> = try {
+                    provider.getAudioFiles(
+                        minAudioDurationMillis = 0,
+                        showAllAudioFiles = false,
+                        allowedExtensions = Constants.DEFAULT_REMOTE_EXTENSIONS
+                    ) ?: HashMap()
+                } catch (_: Exception) { // quick fix for old apis
+                    HashMap()
+                }
+
+                for (composition in map.values) {
+                    val cv = ContentValues()
+                    cv.put("storageId", composition.storageId)
+                    cv.put("artist", composition.artist)
+                    cv.put("title", composition.title)
+                    cv.put("filePath", composition.parentPath)
+                    cv.put("duration", composition.duration)
+                    cv.put("size", composition.size)
+                    cv.put("dateAdded", composition.addedTime)
+                    cv.put("dateModified", composition.modifiedTime)
+                    cv.put(
+                        "corruptionType",
+                        enumConverter.toId(
+                            CompositionCorruptionDetector.getCorruptionType(composition.duration)
+                        )
+                    )
+                    db.insert("compositions", SQLiteDatabase.CONFLICT_REPLACE, cv)
                 }
 
                 //playlists
-                database.execSQL("CREATE TABLE IF NOT EXISTS `play_lists` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `name` TEXT, `dateAdded` INTEGER, `dateModified` INTEGER)");
-                database.execSQL("CREATE UNIQUE INDEX `index_play_lists_name` ON `play_lists` (`name`)");
+                db.execSQL("CREATE TABLE IF NOT EXISTS `play_lists` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `name` TEXT, `dateAdded` INTEGER, `dateModified` INTEGER)")
+                db.execSQL("CREATE UNIQUE INDEX `index_play_lists_name` ON `play_lists` (`name`)")
 
                 //play lists entries
-                database.execSQL("CREATE TABLE IF NOT EXISTS `play_lists_entries` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageItemId` INTEGER, `audioId` INTEGER NOT NULL, `playListId` INTEGER NOT NULL, `orderPosition` INTEGER NOT NULL, FOREIGN KEY(`audioId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`playListId`) REFERENCES `play_lists`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
-                database.execSQL("CREATE INDEX `index_play_lists_entries_audioId` ON `play_lists_entries` (`audioId`)");
-                database.execSQL("CREATE INDEX `index_play_lists_entries_playListId` ON `play_lists_entries` (`playListId`)");
+                db.execSQL("CREATE TABLE IF NOT EXISTS `play_lists_entries` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageItemId` INTEGER, `audioId` INTEGER NOT NULL, `playListId` INTEGER NOT NULL, `orderPosition` INTEGER NOT NULL, FOREIGN KEY(`audioId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`playListId`) REFERENCES `play_lists`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+                db.execSQL("CREATE INDEX `index_play_lists_entries_audioId` ON `play_lists_entries` (`audioId`)")
+                db.execSQL("CREATE INDEX `index_play_lists_entries_playListId` ON `play_lists_entries` (`playListId`)")
 
                 //play queue
-                database.execSQL("CREATE TABLE IF NOT EXISTS `play_queue_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `audioId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `shuffledPosition` INTEGER NOT NULL, FOREIGN KEY(`audioId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
-                try (Cursor c = database.query("SELECT id, (SELECT id FROM compositions WHERE storageId = audioId), position, shuffledPosition FROM play_queue")) {
-                    while (c.moveToNext()) {
-                        ContentValues cv = new ContentValues();
-                        cv.put("id", getLong(c, "id"));
-                        Long audioId = getLong(c, "audioId");
-                        if (audioId == null || audioId < 1) {
-                            continue;
+                db.execSQL("CREATE TABLE IF NOT EXISTS `play_queue_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `audioId` INTEGER NOT NULL, `position` INTEGER NOT NULL, `shuffledPosition` INTEGER NOT NULL, FOREIGN KEY(`audioId`) REFERENCES `compositions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+                db.query("SELECT id, (SELECT id FROM compositions WHERE storageId = audioId), position, shuffledPosition FROM play_queue")
+                    .use { c ->
+                        while (c.moveToNext()) {
+                            val cv = ContentValues()
+                            cv.put("id", getLong(c, "id"))
+                            val audioId = getLong(c, "audioId")
+                            if (audioId == null || audioId < 1) {
+                                continue
+                            }
+                            cv.put("audioId", audioId)
+                            cv.put("position", getLong(c, "position"))
+                            cv.put("shuffledPosition", getLong(c, "shuffledPosition"))
+                            db.insert("play_queue_new", SQLiteDatabase.CONFLICT_REPLACE, cv)
                         }
-                        cv.put("audioId", audioId);
-                        cv.put("position", getLong(c, "position"));
-                        cv.put("shuffledPosition", getLong(c, "shuffledPosition"));
-                        database.insert("play_queue_new", SQLiteDatabase.CONFLICT_REPLACE, cv);
                     }
-                }
-                database.execSQL("INSERT INTO `play_queue_new` (id, audioId, position, shuffledPosition) " +
-                        "SELECT id, (SELECT id FROM compositions WHERE storageId = audioId), position, shuffledPosition " +
-                        "FROM play_queue");//select and replace old audio id with new?
-                database.execSQL("DROP TABLE play_queue");
-                database.execSQL("ALTER TABLE play_queue_new RENAME TO play_queue");
+                db.execSQL(
+                    """
+                    INSERT INTO `play_queue_new` (id, audioId, position, shuffledPosition) 
+                    SELECT id, (SELECT id FROM compositions WHERE storageId = audioId), position, shuffledPosition 
+                    FROM play_queue
+                    """
+                ) //select and replace old audio id with new?
+                db.execSQL("DROP TABLE play_queue")
+                db.execSQL("ALTER TABLE play_queue_new RENAME TO play_queue")
 
-                database.execSQL("CREATE  INDEX `index_play_queue_audioId` ON `play_queue` (`audioId`)");
+                db.execSQL("CREATE INDEX `index_play_queue_audioId` ON `play_queue` (`audioId`)")
             }
-        };
+        }
     }
+
 }

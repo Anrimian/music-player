@@ -15,7 +15,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
-import java.util.Date
 
 @Dao
 interface GenreDao {
@@ -148,12 +147,14 @@ interface GenreDao {
     @Query("UPDATE genre_entries SET genreId = :newGenreId WHERE genreId = :oldGenreId")
     fun changeCompositionsGenre(oldGenreId: Long, newGenreId: Long)
 
-    @Query("""
+    @Query(
+        """
         UPDATE compositions 
-        SET dateModified = :dateModified 
+        SET modifiedTime = :modifiedTime 
         WHERE id IN (SELECT compositionId FROM genre_entries WHERE genreId = :genreId)
-    """)
-    fun updateGenreCompositionsModifyTime(genreId: Long, dateModified: Date)
+    """
+    )
+    fun updateGenreCompositionsModifyTime(genreId: Long, modifiedTime: Long)
 
     @Query("""
         SELECT position 

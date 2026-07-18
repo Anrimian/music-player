@@ -7,12 +7,13 @@
     <locale android:name="el"/>
     <locale android:name="es"/>
     <locale android:name="fr"/>
+    <locale android:name="hu"/>
     <locale android:name="in"/>
     <locale android:name="pt"/>
     <locale android:name="ru"/>
     <locale android:name="tr"/>
     <locale android:name="uk"/>
     <locale android:name="ko"/>
-    <locale android:name="zh-Hans"/>
-    <locale android:name="zh-Hant"/>
+    <locale android:name="zh"/>
+    <locale android:name="zh-TW"/>
 </locale-config>

@@ -1,12 +1,13 @@
 package com.github.anrimian.musicplayer.infrastructure.service.music
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.ServiceCompat
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.utils.Permissions
 import com.github.anrimian.musicplayer.di.Components
@@ -43,6 +44,7 @@ class MusicService : Service() {
     private var randomMode = false
     private var notificationSetting: MusicNotificationSetting? = null
     private var currentAppTheme: AppTheme? = null
+    private var isForeground = false
 
     override fun onCreate() {
         super.onCreate()
@@ -56,21 +58,31 @@ class MusicService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-        if (!Permissions.hasFilePermission(this)) {
-            notificationsDisplayer().startForegroundErrorNotification(
-                this,
-                R.string.no_file_permission
-            )
-            stopForegroundCompat(true)
-            stopSelf()
-            return START_NOT_STICKY
-        }
-        if (intent.getBooleanExtra(START_FOREGROUND_SIGNAL, false)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerState === PlayerState.IDLE) {
-                //should reduce chance of RemoteServiceException
-                mediaNotificationsDisplayer().startStubForegroundNotification(this, mediaSession())
+        try {
+            if (!Permissions.hasFilePermission(this)) {
+                notificationsDisplayer().startForegroundErrorNotification(
+                    this,
+                    R.string.no_file_permission
+                )
+                stopForegroundCompat(true)
+                stopSelf()
+                return START_NOT_STICKY
             }
-            startForeground()
+            if (intent.getBooleanExtra(START_FOREGROUND_SIGNAL, false)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !isForeground) {
+                    //should reduce chance of RemoteServiceException
+                    mediaNotificationsDisplayer().startStubForegroundNotification(this, mediaSession())
+                }
+                startForeground()
+            }
+        } catch (e: RuntimeException) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && e is ForegroundServiceStartNotAllowedException
+            ) {
+                stopSelf()
+                return START_NOT_STICKY
+            }
+            throw e
         }
         val requestCode = intent.getIntExtra(REQUEST_CODE, -1)
         if (requestCode != -1) {
@@ -88,12 +100,13 @@ class MusicService : Service() {
     }
 
     fun startForeground() {
+        isForeground = true
         //reduce chance to show first notification without info
         var reloadCover = false
         if (notificationSetting == null) {
             reloadCover = true
             currentSource = playerInteractor().getCurrentSource()
-            notificationSetting = musicServiceInteractor().notificationSettings
+            notificationSetting = musicServiceInteractor().getNotificationSettings()
         }
         mediaNotificationsDisplayer().startForegroundNotification(
             this,
@@ -110,7 +123,7 @@ class MusicService : Service() {
 
     private fun handleNotificationAction(requestCode: Int, intent: Intent) {
         when (requestCode) {
-            Constants.Actions.PLAY -> {
+            AppConstants.Actions.PLAY -> {
                 val playDelay = intent.getLongExtra(PLAY_DELAY_MILLIS, 0)
                 var playerType: PlayerType? = null
                 val playerTypeInt = intent.getIntExtra(PLAYER_TYPE, 0)
@@ -119,14 +132,14 @@ class MusicService : Service() {
                 }
                 musicServiceInteractor().play(playDelay, playerType)
             }
-            Constants.Actions.PAUSE -> playerInteractor().pause()
-            Constants.Actions.SKIP_TO_NEXT -> musicServiceInteractor().skipToNext()
-            Constants.Actions.SKIP_TO_PREVIOUS -> musicServiceInteractor().skipToPrevious()
-            Constants.Actions.CHANGE_SHUFFLE_NODE -> musicServiceInteractor().changeRandomMode()
-            Constants.Actions.CHANGE_REPEAT_MODE -> musicServiceInteractor().changeRepeatMode()
-            Constants.Actions.REWIND -> musicServiceInteractor().fastSeekBackward()
-            Constants.Actions.FAST_FORWARD -> musicServiceInteractor().fastSeekForward()
-            Constants.Actions.CLOSE -> musicServiceInteractor().reset()
+            AppConstants.Actions.PAUSE -> playerInteractor().pause()
+            AppConstants.Actions.SKIP_TO_NEXT -> musicServiceInteractor().skipToNext()
+            AppConstants.Actions.SKIP_TO_PREVIOUS -> musicServiceInteractor().skipToPrevious()
+            AppConstants.Actions.CHANGE_SHUFFLE_NODE -> musicServiceInteractor().changeRandomMode()
+            AppConstants.Actions.CHANGE_REPEAT_MODE -> musicServiceInteractor().changeRepeatMode()
+            AppConstants.Actions.REWIND -> musicServiceInteractor().fastSeekBackward()
+            AppConstants.Actions.FAST_FORWARD -> musicServiceInteractor().fastSeekForward()
+            AppConstants.Actions.CLOSE -> musicServiceInteractor().reset()
         }
     }
 
@@ -139,9 +152,9 @@ class MusicService : Service() {
                 playerInteractor().getIsPlayingStateObservable(),
                 playerInteractor().getPlayerStateObservable(),
                 playerInteractor().getCurrentSourceObservable(),
-                musicServiceInteractor().repeatModeObservable,
-                musicServiceInteractor().randomModeObservable,
-                musicServiceInteractor().notificationSettingObservable,
+                musicServiceInteractor().getRepeatModeObservable(),
+                musicServiceInteractor().getRandomModeObservable(),
+                musicServiceInteractor().getNotificationSettingObservable(),
                 Components.getAppComponent().themeController().getAppThemeObservable(),
                 serviceState::set
             ).observeOn(AndroidSchedulers.mainThread())
@@ -226,6 +239,7 @@ class MusicService : Service() {
     }
 
     private fun stopForegroundCompat(removeNotification: Boolean) {
+        isForeground = false
         val flags = if (removeNotification) {
             mediaNotificationsDisplayer().cancelCoverLoadingForForegroundNotification()
             ServiceCompat.STOP_FOREGROUND_REMOVE

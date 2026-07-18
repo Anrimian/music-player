@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="open_drawer">Buka laci</string>
     <string name="try_again">Coba lagi</string>
     <string name="can_not_work_without_file_permission">Aplikasi tidak dapat bekerja tanpa izin akses file.</string>
@@ -11,7 +11,7 @@
     <string name="file_not_found">File tidak ditemukan</string>
     <string name="compositions_on_device_not_found">Tidak ada lagu di perangkat ini</string>
     <string name="compositions_and_folders_for_search_not_found">Tidak ada lagu dan folder yang cocok.</string>
-    <string name="foreground_channel_description">Notifikasi permanen</string>
+    <string name="foreground_channel_name">Notifikasi permanen</string>
     <string name="previous_track">Lagu sebelumnya</string>
     <string name="next_track">Lagu berikutnya</string>
     <string name="folder">Folder</string>
@@ -67,16 +67,9 @@
     <string name="now_playing_template">Sedang diputar: %1$s. Buka antrean pemutaran.</string>
     <string name="play_all_in_folder">Putar semua yang ada di playlist ini</string>
     <string name="delete_playlist">Hapus playlist</string>
-    <string name="storage_timeout_error_message">
-        Penyimpanan media perangkat tidak menanggapi.
-        Ini jarang terjadi dan cukup aneh
-        Silahkan coba merestart perangkat, mungkin itu dapat membantu.
-    </string>
+    <string name="storage_timeout_error_message">Penyimpanan media perangkat tidak menanggapi.\nIni jarang terjadi dan cukup aneh\nSilahkan coba merestart perangkat, mungkin itu dapat membantu.</string>
     <string name="select_all">Pilih semua</string>
-    <string name="file_uri_extract_error">
-        Tidak dapat menemukan path file \"%s\" untuk dikirim.
-        Mungkin file berada di path yang disembunyikan.
-    </string>
+    <string name="file_uri_extract_error">Tidak dapat menemukan path file \"%s\" untuk dikirim.\nMungkin file berada di path yang disembunyikan.</string>
     <string name="loading_progress">Memuat…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
     <string name="add_date_order_desc_title">Dari yang terlama</string>
@@ -187,9 +180,7 @@
     <string name="lyrics">Lirik</string>
     <string name="check_tags_error">Gagal memeriksa metadata lagu: %s</string>
     <string name="changing_file_progress">Mengedit file…</string>
-    <string name="android_r_edit_file_permission_denied">
-        Mulai Android 11, mengedit dan menghapus file membutuhkan izin perangkat khusus.
-    </string>
+    <string name="android_r_edit_file_permission_denied">Mulai Android 11, mengedit dan menghapus file membutuhkan izin perangkat khusus.</string>
     <string name="error_report">Laporkan Error</string>
     <string name="critical_error_report_message">Terjadi error yang sangat fatal sehingga aplikasi tidak dapat dibuka, kami berhasil menyimpan info log nya. Karena aplikasi tidak mengirim log secara otomatis, Anda dapat mengirimkannya lewat email agar kami dapat segera memperbaikinya.</string>
     <string name="error_report_message">Terjadi error yang sangat fatal, kami berhasil menyimpan info log nya. Karena aplikasi tidak mengirim log secara otomatis, Anda dapat mengirimkannya lewat email agar kami dapat segera memperbaikinya.</string>
@@ -240,19 +231,16 @@
     <string name="no_lyrics_for_current_composition">Tidak ada lirik</string>
     <string name="edit_lyrics">Ubah lirik</string>
     <string name="show_in_folders">Tampilkan didalam folder</string>
-    <string name="file_source_not_found">File sumber tidak ditemukan</string>
     <string name="file_is_too_large">File terlalu besar</string>
     <string name="preparing_files">Menyiapkan file</string>
     <string name="downloading">Mendownload: %1$d/%2$d</string>
     <string name="downloading_progress">Sedang download(%d%%)</string>
     <string name="rename_progress_count">Mengubah nama (%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? Tindakan ini tidak dapat diurungkan.</string>
+    <string name="undone_action_template">Tindakan ini tidak dapat diurungkan.</string>
     <string name="delete_composition_template">Hapus lagu \"%1$s\"</string>
     <string name="delete_empty_folder">Hapus lagu \"%s\"</string>
     <string name="delete_folder_template">%2$s dari folder \"%1$s\"</string>
-    <string name="android_r_editor_restriction_error">Mulai Android 11, menyalin/memindah/mengubah nama file hanya diperbolehkan di folder: \"%s\".
-        Pindahkan audio ke dalam folder ini, seharusnya itu akan berjalan lancar.
-    </string>
+    <string name="android_r_editor_restriction_error">Mulai Android 11, menyalin/memindah/mengubah nama file hanya diperbolehkan di dalam folder: \"%s\".\nPindahkan audio ke dalam folder tersebut, harusnya itu akan berjalan lancar.</string>
     <string name="folder_already_excluded_from_scanning">Folder sudah dikecualikan dari proses scan</string>
     <string name="no_file_modify_permission">Tidak ada izin untuk mengedit berkas</string>
     <string name="interface_settings">UI</string>
@@ -294,65 +282,85 @@
     <string name="check_for_duplicates">Cek duplikat di playlist sebelum menambahkan lagu baru</string>
     <string name="more_template">…%d lainnya</string>
     <string name="add_without_duplicates">Tambah tanpa duplikat</string>
-
+    <string name="process_unsupported_actions">Perlakukan semua acara media yang tidak dikenali sebagai perintah pemutaran</string>
+    <string name="process_unsupported_actions_description">Dapat menyebabkan pemutaran yang tak terduga</string>
+    <string name="ignore_play_after_connection">Abaikan perintah \'Putar\' selama 3 detik setelah terhubung dengan perangkat Bluetooth</string>
+    <string name="ignore_play_after_connection_description">Dapat mencegah pemutaran tak terduga saat sedang upaya penghubungan</string>
+    <string name="pause_on_audio_device_remove">Jeda begitu terputus dengan perangkat output audio</string>
+    <string name="missing_files_detected">Beberapa file audio hilang</string>
+    <!-- !Not verified by native speaker! -->
+    <string name="missing_files_description">Sistem Android melaporkan bahwa file-file ini tidak lagi tersedia di lokasi aslinya.\nFile mungkin telah dipindahkan, dihapus oleh aplikasi lain, atau berada di kartu SD yang tidak terhubung.\nAnda dapat menghapus entri yang tidak valid ini dari perpustakaan Anda.\nLagu yang tidak tersedia (%d):</string>
+    <!---->
+    <string name="see_more">Lihat lebih banyak (%d)</string>
+    <string name="remove">Hapus</string>
+    <string name="delete_missing_compositions_title">Hapus lagu?</string>
+    <string name="file_not_found_in_all_storages">File tidak ditemukan di penyimpanan perangkat maupun di cloud</string>
+    <string name="question_template">%1$s? %2$s</string>
+    <string name="allowed_file_extensions">Ekstensi file yang diizinkan</string>
+    <string name="allowed_extensions_state">Hanya file dengan ekstensi berikut yang akan dimasukkan ke koleksi: \n%s</string>
+    <string name="allowed_file_extensions_description">Ekstensi dipisahkan dengan simbol \',\'</string>
+    <string name="restore_default">Kembalikan ke default</string>
+    <string name="not_allowed_path">Path tidak diizinkan untuk menulis file</string>
+    <string name="configure_menu">Konfigurasi menu</string>
+    <string name="configure_menu_items">Konfigurasi item menu</string>
+    <string name="save">Simpan</string>
+    <string name="menu_group_primary">Utama</string>
+    <string name="menu_group_secondary">Tambahan</string>
+    <string name="menu_group_hidden">Tersembunyi</string>
+    <string name="undo">Urungkan</string>
+    <string name="playlist_sorted">Playlist disortir</string>
+    <string name="artist_order">Berdasarkan artis</string>
+    <string name="skip_silence">Lewati keheningan</string>
+    <string name="skip_silence_summary">Otomatis lewati bagian hening yang lebih panjang dari %.1f detik</string>
+    <string name="android_media_player_skip_silence_note">Tidak mendukung lewati keheningan</string>
+    <string name="system_interaction">Interaksi Sistem</string>
+    <string name="sound_processing">Pemrosesan Suara</string>
     <plurals name="compositions_count">
         <item quantity="other">%1$s lagu</item>
     </plurals>
-
     <plurals name="files_count">
         <item quantity="other">%1$s berkas</item>
     </plurals>
-
     <plurals name="albums_count">
         <item quantity="other">%1$s album</item>
     </plurals>
-
     <plurals name="play_next_message">
         <item quantity="other">%s akan diputar setelah ini</item>
     </plurals>
-
     <plurals name="added_to_queue_message">
         <item quantity="other">%s lagu ditambahkan ke antrian pemutaran</item>
     </plurals>
-
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="other">%1$d lagu ditambahkan ke playlist \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="other">%1$d lagu dihapus dari playlist \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_compositions_success">
         <item quantity="other">%1$d lagu telah dihapus</item>
     </plurals>
-
     <plurals name="seconds_template">
         <item quantity="other">%1$d detik</item>
     </plurals>
-
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="other">Hapus %d lagu</item>
     </plurals>
-
     <plurals name="for_at_least_minutes">
         <item quantity="other">Setidaknya selama %d menit</item>
     </plurals>
-
     <plurals name="export_playlists_success">
         <item quantity="other">Playlist %d disimpan ke penyimpanan internal</item>
     </plurals>
-
     <plurals name="playlist_import_partial_success">
         <item quantity="other">Playlist berhasil ditambahkan, tetapi berkas %d tidak ditemukan di Koleksi.</item>
     </plurals>
-
     <plurals name="delete_playlists_template">
-        <item quantity="other">Hapus %d daftar putar</item>
+        <item quantity="other">Hapus %d daftar putar?</item>
     </plurals>
-
     <plurals name="delete_playlists_success">
         <item quantity="other">%d playlist dihapus</item>
     </plurals>
-
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="other">Hapus %1$d lagu dari koleksi Anda? %2$s</item>
+    </plurals>
 </resources>

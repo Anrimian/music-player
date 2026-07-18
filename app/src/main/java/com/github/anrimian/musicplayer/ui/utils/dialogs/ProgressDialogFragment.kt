@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.ui.common.format.indeterminate
 import com.github.anrimian.musicplayer.ui.common.format.setExtProgress
@@ -20,13 +20,13 @@ class ProgressDialogFragment : DialogFragment() {
 
         fun newInstance(message: String?) = ProgressDialogFragment().apply {
             arguments = Bundle().apply {
-                putString(Constants.Arguments.MESSAGE_ARG, message)
+                putString(AppConstants.Arguments.MESSAGE_ARG, message)
             }
         }
 
         fun newInstance(@StringRes messageResId: Int) = ProgressDialogFragment().apply {
             arguments = Bundle().apply {
-                putInt(Constants.Arguments.MESSAGE_RES_ARG, messageResId)
+                putInt(AppConstants.Arguments.MESSAGE_RES_ARG, messageResId)
             }
         }
 
@@ -64,7 +64,7 @@ class ProgressDialogFragment : DialogFragment() {
 
     fun setMessage(message: String?) {
         tvProgress.text = message
-        requireArguments().putString(Constants.Arguments.MESSAGE_ARG, message)
+        requireArguments().putString(AppConstants.Arguments.MESSAGE_ARG, message)
     }
 
     fun setIndeterminate(indeterminate: Boolean) {
@@ -81,13 +81,13 @@ class ProgressDialogFragment : DialogFragment() {
 
     private fun getMessage(): String? {
         val args = requireArguments()
-        val message = args.getString(Constants.Arguments.MESSAGE_ARG)
+        val message = args.getString(AppConstants.Arguments.MESSAGE_ARG)
         return if (message == null) {
-            val resId = args.getInt(Constants.Arguments.MESSAGE_RES_ARG)
+            val resId = args.getInt(AppConstants.Arguments.MESSAGE_RES_ARG)
             if (resId == 0) {
                 null
             } else {
-                getString(args.getInt(Constants.Arguments.MESSAGE_RES_ARG))
+                getString(args.getInt(AppConstants.Arguments.MESSAGE_RES_ARG))
             }
         } else {
             message

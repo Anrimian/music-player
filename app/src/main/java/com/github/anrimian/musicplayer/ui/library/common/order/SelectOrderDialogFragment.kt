@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.databinding.DialogOrderBinding
 import com.github.anrimian.musicplayer.di.Components
@@ -36,9 +36,9 @@ class SelectOrderDialogFragment : MvpAppCompatDialogFragment(), SelectOrderView 
             vararg orders: OrderType
         ) = SelectOrderDialogFragment().apply {
             arguments = Bundle().apply {
-                putSerializable(Constants.Arguments.ORDER_ARG, selectedOrder)
-                putSerializable(Constants.Arguments.ORDERS_ARG, orders)
-                putBoolean(Constants.Arguments.FILE_NAME_SETTING_ARG, showFileNameSetting)
+                putSerializable(AppConstants.Arguments.ORDER_ARG, selectedOrder)
+                putSerializable(AppConstants.Arguments.ORDERS_ARG, orders)
+                putBoolean(AppConstants.Arguments.FILE_NAME_SETTING_ARG, showFileNameSetting)
             }
         }
 
@@ -60,7 +60,7 @@ class SelectOrderDialogFragment : MvpAppCompatDialogFragment(), SelectOrderView 
 
         val layoutManager = LinearLayoutManager(activity)
         rvOrder.layoutManager = layoutManager
-        val orders = requireArguments().getSerializableExtra<Array<OrderType>>(Constants.Arguments.ORDERS_ARG)
+        val orders = requireArguments().getSerializableExtra<Array<OrderType>>(AppConstants.Arguments.ORDERS_ARG)
         orderAdapter = OrderAdapter(orders, presenter::onOrderTypeSelected)
         rvOrder.adapter = orderAdapter
 
@@ -78,7 +78,7 @@ class SelectOrderDialogFragment : MvpAppCompatDialogFragment(), SelectOrderView 
         binding.cbDesc.setOnCheckedChangeListener { _, isChecked ->
             presenter.onReverseTypeSelected(isChecked)
         }
-        if (requireArguments().getBoolean(Constants.Arguments.FILE_NAME_SETTING_ARG)) {
+        if (requireArguments().getBoolean(AppConstants.Arguments.FILE_NAME_SETTING_ARG)) {
             ViewUtils.onCheckChanged(binding.cbUseFileName) { checked ->
                 presenter.onFileNameChecked(checked)
             }
@@ -112,6 +112,6 @@ class SelectOrderDialogFragment : MvpAppCompatDialogFragment(), SelectOrderView 
         this.onCompleteListener = onCompleteListener
     }
 
-    private fun getOrder() = requireArguments().getSerializableExtra<Order>(Constants.Arguments.ORDER_ARG)
+    private fun getOrder() = requireArguments().getSerializableExtra<Order>(AppConstants.Arguments.ORDER_ARG)!!
 
 }

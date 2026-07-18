@@ -15,6 +15,10 @@ interface StorageSourceRepository {
         compositionId: Long
     ): Maybe<CompositionContentSource>
 
+    fun getStorageSources(
+        compositionIds: List<Long>
+    ): Single<Map<Long, CompositionContentSource>>
+
     fun getExternalStorageSource(
         composition: CompositionSource
     ): Single<CompositionContentSource>

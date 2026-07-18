@@ -1,6 +1,6 @@
-package com.github.anrimian.musicplayer.domain.models.equalizer;
+package com.github.anrimian.musicplayer.domain.models.equalizer
 
-public enum EqInitializationState {
+enum class EqInitializationState {
     IDLE,
     INITIALIZED,
     INITIALIZATION_ERROR

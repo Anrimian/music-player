@@ -6,15 +6,15 @@ import android.content.Intent
 import android.widget.RemoteViews
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils
-import com.github.anrimian.musicplayer.ui.utils.broadcastPendingIntentFlag
 import com.github.anrimian.musicplayer.ui.widgets.WidgetActionsReceiver
 import com.github.anrimian.musicplayer.ui.widgets.models.WidgetColors
 import com.github.anrimian.musicplayer.ui.widgets.models.WidgetData
 import com.github.anrimian.musicplayer.ui.widgets.providers.WidgetProviderSmallExt
+import com.github.anrimian.utils.broadcastPendingIntentFlag
 
 open class SmallExtWidgetBinder: WidgetBinder() {
 
@@ -52,11 +52,11 @@ open class SmallExtWidgetBinder: WidgetBinder() {
         val intentChangeShuffleMode = Intent(context, WidgetActionsReceiver::class.java)
         intentChangeShuffleMode.putExtra(
             MusicService.REQUEST_CODE,
-            Constants.Actions.CHANGE_SHUFFLE_NODE
+            AppConstants.Actions.CHANGE_SHUFFLE_NODE
         )
         val pIntentChangeShuffleMode = PendingIntent.getBroadcast(
             context,
-            Constants.Actions.CHANGE_SHUFFLE_NODE,
+            AppConstants.Actions.CHANGE_SHUFFLE_NODE,
             intentChangeShuffleMode,
             broadcastPendingIntentFlag()
         )
@@ -65,11 +65,11 @@ open class SmallExtWidgetBinder: WidgetBinder() {
         val intentChangeRepeatMode = Intent(context, WidgetActionsReceiver::class.java)
         intentChangeRepeatMode.putExtra(
             MusicService.REQUEST_CODE,
-            Constants.Actions.CHANGE_REPEAT_MODE
+            AppConstants.Actions.CHANGE_REPEAT_MODE
         )
         val pIntentChangeRepeatMode = PendingIntent.getBroadcast(
             context,
-            Constants.Actions.CHANGE_REPEAT_MODE,
+            AppConstants.Actions.CHANGE_REPEAT_MODE,
             intentChangeRepeatMode,
             broadcastPendingIntentFlag()
         )

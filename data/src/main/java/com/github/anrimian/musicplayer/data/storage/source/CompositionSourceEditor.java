@@ -7,11 +7,11 @@ import com.github.anrimian.musicplayer.data.models.composition.file.StorageCompo
 import com.github.anrimian.musicplayer.data.storage.exceptions.GenreAlreadyPresentException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.IllegalInputException;
 import com.github.anrimian.musicplayer.data.storage.exceptions.TagReaderException;
-import com.github.anrimian.musicplayer.data.storage.providers.music.StorageMusicProvider;
+import com.github.anrimian.musicplayer.data.storage.providers.music.SystemAudioCatalogProvider;
 import com.github.anrimian.musicplayer.data.utils.image.BitmapUtils;
 import com.github.anrimian.musicplayer.domain.Constants;
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource;
-import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileInfo;
+import com.github.anrimian.musicplayer.domain.models.composition.tags.AudioFileTagInfo;
 import com.github.anrimian.musicplayer.domain.models.composition.tags.CompositionSourceTags;
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource;
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper;
@@ -57,11 +57,11 @@ public class CompositionSourceEditor {
     private static final int MAX_COVER_SIZE = 1000;
     private static final int NO_POSITION = -1;
 
-    private final StorageMusicProvider storageMusicProvider;
+    private final SystemAudioCatalogProvider storageMusicProvider;
     private final FileSourceProvider fileSourceProvider;
     private final ContentSourceHelper contentSourceHelper;
 
-    public CompositionSourceEditor(StorageMusicProvider storageMusicProvider,
+    public CompositionSourceEditor(SystemAudioCatalogProvider storageMusicProvider,
                                    FileSourceProvider fileSourceProvider,
                                    ContentSourceHelper contentSourceHelper) {
         this.storageMusicProvider = storageMusicProvider;
@@ -317,7 +317,7 @@ public class CompositionSourceEditor {
         return Single.fromCallable(() -> editAudioFileTag(source, Tag::deleteArtworkField));
     }
 
-    public Single<AudioFileInfo> getAudioFileInfo(CompositionContentSource source) {
+    public Single<AudioFileTagInfo> getAudioFileInfo(CompositionContentSource source) {
         return Single.fromCallable(() -> {
             try {
                 File file = contentSourceHelper.getAsFile(source);
@@ -335,7 +335,7 @@ public class CompositionSourceEditor {
                         tag.getFirst(FieldKey.COMMENT),
                         tag.getFirst(FieldKey.LYRICS),
                         splitGenres(tag.getFirst(FieldKey.GENRE)));
-                return new AudioFileInfo(fileSize, tags);
+                return new AudioFileTagInfo(fileSize, tags);
             } catch (FileNotFoundException e) {
                 throw e;
             } catch (Exception e) {

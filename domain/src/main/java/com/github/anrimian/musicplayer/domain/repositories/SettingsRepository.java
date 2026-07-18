@@ -1,7 +1,14 @@
 package com.github.anrimian.musicplayer.domain.repositories;
 
+import com.github.anrimian.musicplayer.domain.models.menu.AppMenu;
+import com.github.anrimian.musicplayer.domain.models.menu.MenuConfig;
 import com.github.anrimian.musicplayer.domain.models.order.Order;
 import com.github.anrimian.musicplayer.domain.models.player.SoundBalance;
+import com.github.anrimian.musicplayer.domain.utils.functions.Opt;
+
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.rxjava3.core.Observable;
 
@@ -97,6 +104,10 @@ public interface SettingsRepository {
 
     void setPauseOnAudioFocusLossEnabled(boolean enabled);
 
+    boolean isPauseOnAudioDeviceRemoveEnabled();
+
+    void setPauseOnAudioDeviceRemoveEnabled(boolean enabled);
+
     void setExternalPlayerRepeatMode(int mode);
 
     int getExternalPlayerRepeatMode();
@@ -161,7 +172,7 @@ public interface SettingsRepository {
 
     boolean isDisplayFileNameEnabled();
 
-    void setShowAllAudioFilesEnabled(boolean enabled);
+    boolean setShowAllAudioFilesEnabled(boolean enabled);
 
     boolean isShowAllAudioFilesEnabled();
 
@@ -182,4 +193,35 @@ public interface SettingsRepository {
     long getBluetoothConnectAutoPlayDelay();
 
     void setBluetoothConnectAutoPlayDelay(long millis);
+
+    boolean isProcessUnsupportedBluetoothEventEnabled();
+
+    void setProcessUnsupportedBluetoothEventEnabled(boolean enabled);
+
+    boolean isIgnorePlayAfterConnectionEnabled();
+
+    void setIgnorePlayAfterConnectionEnabled(boolean enabled);
+
+    void setBluetoothAutoPlayEnabled(boolean enabled);
+
+    boolean isBluetoothAutoPlayEnabled();
+
+    Set<String> getAllowedFileExtensions();
+
+    void setAllowedFileExtensions(Set<String> extensions);
+
+    Observable<Set<String>> getAllowedFileExtensionsObservable();
+
+    void setMenuConfig(AppMenu appMenu, @Nullable MenuConfig config);
+
+    @Nullable
+    MenuConfig getMenuConfig(AppMenu appMenu);
+
+    Observable<Opt<MenuConfig>> getMenuConfigObservable(AppMenu appMenu);
+
+    void setSkipSilenceEnabled(boolean enabled);
+
+    boolean isSkipSilenceEnabled();
+
+    Observable<Boolean> getSkipSilenceEnabledObservable();
 }

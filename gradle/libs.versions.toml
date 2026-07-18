@@ -1,50 +1,63 @@
 [versions]
-agpVersion = "8.10.1"
-kotlinVersion = "2.1.21"
-kspVersion = "2.1.21-2.0.1" #remember to keep first part aligned with kotlin version
-androidJunit5Version = "1.11.2.0"
+agpVersion = "9.0.1"
+kotlinVersion = "2.3.10"
+kspVersion = "2.3.3"
+androidJunit5Version = "2.0.1"
 roboelectricJunit5Version = "0.9.0"
 
 #support libs
 androidXVersion = "1.7.1"
-mediaCompatVersion = "1.7.0"
-documentFileVersion = "1.0.1"
+mediaCompatVersion = "1.7.1"
+documentFileVersion = "1.1.0"
+androidxAnnotationVersion = "1.9.1"
+fragmentKtxVersion = "1.8.9"
 
 #core
-rxJavaVersion = "3.1.10"
+rxJavaVersion = "3.1.12"
 rxAndroidVersion = "3.0.2"
 rxJavaExtVersion = "3.1.1"
 coroutinesVersion = "1.10.2"
 moxyVersion = "2.2.2"
-daggerVersion = "2.56.2"
-media3Version = "1.7.1"
-roomVersion = '2.7.2'
-jTaggerVersion = '2.2.6c'
-glideVersion = "4.16.0"
-workManagerVersion = "2.8.1" # update to 2.9.0 increases sync debug apk size by 4MB. Check with r8
+viewModelVersion = "2.10.0"
+viewModelComposeVersion = "2.10.0"
+daggerVersion = "2.59.2"
+media3Version = "1.9.3"
+roomVersion = "2.8.4"
+jTaggerVersion = "2.2.6c"
+glideVersion = "5.0.5"
+glideComposeVersion = "1.0.0-beta08"
+workManagerVersion = "2.11.2"
+gmsWearableVersion = "19.0.0"
 
 #ui
-googleMaterialVersion = "1.12.0"
+composeBom = "2026.03.01"
+activityComposeVersion = "1.13.0"
+kotlinxImmutableCollectionsVersion = "0.4.0"
+googleMaterialVersion = "1.13.0"
 constraintLayoutVersion = "2.2.1"
 recyclerViewVersion = "1.4.0"
 slidrVersion = "2.1.0"
 chipsLayoutManagerVersion = "v0.3.7.F"
 rotateLayoutVersion = "3.0.0B"
+reorderableVersion = "3.0.0"
 
 #remote storage libs
-dropboxSdkVersion = "5.4.4"
-playServicesAuthVersion = "20.7.0"
-googleApiVersion = "2.3.0"
+dropboxSdkVersion = "7.0.0"
+playServicesAuthVersion = "21.5.1"
+googleApiVersion = "2.9.0"
+androidXCredentialsVersion = "1.5.0"
+googleIdVersion = "1.2.0"
 gDriveVersion = "v3-rev20240123-2.0.0"
 
 #testing
-jUnit5Version = '5.11.3'
-espressoVersion = '3.5.1'
-mockitoVersion = '5.18.0'
-mockitoKtVersion = '5.4.0'
-androidXTestVersion = "1.6.2"
-roboelectricVersion = "4.14.1"
-androidXTestWorkVersion = "2.10.1"
+jUnit5Version = "6.0.3"
+espressoVersion = "3.7.0"
+mockitoVersion = "5.23.0"
+mockitoKtVersion = "6.3.0"
+dexmakerMockitoInlineVersion = "2.28.6"
+androidXTestVersion = "1.7.0"
+roboelectricVersion = "4.16.1"
+androidXTestWorkVersion = "2.11.2"
 
 #dev tools
 javaxAnnotationVersion = "3.0.2"
@@ -54,24 +67,31 @@ javaxAnnotationVersion = "3.0.2"
 kotlinStdLib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlinVersion" }
 
 #support libs
-appCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidXVersion"}
+appCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidXVersion" }
 appCompatResources = { module = "androidx.appcompat:appcompat-resources", version.ref = "androidXVersion" }
 supportMedia = { module = "androidx.media:media", version.ref = "mediaCompatVersion" }
 documentFile = { module = "androidx.documentfile:documentfile", version.ref = "documentFileVersion" }
+androidxAnnotation = { module = "androidx.annotation:annotation", version.ref = "androidxAnnotationVersion" }
+fragmentKtx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
 
 #core
 rxJava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxJavaVersion" }
 rxJavaExt = { module = "com.github.akarnokd:rxjava3-extensions", version.ref = "rxJavaExtVersion" }
 rxAndroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxAndroidVersion" }
-#not used right now, but started to be used by room. Fixes internal bug in old version
+
 coroutinesCore = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
 coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutinesVersion" }
+coroutinesRx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3", version.ref = "coroutinesVersion" }
 
 moxy = { module = "com.github.moxy-community:moxy", version.ref = "moxyVersion" }
 moxyCompiler = { module = "com.github.moxy-community:moxy-compiler", version.ref = "moxyVersion" }
+moxyAndroid = { module = "com.github.moxy-community:moxy-android", version.ref = "moxyVersion" }
 moxyAppcompat = { module = "com.github.moxy-community:moxy-androidx", version.ref = "moxyVersion" }
 moxyMaterial = { module = "com.github.moxy-community:moxy-material", version.ref = "moxyVersion" }
 moxyKtx = { module = "com.github.moxy-community:moxy-ktx", version.ref = "moxyVersion" }
+
+viewModel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "viewModelVersion" }
+viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "viewModelComposeVersion" }
 
 room = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
 roomRx = { module = "androidx.room:room-rxjava3", version.ref = "roomVersion" }
@@ -84,15 +104,26 @@ exoPlayerCore = { module = "androidx.media3:media3-exoplayer", version.ref = "me
 
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
 glideCompiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glideVersion" }
+glideCompose = { module = "com.github.bumptech.glide:compose", version.ref = "glideComposeVersion" }
 
 workManager = { module = "androidx.work:work-runtime", version.ref = "workManagerVersion" }
 workManagerRx = { module = "androidx.work:work-rxjava3", version.ref = "workManagerVersion" }
+
+gmsWearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "gmsWearableVersion" }
 
 # until issue with lowercase letter followed by uppercase letter won't be solved - use prefix lib
 # https://github.com/gradle/gradle/issues/28928
 libjAudioTagger = { module = "com.github.Anrimian:jaudiotagger", version.ref = "jTaggerVersion" }
 
 #ui
+composeBom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose = { module = "androidx.compose.ui:ui" }
+composePreview = { module = "androidx.compose.ui:ui-tooling-preview" }
+composeTooling = { module = "androidx.compose.ui:ui-tooling" }
+composeMaterial3 = { module = "androidx.compose.material3:material3" }
+composeAnimation = { module = "androidx.compose.animation:animation-graphics" }
+activityCompose = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+kotlinxImmutableCollections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxImmutableCollectionsVersion" }
 #in recent version added +200kb, candidate for optimization
 material = { module = "com.google.android.material:material", version.ref = "googleMaterialVersion" }
 constraintLayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintLayoutVersion" }
@@ -100,20 +131,27 @@ recyclerView = { module = "androidx.recyclerview:recyclerview", version.ref = "r
 slidr = { module = "com.r0adkll:slidableactivity", version.ref = "slidrVersion" }
 chipsLayoutManager = { module = "com.github.Anrimian:ChipsLayoutManager", version.ref = "chipsLayoutManagerVersion" }
 rotateLayout = { module = "com.github.Anrimian:rotate-layout", version.ref = "rotateLayoutVersion" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderableVersion" }
 
 #remote storage libs
 dropboxSdk = { module = "com.dropbox.core:dropbox-core-sdk", version.ref = "dropboxSdkVersion" }
-libgDriveAuth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
-libgoogleApi = { module = "com.google.api-client:google-api-client-android", version.ref = "googleApiVersion" }
+dropboxAndroidSdk = { module = "com.dropbox.core:dropbox-android-sdk", version.ref = "dropboxSdkVersion" }
+playServicesAuth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
+androidXCredentials = { module = "androidx.credentials:credentials", version.ref = "androidXCredentialsVersion" }
+credentialsPlayServicesAuth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidXCredentialsVersion" }
+googleId = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleIdVersion" }
 libgDrive = { module = "com.google.apis:google-api-services-drive", version.ref = "gDriveVersion" }
+libgoogleApi = { module = "com.google.api-client:google-api-client-android", version.ref = "googleApiVersion" }
 
 #tests
 junit5 = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "jUnit5Version" }
 junit5Engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "jUnit5Version" }
 junit5Params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "jUnit5Version" }
+junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoVersion" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockitoVersion" }
 mockitoKt = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKtVersion" }
+dexmakerMockitoInline = { module = "com.linkedin.dexmaker:dexmaker-mockito-inline", version.ref = "dexmakerMockitoInlineVersion" }
 androidXTestRules = { module = "androidx.test:rules", version.ref = "androidXTestVersion" }
 androidXTestRunner = { module = "androidx.test:runner", version.ref = "androidXTestVersion" }
 androidXTestWork = { module = "androidx.work:work-testing", version.ref = "androidXTestWorkVersion" }
@@ -123,9 +161,43 @@ roomTest = { module = "androidx.room:room-testing", version.ref = "roomVersion" 
 #dev tools
 javaxAnnotation = { module = "com.google.code.findbugs:jsr305", version.ref = "javaxAnnotationVersion" }
 
+[bundles]
+compose = [
+    "compose",
+    "composePreview",
+    "composeMaterial3",
+    "composeAnimation",
+    "kotlinxImmutableCollections"
+]
+
+moxy = [
+    "moxy",
+    "moxyAndroid",
+    "moxyAppcompat",
+    "moxyMaterial",
+    "moxyKtx"
+]
+
+room = [
+    "room",
+    "roomRx"
+]
+
+unitTesting = [
+    "junit5",
+    "junit5Params",
+    "mockito",
+    "mockitoKt"
+]
+
+androidUnitTesting = [
+    "roboelectric"
+]
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agpVersion" }
-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
+kapt = { id = "com.android.legacy-kapt", version.ref = "agpVersion" }
+kotlinCompose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinVersion" }
 kspCodegen = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 androidJunit5 = { id = "de.mannodermaus.android-junit5", version.ref = "androidJunit5Version" }
-roboelectricJunit5 = { id = "tech.apter.junit5.jupiter.robolectric-extension-gradle-plugin", version.ref = "roboelectricJunit5Version"}
+roboelectricJunit5 = { id = "tech.apter.junit5.jupiter.robolectric-extension-gradle-plugin", version.ref = "roboelectricJunit5Version" }

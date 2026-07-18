@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 18,
-    "identityHash": "0889b478decfdc216f8cd133c007d734",
+    "identityHash": "986d704a3678f223e39a55cd5cb1a3d7",
     "entities": [
       {
         "tableName": "play_queue",
@@ -84,7 +84,7 @@
       },
       {
         "tableName": "compositions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `title` TEXT, `trackNumber` INTEGER, `discNumber` INTEGER, `comment` TEXT, `lyrics` TEXT, `fileName` TEXT NOT NULL, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `storageId` INTEGER, `dateAdded` INTEGER NOT NULL, `dateModified` INTEGER NOT NULL, `storageModifyTime` INTEGER NOT NULL, `pathModifyTime` INTEGER, `lastScanDate` INTEGER NOT NULL, `missingDate` INTEGER NOT NULL, `coverModifyTime` INTEGER NOT NULL, `localFileStatus` INTEGER NOT NULL, `corruptionType` INTEGER, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `albumId` INTEGER, `folderId` INTEGER, `title` TEXT, `trackNumber` INTEGER, `discNumber` INTEGER, `comment` TEXT, `lyrics` TEXT, `fileName` TEXT NOT NULL, `duration` INTEGER NOT NULL, `size` INTEGER NOT NULL, `storageId` INTEGER, `addedTime` INTEGER NOT NULL, `modifiedTime` INTEGER NOT NULL, `storageModifyTime` INTEGER NOT NULL, `pathModifyTime` INTEGER, `lastScanTime` INTEGER NOT NULL, `missingTime` INTEGER NOT NULL, `coverModifyTime` INTEGER NOT NULL, `localFileStatus` INTEGER NOT NULL, `corruptionType` INTEGER, `initialSource` INTEGER NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`albumId`) REFERENCES `albums`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`folderId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -156,14 +156,14 @@
             "affinity": "INTEGER"
           },
           {
-            "fieldPath": "dateAdded",
-            "columnName": "dateAdded",
+            "fieldPath": "addedTime",
+            "columnName": "addedTime",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "dateModified",
-            "columnName": "dateModified",
+            "fieldPath": "modifiedTime",
+            "columnName": "modifiedTime",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -179,14 +179,14 @@
             "affinity": "INTEGER"
           },
           {
-            "fieldPath": "lastScanDate",
-            "columnName": "lastScanDate",
+            "fieldPath": "lastScanTime",
+            "columnName": "lastScanTime",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "missingDate",
-            "columnName": "missingDate",
+            "fieldPath": "missingTime",
+            "columnName": "missingTime",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -287,7 +287,7 @@
       },
       {
         "tableName": "play_lists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `name` TEXT, `dateAdded` INTEGER, `dateModified` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `storageId` INTEGER, `name` TEXT NOT NULL, `addedTime` INTEGER NOT NULL, `modifiedTime` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -303,17 +303,20 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
-            "fieldPath": "dateAdded",
-            "columnName": "dateAdded",
-            "affinity": "INTEGER"
+            "fieldPath": "addedTime",
+            "columnName": "addedTime",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
-            "fieldPath": "dateModified",
-            "columnName": "dateModified",
-            "affinity": "INTEGER"
+            "fieldPath": "modifiedTime",
+            "columnName": "modifiedTime",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -421,7 +424,7 @@
       },
       {
         "tableName": "artists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -432,7 +435,8 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -455,7 +459,7 @@
       },
       {
         "tableName": "albums",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artistId` INTEGER, `name` TEXT NOT NULL, FOREIGN KEY(`artistId`) REFERENCES `artists`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -471,7 +475,8 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -618,7 +623,7 @@
       },
       {
         "tableName": "folders",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentId` INTEGER, `name` TEXT, FOREIGN KEY(`parentId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentId` INTEGER, `name` TEXT NOT NULL, FOREIGN KEY(`parentId`) REFERENCES `folders`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -634,7 +639,8 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -714,7 +720,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0889b478decfdc216f8cd133c007d734')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '986d704a3678f223e39a55cd5cb1a3d7')"
     ]
   }
 }

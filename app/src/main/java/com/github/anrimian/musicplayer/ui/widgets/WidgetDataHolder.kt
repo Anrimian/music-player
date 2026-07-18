@@ -1,10 +1,9 @@
 package com.github.anrimian.musicplayer.ui.widgets
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.github.anrimian.musicplayer.Constants
+import com.github.anrimian.musicplayer.AppConstants
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.data.utils.preferences.SharedPreferencesHelper
 import com.github.anrimian.musicplayer.ui.widgets.models.WidgetColors
@@ -56,8 +55,7 @@ object WidgetDataHolder {
     ): Boolean {
         val widgetData = getWidgetData(context)
 
-        val preferences = getWidgetPreferences(context)
-        val editor = preferences.edit()
+        val editor = getWidgetPreferences(context).edit()
 
         var savableDataChanged = false
         var dataChanged = false
@@ -133,7 +131,7 @@ object WidgetDataHolder {
     }
 
     fun getWidgetColors(context: Context): WidgetColors? {
-        val preferences = getPreferences(context)
+        val preferences = getWidgetPreferences(context)
         if (preferences.getBoolean(USE_DEFAULT_COLORS, true)) {
             return null
         }
@@ -164,17 +162,13 @@ object WidgetDataHolder {
         )
     }
 
-    private fun getPreferences(context: Context): SharedPreferencesHelper {
-        val preferences = getWidgetPreferences(context)
+    private fun getWidgetPreferences(context: Context): SharedPreferencesHelper {
+        val preferences = context.getSharedPreferences(WIDGET_STATE, Context.MODE_PRIVATE)
         return SharedPreferencesHelper(preferences)
     }
 
-    private fun getWidgetPreferences(context: Context): SharedPreferences {
-        return context.getSharedPreferences(WIDGET_STATE, Context.MODE_PRIVATE)
-    }
-
     private fun loadWidgetData(context: Context): WidgetData {
-        val preferences = getPreferences(context)
+        val preferences = getWidgetPreferences(context)
         return WidgetData(
             preferences.getString(CURRENT_COMPOSITION_NAME),
             preferences.getString(CURRENT_COMPOSITION_AUTHOR),
@@ -184,7 +178,7 @@ object WidgetDataHolder {
             preferences.getLong(CURRENT_COMPOSITION_SIZE),
             preferences.getBoolean(CURRENT_COMPOSITION_IS_FILE_EXISTS),
             preferences.getInt(CURRENT_QUEUE_SIZE),
-            Constants.RemoteViewPlayerState.PAUSE,
+            AppConstants.RemoteViewPlayerState.PAUSE,
             preferences.getBoolean(RANDOM_PLAY),
             preferences.getInt(REPEAT),
             preferences.getBoolean(COVERS_ENABLED),

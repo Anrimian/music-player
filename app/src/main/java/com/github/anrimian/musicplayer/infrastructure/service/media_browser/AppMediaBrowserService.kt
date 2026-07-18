@@ -6,6 +6,7 @@ import android.support.v4.media.MediaDescriptionCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.utils.MediaConstants
 import com.github.anrimian.musicplayer.R
+import com.github.anrimian.musicplayer.data.storage.providers.MediaStoreUtils
 import com.github.anrimian.musicplayer.data.utils.Permissions
 import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.domain.Constants.TRIGGER
@@ -15,17 +16,19 @@ import com.github.anrimian.musicplayer.domain.models.composition.Composition
 import com.github.anrimian.musicplayer.domain.models.folders.CompositionFileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FileSource
 import com.github.anrimian.musicplayer.domain.models.folders.FolderFileSource
+import com.github.anrimian.musicplayer.domain.models.folders.Volume
 import com.github.anrimian.musicplayer.domain.models.genres.Genre
 import com.github.anrimian.musicplayer.domain.models.play_queue.PlayQueueEvent
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayListItem
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
+import com.github.anrimian.musicplayer.domain.models.playlist.PlaylistEntry
 import com.github.anrimian.musicplayer.domain.models.utils.CompositionHelper.formatCompositionName
 import com.github.anrimian.musicplayer.domain.utils.functions.Opt
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatAlbumAdditionalInfoForMediaBrowser
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAdditionalInfoForMediaBrowser
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionAuthor
 import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatCompositionsCount
-import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatPlayListDescriptionForMediaBrowser
+import com.github.anrimian.musicplayer.ui.common.format.FormatUtils.formatPlaylistDescriptionForMediaBrowser
+import com.github.anrimian.musicplayer.ui.common.format.formatVolumeAdditionalInfoForMediaBrowser
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -156,19 +159,50 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         resultCallback: Result<List<MediaBrowserCompat.MediaItem>>,
         folderNodeId: String
     ) {
+        val musicServiceInteractor = getAppComponent().musicServiceInteractor()
         val parentFolderId = folderNodeId.split(DELIMITER).last().toLongOrNull()
-        loadItems(
-            folderNodeId,
-            resultCallback,
-            getAppComponent().musicServiceInteractor().getFoldersObservable(parentFolderId)
-        ) { sources -> sources.map { source -> toActionItem(source, parentFolderId) } }
+        if (parentFolderId == null) {
+            val observable = musicServiceInteractor.getVolumesObservable()
+                .flatMap { volumes ->
+                    if (volumes.size == 1) {
+                        val volume = volumes.first()
+                        musicServiceInteractor.getFoldersObservable(volume.rootFolderId)
+                            .map { sources -> Pair(sources, volume.rootFolderId) }
+                    } else {
+                        Observable.just(volumes)
+                    }
+                }
+
+            loadItems(
+                folderNodeId,
+                resultCallback,
+                observable
+            ) { result ->
+                return@loadItems if (result is Pair<*, *>) {
+                    @Suppress("UNCHECKED_CAST")
+                    val pair = result as Pair<List<FileSource>, Long>
+                    val (sources, parentFolderId) = pair
+                    sources.map { source -> toActionItem(source, parentFolderId) }
+                } else {
+                    @Suppress("UNCHECKED_CAST")
+                    val volumes = result as List<Volume>
+                    volumes.map { volume -> toActionItem(volume) }
+                }
+            }
+        } else {
+            loadItems(
+                folderNodeId,
+                resultCallback,
+                musicServiceInteractor.getFoldersObservable(parentFolderId)
+            ) { sources -> sources.map { source -> toActionItem(source, parentFolderId) } }
+        }
     }
 
     private fun loadArtists(resultCallback: Result<List<MediaBrowserCompat.MediaItem>>) {
         loadItems(
             ARTISTS_NODE_ID,
             resultCallback,
-            getAppComponent().musicServiceInteractor().artistsObservable
+            getAppComponent().musicServiceInteractor().getArtistsObservable()
         ) { sources -> sources.map(this::toBrowsableItem) }
     }
 
@@ -191,7 +225,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         loadItems(
             ALBUMS_NODE_ID,
             resultCallback,
-            getAppComponent().musicServiceInteractor().albumsObservable
+            getAppComponent().musicServiceInteractor().getAlbumsObservable()
         ) { sources -> sources.map(this::toBrowsableItem) }
     }
 
@@ -199,7 +233,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         loadItems(
             GENRES_NODE_ID,
             resultCallback,
-            getAppComponent().musicServiceInteractor().genresObservable
+            getAppComponent().musicServiceInteractor().getGenresObservable()
         ) { sources -> sources.map(this::toBrowsableItem) }
     }
 
@@ -237,7 +271,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         loadItems(
             PLAYLISTS_NODE_ID,
             resultCallback,
-            getAppComponent().musicServiceInteractor().playListsObservable
+            getAppComponent().musicServiceInteractor().getPlaylistsObservable()
         ) { sources -> sources.map(this::toBrowsableItem) }
     }
 
@@ -367,10 +401,10 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
         val appComponent = getAppComponent()
         val coverUriSingle =
-            if (appComponent.musicServiceInteractor().isCoversInNotificationEnabled) {
+            if (appComponent.musicServiceInteractor().isCoversInNotificationEnabled()) {
                 appComponent.imageLoader().loadImageUri(queueItem)
             } else {
-                Single.just(Opt(null))
+                Single.just(Opt())
             }
 
         return coverUriSingle.map { coverUriOpt ->
@@ -406,6 +440,12 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         formatCompositionName(composition),
         formatCompositionAdditionalInfoForMediaBrowser(this, composition),
         Bundle().apply { putInt(POSITION_ARG, position) }
+    )
+
+    private fun toActionItem(volume: Volume) = browsableItem(
+        FOLDERS_NODE_ID + DELIMITER + volume.rootFolderId,
+        MediaStoreUtils.getVolumeDisplayName(this, volume.storageKey),
+        formatVolumeAdditionalInfoForMediaBrowser(this, volume)
     )
 
     private fun toActionItem(fileSource: FileSource, folderId: Long?): MediaBrowserCompat.MediaItem {
@@ -465,13 +505,13 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private fun toActionPlaylistItem(
         position: Int,
-        playlistItem: PlayListItem,
+        playlistEntry: PlaylistEntry,
         playlistId: Long
     ): MediaBrowserCompat.MediaItem {
         return actionItem(
             PLAYLIST_ITEMS_ACTION_ID,
-            formatCompositionName(playlistItem),
-            formatCompositionAdditionalInfoForMediaBrowser(this, playlistItem),
+            formatCompositionName(playlistEntry),
+            formatCompositionAdditionalInfoForMediaBrowser(this, playlistEntry),
             Bundle().apply {
                 putInt(POSITION_ARG, position)
                 putLong(PLAYLIST_ID_ARG, playlistId)
@@ -497,10 +537,10 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         formatAlbumAdditionalInfoForMediaBrowser(this, genre)
     )
 
-    private fun toBrowsableItem(playlist: PlayList) = browsableItem(
+    private fun toBrowsableItem(playlist: Playlist) = browsableItem(
         PLAYLIST_ITEMS_NODE_ID + DELIMITER + playlist.id,
         playlist.name,
-        formatPlayListDescriptionForMediaBrowser(this, playlist)
+        formatPlaylistDescriptionForMediaBrowser(this, playlist)
     )
 
     private fun actionItem(mediaId: String, titleResId: Int, subtitle: CharSequence? = null) =
@@ -559,9 +599,9 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         const val COMPOSITION_ID_ARG = "composition_id_arg"
         const val FOLDER_ID_ARG = "folder_id_arg"
         const val ARTIST_ID_ARG = "artist_id_arg"
-        const val ALBUM_ID_ARG = "artist_id_arg"
+        const val ALBUM_ID_ARG = "album_id_arg"
         const val GENRE_ID_ARG = "genre_id_arg"
-        const val PLAYLIST_ID_ARG = "artist_id_arg"
+        const val PLAYLIST_ID_ARG = "playlist_id_arg"
         const val SEARCH_QUERY_ARG = "search_query_arg"
 
         private const val ROOT_ID = "root_id"

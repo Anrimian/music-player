@@ -2,9 +2,10 @@ package com.github.anrimian.musicplayer.ui.library.common.library
 
 import com.github.anrimian.musicplayer.data.models.exceptions.DuplicatePlaylistEntriesException
 import com.github.anrimian.musicplayer.domain.interactors.player.LibraryPlayerInteractor
-import com.github.anrimian.musicplayer.domain.interactors.playlists.PlayListsInteractor
+import com.github.anrimian.musicplayer.domain.interactors.playlists.PlaylistsInteractor
 import com.github.anrimian.musicplayer.domain.models.composition.Composition
-import com.github.anrimian.musicplayer.domain.models.playlist.PlayList
+import com.github.anrimian.musicplayer.domain.models.composition.CompositionModel
+import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
 import com.github.anrimian.musicplayer.ui.common.error.parser.ErrorParser
 import com.github.anrimian.musicplayer.ui.common.mvp.AppPresenter
 import io.reactivex.rxjava3.core.Scheduler
@@ -12,21 +13,21 @@ import io.reactivex.rxjava3.core.Single
 
 abstract class BaseLibraryPresenter<V: BaseLibraryView>(
     private val playerInteractor: LibraryPlayerInteractor,
-    private val playListsInteractor: PlayListsInteractor,
+    private val playListsInteractor: PlaylistsInteractor,
     uiScheduler: Scheduler,
     errorParser: ErrorParser,
 ) : AppPresenter<V>(uiScheduler, errorParser) {
 
-    private var compositionsForPlayListFetcher: Single<List<Composition>>? = null
-    private var playlistToInsert: PlayList? = null
+    private var compositionsForPlaylistFetcher: Single<List<Composition>>? = null
+    private var playlistToInsert: Playlist? = null
     private var insertToPlaylistCompleteAction: (() -> Unit)? = null
 
     fun onAddDuplicatePlaylistEntriesConfirmed(ignoreDuplicates: Boolean) {
-        if (compositionsForPlayListFetcher == null || playlistToInsert == null) {
+        if (compositionsForPlaylistFetcher == null || playlistToInsert == null) {
             return
         }
-        compositionsForPlayListFetcher!!.flatMap { c ->
-            playListsInteractor.addCompositionsToPlayList(c, playlistToInsert!!, false, ignoreDuplicates)
+        compositionsForPlaylistFetcher!!.flatMap { c ->
+            playListsInteractor.addCompositionsToPlaylist(c, playlistToInsert!!, false, ignoreDuplicates)
         }.launchOnUi(this::onAddingPlaylistCompleted, viewState::showErrorMessage)
     }
 
@@ -54,7 +55,7 @@ abstract class BaseLibraryPresenter<V: BaseLibraryView>(
 
     protected fun performAddToPlaylist(
         compositions: List<Composition>,
-        playList: PlayList,
+        playList: Playlist,
         onComplete: () -> Unit
     ) {
         performAddToPlaylist(Single.just(compositions), playList, onComplete)
@@ -62,28 +63,28 @@ abstract class BaseLibraryPresenter<V: BaseLibraryView>(
 
     protected fun performAddToPlaylist(
         compositionsFetcher: Single<List<Composition>>,
-        playList: PlayList,
+        playList: Playlist,
         onComplete: () -> Unit
     ) {
-        this.compositionsForPlayListFetcher = compositionsFetcher
+        this.compositionsForPlaylistFetcher = compositionsFetcher
         this.playlistToInsert = playList
         this.insertToPlaylistCompleteAction = onComplete
         compositionsFetcher.flatMap { c ->
-            playListsInteractor.addCompositionsToPlayList(c, playList, true, false)
+            playListsInteractor.addCompositionsToPlaylist(c, playList, true, false)
         }.subscribeOnUi(this::onAddingPlaylistCompleted) { t -> this.onAddToPlaylistError(t, playList) }
     }
 
-    private fun onAddingPlaylistCompleted(compositions: List<Composition>) {
+    private fun onAddingPlaylistCompleted(compositions: List<CompositionModel>) {
         if (playlistToInsert != null) {
-            viewState.showAddingToPlayListComplete(playlistToInsert!!, compositions)
+            viewState.showAddingToPlaylistComplete(playlistToInsert!!, compositions)
         }
         insertToPlaylistCompleteAction?.invoke()
         insertToPlaylistCompleteAction = null
-        compositionsForPlayListFetcher = null
+        compositionsForPlaylistFetcher = null
         playlistToInsert = null
     }
 
-    private fun onAddToPlaylistError(t: Throwable, playList: PlayList) {
+    private fun onAddToPlaylistError(t: Throwable, playList: Playlist) {
         if (t is DuplicatePlaylistEntriesException) {
             val duplicateCheckEnabled = playListsInteractor.isPlaylistDuplicateCheckEnabled()
             viewState.showPlaylistDuplicateEntryDialog(t.duplicates, t.hasNonDuplicates, playList, duplicateCheckEnabled)

@@ -2,11 +2,8 @@ package com.github.anrimian.musicplayer.domain.repositories
 
 import com.github.anrimian.musicplayer.domain.models.composition.FullComposition
 import com.github.anrimian.musicplayer.domain.models.composition.content.CompositionContentSource
-import com.github.anrimian.musicplayer.domain.models.folders.FileSource
-import com.github.anrimian.musicplayer.domain.models.folders.FilesChangeResult
 import com.github.anrimian.musicplayer.domain.models.image.ImageSource
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 interface EditorRepository {
@@ -87,31 +84,8 @@ interface EditorRepository {
         text: String?
     ): Completable
 
-    fun changeCompositionFileName(
-        compositionId: Long,
-        fileName: String
-    ): Single<FilesChangeResult>
-
-    fun changeFolderName(
-        folderId: Long,
-        newFolderName: String
-    ): Single<FilesChangeResult>
-
-    fun moveFiles(
-        files: Collection<FileSource>,
-        fromFolderId: Long?,
-        toFolderId: Long?
-    ): Single<FilesChangeResult>
-
-    fun moveFilesToNewDirectory(
-        files: Collection<FileSource>,
-        fromFolderId: Long?,
-        targetParentFolderId: Long?,
-        directoryName: String?
-    ): Single<FilesChangeResult>
-
     fun updateAlbumName(
-        name: String?,
+        name: String,
         compositionIds: List<Long>,
         sources: List<CompositionContentSource>,
         albumId: Long,
@@ -127,7 +101,7 @@ interface EditorRepository {
     ): Completable
 
     fun updateArtistName(
-        name: String?,
+        name: String,
         compositionIds: List<Long>,
         sources: List<CompositionContentSource>,
         artistId: Long,

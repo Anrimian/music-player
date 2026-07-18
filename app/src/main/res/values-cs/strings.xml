@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="open_drawer">Otevřít dok aplikací</string>
     <string name="try_again">Zkusit znovu</string>
     <string name="can_not_work_without_file_permission">Aplikace nemůže pracovat bez oprávnění přístupu k úložišti</string>
@@ -12,7 +11,7 @@
     <string name="file_not_found">Soubor nenalezen</string>
     <string name="compositions_on_device_not_found">Na zařízení nebyla nalezena žádná skladba</string>
     <string name="compositions_and_folders_for_search_not_found">Skladby a složky odpovídající výsledkům hledání nebyly nalezeny</string>
-    <string name="foreground_channel_description">Oznámení přehrávače při běhu na popředí</string>
+    <string name="foreground_channel_name">Oznámení přehrávače při běhu na popředí</string>
     <string name="previous_track">Předchozí skladba</string>
     <string name="next_track">Další skladba</string>
     <string name="folder">Složka</string>
@@ -68,16 +67,9 @@
     <string name="now_playing_template">Nyní se přehrává: %1$s. Otevřít frontu přehrávání</string>
     <string name="play_all_in_folder">Přehrát vše ve složce</string>
     <string name="delete_playlist">Smazat seznam skladeb</string>
-    <string name="storage_timeout_error_message">
-        Úložistě zařízení neodpovídá.
-        To je velmi zvláštní a neobvyklé.
-        Zkuste restartovat zařízení, možná to pomůže.
-    </string>
+    <string name="storage_timeout_error_message">Médií v zařízení neodpovídá.\nToto je velmi divný a vzácný problém.\nZkuste restartovat zařízení, možná to vyřeší tento problém.</string>
     <string name="select_all">Vybrat vše</string>
-    <string name="file_uri_extract_error">
-        Nelze získat systémovou cestu pro skladbu \"%s\" k odeslání.
-        Možná je ve vyhrazené systémové složce.
-    </string>
+    <string name="file_uri_extract_error">Nelze zjistit systémovou cestu pro skladbu \"%s\", za účelem odeslání.\nJe možné, že se nachází v soukromé systémové složce.</string>
     <string name="loading_progress">Nahrávám…</string>
     <string name="alphabetical_order_desc_title">Z - A</string>
     <string name="add_date_order_desc_title">Později přidané první</string>
@@ -188,9 +180,7 @@
     <string name="lyrics">Text písně</string>
     <string name="check_tags_error">Nešlo zkontrolovat štítky skladby: %s</string>
     <string name="changing_file_progress">Měním soubor…</string>
-    <string name="android_r_edit_file_permission_denied">
-        Od verze Android 11 vyžaduje úprava a mazání souborů výslovné povolení povolení
-    </string>
+    <string name="android_r_edit_file_permission_denied">Od verze Android 11 vyžaduje úprava a mazání souborů výslovné povolení povolení</string>
     <string name="error_report">Nahlásit chybu</string>
     <string name="critical_error_report_message">Nastala kritická chyba a aplikaci nelze spustit. Tato chyba je velmi nežádoucí. Aplikace automaticky neodesílá žádná data, ale můžete manuálně odeslat emailem soubor protokolu. Takto pomůžete k odstranění této chyby.</string>
     <string name="error_report_message">Nastala kritická chyba. Aplikace automaticky neodesílá žádná data, ale můžete manuálně odeslat emailem soubor protokolu. Takto pomůžete k odstranění této chyby.</string>
@@ -241,19 +231,16 @@
     <string name="no_lyrics_for_current_composition">Žádný text pro tuto skladbu</string>
     <string name="edit_lyrics">Upravit text</string>
     <string name="show_in_folders">Zobrazit ve složkách</string>
-    <string name="file_source_not_found">Vzdálený soubor nenalezen</string>
     <string name="file_is_too_large">Soubor je příliš velký</string>
     <string name="preparing_files">Připravuji soubory</string>
     <string name="downloading">Stahování: %1$d/%2$d</string>
     <string name="downloading_progress">Stahování:(%d%%)</string>
     <string name="rename_progress_count">Zbývá(%1$d/%2$d)…</string>
-    <string name="undone_action_template">%s? Tato akce se nedá vrátit.</string>
+    <string name="undone_action_template">Tato akce se nedá vrátit.</string>
     <string name="delete_composition_template">Smazat skladbu \"%1$s\"</string>
     <string name="delete_empty_folder">Smazat složku \"%s\"</string>
     <string name="delete_folder_template">%2$s ze složky \"%1$s\"</string>
-    <string name="android_r_editor_restriction_error">Od Android 11 je kopírování/přesouvání/přejmenování souborů je povolené pouze v těchto složkách: \"%s\".
-        Vložte audio soubory do těchto složek a operace by měly proběhnout.
-    </string>
+    <string name="android_r_editor_restriction_error">Od Android 11 je kopírování/přesouvání/přejmenování souborů je povolené pouze v těchto složkách: \"%s\".\nVložte audio soubory do těchto složek a operace by měly proběhnout.</string>
     <string name="folder_already_excluded_from_scanning">Tato složka je už vyloučena z prohledávání</string>
     <string name="no_file_modify_permission">Bez oprávnění upravit soubotr</string>
     <string name="interface_settings">Rozhraní</string>
@@ -281,7 +268,6 @@
     <string name="overwrite_playlist">Seznam skladeb s tímto názvem již existuje. \nPřepsat?</string>
     <string name="playlist_has_no_records">Seznam skladeb neobsahuje žádné skladby</string>
     <string name="export_playlists_success">Soubor \"%1$s.m3u\" byl uložen do vnitřního úložiště</string>
-    <!--not verified-->
     <string name="name_is_too_long">název je příliš dlouhý</string>
     <string name="play_queue_items_limit_error">Počet položek ve frontě přehrávání nemůže být vyšší než %d</string>
     <string name="play_list_items_limit_error">Počet položek seznamu videí nemůže být vyšší než %d</string>
@@ -296,113 +282,133 @@
     <string name="check_for_duplicates">Před přidáním nových skladeb zkontrolujte seznam skladeb, zda neobsahuje duplikáty</string>
     <string name="more_template">…%d dalších</string>
     <string name="add_without_duplicates">Přidat bez duplikátů</string>
+    <string name="process_unsupported_actions">Považovat jakoukoli neznámou událost médií za příkaz k přehrávání/pozastavení</string>
+    <string name="process_unsupported_actions_description">Může způsobit neočekávané přehrávání/pozastavení</string>
+    <string name="ignore_play_after_connection">Ignorovat příkazy \'Přehrát\' 3 sekundy po připojení zařízení Bluetooth</string>
+    <string name="ignore_play_after_connection_description">Může zabránit neočekávanému přehrávání při připojení</string>
+    <string name="pause_on_audio_device_remove">Pozastavit při odpojení výstupního zvukového zařízení</string>
+    <string name="missing_files_detected">Zjištěny chybějící zvukové soubory</string>
+    <!-- !Not verified by native speaker! -->
+    <string name="missing_files_description">Systém Android hlásí, že tyto soubory již nejsou na svých původních umístěních dostupné.\nMohly být přesunuty, smazány jinou aplikací nebo jsou na odpojené SD kartě.\nTyto neplatné položky můžete z knihovny smazat.\nNedostupné skladby (%d):</string>
     <!---->
-
+    <string name="see_more">Zobrazit více (%d)</string>
+    <string name="remove">Odstranit</string>
+    <string name="delete_missing_compositions_title">Smazat skladby?</string>
+    <string name="file_not_found_in_all_storages">Soubor nebyl nalezen lokálně ani v cloudu</string>
+    <string name="question_template">%1$s? %2$s</string>
+    <string name="allowed_file_extensions">Povolené přípony souborů</string>
+    <string name="allowed_extensions_state">Do knihovny budou zahrnuty pouze soubory s těmito příponami: \n%s</string>
+    <string name="allowed_file_extensions_description">Přípony jsou odděleny symbolem \',\'</string>
+    <string name="restore_default">Obnovit výchozí</string>
+    <string name="not_allowed_path">Zakázaná cesta k zápisu souboru</string>
+    <string name="configure_menu">Konfigurovat menu</string>
+    <string name="configure_menu_items">Konfigurovat položky menu</string>
+    <string name="save">Uložit</string>
+    <string name="menu_group_primary">Hlavní</string>
+    <string name="menu_group_secondary">Dodatečné</string>
+    <string name="menu_group_hidden">Skryté</string>
+    <string name="undo">Vrátit zpět</string>
+    <string name="playlist_sorted">Seznam skladeb seřazen</string>
+    <string name="artist_order">Podle umělce</string>
+    <string name="skip_silence">Přeskočit ticho</string>
+    <string name="skip_silence_summary">Automaticky přeskočit tiché části delší než %.1fs</string>
+    <string name="android_media_player_skip_silence_note">Nepodporuje přeskočení ticha</string>
+    <string name="system_interaction">Interakce se systémem</string>
+    <string name="sound_processing">Zpracování zvuku</string>
     <plurals name="compositions_count">
         <item quantity="one">%1$s píseň</item>
         <item quantity="few">%1$s písně</item>
         <item quantity="many">%1$s písně</item>
         <item quantity="other">%1$s písní</item>
     </plurals>
-
     <plurals name="files_count">
         <item quantity="one">%1$s soubor</item>
         <item quantity="few">%1$s soubory</item>
         <item quantity="many">%1$s soubory</item>
         <item quantity="other">%1$s souborů</item>
     </plurals>
-
     <plurals name="albums_count">
         <item quantity="one">%1$s album</item>
         <item quantity="few">%1$s alba</item>
         <item quantity="many">%1$s alba</item>
         <item quantity="other">%1$s alb</item>
     </plurals>
-
     <plurals name="play_next_message">
         <item quantity="one">%s píseň bude přehrána jako další</item>
         <item quantity="few">%s písně budou přehrány jako dalších</item>
         <item quantity="many">%s písně budou přehrány jako dalších</item>
         <item quantity="other">%s písní bude přehráno jako dalších</item>
     </plurals>
-
     <plurals name="added_to_queue_message">
         <item quantity="one">%s píseň přidána na konec fronty přehrávání</item>
         <item quantity="few">%s písně přidány na konec fronty přehrávání</item>
         <item quantity="many">%s písně přidány na konec fronty přehrávání</item>
         <item quantity="other">%s písní přidáno na konec fronty přehrávání</item>
     </plurals>
-
     <plurals name="add_to_playlist_count_success_template">
         <item quantity="one">%1$d píseň přidána do seznamu skladeb \"%2$s\"</item>
         <item quantity="few">%1$d písně přidány do seznamu skladeb \"%2$s\"</item>
         <item quantity="many">%1$d písně přidány do seznamu skladeb \"%2$s\"</item>
         <item quantity="other">%1$d písní přidáno do seznamu skladeb \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_from_playlist_count_success_template">
         <item quantity="one">%1$d píseň smazána ze seznamu skladeb \"%2$s\"</item>
         <item quantity="few">%1$d písně smazány ze seznamu skladeb \"%2$s\"</item>
         <item quantity="many">%1$d písně smazány ze seznamu skladeb \"%2$s\"</item>
         <item quantity="other">%1$d písní smazáno ze seznamu skladeb \"%2$s\"</item>
     </plurals>
-
     <plurals name="delete_compositions_success">
         <item quantity="one">%1$d píseň vymazána</item>
         <item quantity="few">%1$d písně smazány</item>
         <item quantity="many">%1$d písně smazány</item>
         <item quantity="other">%1$d písní smazáno</item>
     </plurals>
-
     <plurals name="seconds_template">
         <item quantity="one">%1$d sekunda</item>
         <item quantity="few">%1$d sekundy</item>
         <item quantity="many">%1$d sekundy</item>
         <item quantity="other">%1$d sekund</item>
     </plurals>
-
-    <plurals name="delete_compositions_template">
+    <plurals name="delete_song_template">
         <item quantity="one">Smazat %d píseň</item>
         <item quantity="few">Smazat %d písně</item>
         <item quantity="many">Smazat %d písní</item>
         <item quantity="other">Smazat %d písní</item>
     </plurals>
-
     <plurals name="for_at_least_minutes">
         <item quantity="one">Pro alespoň %d minutu</item>
         <item quantity="few">Pro alespoň %d minuty</item>
         <item quantity="many">Pro alespoň %d minut</item>
         <item quantity="other">Pro alespoň %d minut</item>
     </plurals>
-
     <plurals name="export_playlists_success">
         <item quantity="one">%d seznam skladeb byl uložen do vnitřního úložiště</item>
         <item quantity="few">%d seznamy skladeb byly uložen do vnitřního úložiště</item>
         <item quantity="many">%d seznamů skladeb bylo uložen do vnitřního úložiště</item>
         <item quantity="other">%d seznamů skladeb bylo uložen do vnitřního úložiště</item>
     </plurals>
-
     <plurals name="playlist_import_partial_success">
         <item quantity="one">Seznam skladeb byl úspěšně importován, ale %d soubor nebyl nalezen v knihovně</item>
         <item quantity="few">Seznam skladeb byly úspěšně importován, ale %d soubory nebyl nalezen v knihovně</item>
         <item quantity="many">Seznam skladeb byly úspěšně importován, ale %d souborů nebyl nalezen v knihovně</item>
         <item quantity="other">Seznam skladeb byly úspěšně importován, ale %d souborů nebyl nalezen v knihovně</item>
     </plurals>
-
-    <!--not verified-->
     <plurals name="delete_playlists_template">
-        <item quantity="one">Smazat %d seznam skladeb</item>
-        <item quantity="few">Smazat %d seznam skladeb</item>
-        <item quantity="many">Odebrat %d seznamy videí</item>
-        <item quantity="other">Odebrat %d seznamy videí</item>
+        <item quantity="one">Smazat %d seznam skladeb?</item>
+        <item quantity="few">Smazat %d seznam skladeb?</item>
+        <item quantity="many">Odebrat %d seznamy videí?</item>
+        <item quantity="other">Odebrat %d seznamy videí?</item>
     </plurals>
-
     <plurals name="delete_playlists_success">
         <item quantity="one">%d seznam skladeb byl smazán</item>
         <item quantity="few">%d seznam videí odstraněn</item>
         <item quantity="many">Bylo odstraněno %d seznamů videí</item>
         <item quantity="other">%d seznamů videí odstraněno</item>
     </plurals>
-    <!---->
-
+    <plurals name="delete_compositions_from_library_question">
+        <item quantity="one">Smazat %1$d skladbu z knihovny? %2$s</item>
+        <item quantity="few">Smazat %1$d skladby z knihovny? %2$s</item>
+        <item quantity="many">Smazat %1$d skladeb z knihovny? %2$s</item>
+        <item quantity="other">Smazat %1$d skladeb z knihovny? %2$s</item>
+    </plurals>
 </resources>
