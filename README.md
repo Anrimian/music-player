@@ -53,3 +53,20 @@ ka nyi - Hungarian localization
 No analytics, no data collection.
 
 Privacy policies: [Simple Music Player](app/sync/privacy-policy.md), [Simple Music Player Offline](app/lite/privacy-policy.md)
+
+## License
+
+Copyright (C) 2017-2026 Anrimian
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
