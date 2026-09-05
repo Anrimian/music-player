@@ -20,6 +20,7 @@ import com.github.anrimian.musicplayer.ui.utils.applyImeConstraintBottomMarginIn
 import com.github.anrimian.musicplayer.ui.utils.applyTopInsets
 import com.github.anrimian.musicplayer.ui.utils.dialogs.ProgressDialogFragment
 import com.github.anrimian.musicplayer.ui.utils.fragments.DialogFragmentDelayRunner
+import com.github.anrimian.musicplayer.ui.utils.views.text_view.SafeArrowKeyMovementMethod
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher
 import com.google.android.material.snackbar.Snackbar
 import com.r0adkll.slidr.Slidr
@@ -71,6 +72,7 @@ class LyricsEditorActivity : BaseMvpAppCompatActivity(), LyricsEditorView {
         )
 
         SimpleTextWatcher.onTextChanged(binding.evLyrics, presenter::onTextChanged)
+        binding.evLyrics.movementMethod = SafeArrowKeyMovementMethod
 
         binding.btnChange.setOnClickListener { presenter.onChangeButtonClicked() }
 

@@ -264,6 +264,9 @@ class PlayQueueDaoWrapper(
 
     fun insertTrackPosition(itemId: Long, trackPosition: Long) {
         libraryDatabase.runInTransaction {
+            if (!playQueueDao.exists(itemId)) {
+                return@runInTransaction
+            }
             val currentPosition = playQueueDao.getTrackPosition(itemId)
             if (currentPosition == trackPosition) {
                 return@runInTransaction

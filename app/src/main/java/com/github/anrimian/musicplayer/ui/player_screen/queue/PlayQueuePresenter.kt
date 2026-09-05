@@ -62,7 +62,7 @@ class PlayQueuePresenter(
         subscribeOnPlayerStateChanges()
         subscribeOnCurrentCompositionChanging()
         syncInteractor.getFilesSyncStateObservable()
-            .unsafeSubscribeOnUi(viewState::showFilesSyncState)
+            .subscribeOnUi(viewState::showFilesSyncState, errorParser::logError)
     }
 
     fun onLoadAgainQueueClicked() {
@@ -188,7 +188,7 @@ class PlayQueuePresenter(
     }
 
     private fun deletePlayQueueItem(item: PlayQueueItem) {
-        playerInteractor.removeQueueItem(item).unsafeSubscribeOnUi(viewState::showDeletedItemMessage)
+        playerInteractor.removeQueueItem(item).subscribeOnUi(viewState::showDeletedItemMessage, errorParser::logError)
     }
 
     private fun addPreparedCompositionsToPlayList(playList: Playlist) {
@@ -271,7 +271,7 @@ class PlayQueuePresenter(
 
     private fun subscribeOnCurrentCompositionChanging() {
         playerInteractor.getCurrentQueueItemObservable()
-            .unsafeSubscribeOnUi(this::onPlayQueueEventReceived)
+            .subscribeOnUi(this::onPlayQueueEventReceived, errorParser::logError)
     }
 
     private fun onPlayQueueEventReceived(playQueueEvent: PlayQueueEvent) {

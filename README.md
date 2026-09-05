@@ -12,7 +12,9 @@ A music player for Android that I wrote for myself, in accordance with my vision
 
 **Simple Music Player Offline** is the same app without sync, and without the internet permission at all.
 
-Coming to Google Play soon, and also built as a standalone app in [releases](https://github.com/Anrimian/music-player/releases).
+<a href='https://play.google.com/store/apps/details?id=com.github.anrimian.musicplayer.lite&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height=65px/></a>
+
+Also built as a standalone app in [releases](https://github.com/Anrimian/music-player/releases).
 
 ## About the source code here
 

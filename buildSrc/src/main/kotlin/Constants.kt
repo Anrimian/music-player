@@ -2,14 +2,14 @@ import org.gradle.api.JavaVersion
 
 object Constants {
 
-    const val SYNC_VERSION_NAME = "1.0.2"
+    const val SYNC_VERSION_NAME = "1.0.3"
     /**Even numbers only, increase only by 2*/
-    const val SYNC_VERSION_CODE = 224
+    const val SYNC_VERSION_CODE = 226
     const val SYNC_VERSION_CODE_LEGACY = SYNC_VERSION_CODE - 1
 
     const val LITE_VERSION_NAME = SYNC_VERSION_NAME
     /**Even numbers only, increase only by 2*/
-    const val LITE_VERSION_CODE = 2
+    const val LITE_VERSION_CODE = 4
     const val LITE_VERSION_CODE_LEGACY = LITE_VERSION_CODE - 1
 
     const val SYNC_PACKAGE_NAME = "com.github.anrimian.musicplayer"

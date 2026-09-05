@@ -3,6 +3,7 @@ package com.github.anrimian.musicplayer.data.repositories.scanner.storage.playli
 import androidx.core.util.Pair
 import com.github.anrimian.musicplayer.data.database.dao.compositions.CompositionsDaoWrapper
 import com.github.anrimian.musicplayer.data.database.dao.playlist.PlaylistsDaoWrapper
+import com.github.anrimian.musicplayer.data.models.exceptions.PlaylistAlreadyExistsException
 import com.github.anrimian.musicplayer.data.repositories.scanner.storage.playlists.m3uparser.PlayListFile
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.AppPlaylist
 import com.github.anrimian.musicplayer.data.storage.providers.playlists.StoragePlaylist
@@ -55,12 +56,14 @@ class StoragePlaylistsAnalyzer(
         val pathIdMap = HashMap<String, Long>()
         for (newDbPlaylist in newDbPlaylists) {
             val compositionIds = compositionsDao.getCompositionIds(newDbPlaylist.entries, pathIdMap)
-            playListsDao.insertPlaylist(
-                newDbPlaylist.name,
-                newDbPlaylist.createDate,
-                newDbPlaylist.modifyDate,
-                compositionIds
-            )
+            try {
+                playListsDao.insertPlaylist(
+                    newDbPlaylist.name,
+                    newDbPlaylist.createDate,
+                    newDbPlaylist.modifyDate,
+                    compositionIds
+                )
+            } catch (_: PlaylistAlreadyExistsException) {}
         }
         for (newCachePlayList in newCachePlaylists) {
             val playlistFile = PlayListFile(

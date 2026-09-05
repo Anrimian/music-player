@@ -204,10 +204,10 @@ class ExternalPlayerInteractor(
     private fun onMusicPlayerEventReceived(playerEvent: PlayerEvent) {
         when (playerEvent) {
             is PlayerEvent.FinishedEvent -> {
-                onSeekFinished(0)
                 if (settingsRepository.externalPlayerRepeatMode != RepeatMode.REPEAT_COMPOSITION) {
                     playerCoordinatorInteractor.pause(PlayerType.EXTERNAL)
                 }
+                onSeekFinished(0)
             }
             is PlayerEvent.ErrorEvent -> {
                 val throwable = playerEvent.throwable

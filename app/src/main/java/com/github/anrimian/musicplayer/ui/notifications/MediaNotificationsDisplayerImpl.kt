@@ -46,21 +46,11 @@ class MediaNotificationsDisplayerImpl(
     private var currentNotificationBitmap: Bitmap? = null
     private var cancellationRunnable: Runnable? = null
 
-    init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                FOREGROUND_CHANNEL_ID,
-                context.getString(R.string.foreground_channel_name),
-                NotificationManager.IMPORTANCE_LOW
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
     override fun startStubForegroundNotification(
         service: Service,
         mediaSession: MediaSessionCompat
     ) {
+        createForegroundNotificationChannel()
         NotificationUtils.startMediaPlaybackForeground(service, FOREGROUND_NOTIFICATION_ID, getStubNotification(mediaSession))
     }
 
@@ -105,6 +95,7 @@ class MediaNotificationsDisplayerImpl(
         notificationSetting: MusicNotificationSetting?,
         reloadCover: Boolean
     ) {
+        createForegroundNotificationChannel()
         notificationInfoState = NotificationInfoState(
             isPlayingState,
             source,
@@ -141,6 +132,8 @@ class MediaNotificationsDisplayerImpl(
         if (!isNotificationVisible(notificationManager, FOREGROUND_NOTIFICATION_ID)) {
             return
         }
+
+        createForegroundNotificationChannel()
 
         notificationInfoState = NotificationInfoState(
             isPlayingState,
@@ -531,6 +524,17 @@ class MediaNotificationsDisplayerImpl(
 
     private fun getString(@StringRes resId: Int): String {
         return context.getString(resId)
+    }
+
+    private fun createForegroundNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                FOREGROUND_CHANNEL_ID,
+                context.getString(R.string.foreground_channel_name),
+                NotificationManager.IMPORTANCE_LOW
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     private class NotificationInfoState(

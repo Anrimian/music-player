@@ -1,19 +1,18 @@
 package com.github.anrimian.musicplayer.ui.common.images.glide.loaders
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.data.DataFetcher
-import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.AppModelLoader
 import com.github.anrimian.musicplayer.ui.common.images.models.UriCompositionImage
-import com.github.anrimian.musicplayer.ui.utils.ImageUtils
+import java.io.ByteArrayInputStream
 import java.io.IOException
+import java.io.InputStream
 
 class ExternalCompositionModelLoader(
     private val context: Context,
-) : AppModelLoader<UriCompositionImage, Bitmap>() {
+) : AppModelLoader<UriCompositionImage, InputStream>() {
 
     override fun getModelKey(model: UriCompositionImage): Any {
         return model
@@ -22,7 +21,7 @@ class ExternalCompositionModelLoader(
     override fun loadData(
         model: UriCompositionImage,
         priority: Priority,
-        callback: DataFetcher.DataCallback<in Bitmap>,
+        callback: DataFetcher.DataCallback<in InputStream>,
     ) {
         var mmr: MediaMetadataRetriever? = null
         try {
@@ -30,12 +29,11 @@ class ExternalCompositionModelLoader(
             mmr.setDataSource(context, model.uri)
             val imageBytes = mmr.embeddedPicture
 
-            var bitmap: Bitmap? = null
             if (imageBytes != null) {
-                val coverSize = context.resources.getInteger(R.integer.icon_image_full_size)
-                bitmap = ImageUtils.decodeBitmap(imageBytes, coverSize)
+                callback.onDataReady(ByteArrayInputStream(imageBytes))
+            } else {
+                callback.onDataReady(null)
             }
-            callback.onDataReady(bitmap)
         } catch (e: Exception) {
             callback.onLoadFailed(e)
         } finally {

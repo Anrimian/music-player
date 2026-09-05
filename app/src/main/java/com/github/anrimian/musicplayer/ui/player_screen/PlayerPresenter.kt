@@ -224,7 +224,7 @@ class PlayerPresenter(
 
     private fun subscribeOnCurrentCompositionSyncState() {
         playerScreenInteractor.getCurrentCompositionFileSyncState()
-            .unsafeSubscribeOnUi(this::onCurrentCompositionSyncStateReceived)
+            .subscribeOnUi(this::onCurrentCompositionSyncStateReceived, errorParser::logError)
     }
 
     private fun onCurrentCompositionSyncStateReceived(fileSyncStateOpt: Optional<FileSyncState>) {
@@ -233,7 +233,7 @@ class PlayerPresenter(
 
     private fun subscribeOnCurrentComposition() {
         playerInteractor.getCurrentQueueItemObservable()
-            .unsafeSubscribeOnUi(this::onPlayQueueEventReceived)
+            .subscribeOnUi(this::onPlayQueueEventReceived, errorParser::logError)
     }
 
     private fun onPlayQueueEventReceived(playQueueEvent: PlayQueueEvent) {

@@ -7,5 +7,7 @@
     <string name="about_app_text_here_link">здесь</string>
     <string name="patchnotes">Описание обновлений</string>
     <string name="about_app_text_crowdin" translatable="false">присоединиться к проекту на Crowdin</string>
+    <string name="main_version">основной версии</string>
+    <string name="offline_version">оффлайн-версия</string>
 
 </resources>

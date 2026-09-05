@@ -116,6 +116,13 @@ class AndroidMediaPlayer(
             if (isSourcePrepared) {
                 synchronized(mediaPlayer) {
                     mediaPlayer.seekTo(position.toInt())
+                    // If logical state is playing but physical playback stopped (e.g. track ended),
+                    // we must restart it to handle track repeats correctly
+                    if (isPlaying && !mediaPlayer.isPlaying) {
+                        mediaPlayer.start()
+                        isFinished.set(false)
+                        startTrackEndMonitor()
+                    }
                 }
             } else if (currentSource != null) {
                 postponedPosition = position
@@ -182,7 +189,8 @@ class AndroidMediaPlayer(
                     }
                 }
             } catch (_: IllegalStateException) {
-            } //IllegalArgumentException - handle unsupported case
+            } catch (_: IllegalArgumentException) {
+            } //IllegalArgumentException - reset ui
         }
     }
 

@@ -1,3 +1,6 @@
+import buildlogic.registerMappingArchive
+import com.android.build.api.artifact.SingleArtifact
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kapt)
@@ -95,6 +98,23 @@ android {
         )
     }
 }
+
+androidComponents {
+    onVariants { appVariant ->
+        if (appVariant.buildType != "release") return@onVariants
+        val output = appVariant.outputs.single()
+        registerMappingArchive(
+            app = "lite",
+            variant = appVariant.name,
+            versionCodeConstant = "LITE_VERSION_CODE",
+            appId = appVariant.applicationId,
+            version = output.versionName.map { it },
+            code = output.versionCode.map { it },
+            mapping = appVariant.artifacts.get(SingleArtifact.OBFUSCATION_MAPPING_FILE),
+        )
+    }
+}
+
 dependencies {
     implementation(project(":shared:app"))
     implementation(project(":shared:domain"))

@@ -37,6 +37,7 @@ import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.attrColor
 import com.github.anrimian.musicplayer.ui.utils.getParcelableExtra
 import com.github.anrimian.musicplayer.ui.utils.views.menu.ActionMenuUtil
+import com.github.anrimian.musicplayer.ui.utils.views.text_view.SafeArrowKeyMovementMethod
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -78,6 +79,7 @@ class AdvancedToolbar @JvmOverloads constructor(
 
     init {
         binding.etSearch.addTextChangedListener(SimpleTextWatcher(::onSearchTextChanged))
+        binding.etSearch.movementMethod = SafeArrowKeyMovementMethod
         binding.etSearch.setOnEditorActionListener(OnEditorActionListener(::onSearchTextViewAction))
 
         binding.tvSubtitle.visibility = GONE

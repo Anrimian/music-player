@@ -6,6 +6,11 @@
     <string name="source_code_link" translatable="false">https://github.com/Anrimian/music-player</string>
     <string name="patch_notes_link" translatable="false">https://github.com/Anrimian/music-player/releases</string>
     <string name="crowdin_link" translatable="false">https://crowdin.com/project/s-music-player</string>
+    <string name="google_play" translatable="false">Google Play</string>
+    <string name="main_version" translatable="false">main version</string>
+    <string name="offline_version" translatable="false">offline version</string>
+    <string name="main_app_play_store_link" translatable="false">https://play.google.com/store/apps/details?id=com.github.anrimian.musicplayer</string>
+    <string name="lite_app_play_store_link" translatable="false">https://play.google.com/store/apps/details?id=com.github.anrimian.musicplayer.lite</string>
 
     <string name="title_external_player" translatable="false">Music Player - Play File</string>
     <string name="useless_image" translatable="false">Useless image</string>

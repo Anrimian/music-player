@@ -87,23 +87,16 @@ internal object Migrations {
             )
             db.execSQL(
                 """
-                DELETE FROM genre_entries
-                WHERE compositionId IN (SELECT loser_id FROM temp_composition_remap)
-                AND EXISTS (
-                    SELECT 1
-                    FROM genre_entries survivor_entry
-                    INNER JOIN temp_composition_remap remap ON remap.loser_id = genre_entries.compositionId
-                    WHERE survivor_entry.genreId = genre_entries.genreId
-                      AND survivor_entry.compositionId = remap.survivor_id
+                UPDATE OR IGNORE genre_entries
+                SET compositionId = (
+                    SELECT survivor_id FROM temp_composition_remap WHERE loser_id = genre_entries.compositionId
                 )
+                WHERE compositionId IN (SELECT loser_id FROM temp_composition_remap)
                 """
             )
             db.execSQL(
                 """
-                UPDATE genre_entries
-                SET compositionId = (
-                    SELECT survivor_id FROM temp_composition_remap WHERE loser_id = genre_entries.compositionId
-                )
+                DELETE FROM genre_entries
                 WHERE compositionId IN (SELECT loser_id FROM temp_composition_remap)
                 """
             )

@@ -31,6 +31,7 @@ import com.github.anrimian.musicplayer.databinding.DialogCommonInputSimpleBindin
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
 import com.github.anrimian.musicplayer.ui.utils.args
+import com.github.anrimian.musicplayer.ui.utils.views.text_view.SafeArrowKeyMovementMethod
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher
 
 open class InputTextDialogFragment : DialogFragment() {
@@ -126,6 +127,7 @@ open class InputTextDialogFragment : DialogFragment() {
         }
         editText.imeOptions = if (completeOnEnterButton) IME_ACTION_DONE else IME_ACTION_UNSPECIFIED
         editText.setRawInputType(args.getInt(INPUT_TYPE_ARG))
+        editText.movementMethod = SafeArrowKeyMovementMethod
         val digits = args.getString(DIGITS_ARG)
         if (digits != null) {
             editText.keyListener = DigitsKeyListener.getInstance(digits)

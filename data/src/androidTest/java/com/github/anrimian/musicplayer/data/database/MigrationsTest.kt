@@ -121,6 +121,9 @@ class MigrationsTest {
             execSQL("INSERT INTO genre_entries (genreId, compositionId, position) VALUES (1, 3, 0)")
             execSQL("INSERT INTO genre_entries (genreId, compositionId, position) VALUES (1, 5, 1)")
             execSQL("INSERT INTO genre_entries (genreId, compositionId, position) VALUES (2, 1, 0)")
+            execSQL("INSERT INTO genres (id, name) VALUES (3, 'Jazz')")
+            execSQL("INSERT INTO genre_entries (genreId, compositionId, position) VALUES (3, 4, 0)")
+            execSQL("INSERT INTO genre_entries (genreId, compositionId, position) VALUES (3, 5, 1)")
         }
 
         val expectedSurvivorId = 3L
@@ -176,7 +179,7 @@ class MigrationsTest {
         db.query(
             "SELECT genreId, compositionId FROM genre_entries ORDER BY genreId, position",
         ).use { cursor ->
-            assertEquals(2, cursor.count)
+            assertEquals(3, cursor.count)
 
             cursor.moveToFirst()
             assertEquals(1L, cursor.getLong(0))
@@ -184,6 +187,10 @@ class MigrationsTest {
 
             cursor.moveToNext()
             assertEquals(2L, cursor.getLong(0))
+            assertEquals(expectedSurvivorId, cursor.getLong(1))
+
+            cursor.moveToNext()
+            assertEquals(3L, cursor.getLong(0))
             assertEquals(expectedSurvivorId, cursor.getLong(1))
         }
 

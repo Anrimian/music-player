@@ -16,6 +16,7 @@ import com.github.anrimian.musicplayer.ui.common.format.setExtProgress
 import com.github.anrimian.musicplayer.ui.editor.common.ErrorHandler
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.views.text_view.SafeArrowKeyMovementMethod
 import com.github.anrimian.musicplayer.ui.utils.views.text_view.SimpleTextWatcher
 import moxy.MvpAppCompatDialogFragment
 import moxy.ktx.moxyPresenter
@@ -50,6 +51,7 @@ abstract class BatchEditorDialogFragment<T: BatchEditorView>: MvpAppCompatDialog
 
         binding.etInput.imeOptions = EditorInfo.IME_ACTION_DONE
         binding.etInput.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.etInput.movementMethod = SafeArrowKeyMovementMethod
         binding.etInput.setOnEditorActionListener { _, _, _ ->
             presenter.onChangeButtonClicked()
             true

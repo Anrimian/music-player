@@ -15,6 +15,7 @@ import com.github.anrimian.musicplayer.di.Components
 import com.github.anrimian.musicplayer.ui.common.error.ErrorCommand
 import com.github.anrimian.musicplayer.ui.utils.AndroidUtils
 import com.github.anrimian.musicplayer.ui.utils.ViewUtils
+import com.github.anrimian.musicplayer.ui.utils.views.text_view.SafeArrowKeyMovementMethod
 import moxy.MvpAppCompatDialogFragment
 import moxy.ktx.moxyPresenter
 
@@ -48,6 +49,7 @@ class RenamePlayListDialogFragment : MvpAppCompatDialogFragment(), RenamePlayLis
         
         binding.etInput.imeOptions = EditorInfo.IME_ACTION_DONE
         binding.etInput.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.etInput.movementMethod = SafeArrowKeyMovementMethod
         binding.etInput.setOnEditorActionListener { _, _, _ -> 
             onCompleteButtonClicked()
             true

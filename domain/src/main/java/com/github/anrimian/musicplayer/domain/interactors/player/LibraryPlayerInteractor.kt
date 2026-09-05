@@ -614,8 +614,8 @@ class LibraryPlayerInteractor(
 
     private fun onCompositionPlayFinished() {
         if (settingsRepository.repeatMode == RepeatMode.PLAY_COMPOSITION_ONCE) {
-            onSeekFinished(0)
             pause()
+            onSeekFinished(0)
             return
         }
         if (settingsRepository.repeatMode == RepeatMode.REPEAT_COMPOSITION) {

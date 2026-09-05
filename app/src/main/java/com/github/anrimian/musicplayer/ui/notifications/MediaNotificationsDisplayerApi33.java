@@ -62,17 +62,11 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
         this.notificationBuilder = notificationBuilder;
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
-                    context.getString(R.string.foreground_channel_name),
-                    NotificationManager.IMPORTANCE_LOW);
-            notificationManager.createNotificationChannel(channel);
-        }
     }
 
     @Override
     public void startStubForegroundNotification(Service service, MediaSessionCompat mediaSession) {
+        createForegroundNotificationChannel();
         startMediaPlaybackForeground(service, FOREGROUND_NOTIFICATION_ID, getStubNotification(mediaSession));
     }
 
@@ -114,6 +108,7 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
                                             boolean randomMode,
                                             @Nullable MusicNotificationSetting notificationSetting,
                                             boolean reloadCover) {
+        createForegroundNotificationChannel();
         Notification notification = getDefaultMusicNotification(isPlayingState,
                 source,
                 mediaSession,
@@ -134,6 +129,8 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
         if (!isNotificationVisible(notificationManager, FOREGROUND_NOTIFICATION_ID)) {
             return;
         }
+
+        createForegroundNotificationChannel();
 
         Notification notification = getDefaultMusicNotification(isPlayingState,
                 source,
@@ -285,6 +282,15 @@ public class MediaNotificationsDisplayerApi33 implements MediaNotificationsDispl
 
     private String getString(@StringRes int resId) {
         return context.getString(resId);
+    }
+
+    private void createForegroundNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(FOREGROUND_CHANNEL_ID,
+                    context.getString(R.string.foreground_channel_name),
+                    NotificationManager.IMPORTANCE_LOW);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
 }

@@ -1,7 +1,6 @@
 package com.github.anrimian.musicplayer.ui.common.images.glide
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.util.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
@@ -62,13 +61,13 @@ class MyAppGlideModule : AppGlideModule() {
         AppModelLoader.addModelLoader(
             registry,
             CompositionImage::class.java,
-            Bitmap::class.java,
+            InputStream::class.java,
             CompositionModelLoader(context, Components.getAppComponent().storageSourceRepository())
         )
         AppModelLoader.addModelLoader(
             registry,
             UriCompositionImage::class.java,
-            Bitmap::class.java,
+            InputStream::class.java,
             ExternalCompositionModelLoader(context)
         )
         AppModelLoader.addModelLoader(

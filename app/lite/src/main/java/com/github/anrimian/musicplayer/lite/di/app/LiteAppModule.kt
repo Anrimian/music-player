@@ -64,10 +64,8 @@ class LiteAppModule {
     @Singleton
     fun mediaPlayerDataSourceBuilder(
         context: Context,
-        systemAudioCatalogProvider: SystemAudioCatalogProvider,
     ) = MediaPlayerDataSourceBuilder(
-        context,
-        systemAudioCatalogProvider
+        context
     )
 
     @Provides

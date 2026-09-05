@@ -303,7 +303,7 @@ class CompositionEditorPresenter(
 
     private fun subscribeOnSyncState() {
         syncInteractor.getFileSyncStateObservable(compositionId)
-            .unsafeSubscribeOnUi(this::onSyncStateReceived)
+            .subscribeOnUi(this::onSyncStateReceived, errorParser::logError)
     }
 
     private fun subscribeOnComposition() {

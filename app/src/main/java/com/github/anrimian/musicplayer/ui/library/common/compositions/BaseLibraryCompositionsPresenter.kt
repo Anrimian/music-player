@@ -54,7 +54,7 @@ abstract class BaseLibraryCompositionsPresenter<C : Composition, V : BaseLibrary
         subscribeOnCompositions()
         subscribeOnCurrentComposition()
         syncInteractor.getFilesSyncStateObservable()
-            .unsafeSubscribeOnUi(viewState::showFilesSyncState)
+            .subscribeOnUi(viewState::showFilesSyncState, errorParser::logError)
     }
 
     fun onStop(listPosition: ListPosition) {

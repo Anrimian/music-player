@@ -35,24 +35,17 @@ import com.github.anrimian.musicplayer.domain.utils.functions.Opt
 import com.github.anrimian.musicplayer.infrastructure.receivers.AppMediaButtonReceiver
 import com.github.anrimian.musicplayer.infrastructure.receivers.BluetoothConnectionReceiver
 import com.github.anrimian.musicplayer.infrastructure.service.SystemServiceControllerImpl
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ALBUM_ID_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ALBUM_ITEMS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ARTIST_ID_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.ARTIST_ITEMS_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.COMPOSITIONS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.COMPOSITION_ID_ARG
+import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.DELIMITER
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.FOLDERS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.FOLDER_ID_ARG
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.GENRE_ID_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.GENRE_ITEMS_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.PAUSE_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.PLAYLIST_ID_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.PLAYLIST_ITEMS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.POSITION_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.RECENT_MEDIA_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.RESUME_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SEARCH_ITEMS_ACTION_ID
-import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SEARCH_QUERY_ARG
 import com.github.anrimian.musicplayer.infrastructure.service.media_browser.AppMediaBrowserService.Companion.SHUFFLE_ALL_AND_PLAY_ACTION_ID
 import com.github.anrimian.musicplayer.infrastructure.service.music.CompositionSourceModelHelper
 import com.github.anrimian.musicplayer.infrastructure.service.music.MusicService
@@ -424,10 +417,17 @@ class MediaSessionHandler(
                 PlaybackStateCompat.STATE_PAUSED
             }
         }
+        // 0f is required by the PlaybackStateCompat contract when the state is not STATE_PLAYING
+        val playbackSpeed = if (playerState == PlaybackStateCompat.STATE_PLAYING) {
+            playbackState.playbackSpeed
+        } else {
+            0f
+        }
         playbackStateBuilder.setState(
             playerState,
             playbackState.trackPosition,
-            playbackState.playbackSpeed)
+            playbackSpeed
+        )
     }
 
     private class MetadataState {
@@ -542,7 +542,8 @@ class MediaSessionHandler(
         }
 
         override fun onPlayFromMediaId(mediaId: String, extras: Bundle) {
-            when(mediaId) {
+            val parts = mediaId.split(DELIMITER)
+            when(val action = parts.first()) {
                 RESUME_ACTION_ID,
                 RECENT_MEDIA_ACTION_ID -> SystemServiceControllerImpl.startPlayForegroundService(context)
                 PAUSE_ACTION_ID -> libraryPlayerInteractor.pause()
@@ -552,52 +553,56 @@ class MediaSessionHandler(
                         .subscribe({}, this::processError)
                 }
                 COMPOSITIONS_ACTION_ID -> {
-                    val position = extras.getInt(POSITION_ARG)
+                    val position = parts.getOrNull(1)?.toIntOrNull() ?: 0
                     actionDisposable = musicServiceInteractor.startPlayingFromCompositions(position)
                         .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 SEARCH_ITEMS_ACTION_ID -> {
-                    val position = extras.getInt(POSITION_ARG)
-                    val searchQuery = extras.getString(SEARCH_QUERY_ARG)
+                    val position = parts.getOrNull(1)?.toIntOrNull() ?: 0
+                    val searchQuery = if (parts.size >= 3) {
+                        val prefixToStrip = action + DELIMITER + parts[1] + DELIMITER
+                        val extracted = mediaId.substringAfter(prefixToStrip)
+                        extracted.ifEmpty { null }
+                    } else {
+                        null
+                    }
                     actionDisposable = musicServiceInteractor.playFromSearch(searchQuery, position)
                         .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 FOLDERS_ACTION_ID -> {
-                    var folderId: Long? = extras.getLong(FOLDER_ID_ARG)
-                    if (folderId == 0L) {
-                        folderId = null
-                    }
-                    val compositionId = extras.getLong(COMPOSITION_ID_ARG)
+                    val rawFolderId = parts.getOrNull(1)?.toLongOrNull() ?: 0L
+                    val folderId = if (rawFolderId == 0L) null else rawFolderId
+                    val compositionId = parts.getOrNull(2)?.toLongOrNull() ?: 0L
                     actionDisposable = musicServiceInteractor.play(folderId, compositionId)
                         .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 ARTIST_ITEMS_ACTION_ID -> {
-                    val artistId = extras.getLong(ARTIST_ID_ARG)
-                    val position = extras.getInt(POSITION_ARG)
+                    val artistId = parts.getOrNull(1)?.toLongOrNull() ?: 0L
+                    val position = parts.getOrNull(2)?.toIntOrNull() ?: 0
                     actionDisposable = musicServiceInteractor.startPlayingFromArtistCompositions(artistId, position)
                         .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 ALBUM_ITEMS_ACTION_ID -> {
-                    val albumId = extras.getLong(ALBUM_ID_ARG)
-                    val position = extras.getInt(POSITION_ARG)
+                    val albumId = parts.getOrNull(1)?.toLongOrNull() ?: 0L
+                    val position = parts.getOrNull(2)?.toIntOrNull() ?: 0
                     actionDisposable = musicServiceInteractor.startPlayingFromAlbumCompositions(albumId, position)
                         .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 GENRE_ITEMS_ACTION_ID -> {
-                    val genreId = extras.getLong(GENRE_ID_ARG)
-                    val position = extras.getInt(POSITION_ARG)
+                    val genreId = parts.getOrNull(1)?.toLongOrNull() ?: 0L
+                    val position = parts.getOrNull(2)?.toIntOrNull() ?: 0
                     actionDisposable = musicServiceInteractor.startPlayingFromGenreCompositions(genreId, position)
                         .observeOn(uiScheduler)
                         .subscribe({}, this::processError)
                 }
                 PLAYLIST_ITEMS_ACTION_ID -> {
-                    val playlistId = extras.getLong(PLAYLIST_ID_ARG)
-                    val position = extras.getInt(POSITION_ARG)
+                    val playlistId = parts.getOrNull(1)?.toLongOrNull() ?: 0L
+                    val position = parts.getOrNull(2)?.toIntOrNull() ?: 0
                     actionDisposable = musicServiceInteractor.startPlayingFromPlaylistItems(playlistId, position)
                         .observeOn(uiScheduler)
                         .subscribe({}, this::processError)

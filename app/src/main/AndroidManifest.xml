@@ -23,6 +23,9 @@
     <!--prevent rare crash on some devices with notification display-->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
+    <!--from com.github.rongi.rotate_layout lib, cleanup after library remove-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
+
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
 
     <!-- support for tablets -->

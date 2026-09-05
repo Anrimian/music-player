@@ -50,6 +50,9 @@ class PlaylistsDaoWrapper(
         compositionsIds: List<Long>
     ): Long {
         return libraryDatabase.runInTransaction<Long> {
+            if (playListDao.isPlayListWithNameExists(name)) {
+                throw PlaylistAlreadyExistsException()
+            }
             val playlistId = playListDao.insertPlaylist(null, name, addedTime, modifiedTime)
             insertPlayListEntries(playlistId, compositionsIds)
             playlistId

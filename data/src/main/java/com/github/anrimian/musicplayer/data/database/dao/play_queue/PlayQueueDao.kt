@@ -62,6 +62,9 @@ interface PlayQueueDao {
     @Query("SELECT shuffledPosition FROM play_queue WHERE id = :id")
     fun getShuffledPosition(id: Long): Int
 
+    @Query("SELECT exists(SELECT 1 FROM play_queue WHERE id = :id)")
+    fun exists(id: Long): Boolean
+
     @Query("SELECT * FROM play_queue WHERE id = :id")
     fun getItem(id: Long): PlayQueueEntity
 

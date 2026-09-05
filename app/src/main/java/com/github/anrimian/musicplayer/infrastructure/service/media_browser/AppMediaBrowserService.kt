@@ -34,22 +34,6 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 
-//TODO crash on android 12: foreground service not allowed to start
-// How to reproduce: start google assistant in driving mode,
-//  start play(from main screen or from app suggestions screen(open app from list, first screen)
-//            (do not use app browser screens)
-//  play, stop. Wait until media browser service will be unbound, play -> crash
-//  NOTE: crash happens when there are no bound services
-//  NOTE: If session was released - all starts normally
-//  A1: do not stop service when after latest bind time had passed less than 1h(configurable in advanced settings)
-//     ++! Check bind on assistant main screen
-//     ! Won't work because bind called not only here, also after widget start and so on
-//     + Keep service time setting for lower android versions(disabled by default)
-//   A2: when unbind or ondestroy was called and second service is not in foreground - release media session
-//    ! crash will disappear, but player panel in assistant will be closed too
-//    ? can we set media session in such state when service will be bound again
-//   A3: do something with media session before service launch?
-
 //strange initial state(random? just in case of install while android auto is active?)
 
 //later improvements:
@@ -426,20 +410,15 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         composition: Composition,
         searchQuery: String?
     ) = actionItem(
-        SEARCH_ITEMS_ACTION_ID,
+        "$SEARCH_ITEMS_ACTION_ID$DELIMITER$position$DELIMITER${searchQuery ?: ""}",
         formatCompositionName(composition),
-        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
-        Bundle().apply {
-            putInt(POSITION_ARG, position)
-            putString(SEARCH_QUERY_ARG, searchQuery)
-        }
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition)
     )
 
     private fun toActionItem(position: Int, composition: Composition) = actionItem(
-        COMPOSITIONS_ACTION_ID,
+        "$COMPOSITIONS_ACTION_ID$DELIMITER$position",
         formatCompositionName(composition),
-        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
-        Bundle().apply { putInt(POSITION_ARG, position) }
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition)
     )
 
     private fun toActionItem(volume: Volume) = browsableItem(
@@ -459,14 +438,11 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
             }
             is CompositionFileSource -> {
                 val composition = fileSource.composition
+                val fId = folderId ?: 0L
                 actionItem(
-                    FOLDERS_ACTION_ID,
+                    "$FOLDERS_ACTION_ID$DELIMITER$fId$DELIMITER${composition.id}",
                     formatCompositionName(composition),
-                    formatCompositionAdditionalInfoForMediaBrowser(this, composition),
-                    Bundle().apply {
-                        putLong(COMPOSITION_ID_ARG, composition.id)
-                        putLong(FOLDER_ID_ARG, folderId ?: 0)
-                    }
+                    formatCompositionAdditionalInfoForMediaBrowser(this, composition)
                 )
             }
             else -> throw IllegalStateException()
@@ -474,33 +450,21 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     }
 
     private fun toActionArtistItem(position: Int, composition: Composition, artistId: Long) = actionItem(
-        ARTIST_ITEMS_ACTION_ID,
+        "$ARTIST_ITEMS_ACTION_ID$DELIMITER$artistId$DELIMITER$position",
         formatCompositionName(composition),
-        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
-        Bundle().apply {
-            putInt(POSITION_ARG, position)
-            putLong(ARTIST_ID_ARG, artistId)
-        }
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition)
     )
 
     private fun toActionAlbumItem(position: Int, composition: Composition, albumId: Long) = actionItem(
-        ALBUM_ITEMS_ACTION_ID,
+        "$ALBUM_ITEMS_ACTION_ID$DELIMITER$albumId$DELIMITER$position",
         formatCompositionName(composition),
-        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
-        Bundle().apply {
-            putInt(POSITION_ARG, position)
-            putLong(ALBUM_ID_ARG, albumId)
-        }
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition)
     )
 
     private fun toActionGenreItem(position: Int, composition: Composition, genreId: Long) = actionItem(
-        GENRE_ITEMS_ACTION_ID,
+        "$GENRE_ITEMS_ACTION_ID$DELIMITER$genreId$DELIMITER$position",
         formatCompositionName(composition),
-        formatCompositionAdditionalInfoForMediaBrowser(this, composition),
-        Bundle().apply {
-            putInt(POSITION_ARG, position)
-            putLong(GENRE_ID_ARG, genreId)
-        }
+        formatCompositionAdditionalInfoForMediaBrowser(this, composition)
     )
 
     private fun toActionPlaylistItem(
@@ -509,13 +473,9 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         playlistId: Long
     ): MediaBrowserCompat.MediaItem {
         return actionItem(
-            PLAYLIST_ITEMS_ACTION_ID,
+            "$PLAYLIST_ITEMS_ACTION_ID$DELIMITER$playlistId$DELIMITER$position",
             formatCompositionName(playlistEntry),
-            formatCompositionAdditionalInfoForMediaBrowser(this, playlistEntry),
-            Bundle().apply {
-                putInt(POSITION_ARG, position)
-                putLong(PLAYLIST_ID_ARG, playlistId)
-            }
+            formatCompositionAdditionalInfoForMediaBrowser(this, playlistEntry)
         )
     }
 
@@ -549,14 +509,12 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
     private fun actionItem(
         mediaId: String,
         title: CharSequence?,
-        subtitle: CharSequence? = null,
-        extras: Bundle? = null
+        subtitle: CharSequence? = null
     ) = MediaBrowserCompat.MediaItem(
         MediaDescriptionCompat.Builder()
             .setTitle(title)
             .setMediaId(mediaId)
             .setSubtitle(subtitle)
-            .setExtras(extras)
             .build(),
         MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
     )
@@ -566,14 +524,12 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
 
     private fun browsableItem(mediaId: String,
                               title: CharSequence?,
-                              subtitle: CharSequence? = null,
-                              extras: Bundle? = null
+                              subtitle: CharSequence? = null
     ) = MediaBrowserCompat.MediaItem(
         MediaDescriptionCompat.Builder()
             .setTitle(title)
             .setMediaId(mediaId)
             .setSubtitle(subtitle)
-            .setExtras(extras)
             .build(),
         MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
     )
@@ -595,15 +551,6 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         const val PLAYLIST_ITEMS_ACTION_ID = "playlist_items_action_id"
         const val SEARCH_ITEMS_ACTION_ID = "search_items_action_id"
 
-        const val POSITION_ARG = "position_arg"
-        const val COMPOSITION_ID_ARG = "composition_id_arg"
-        const val FOLDER_ID_ARG = "folder_id_arg"
-        const val ARTIST_ID_ARG = "artist_id_arg"
-        const val ALBUM_ID_ARG = "album_id_arg"
-        const val GENRE_ID_ARG = "genre_id_arg"
-        const val PLAYLIST_ID_ARG = "playlist_id_arg"
-        const val SEARCH_QUERY_ARG = "search_query_arg"
-
         private const val ROOT_ID = "root_id"
         private const val RECENT_MEDIA_ROOT_ID = "recent_media_root_id"
 
@@ -618,7 +565,7 @@ class AppMediaBrowserService: MediaBrowserServiceCompat() {
         private const val GENRE_ITEMS_NODE_ID = "genre_items_node_id"
         private const val PLAYLIST_ITEMS_NODE_ID = "playlist_items_node_id"
 
-        const val DELIMITER = '-'
+        const val DELIMITER = '|'
     }
 
 }

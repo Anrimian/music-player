@@ -16,6 +16,7 @@ class AboutTextBinderImpl : AboutTextBinder {
         val context = fragment.requireContext()
         val aboutText = context.getString(
             R.string.about_app_text,
+            context.linkify("", R.string.main_version, R.string.main_app_play_store_link),
             context.linkify("mailto:", R.string.about_app_text_write, R.string.feedback_email),
             context.linkify("", R.string.privacy_policy, R.string.privacy_policy_link),
             context.linkify("", R.string.about_app_text_crowdin, R.string.crowdin_link),

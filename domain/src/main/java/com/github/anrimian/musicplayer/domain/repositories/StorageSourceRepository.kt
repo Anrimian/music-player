@@ -4,7 +4,6 @@ import com.github.anrimian.musicplayer.domain.models.composition.content.Composi
 import com.github.anrimian.musicplayer.domain.models.composition.source.CompositionSource
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
-import java.io.FileDescriptor
 
 interface StorageSourceRepository {
 
@@ -25,5 +24,5 @@ interface StorageSourceRepository {
 
     fun getCompositionArtworkBinaryData(compositionId: Long): Maybe<ByteArray>
 
-    fun getCompositionFileDescriptor(compositionId: Long): FileDescriptor
+    fun getCompositionUri(compositionId: Long): String
 }

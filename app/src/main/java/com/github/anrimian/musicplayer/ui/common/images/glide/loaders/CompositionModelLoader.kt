@@ -1,21 +1,21 @@
 package com.github.anrimian.musicplayer.ui.common.images.glide.loaders
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import androidx.core.net.toUri
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.data.DataFetcher
-import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.repositories.StorageSourceRepository
 import com.github.anrimian.musicplayer.ui.common.images.glide.util.AppModelLoader
 import com.github.anrimian.musicplayer.ui.common.images.models.CompositionImage
-import com.github.anrimian.musicplayer.ui.utils.ImageUtils
+import java.io.ByteArrayInputStream
 import java.io.IOException
+import java.io.InputStream
 
 class CompositionModelLoader(
     private val context: Context,
-    private val storageSourceRepository: StorageSourceRepository
-) : AppModelLoader<CompositionImage, Bitmap>() {
+    private val storageSourceRepository: StorageSourceRepository,
+) : AppModelLoader<CompositionImage, InputStream>() {
 
     override fun getModelKey(model: CompositionImage): Any {
         return model
@@ -24,7 +24,7 @@ class CompositionModelLoader(
     override fun loadData(
         model: CompositionImage,
         priority: Priority,
-        callback: DataFetcher.DataCallback<in Bitmap>
+        callback: DataFetcher.DataCallback<in InputStream>,
     ) {
         var mmr: MediaMetadataRetriever? = null
         try {
@@ -34,16 +34,16 @@ class CompositionModelLoader(
 
             if (imageBytes == null) {
                 mmr = MediaMetadataRetriever()
-                mmr.setDataSource(storageSourceRepository.getCompositionFileDescriptor(id))
+                val uriString = storageSourceRepository.getCompositionUri(id)
+                mmr.setDataSource(context, uriString.toUri())
                 imageBytes = mmr.embeddedPicture
             }
 
-            var bitmap: Bitmap? = null
             if (imageBytes != null) {
-                val coverSize = context.resources.getInteger(R.integer.icon_image_full_size)
-                bitmap = ImageUtils.decodeBitmap(imageBytes, coverSize)
+                callback.onDataReady(ByteArrayInputStream(imageBytes))
+            } else {
+                callback.onDataReady(null)
             }
-            callback.onDataReady(bitmap)
         } catch (e: Exception) {
             callback.onLoadFailed(e)
         } finally {

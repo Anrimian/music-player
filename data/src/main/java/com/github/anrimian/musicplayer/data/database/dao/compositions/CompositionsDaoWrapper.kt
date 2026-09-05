@@ -535,6 +535,12 @@ class CompositionsDaoWrapper(
     ): Boolean {
         return libraryDatabase.runInTransaction<Boolean> {
             val id = composition.id
+
+            // file was read outside of this transaction, so composition can be deleted meanwhile
+            if (!compositionsDao.exists(id)) {
+                return@runInTransaction false
+            }
+
             val tags = fileInfo.audioTags
 
             var wasChanges = false

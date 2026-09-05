@@ -31,23 +31,18 @@ public class NotificationsDisplayerImpl implements NotificationsDisplayer {
     public NotificationsDisplayerImpl(Context context) {
         this.context = context;
         this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel errorChannel = new NotificationChannel(ERROR_CHANNEL_ID,
-                    context.getString(R.string.error_channel_description),
-                    NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(errorChannel);
-        }
     }
 
     @Override
     public void showErrorNotification(@StringRes int errorMessageId) {
+        createErrorNotificationChannel();
         notificationManager.notify(ERROR_NOTIFICATION_ID, getErrorNotification(errorMessageId));
     }
 
     @Override
     public void startForegroundErrorNotification(Service service,
                                                  @StringRes int errorMessageId) {
+        createErrorNotificationChannel();
         Notification notification = getErrorNotification(errorMessageId);
         startMediaPlaybackForeground(service, ERROR_NOTIFICATION_ID, notification);
     }
@@ -55,6 +50,15 @@ public class NotificationsDisplayerImpl implements NotificationsDisplayer {
     @Override
     public void removeErrorNotification() {
         notificationManager.cancel(ERROR_NOTIFICATION_ID);
+    }
+
+    private void createErrorNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel errorChannel = new NotificationChannel(ERROR_CHANNEL_ID,
+                    context.getString(R.string.error_channel_description),
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(errorChannel);
+        }
     }
 
     private Notification getErrorNotification(@StringRes int errorMessageId) {

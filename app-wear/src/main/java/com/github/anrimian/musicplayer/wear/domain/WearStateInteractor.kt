@@ -299,7 +299,7 @@ class WearStateInteractor(
 
     private fun startTrackPositionObservable() {
         trackPositionDisposable = Observable.interval(0, 1, TimeUnit.SECONDS)
-            .map { getCurrentTrackPosition() + 1 }
+            .map { getCurrentTrackPosition() + 1000 }
             .subscribe(trackPositionSubject::onNext)
     }
 

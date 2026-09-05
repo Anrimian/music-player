@@ -12,7 +12,6 @@ import com.github.anrimian.musicplayer.domain.repositories.StorageSourceReposito
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
-import java.io.FileDescriptor
 import java.util.concurrent.TimeUnit
 
 private const val STORAGE_TIMEOUT_SECONDS = 3L
@@ -59,9 +58,9 @@ class StorageSourceRepositoryImpl(
             .flatMap(compositionSourceEditor::getCompositionArtworkBinaryData)
     }
 
-    override fun getCompositionFileDescriptor(compositionId: Long): FileDescriptor {
+    override fun getCompositionUri(compositionId: Long): String {
         val storageId = compositionsDao.requireStorageId(compositionId)
-        return systemAudioCatalogProvider.getFileDescriptor(storageId)
+        return systemAudioCatalogProvider.getCompositionUri(storageId).toString()
     }
 
     private fun getStorageCompositionSource(compositionId: Long): Maybe<CompositionContentSource> {

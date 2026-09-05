@@ -32,7 +32,6 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.io.File
-import java.io.FileDescriptor
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
@@ -437,19 +436,6 @@ class SystemAudioCatalogProvider(
 
     fun getCompositionStream(id: Long): InputStream {
         return contentResolver.openInputStream(getCompositionUri(id)) ?: throw FileNotFoundException()
-    }
-
-    fun getFileDescriptor(uri: Uri): FileDescriptor {
-        val fd = contentResolver.openFileDescriptor(uri, "r")
-            ?: throw RuntimeException("file descriptor not found")
-        return fd.fileDescriptor
-    }
-
-    fun getFileDescriptor(id: Long): FileDescriptor {
-        val uri = getCompositionUri(id)
-        val fd = contentResolver.openFileDescriptor(uri, "r")
-            ?: throw RuntimeException("file descriptor not found")
-        return fd.fileDescriptor
     }
 
     fun openCompositionOutputStream(id: Long?): OutputStream? {

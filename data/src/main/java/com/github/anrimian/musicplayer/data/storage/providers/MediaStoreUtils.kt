@@ -103,6 +103,11 @@ class FileVolume(val storageKey: String, val path: String, val isPrimary: Boolea
 
 object MediaStoreUtils {
 
+    // Value of MediaStore.VOLUME_EXTERNAL_PRIMARY inlined as a literal: that field is annotated
+    // @RequiresApi(29), but the volume name is a frozen API contract and we reference it from
+    // fallback branches that run down to API 24, where the constant would trip the NewApi lint.
+    private const val VOLUME_EXTERNAL_PRIMARY = "external_primary"
+
     @JvmStatic
     fun checkIfMediaStoreAvailable(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -154,15 +159,43 @@ object MediaStoreUtils {
                     continue
                 }
                 val volumeDir = volume.directory
+                var path: String? = null
                 if (volumeDir != null) {
+                    path = volumeDir.absolutePath.trimStart('/')
+                } else if (volume.isPrimary) {
+                    path = Environment.getExternalStorageDirectory().absolutePath.trimStart('/')
+                } else {
+                    val rawPath = try {
+                        val getPathMethod = volume.javaClass.getMethod("getPath")
+                        getPathMethod.invoke(volume) as? String
+                    } catch (_: Exception) {
+                        null
+                    }
+                    if (rawPath != null) {
+                        val rootFile = File(rawPath)
+                        path = try {
+                            rootFile.canonicalPath.trimStart('/')
+                        } catch (_: IOException) {
+                            rootFile.absolutePath.trimStart('/')
+                        }
+                    }
+                }
+
+                if (path != null) {
+                    // The key is matched against MediaStore's Media.VOLUME_NAME, which is always
+                    // lower case. FAT uuids come back upper case from StorageVolume ("1A2B-3C4D"),
+                    // so a raw uuid key would never match the cursor's volume name. storageKey below
+                    // must stay in the original case — getVolumeDisplayName compares it to the raw
+                    // StorageVolume.uuid.
                     val key = volume.mediaStoreVolumeName
-                        ?: if (volume.isPrimary) MediaStore.VOLUME_EXTERNAL_PRIMARY else volumeDir.name
-                    val path = volumeDir.absolutePath.trimStart('/')
+                        ?: if (volume.isPrimary) MediaStore.VOLUME_EXTERNAL_PRIMARY else volume.uuid?.lowercase() ?: path
                     val storageKey = volume.uuid ?: path
                     volumes[key] = FileVolume(storageKey, path, volume.isPrimary)
                 }
             }
-            return volumes
+            if (volumes.isNotEmpty()) {
+                return volumes
+            }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // StorageManager is the authoritative volume source — getExternalFilesDirs
@@ -188,7 +221,15 @@ object MediaStoreUtils {
                     rootFile.absolutePath.trimStart('/')
                 }
                 val isPrimary = storageVolume.isPrimary
-                val key = if (isPrimary) "external" else (storageVolume.uuid ?: path)
+                // Key must match MediaStore's Media.VOLUME_NAME when this block is reached as an
+                // R+ fallthrough: "external_primary" for primary, lower-cased uuid for removable
+                // volumes (see the R block above). "external" is only a query target, never a row's
+                // VOLUME_NAME value, so it must not be used as a key here.
+                val key = if (isPrimary) {
+                    VOLUME_EXTERNAL_PRIMARY
+                } else {
+                    storageVolume.uuid?.lowercase() ?: path
+                }
                 volumes[key] = FileVolume(path, path, isPrimary)
             }
             if (volumes.isNotEmpty()) {
@@ -205,8 +246,10 @@ object MediaStoreUtils {
             val root = heuristicLookupForVolumeRoot(dir)
             if (root != null) {
                 val isPrimary = Environment.isExternalStorageEmulated(root)
+                // "external_primary" matches MediaStore's Media.VOLUME_NAME for primary storage on
+                // an R+ fallthrough ("external" is only a query target, never a row value).
                 val key = if (isPrimary) {
-                    "external"
+                    VOLUME_EXTERNAL_PRIMARY
                 } else {
                     getVolumeName(context, root, storageManager)
                 }

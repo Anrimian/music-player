@@ -412,6 +412,9 @@ interface CompositionsDao {
     @Query("UPDATE compositions SET storageId = :storageId WHERE id = :id")
     fun updateStorageId(id: Long, storageId: Long?)
 
+    @Query("SELECT exists(SELECT 1 FROM compositions WHERE id = :id)")
+    fun exists(id: Long): Boolean
+
     @Query("SELECT id FROM compositions WHERE storageId = :storageId")
     fun selectIdByStorageId(storageId: Long): Long
 

@@ -399,8 +399,18 @@ class PlaylistDetailsViewModel(
 
     private fun LongArray.locateCompositions(): List<CompositionModel> {
         val currentItems = currentState.playlistItems.data ?: return emptyList()
-        val sourceIdsSet = this.toSet()
-        return currentItems.filter { playlistEntry -> playlistEntry.id in sourceIdsSet }
+        val remainingIds = this.toMutableSet()
+        val result = ArrayList<CompositionModel>(remainingIds.size)
+
+        for (item in currentItems) {
+            if (remainingIds.remove(item.id)) {
+                result.add(item)
+                if (remainingIds.isEmpty()) {
+                    break
+                }
+            }
+        }
+        return result
     }
 
 }

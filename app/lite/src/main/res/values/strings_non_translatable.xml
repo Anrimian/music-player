@@ -5,24 +5,24 @@
 
     <string name="about_app_text" translatable="false"><![CDATA[
         <big><b>What is this app?</b></big>
-        <br/>This is a music player that I wrote for myself, in accordance with my vision of how a music player should look like.
-        <br/>If you find an error, %1$s about it.
-        <br/>If you feel that some features are missing, %1$s about it, but I can\'t promise that it will necessarily be implemented. Usually it happens after a while.
+        <br/>This is a music player that I wrote for myself, in accordance with my vision of how a music player should look like. It comes in two versions: this offline one has no cloud sync and no internet permission at all. Optional cloud sync lives in the %1$s.
+        <br/>If you find an error, %2$s about it.
+        <br/>If you feel that some features are missing, %2$s about it, but I can\'t promise that it will necessarily be implemented. Usually it happens after a while.
         <br/>
         <br/><big><b>Is this app completely free?</b></big>
         <br/>Yes, no ads, no in-app purchases. Perhaps if this app becomes highly popular there could be implemented some paid non-essential features, but there definitely won\'t be ads or lock existing functionality.
         <br/>
         <br/><big><b>Has this app any analytics or data collection?</b></big>
         <br/>No analytics or something else. This app even hasn\'t internet connection permission. (At least until implementation features that requires internet connection.)
-        <br/>%2$s.
+        <br/>%3$s.
         <br/>
         <br/><big><b>Translations</b></big>
-        <br/>All translations are provided by users. If you spot a mistake or want to help translate the app into your language, you can %3$s.
+        <br/>All translations are provided by users. If you spot a mistake or want to help translate the app into your language, you can %4$s.
         <br/>
         <br/><big><b>Source code</b></big>
-        <br/>Application source code is can be viewed %4$s. Also there can be viewed app known issues/plans.
+        <br/>Application source code is can be viewed %5$s. Also there can be viewed app known issues/plans.
         <br/>
-        <br/>%5$s
+        <br/>%6$s
         <br/>
         <br/><big>----------------------------------------------</b></big>
         <br/><big><b>Frequently Asked Questions</b></big>
@@ -35,7 +35,7 @@
         <br/>Bottom panel can be opened by click or gesture. These buttons are placed there.
         <br/>
         <br/><big><b>Music pauses by itself for unknown reason</b></big>
-        <br/>This app will pause playback if another application requests to play sound. Some apps, however, might request this \'unfairly\' due to their own internal logic. You can prevent this app from automatically pausing in these situations %6$s.
+        <br/>This app will pause playback if another application requests to play sound. Some apps, however, might request this \'unfairly\' due to their own internal logic. You can prevent this app from automatically pausing in these situations %7$s.
         <br/>
     ]]>
     </string>

@@ -58,22 +58,22 @@ object CompositionSourceModelHelper {
                     uriStr = uri.toString()
                 }
                 metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr)
-                mediaSession.setMetadata(metadataBuilder.build())
+                mediaSession.setSafeMetadata(metadataBuilder)
             })
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 cancellations.add(imageLoader.loadMediaSessionImage(composition) { bitmap: Bitmap? ->
                     putBitmapToMetadata(metadataBuilder, bitmap)
-                    mediaSession.setMetadata(metadataBuilder.build())
+                    mediaSession.setSafeMetadata(metadataBuilder)
                 })
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null)
-                mediaSession.setMetadata(metadataBuilder.build())
+                mediaSession.setSafeMetadata(metadataBuilder)
             } else {
                 //uri doesn't work for lock screen background, so put it here
                 cancellations.add(imageLoader.loadImage(composition) { bitmap: Bitmap? ->
                     putBitmapToMetadata(metadataBuilder, bitmap)
-                    mediaSession.setMetadata(metadataBuilder.build())
+                    mediaSession.setSafeMetadata(metadataBuilder)
                 })
             }
         }
@@ -84,22 +84,22 @@ object CompositionSourceModelHelper {
                     uriStr = uri.toString()
                 }
                 metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, uriStr)
-                mediaSession.setMetadata(metadataBuilder.build())
+                mediaSession.setSafeMetadata(metadataBuilder)
             })
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 cancellations.add(imageLoader.loadMediaSessionImage(source) { bitmap: Bitmap? ->
                     putBitmapToMetadata(metadataBuilder, bitmap)
-                    mediaSession.setMetadata(metadataBuilder.build())
+                    mediaSession.setSafeMetadata(metadataBuilder)
                 })
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null)
-                mediaSession.setMetadata(metadataBuilder.build())
+                mediaSession.setSafeMetadata(metadataBuilder)
             } else {
                 //uri doesn't work for lock screen background, so put it here
                 cancellations.add(imageLoader.loadImage(source) { bitmap: Bitmap? ->
                     putBitmapToMetadata(metadataBuilder, bitmap)
-                    mediaSession.setMetadata(metadataBuilder.build())
+                    mediaSession.setSafeMetadata(metadataBuilder)
                 })
             }
         }
@@ -134,7 +134,7 @@ object CompositionSourceModelHelper {
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, composition.duration)
                 .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNumber)
                 .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, totalTracks)
-            mediaSession.setMetadata(builder.build())
+            mediaSession.setSafeMetadata(builder)
             return
         }
         if (source is ExternalCompositionSource) {
@@ -150,7 +150,7 @@ object CompositionSourceModelHelper {
                     FormatUtils.formatAuthor(source.artist, context).toString()
                 )
                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, source.duration)
-            mediaSession.setMetadata(builder.build())
+            mediaSession.setSafeMetadata(builder)
             return
         }
         mediaSession.setMetadata(null)
@@ -164,6 +164,29 @@ object CompositionSourceModelHelper {
             metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap)
         } else {
             metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null)
+        }
+    }
+
+    private fun MediaSessionCompat.setSafeMetadata(metadataBuilder: MediaMetadataCompat.Builder) {
+        val metadata = metadataBuilder.build()
+        val bitmap = metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ART)
+        
+        if (bitmap != null && bitmap.isRecycled) {
+            val activeBitmap = controller.metadata?.getBitmap(MediaMetadataCompat.METADATA_KEY_ART)
+            if (activeBitmap != null && !activeBitmap.isRecycled) {
+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, activeBitmap)
+            } else {
+                metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null)
+            }
+        }
+        
+        try {
+            setMetadata(metadataBuilder.build())
+        } catch (_: IllegalArgumentException) {
+            metadataBuilder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, null)
+            try {
+                setMetadata(metadataBuilder.build())
+            } catch (_: Exception) {}
         }
     }
 }

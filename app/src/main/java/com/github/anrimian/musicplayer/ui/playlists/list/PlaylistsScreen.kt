@@ -40,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.anrimian.musicplayer.R
 import com.github.anrimian.musicplayer.domain.models.playlist.Playlist
-import com.github.anrimian.musicplayer.domain.models.utils.ListPosition
 import com.github.anrimian.musicplayer.ui.common.compose.Dimens
 import com.github.anrimian.musicplayer.ui.common.compose.PreviewAppTheme
 import com.github.anrimian.musicplayer.ui.common.compose.components.AppFastScroller
@@ -168,7 +167,6 @@ fun PlaylistsScreen(
         onPlaylistMenuItemClicked = viewModel::onPlaylistMenuItemClicked,
         onCreatePlaylistButtonClicked = viewModel::onCreatePlaylistButtonClicked,
         onTryAgainButtonClicked = viewModel::onTryAgainButtonClicked,
-        onStop = viewModel::onStop,
         snackbarHost = { AppSnackbarHost(snackbarHostState) },
     )
 }
@@ -183,12 +181,9 @@ private fun PlaylistsScreenContent(
     onPlaylistMenuItemClicked: (AppMenuItem, Playlist) -> Unit,
     onCreatePlaylistButtonClicked: () -> Unit,
     onTryAgainButtonClicked: () -> Unit,
-    onStop: (ListPosition) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHost: @Composable () -> Unit = {},
 ) {
-    listState.attachStopCallback(onStop)
-
     val (isFabVisible, fabNestedScrollConnection) = rememberScrollingFabVisibility(listState)
 
     AppScaffold(
@@ -445,7 +440,6 @@ private fun PlaylistsScreenContentPreview() {
             onPlaylistMenuItemClicked = { _, _ -> },
             onCreatePlaylistButtonClicked = {},
             onTryAgainButtonClicked = {},
-            onStop = {},
         )
     }
 }

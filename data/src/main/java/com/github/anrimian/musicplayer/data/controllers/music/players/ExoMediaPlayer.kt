@@ -8,6 +8,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
 import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.SonicAudioProcessor
 import androidx.media3.datasource.DefaultDataSource
@@ -124,7 +125,14 @@ class ExoMediaPlayer(
     override fun seekTo(position: Long) {
         Completable.fromRunnable {
             try {
+                val wasEnded = player.playbackState == Player.STATE_ENDED
                 player.seekTo(position)
+                // Xiaomi HyperOS fix: explicit playWhenReady toggle is required to re-prime the hardware AudioTrack
+                // when seeking from STATE_ENDED, otherwise playback remains silent.
+                if (wasEnded && player.playWhenReady) {
+                    player.playWhenReady = false
+                    player.playWhenReady = true
+                }
             } catch (_: IndexOutOfBoundsException) { //crash inside exoplayer
                 return@fromRunnable
             }

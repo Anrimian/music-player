@@ -77,7 +77,7 @@ class LibraryFoldersPresenter(
         subscribeOnRepeatMode()
         subscribeOnMoveEnabledState()
         syncInteractor.getFilesSyncStateObservable()
-            .unsafeSubscribeOnUi(viewState::showFilesSyncState)
+            .subscribeOnUi(viewState::showFilesSyncState, errorParser::logError)
     }
 
     fun onStop(listPosition: ListPosition) {
