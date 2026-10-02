@@ -6,7 +6,7 @@ A music player for Android that I wrote for myself, in accordance with my vision
 
 ## Two versions
 
-**Simple Music Player** is the main app. It plays music from your device, and can optionally sync your audio library with cloud storage.
+**Simple Music Player** is the main app. It plays music from your device, and can optionally sync your audio library with cloud storage. Dropbox syncing is free; Google Drive and other cloud storages need a subscription. The player itself is never locked, and there are no ads.
 
 <a href='https://play.google.com/store/apps/details?id=com.github.anrimian.musicplayer&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height=65px/></a>
 
