@@ -36,7 +36,7 @@ If your language is missing from the list, write to me and I'll add it.
 
 ## Credits
 
-Loui's - Portuguese localization\
+Gabriel Kwiecinski Antunes & Loui's - Portuguese localization\
 Ronny Hernandez - Spanish localization\
 SiltyNiKE - Ukrainian localization\
 Petr Knyttl - Czech localization\
